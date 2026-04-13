@@ -672,7 +672,7 @@ const handleMercadoPago = async () => {
       `\nTotal: ${formatPrice(total)}`
   )}`}
   target="_blank"
-  className="flex items-center justify-center gap-2 mt-3 bg-green-600 hover:bg-green-700 transition text-white py-2 rounded-xl"
+  className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
 >
   Contactar por WhatsApp
 </a>
