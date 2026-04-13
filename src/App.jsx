@@ -677,7 +677,7 @@ const handleMercadoPago = async () => {
       target="_blank"
       className="block mt-3 bg-green-500 text-white text-center py-2 rounded-xl"
     >
-      Finalizar compra
+      🟢 Contactar por WhatsApp
     </a>
   </>
 )}
