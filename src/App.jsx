@@ -612,12 +612,13 @@ const handleMercadoPago = async () => {
 		 {/* BOTÓN WHATSAPP */}
                   <a
                     href={`${WHATSAPP}?text=${encodeURIComponent(
-                      `Hola! Quiero comprar:\n${product.name}\n${size || ""}\nPrecio: ${price ? formatPrice(price) : ""}`
+                      `Hola! Me interesa este producto 🐶:\n${product.name}\n${size || ""}\nPrecio: ${price ? formatPrice(price) : ""}`
                     )}`}
 		  target="_blank"
-                    className="border text-center py-2 rounded-xl"
+                    className="bg-green-500 text-white flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-green-600 transition"
                   >
-                    Comprar
+                    <img src="/whatsapp.png" className="w-5 h-5" />
+  		    Consultar por WhatsApp
                   </a>
                 </div>
                   
