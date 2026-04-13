@@ -617,8 +617,8 @@ const handleMercadoPago = async () => {
 		  target="_blank"
                     className="bg-green-500 text-white flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-green-600 transition"
                   >
-                    <img src="/whatsapp.png" className="w-5 h-5" />
-  		    Consultar por WhatsApp
+                    <MessageCircle size={18} />
+  		Consultar por WhatsApp
                   </a>
                 </div>
                   
