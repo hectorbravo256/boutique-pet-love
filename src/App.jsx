@@ -1,7 +1,4 @@
-import {
-  ShoppingBag,
-  MessageCircle,
-} from "lucide-react";
+import { ShoppingBag, MessageCircle } from "lucide-react";
 
 import { useEffect, useState, useRef } from "react";
 
@@ -663,22 +660,23 @@ const handleMercadoPago = async () => {
     </button>
 
     {/* 🟢 WHATSAPP */}
-    <a
-      href={`${WHATSAPP}?text=${encodeURIComponent(
-        "Pedido:\n" +
-          cart
-            .map(
-              (i) =>
-                `${i.name} - ${i.size} - ${formatPrice(i.price)}`
-            )
-            .join("\n") +
-          `\nTotal: ${formatPrice(total)}`
-      )}`}
-      target="_blank"
-      className="block mt-3 bg-green-500 text-white text-center py-2 rounded-xl"
-    >
-      🟢 Contactar por WhatsApp
-    </a>
+   <a
+  href={`${WHATSAPP}?text=${encodeURIComponent(
+    "Pedido:\n" +
+      cart
+        .map(
+          (i) =>
+            `${i.name} - ${i.size} - ${formatPrice(i.price)}`
+        )
+        .join("\n") +
+      `\nTotal: ${formatPrice(total)}`
+  )}`}
+  target="_blank"
+  className="flex items-center justify-center gap-2 mt-3 bg-green-600 hover:bg-green-700 transition text-white py-2 rounded-xl"
+>
+  <MessageCircle size={18} />
+  Contactar por WhatsApp
+</a>
   </>
 )}
       </div>
