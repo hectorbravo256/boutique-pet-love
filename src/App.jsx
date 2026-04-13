@@ -674,7 +674,6 @@ const handleMercadoPago = async () => {
   target="_blank"
   className="flex items-center justify-center gap-2 mt-3 bg-green-600 hover:bg-green-700 transition text-white py-2 rounded-xl"
 >
-  <MessageCircle size={18} />
   Contactar por WhatsApp
 </a>
   </>
