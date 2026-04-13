@@ -344,7 +344,7 @@ const handleMercadoPago = async () => {
   }
 
   try {
-    const res = await fetch("/.netlify/functions/create-preference", {
+  const res = await fetch("/.netlify/functions/create-preference", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",

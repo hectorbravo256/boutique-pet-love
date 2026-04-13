@@ -6,15 +6,22 @@ const client = new MercadoPagoConfig({
 
 export const handler = async (event) => {
   try {
-    const { items } = JSON.parse(event.body);
+    const body = JSON.parse(event.body || "{}");
+
+    if (!body.items || body.items.length === 0) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No hay items" }),
+      };
+    }
 
     const preference = new Preference(client);
 
     const response = await preference.create({
       body: {
-        items: items.map((item) => ({
+        items: body.items.map((item) => ({
           title: item.name,
-          unit_price: item.price,
+          unit_price: Number(item.price),
           quantity: 1,
           currency_id: "CLP",
         })),
