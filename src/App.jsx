@@ -247,6 +247,15 @@ const products = [
 export default function App() {
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
+const [formData, setFormData] = useState({
+  nombre: "",
+  rut: "",
+  direccion: "",
+  comuna: "",
+  region: "",
+  observacion: "",
+});
+
   const [currentIndex, setCurrentIndex] = useState({});
   const touchStartRef = useRef({});
   const [zoomGallery, setZoomGallery] = useState(null);
@@ -664,14 +673,6 @@ const handleMercadoPago = async () => {
   Total: {formatPrice(totalFinal)}
 </p>
 
-const [formData, setFormData] = useState({
-  nombre: "",
-  rut: "",
-  direccion: "",
-  comuna: "",
-  region: "",
-  observacion: "",
-});
 
 <div className="mt-4 space-y-2">
 
