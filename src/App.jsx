@@ -1,4 +1,4 @@
-import { ShoppingBag, MessageCircle } from "lucide-react";
+import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 
 import { useEffect, useState, useRef } from "react";
 
@@ -605,9 +605,10 @@ const handleMercadoPago = async () => {
 		 {/* BOTÓN AGREGAR */}
                   <button
                     onClick={() => addToCart(product, size, price)}
-                    className="bg-pink-600 text-white py-2 rounded-xl"
+                    className="bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
                   >
-                    Agregar
+		  <ShoppingCart size={16} strokeWidth={2} />
+                    Agregar Carro
                   </button>
 		 {/* BOTÓN WHATSAPP */}
                   <a
