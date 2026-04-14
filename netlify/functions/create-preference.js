@@ -18,15 +18,19 @@ export const handler = async (event) => {
     const preference = new Preference(client);
 
     const response = await preference.create({
-      body: {
-        items: body.items.map((item) => ({
-          title: item.name,
-          unit_price: Number(item.price),
-          quantity: 1,
-          currency_id: "CLP",
-        })),
-      },
-    });
+  body: {
+    items: body.items.map((item) => ({
+      title: item.name,
+      unit_price: Number(item.price),
+      quantity: 1,
+      currency_id: "CLP",
+    })),
+
+    metadata: {
+      cliente: body.formData,
+    },
+  },
+});
 
     return {
       statusCode: 200,

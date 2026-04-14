@@ -349,15 +349,10 @@ const handleMercadoPago = async () => {
   headers: {
     "Content-Type": "application/json",
   },
-  body: JSON.stringify({
-    items: [
-  ...cart,
-  {
-    name: "Costo de envío",
-    price: shipping,
-  },
-],
-  }),
+ body: JSON.stringify({
+  items: cart,
+  formData,
+}),
 });
 
     const data = await res.json();
@@ -668,6 +663,55 @@ const handleMercadoPago = async () => {
 <p className="font-bold mt-2">
   Total: {formatPrice(totalFinal)}
 </p>
+
+const [formData, setFormData] = useState({
+  nombre: "",
+  rut: "",
+  direccion: "",
+  comuna: "",
+  region: "",
+  observacion: "",
+});
+
+<div className="mt-4 space-y-2">
+
+<input
+  placeholder="Nombre y Apellidos"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+/>
+
+<input
+  placeholder="RUT"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, rut: e.target.value})}
+/>
+
+<input
+  placeholder="Dirección de envío"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, direccion: e.target.value})}
+/>
+
+<input
+  placeholder="Comuna"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, comuna: e.target.value})}
+/>
+
+<input
+  placeholder="Región"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, region: e.target.value})}
+/>
+
+<textarea
+  placeholder="Observación / Referencia"
+  className="w-full border p-2 rounded"
+  onChange={(e) => setFormData({...formData, observacion: e.target.value})}
+/>
+
+</div>
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
