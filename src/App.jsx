@@ -334,6 +334,9 @@ useEffect(() => {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
+const shipping = cart.length > 0 ? 3500 : 0;
+const totalFinal = total + shipping;
+
 const handleMercadoPago = async () => {
   if (cart.length === 0) {
     alert("El carrito está vacío");
@@ -347,7 +350,13 @@ const handleMercadoPago = async () => {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    items: cart,
+    items: [
+  ...cart,
+  {
+    name: "Costo de envío",
+    price: shipping,
+  },
+],
   }),
 });
 
@@ -652,6 +661,14 @@ const handleMercadoPago = async () => {
       Total: {formatPrice(total)}
     </p>
 
+<p className="text-sm">
+  Envío: {formatPrice(shipping)}
+</p>
+
+<p className="font-bold mt-2">
+  Total: {formatPrice(totalFinal)}
+</p>
+
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
       onClick={handleMercadoPago}
@@ -670,7 +687,9 @@ const handleMercadoPago = async () => {
             `${i.name} - ${i.size} - ${formatPrice(i.price)}`
         )
         .join("\n") +
-      `\nTotal: ${formatPrice(total)}`
+      `\nSubtotal: ${formatPrice(total)}
+Envío: ${formatPrice(shipping)}
+Total: ${formatPrice(totalFinal)}`
   )}`}
   target="_blank"
   className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
