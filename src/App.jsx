@@ -343,7 +343,17 @@ useEffect(() => {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-const shipping = cart.length > 0 ? 3500 : 0;
+const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+const aplicaEnvio =
+  cart.length > 0 && regionesConEnvio.includes(formData.region);
+
+const shipping = aplicaEnvio ? 3500 : 0;
+
 const totalFinal = total + shipping;
 
 const handleMercadoPago = async () => {
@@ -692,8 +702,10 @@ if (!formData.region) {
       Total: {formatPrice(total)}
     </p>
 
-<p className="text-sm">
-  Envío: {formatPrice(shipping)}
+<p className="text-xs text-gray-500">
+  {aplicaEnvio
+    ? "Despacho a domicilio"
+    : "Envío por pagar vía Starken o Blue Express"}
 </p>
 
 <p className="font-bold mt-2">
