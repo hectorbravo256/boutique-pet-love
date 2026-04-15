@@ -946,10 +946,26 @@ Total: ${formatPrice(totalFinal)}`
           : prev.index - 1,
     }))
   }
-  className="absolute left-5 text-white text-3xl z-50"
+  className="absolute right-5 text-white text-3xl z-50 bg-black/40 px-3 py-1 rounded-full"
 >
   ◀
 </button>
+
+<button
+  onClick={() =>
+    setZoomGallery((prev) => ({
+      ...prev,
+      index:
+        prev.index === prev.images.length - 1
+          ? 0
+          : prev.index + 1,
+    }))
+  }
+  className="absolute right-5 text-white text-3xl z-50 bg-black/40 px-3 py-1 rounded-full"
+>
+  ▶
+</button>
+
   </div>
 )}
 
