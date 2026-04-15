@@ -1,7 +1,5 @@
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
-
 import { useEffect, useState, useRef } from "react";
-
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 
@@ -248,13 +246,15 @@ const products = [
   },
 ];
 
-export default function App() {
+
+function AppContent() {
   const navigate = useNavigate();
 
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
-const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState({
   nombre: "",
   rut: "",
   direccion: "",
@@ -266,12 +266,10 @@ const [formData, setFormData] = useState({
   const [currentIndex, setCurrentIndex] = useState({});
   const touchStartRef = useRef({});
   const [zoomGallery, setZoomGallery] = useState(null);
-// { images: [], index: 0 }
+  const zoomTouchStart = useRef(0);
 
-const zoomTouchStart = useRef(0);
-
-const handleTouchStart = (e, productId) => {
-  touchStartRef.current[productId] = e.touches[0].clientX;
+  const handleTouchStart = (e, productId) => {
+   touchStartRef.current[productId] = e.touches[0].clientX;
 };
 
 const handleTouchEnd = (e, product) => {
@@ -290,12 +288,9 @@ const handleTouchEnd = (e, product) => {
           ? (current + 1) % product.images.length
           : (current - 1 + product.images.length) % product.images.length;
 
-      return {
-        ...prev,
-        [product.id]: next,
-      };
-    });
-  }
+   return { ...prev, [product.id]: next };
+      });
+    }
 
   delete touchStartRef.current[product.id];
 };
@@ -423,15 +418,7 @@ if (!formData.region) {
 };
 
   return (
-  <BrowserRouter>
-  <Routes>
-
-    {/* 🏪 TIENDA */}
-    <Route
-      path="/"
-      element={
-	<>
-        <div className="bg-pink-50 min-h-screen">
+         <div className="bg-pink-50 min-h-screen">
     
       {/* TOP BAR */}
       <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center text-sm py-1">
@@ -825,7 +812,7 @@ if (!formData.region) {
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
-  onClick={() => navigate("/checkout")}
+  onClick={() => window.location.href = "/checkout"}
   className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
 >
   Continuar compra
@@ -971,26 +958,20 @@ Total: ${formatPrice(totalFinal)}`
   }
 />
 
-    {/* 💳 CHECKOUT */}
-    <Route
-      path="/checkout"
-      element={
-        <Checkout
-          cart={cart}
-          total={total}
-          shipping={shipping}
-          totalFinal={totalFinal}
-          formData={formData}
-          setFormData={setFormData}
-          handleMercadoPago={handleMercadoPago}
-          aplicaEnvio={aplicaEnvio}
+  export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        <Route path="/" element={<AppContent />} />
+
+        <Route
+          path="/checkout"
+          element={<Checkout />}
         />
-      }
-    />
 
-  </Routes>
-</BrowserRouter>
-
+      </Routes>
+    </BrowserRouter>
      
 );
 }
