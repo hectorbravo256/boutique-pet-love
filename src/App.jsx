@@ -352,6 +352,12 @@ const regionesConEnvio = [
 const aplicaEnvio =
   cart.length > 0 && regionesConEnvio.includes(formData.region);
 
+const mensajeEnvio = formData.region
+  ? regionesConEnvio.includes(formData.region)
+    ? "Envío $3.500 por PAKET"
+    : "Envío por pagar (Starken / Blue Express)"
+  : "Selecciona tu región para calcular envío";
+
 const shipping = aplicaEnvio ? 3500 : 0;
 
 const totalFinal = total + shipping;
@@ -764,6 +770,10 @@ if (!formData.region) {
   <option>Región de Los Lagos</option>
   <option>Región de Aysén del General Carlos Ibáñez del Campo</option>
 </select>
+
+<p className="text-xs mt-1 text-gray-500">
+  {mensajeEnvio}
+</p>
 
 <textarea
   placeholder="Observación / Referencia"
