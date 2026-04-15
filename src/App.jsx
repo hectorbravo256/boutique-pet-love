@@ -704,19 +704,26 @@ if (!formData.region) {
 
 {cart.length > 0 && (
   <>
-    <p className="font-bold mt-2">
-      Total: {formatPrice(total)}
-    </p>
+   <div className="mt-3 border-t pt-2 text-sm space-y-1">
+  <div className="flex justify-between">
+    <span>Total productos:</span>
+    <span>{formatPrice(total)}</span>
+  </div>
 
-<p className="text-xs text-gray-500">
-  {aplicaEnvio
-    ? "Despacho a domicilio"
-    : "Envío por pagar vía Starken o Blue Express"}
-</p>
+  <div className="flex justify-between">
+    <span>Envío:</span>
+    <span>
+      {aplicaEnvio
+        ? formatPrice(shipping)
+        : "Por pagar"}
+    </span>
+  </div>
 
-<p className="font-bold mt-2">
-  Total: {formatPrice(totalFinal)}
-</p>
+  <div className="flex justify-between font-bold text-base border-t pt-2 mt-2">
+    <span>Total:</span>
+    <span>{formatPrice(totalFinal)}</span>
+  </div>
+</div>
 
 
 <div className="mt-4 space-y-2">
