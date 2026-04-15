@@ -15,17 +15,31 @@ export const handler = async (event) => {
       };
     }
 
-    const preference = new Preference(client);
+  
+    const items = body.items.map((item) => ({
+  title: item.name,
+  unit_price: Number(item.price),
+  quantity: 1,
+  currency_id: "CLP",
+}));
+
+// ✅ Agregar envío si hay productos
+if (items.length > 0) {
+  items.push({
+    title: "Costo de envío",
+    unit_price: 3500,
+    quantity: 1,
+    currency_id: "CLP",
+  });
+}
+
+  const preference = new Preference(client);
 
     const response = await preference.create({
   body: {
-    items: body.items.map((item) => ({
-      title: item.name,
-      unit_price: Number(item.price),
-      quantity: 1,
-      currency_id: "CLP",
-    })),
+	items: items,
 
+	// ✅ Guardar datos del cliente
     metadata: {
       cliente: body.formData,
     },
