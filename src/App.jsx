@@ -344,24 +344,6 @@ function AppContent() {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-  const regionesConEnvio = [
-  	"Región Metropolitana de Santiago",
-  	"Región de Valparaíso",
-  	"Región del Libertador General Bernardo O'Higgins",
-];
-
-  const aplicaEnvio =
-  	cart.length > 0 && regionesConEnvio.includes(formData.region);
-
-  const mensajeEnvio = formData.region
-  	? regionesConEnvio.includes(formData.region)
-    	? "Envío $3.500 por PAKET"
-    	: "Envío por pagar (Starken / Blue Express)"
-  	: "Selecciona tu región para calcular envío";
-
-  const shipping = aplicaEnvio ? 3500 : 0;
-
-  const totalFinal = total + shipping;
 
   const handleMercadoPago = async () => {
   	// ✅ VALIDACIÓN FORMULARIO
@@ -911,6 +893,18 @@ function CheckoutWrapper() {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
+    const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+const aplicaEnvio =
+  cart.length > 0 && regionesConEnvio.includes(formData.region);
+
+const shipping = aplicaEnvio ? 3500 : 0;
+
+const totalFinal = total + shipping;
 
 return (
   <Checkout
