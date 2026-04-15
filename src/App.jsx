@@ -6,6 +6,8 @@ import Checkout from "./Checkout";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
+/* ================= PRODUCTOS ================= */
+
 const products = [
   {
     id: 1,
@@ -246,6 +248,7 @@ const products = [
   },
 ];
 
+/* ================= APP PRINCIPAL ================= */
 
 function AppContent() {
   const navigate = useNavigate();
@@ -253,7 +256,6 @@ function AppContent() {
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
-
   const [formData, setFormData] = useState({
   nombre: "",
   rut: "",
@@ -262,28 +264,22 @@ function AppContent() {
   region: "",
   observacion: "",
 });
-
   const [currentIndex, setCurrentIndex] = useState({});
   const touchStartRef = useRef({});
   const [zoomGallery, setZoomGallery] = useState(null);
   const zoomTouchStart = useRef(0);
-
   const handleTouchStart = (e, productId) => {
    touchStartRef.current[productId] = e.touches[0].clientX;
 };
-
-const handleTouchEnd = (e, product) => {
+  const handleTouchEnd = (e, product) => {
   const start = touchStartRef.current[product.id];
   if (!start) return;
-
   const end = e.changedTouches[0].clientX;
   const diff = start - end;
-
   if (Math.abs(diff) > 50 && product.images) {
     setCurrentIndex((prev) => {
-      const current = prev[product.id] || 0;
-
-      const next =
+  const current = prev[product.id] || 0;
+  const next =
         diff > 0
           ? (current + 1) % product.images.length
           : (current - 1 + product.images.length) % product.images.length;
@@ -294,7 +290,8 @@ const handleTouchEnd = (e, product) => {
 
   delete touchStartRef.current[product.id];
 };
-
+ 
+/* ===== CARRITO LOCAL ===== */
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
@@ -302,15 +299,15 @@ const handleTouchEnd = (e, product) => {
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+  	}, [cart]);
 
-useEffect(() => {
-  document.body.style.overflow = zoomGallery ? "hidden" : "auto";
-}, [zoomGallery]);
+  useEffect(() => {
+  	document.body.style.overflow = zoomGallery ? "hidden" : "auto";
+	}, [zoomGallery]);
 
-const AUTO_SLIDE = false; // 🔥 cambiar a true cuando quieras activarlo
+	const AUTO_SLIDE = false; // 🔥 cambiar a true cuando quieras activarlo
 
-useEffect(() => {
+  useEffect(() => {
   if (!AUTO_SLIDE) return;
 
   const interval = setInterval(() => {
@@ -332,6 +329,8 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
+
+ /* ===== FUNCIONES ===== */
   const formatPrice = (p) =>
     p ? "$" + p.toLocaleString("es-CL") : "";
 
@@ -345,27 +344,27 @@ useEffect(() => {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-const regionesConEnvio = [
-  "Región Metropolitana de Santiago",
-  "Región de Valparaíso",
-  "Región del Libertador General Bernardo O'Higgins",
+  const regionesConEnvio = [
+  	"Región Metropolitana de Santiago",
+  	"Región de Valparaíso",
+  	"Región del Libertador General Bernardo O'Higgins",
 ];
 
-const aplicaEnvio =
-  cart.length > 0 && regionesConEnvio.includes(formData.region);
+  const aplicaEnvio =
+  	cart.length > 0 && regionesConEnvio.includes(formData.region);
 
-const mensajeEnvio = formData.region
-  ? regionesConEnvio.includes(formData.region)
-    ? "Envío $3.500 por PAKET"
-    : "Envío por pagar (Starken / Blue Express)"
-  : "Selecciona tu región para calcular envío";
+  const mensajeEnvio = formData.region
+  	? regionesConEnvio.includes(formData.region)
+    	? "Envío $3.500 por PAKET"
+    	: "Envío por pagar (Starken / Blue Express)"
+  	: "Selecciona tu región para calcular envío";
 
-const shipping = aplicaEnvio ? 3500 : 0;
+  const shipping = aplicaEnvio ? 3500 : 0;
 
-const totalFinal = total + shipping;
+  const totalFinal = total + shipping;
 
-const handleMercadoPago = async () => {
-  // ✅ VALIDACIÓN FORMULARIO
+  const handleMercadoPago = async () => {
+  	// ✅ VALIDACIÓN FORMULARIO
 
 if (!formData.nombre) {
   alert("Ingresa tu nombre");
@@ -417,6 +416,7 @@ if (!formData.region) {
   }
 };
 
+/* ================= UI ================= */
   return (
          <div className="bg-pink-50 min-h-screen">
     
@@ -433,6 +433,7 @@ if (!formData.region) {
             <h1 className="text-pink-600 text-2xl md:text-3xl font-extrabold tracking-wide">
   		BOUTIQUE PET LOVE
 		</h1>
+
             <p className="text-purple-400 text-sm md:text-base font-semibold">
   		Moda y accesorios para mascotas
 		</p>
@@ -812,7 +813,7 @@ if (!formData.region) {
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
-  onClick={() => window.location.href = "/checkout"}
+  onClick={() => navigate("/checkout")}
   className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
 >
   Continuar compra
@@ -954,24 +955,45 @@ Total: ${formatPrice(totalFinal)}`
 
 
       </div>
-    </>
-  }
-/>
+  );
+}
 
-  export default function App() {
+
+/* ================= CHECKOUT WRAPPER ================= */
+function CheckoutWrapper() {
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("cart");
+    if (saved) setCart(JSON.parse(saved));
+  }, []);
+
+  const total = cart.reduce((acc, i) => acc + i.price, 0);
+
+  return (
+    <Checkout
+      cart={cart}
+      total={total}
+      shipping={0}
+      totalFinal={total}
+      formData={{}}
+      setFormData={() => {}}
+      handleMercadoPago={() => alert("Pago en construcción")}
+      aplicaEnvio={false}
+    />
+  );
+}
+
+
+
+/* ================= ROUTER ================= */
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<AppContent />} />
-
-        <Route
-          path="/checkout"
-          element={<Checkout />}
-        />
-
+        <Route path="/checkout" element={<CheckoutWrapper />} />
       </Routes>
     </BrowserRouter>
-     
-);
+  );
 }
