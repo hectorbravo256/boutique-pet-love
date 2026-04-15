@@ -347,6 +347,33 @@ const shipping = cart.length > 0 ? 3500 : 0;
 const totalFinal = total + shipping;
 
 const handleMercadoPago = async () => {
+  // ✅ VALIDACIÓN FORMULARIO
+
+if (!formData.nombre) {
+  alert("Ingresa tu nombre");
+  return;
+}
+
+if (!formData.rut) {
+  alert("Ingresa tu RUT");
+  return;
+}
+
+if (!formData.direccion) {
+  alert("Ingresa tu Dirección");
+  return;
+}
+
+if (!formData.comuna) {
+  alert("Ingresa tu Comuna");
+  return;
+}
+
+if (!formData.region) {
+  alert("Selecciona una región");
+  return;
+}
+
   if (cart.length === 0) {
     alert("El carrito está vacío");
     return;
@@ -700,11 +727,31 @@ const handleMercadoPago = async () => {
   onChange={(e) => setFormData({...formData, comuna: e.target.value})}
 />
 
-<input
-  placeholder="Región"
+<select
   className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, region: e.target.value})}
-/>
+  value={formData.region}
+  onChange={(e) =>
+    setFormData({ ...formData, region: e.target.value })
+  }
+>
+  <option value="">Selecciona Región</option>
+
+  <option>Región de Arica y Parinacota</option>
+  <option>Región de Tarapacá</option>
+  <option>Región de Antofagasta</option>
+  <option>Región de Atacama</option>
+  <option>Región de Coquimbo</option>
+  <option>Región de Valparaíso</option>
+  <option>Región Metropolitana de Santiago</option>
+  <option>Región del Libertador General Bernardo O'Higgins</option>
+  <option>Región del Maule</option>
+  <option>Región de Ñuble</option>
+  <option>Región del Biobío</option>
+  <option>Región de La Araucanía</option>
+  <option>Región de Los Ríos</option>
+  <option>Región de Los Lagos</option>
+  <option>Región de Aysén del General Carlos Ibáñez del Campo</option>
+</select>
 
 <textarea
   placeholder="Observación / Referencia"

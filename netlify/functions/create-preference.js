@@ -23,8 +23,15 @@ export const handler = async (event) => {
   currency_id: "CLP",
 }));
 
-// ✅ Agregar envío si hay productos
-if (items.length > 0) {
+
+// ✅ AQUÍ PEGAS ESTO
+const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+if (regionesConEnvio.includes(body.formData.region)) {
   items.push({
     title: "Costo de envío",
     unit_price: 3500,
