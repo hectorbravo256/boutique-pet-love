@@ -969,12 +969,10 @@ Total: ${formatPrice(totalFinal)}`
 )}
 
     </div>
-</>
-}
-
-       </div>
-      }
-    />
+      </div>
+    </>
+  }
+/>
 
     {/* 💳 CHECKOUT */}
     <Route
