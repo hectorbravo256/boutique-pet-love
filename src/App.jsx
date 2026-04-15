@@ -247,6 +247,7 @@ const products = [
 export default function App() {
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(true);
 const [formData, setFormData] = useState({
   nombre: "",
   rut: "",
@@ -455,7 +456,10 @@ if (!formData.region) {
             className="border rounded-full px-3 py-1 text-sm"
           />
 
-          <div className="relative bg-pink-600 text-white px-4 py-2 rounded-full flex items-center gap-2">
+          <div
+  		onClick={() => setCartOpen(!cartOpen)}
+  		className="relative bg-pink-600 text-white px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer"
+		>
             <ShoppingBag size={16} />
             Carrito
             <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 rounded-full">
@@ -686,7 +690,21 @@ if (!formData.region) {
 </section>
 
       {/* CARRITO */}
-      <div className="fixed bottom-5 right-5 bg-white p-4 rounded-2xl shadow w-64">
+      <div
+  	className={`fixed bottom-5 right-5 bg-white rounded-2xl shadow transition-all duration-300 ${
+    	cartOpen ? "w-64 p-4" : "w-16 h-16 flex items-center justify-center"
+  	}`}
+	>
+	{cartOpen ? (
+    <>
+      {/* BOTÓN CERRAR */}
+      <button
+        onClick={() => setCartOpen(false)}
+        className="absolute top-2 right-2 text-gray-400"
+      >
+        ✕
+      </button>
+
         <h3 className="font-bold">Carrito</h3>
 
         {cart.length === 0 && <p>Vacío</p>}
@@ -704,6 +722,7 @@ if (!formData.region) {
 
 {cart.length > 0 && (
   <>
+ 	{/* TOTALES BONITOS */}
    <div className="mt-3 border-t pt-2 text-sm space-y-1">
   <div className="flex justify-between">
     <span>Total productos:</span>
@@ -819,6 +838,12 @@ Total: ${formatPrice(totalFinal)}`
 </a>
   </>
 )}
+</>
+  ) : (
+    <button onClick={() => setCartOpen(true)}>
+      <ShoppingCart size={24} />
+    </button>
+  )}
       </div>
 
       {/* WHATSAPP */}
