@@ -5,6 +5,13 @@ export default function Checkout({ cart, total, shipping, totalFinal, formData, 
   const formatPrice = (p) =>
     p ? "$" + p.toLocaleString("es-CL") : "";
 
+const mensajeEnvio = formData.region
+  ? aplicaEnvio
+    ? "Envío $3.500 por PAKET"
+    : "Envío por pagar (Starken / Blue Express)"
+  : "Selecciona tu región";
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
 
@@ -18,27 +25,34 @@ export default function Checkout({ cart, total, shipping, totalFinal, formData, 
             <span>{formatPrice(item.price)}</span>
           </div>
         ))}
+<div className="bg-gray-50 rounded-xl p-4 mt-4 space-y-2">
 
-        <div className="border-t mt-4 pt-3 text-sm space-y-2">
-          <div className="flex justify-between">
-            <span>Total productos:</span>
-            <span>{formatPrice(total)}</span>
-          </div>
+  <div className="flex justify-between text-sm">
+    <span>Subtotal</span>
+    <span>{formatPrice(total)}</span>
+  </div>
 
-          <div className="flex justify-between">
-            <span>Envío:</span>
-            <span>
-              {aplicaEnvio
-                ? formatPrice(shipping)
-                : "Por pagar"}
-            </span>
-          </div>
+  <div className="flex justify-between text-sm">
+    <span>Envío</span>
+    <span className={aplicaEnvio ? "text-green-600 font-semibold" : "text-orange-500 font-semibold"}>
+      {aplicaEnvio
+        ? formatPrice(shipping)
+        : "Por pagar"}
+    </span>
+  </div>
 
-          <div className="flex justify-between font-bold text-lg border-t pt-2">
-            <span>Total:</span>
-            <span>{formatPrice(totalFinal)}</span>
-          </div>
-        </div>
+  {/* 👇 MENSAJE CLAVE */}
+ <p className={`text-xs font-medium ${aplicaEnvio ? "text-green-600" : "text-orange-500"}`}>
+  {mensajeEnvio}
+</p>
+
+  <div className="border-t pt-2 flex justify-between font-bold text-lg">
+    <span>Total</span>
+    <span>{formatPrice(totalFinal)}</span>
+  </div>
+
+</div>
+        
       </div>
 
       {/* 📋 FORMULARIO */}

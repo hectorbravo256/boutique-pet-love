@@ -978,6 +978,9 @@ Total: ${formatPrice(totalFinal)}`
 /* ================= CHECKOUT WRAPPER ================= */
 function CheckoutWrapper() {
   const [cart, setCart] = useState([]);
+  const [formData, setFormData] = useState({
+    region: "",
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
@@ -986,7 +989,6 @@ function CheckoutWrapper() {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-  return (
     const regionesConEnvio = [
   "Región Metropolitana de Santiago",
   "Región de Valparaíso",
@@ -1011,7 +1013,6 @@ return (
     handleMercadoPago={() => alert("Pago en construcción")}
     aplicaEnvio={aplicaEnvio}
   />
-
   );
 }
 
