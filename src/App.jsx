@@ -987,16 +987,31 @@ function CheckoutWrapper() {
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
   return (
-    <Checkout
-      cart={cart}
-      total={total}
-      shipping={0}
-      totalFinal={total}
-      formData={{}}
-      setFormData={() => {}}
-      handleMercadoPago={() => alert("Pago en construcción")}
-      aplicaEnvio={false}
-    />
+    const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+const aplicaEnvio =
+  cart.length > 0 && regionesConEnvio.includes(formData.region);
+
+const shipping = aplicaEnvio ? 3500 : 0;
+
+const totalFinal = total + shipping;
+
+return (
+  <Checkout
+    cart={cart}
+    total={total}
+    shipping={shipping}
+    totalFinal={totalFinal}
+    formData={formData}
+    setFormData={setFormData}
+    handleMercadoPago={() => alert("Pago en construcción")}
+    aplicaEnvio={aplicaEnvio}
+  />
+);
   );
 }
 
