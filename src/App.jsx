@@ -1011,7 +1011,7 @@ return (
     handleMercadoPago={() => alert("Pago en construcción")}
     aplicaEnvio={aplicaEnvio}
   />
-);
+
   );
 }
 
