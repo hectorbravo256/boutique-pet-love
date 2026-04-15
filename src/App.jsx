@@ -2,6 +2,10 @@ import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 
 import { useEffect, useState, useRef } from "react";
 
+import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
+import Checkout from "./Checkout";
+
+
 const WHATSAPP = "https://wa.me/56982700002";
 
 const products = [
@@ -245,6 +249,8 @@ const products = [
 ];
 
 export default function App() {
+  const navigate = useNavigate();
+
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
@@ -417,8 +423,16 @@ if (!formData.region) {
 };
 
   return (
-    <div className="bg-pink-50 min-h-screen">
+  <BrowserRouter>
+  <Routes>
 
+    {/* 🏪 TIENDA */}
+    <Route
+      path="/"
+      element={
+	<>
+        <div className="bg-pink-50 min-h-screen">
+    
       {/* TOP BAR */}
       <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center text-sm py-1">
         Envíos a todo Chile • Moda y accesorios para mascotas
@@ -702,7 +716,7 @@ if (!formData.region) {
   	onClick={() => setCartOpen(false)}
   	className="absolute top-2 right-2 text-black text-xl font-bold hover:opacity-60 transition"
 	>
-  	−
+  	Minimizar −
 	</button>
 
         <h3 className="font-bold">Carrito</h3>
@@ -811,11 +825,11 @@ if (!formData.region) {
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
-      onClick={handleMercadoPago}
-      className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
-    >
-      💳 Pagar con MercadoPago
-    </button>
+  onClick={() => navigate("/checkout")}
+  className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
+>
+  Continuar compra
+</button>
 
     {/* 🟢 WHATSAPP */}
    <a
@@ -955,5 +969,35 @@ Total: ${formatPrice(totalFinal)}`
 )}
 
     </div>
+</>
+}
+
+       </div>
+      }
+    />
+
+    {/* 💳 CHECKOUT */}
+    <Route
+      path="/checkout"
+      element={
+        <Checkout
+          cart={cart}
+          total={total}
+          shipping={shipping}
+          totalFinal={totalFinal}
+          formData={formData}
+          setFormData={setFormData}
+          handleMercadoPago={handleMercadoPago}
+          aplicaEnvio={aplicaEnvio}
+        />
+      }
+    />
+
+  </Routes>
+</BrowserRouter>
+
+     
+);
+
   );
 }

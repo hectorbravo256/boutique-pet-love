@@ -1,0 +1,105 @@
+import { useState } from "react";
+
+export default function Checkout({ cart, total, shipping, totalFinal, formData, setFormData, handleMercadoPago, aplicaEnvio }) {
+
+  const formatPrice = (p) =>
+    p ? "$" + p.toLocaleString("es-CL") : "";
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
+
+      {/* 🧾 RESUMEN */}
+      <div className="bg-white p-6 rounded-2xl shadow">
+        <h2 className="text-xl font-bold mb-4">Resumen del pedido</h2>
+
+        {cart.map((item, i) => (
+          <div key={i} className="flex justify-between text-sm mb-2">
+            <span>{item.name} ({item.size})</span>
+            <span>{formatPrice(item.price)}</span>
+          </div>
+        ))}
+
+        <div className="border-t mt-4 pt-3 text-sm space-y-2">
+          <div className="flex justify-between">
+            <span>Total productos:</span>
+            <span>{formatPrice(total)}</span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Envío:</span>
+            <span>
+              {aplicaEnvio
+                ? formatPrice(shipping)
+                : "Por pagar"}
+            </span>
+          </div>
+
+          <div className="flex justify-between font-bold text-lg border-t pt-2">
+            <span>Total:</span>
+            <span>{formatPrice(totalFinal)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 📋 FORMULARIO */}
+      <div className="bg-white p-6 rounded-2xl shadow">
+        <h2 className="text-xl font-bold mb-4">Datos de envío</h2>
+
+        <div className="space-y-3">
+
+          <input
+            placeholder="Nombre y Apellidos"
+            className="w-full border p-2 rounded"
+            onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+          />
+
+          <input
+            placeholder="RUT"
+            className="w-full border p-2 rounded"
+            onChange={(e) => setFormData({...formData, rut: e.target.value})}
+          />
+
+          <input
+            placeholder="Dirección"
+            className="w-full border p-2 rounded"
+            onChange={(e) => setFormData({...formData, direccion: e.target.value})}
+          />
+
+          <input
+            placeholder="Comuna"
+            className="w-full border p-2 rounded"
+            onChange={(e) => setFormData({...formData, comuna: e.target.value})}
+          />
+
+          <select
+            className="w-full border p-2 rounded"
+            onChange={(e) =>
+              setFormData({ ...formData, region: e.target.value })
+            }
+          >
+            <option value="">Selecciona Región</option>
+            <option>Región Metropolitana de Santiago</option>
+            <option>Región de Valparaíso</option>
+            <option>Región del Libertador General Bernardo O'Higgins</option>
+            <option>Región del Maule</option>
+            <option>Región del Biobío</option>
+          </select>
+
+          <textarea
+            placeholder="Observación"
+            className="w-full border p-2 rounded"
+            onChange={(e) => setFormData({...formData, observacion: e.target.value})}
+          />
+
+        </div>
+
+        <button
+          onClick={handleMercadoPago}
+          className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+        >
+          💳 Pagar con MercadoPago
+        </button>
+      </div>
+    </div>
+  );
+}
