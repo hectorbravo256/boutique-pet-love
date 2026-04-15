@@ -700,12 +700,12 @@ if (!formData.region) {
 	{cartOpen ? (
     <>
       {/* BOTÓN CERRAR */}
-      <button
-  	onClick={() => setCartOpen(false)}
-  	className="absolute top-2 right-2 text-black text-xl font-bold hover:opacity-60 transition"
-	>
-  	Minimizar −
-	</button>
+   <button
+  onClick={() => setCartOpen(false)}
+  className="absolute top-2 right-2 text-red-500 text-lg font-bold hover:text-red-700 transition"
+>
+  -
+</button>
 
         <h3 className="font-bold">Carrito</h3>
 
@@ -726,90 +726,14 @@ if (!formData.region) {
   <>
  	{/* TOTALES BONITOS */}
    <div className="mt-3 border-t pt-2 text-sm space-y-1">
-  <div className="flex justify-between">
-    <span>Total productos:</span>
+  <div className="flex justify-between font-bold text-base">
+    <span>Total:</span>
     <span>{formatPrice(total)}</span>
   </div>
-
-  <div className="flex justify-between">
-    <span>Envío:</span>
-    <span>
-      {aplicaEnvio
-        ? formatPrice(shipping)
-        : "Por pagar"}
-    </span>
-  </div>
-
-  <div className="flex justify-between font-bold text-base border-t pt-2 mt-2">
-    <span>Total:</span>
-    <span>{formatPrice(totalFinal)}</span>
-  </div>
 </div>
 
 
-<div className="mt-4 space-y-2">
 
-<input
-  placeholder="Nombre y Apellidos"
-  className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-/>
-
-<input
-  placeholder="RUT"
-  className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, rut: e.target.value})}
-/>
-
-<input
-  placeholder="Dirección de envío"
-  className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, direccion: e.target.value})}
-/>
-
-<input
-  placeholder="Comuna"
-  className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, comuna: e.target.value})}
-/>
-
-<select
-  className="w-full border p-2 rounded"
-  value={formData.region}
-  onChange={(e) =>
-    setFormData({ ...formData, region: e.target.value })
-  }
->
-  <option value="">Selecciona Región</option>
-
-  <option>Región de Arica y Parinacota</option>
-  <option>Región de Tarapacá</option>
-  <option>Región de Antofagasta</option>
-  <option>Región de Atacama</option>
-  <option>Región de Coquimbo</option>
-  <option>Región de Valparaíso</option>
-  <option>Región Metropolitana de Santiago</option>
-  <option>Región del Libertador General Bernardo O'Higgins</option>
-  <option>Región del Maule</option>
-  <option>Región de Ñuble</option>
-  <option>Región del Biobío</option>
-  <option>Región de La Araucanía</option>
-  <option>Región de Los Ríos</option>
-  <option>Región de Los Lagos</option>
-  <option>Región de Aysén del General Carlos Ibáñez del Campo</option>
-</select>
-
-<p className="text-xs mt-1 text-gray-500">
-  {mensajeEnvio}
-</p>
-
-<textarea
-  placeholder="Observación / Referencia"
-  className="w-full border p-2 rounded"
-  onChange={(e) => setFormData({...formData, observacion: e.target.value})}
-/>
-
-</div>
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
@@ -829,9 +753,7 @@ if (!formData.region) {
             `${i.name} - ${i.size} - ${formatPrice(i.price)}`
         )
         .join("\n") +
-      `\nSubtotal: ${formatPrice(total)}
-Envío: ${formatPrice(shipping)}
-Total: ${formatPrice(totalFinal)}`
+      `\nTotal: ${formatPrice(totalFinal)}`
   )}`}
   target="_blank"
   className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
@@ -989,18 +911,6 @@ function CheckoutWrapper() {
 
   const total = cart.reduce((acc, i) => acc + i.price, 0);
 
-    const regionesConEnvio = [
-  "Región Metropolitana de Santiago",
-  "Región de Valparaíso",
-  "Región del Libertador General Bernardo O'Higgins",
-];
-
-const aplicaEnvio =
-  cart.length > 0 && regionesConEnvio.includes(formData.region);
-
-const shipping = aplicaEnvio ? 3500 : 0;
-
-const totalFinal = total + shipping;
 
 return (
   <Checkout
