@@ -702,7 +702,7 @@ if (!formData.region) {
       {/* BOTÓN CERRAR */}
 <button
   onClick={() => setCartOpen(false)}
-  className="absolute top-2 right-2 bg-red-500 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-600 transition shadow-lg"
+  className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full shadow-md hover:scale-105 hover:shadow-lg transition"
 >
   −
 </button>
@@ -763,11 +763,21 @@ if (!formData.region) {
   </>
 )}
 </>
-  ) : (
-    <button onClick={() => setCartOpen(true)}>
-      <ShoppingCart size={24} />
-    </button>
-  )}
+ ) : (
+  <div
+    onClick={() => setCartOpen(true)}
+    className="relative cursor-pointer bg-pink-600 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-lg"
+  >
+    <ShoppingCart size={24} />
+
+    {/* 🔢 CONTADOR */}
+    {cart.length > 0 && (
+     <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-bounce">
+        {cart.length}
+      </span>
+    )}
+  </div>
+)}
       </div>
 
       {/* WHATSAPP */}
