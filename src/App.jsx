@@ -962,13 +962,10 @@ Total: ${formatPrice(totalFinal)}`
 >
   ◀
 </button>
-
-
-
   </div>
 )}
 
-    </div>
+
       </div>
     </>
   }
@@ -996,6 +993,4 @@ Total: ${formatPrice(totalFinal)}`
 
      
 );
-
-  );
 }
