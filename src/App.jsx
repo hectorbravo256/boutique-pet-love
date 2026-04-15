@@ -700,11 +700,11 @@ if (!formData.region) {
 	{cartOpen ? (
     <>
       {/* BOTÓN CERRAR */}
-   <button
+<button
   onClick={() => setCartOpen(false)}
-  className="absolute top-2 right-2 text-red-500 text-lg font-bold hover:text-red-700 transition"
+  className="absolute top-2 right-2 bg-red-500 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-600 transition shadow-lg"
 >
-  -
+  −
 </button>
 
         <h3 className="font-bold">Carrito</h3>
