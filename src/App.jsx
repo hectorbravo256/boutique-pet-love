@@ -984,6 +984,31 @@ if (!formData.region) {
 function CheckoutWrapper() {
   const [cart, setCart] = useState([]);
 
+const handleMercadoPago = async () => {
+  if (cart.length === 0) {
+    alert("El carrito está vacío");
+    return;
+  }
+
+  try {
+    const res = await fetch("/.netlify/functions/create-preference", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items: cart,
+        formData,
+      }),
+    });
+
+    const data = await res.json();
+    window.location.href = data.init_point;
+  } catch (error) {
+    alert("Error al iniciar pago");
+  }
+};
+
 const increaseQty = (index) => {
   const updated = [...cart];
   updated[index].qty = (updated[index].qty || 1) + 1;
@@ -1040,7 +1065,7 @@ return (
   totalFinal={totalFinal}
   formData={formData}
   setFormData={setFormData}
-  handleMercadoPago={() => alert("Pago en construcción")}
+  handleMercadoPago={handleMercadoPago}
   aplicaEnvio={aplicaEnvio}
 
   /* 🔥 NUEVO */
