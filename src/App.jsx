@@ -253,6 +253,21 @@ const products = [
 function AppContent() {
   const navigate = useNavigate();
 
+const increaseQty = (index) => {
+  const updated = [...cart];
+  updated[index].qty = (updated[index].qty || 1) + 1;
+  setCart(updated);
+};
+
+const decreaseQty = (index) => {
+  const updated = [...cart];
+  if ((updated[index].qty || 1) > 1) {
+    updated[index].qty -= 1;
+  }
+  setCart(updated);
+};
+
+
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
@@ -335,6 +350,22 @@ function AppContent() {
     p ? "$" + p.toLocaleString("es-CL") : "";
 
   const addToCart = (product, size, price) => {
+
+const buyNow = (product, size, price) => {
+  if (!size) return alert("Selecciona talla");
+
+  const newItem = { ...product, size, price };
+
+  // reemplaza carrito completo (checkout directo)
+  setCart([newItem]);
+
+  // guardar en localStorage
+  localStorage.setItem("cart", JSON.stringify([newItem]));
+
+  // ir al checkout
+  navigate("/checkout");
+};
+
     if (!size) return alert("Selecciona talla");
     setCart([...cart, { ...product, size, price }]);
   };
@@ -342,7 +373,10 @@ function AppContent() {
   const removeItem = (i) =>
     setCart(cart.filter((_, idx) => idx !== i));
 
-  const total = cart.reduce((acc, i) => acc + i.price, 0);
+  const total = cart.reduce(
+  (acc, i) => acc + i.price * (i.qty || 1),
+  0
+);
 
   const regionesConEnvio = [
   	"Región Metropolitana de Santiago",
@@ -439,6 +473,10 @@ if (!formData.region) {
 		</p>
           </div>
         </div>
+
+<div className="bg-black text-white text-xs text-center py-2">
+  🚚 Envíos a todo Chile | RM, V y VI: $3.500 | Otras regiones: por pagar
+</div>
 
        <div className="hidden md:flex gap-8 text-lg md:text-xl font-bold text-gray-700">
  	<a href="#" className="hover:text-pink-600 transition duration-200">
@@ -541,7 +579,10 @@ if (!formData.region) {
 
 
             return (
-              <div key={product.id} className="bg-white p-4 rounded-2xl shadow hover:shadow-lg transition">
+              <div
+  key={product.id}
+  className="bg-white p-4 rounded-2xl shadow hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
+>
 
 <div
   className="relative overflow-hidden rounded-xl touch-pan-y select-none"
@@ -627,6 +668,10 @@ if (!formData.region) {
   <span className="absolute top-2 left-2 bg-white text-pink-600 text-xs px-2 py-1 rounded-full shadow">
     {product.badge}
   </span>
+<span className="absolute top-2 right-2 bg-pink-600 text-white text-xs px-2 py-1 rounded-full shadow">
+  🔥 Más vendido
+</span>
+
 </div>
 
 
@@ -663,11 +708,19 @@ if (!formData.region) {
                   ))}
                 </select>
 
-                <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="grid grid-cols-1 gap-2 mt-4">
+		{/* COMPRAR AHORA (🔥 NUEVO) */}
+		<button
+  		onClick={() => buyNow(product, size, price)}
+  		className="bg-black text-white py-2 rounded-xl font-semibold hover:opacity-90 transition"
+		>
+  		⚡ Comprar ahora
+		</button>
+
 		 {/* BOTÓN AGREGAR */}
                   <button
                     onClick={() => addToCart(product, size, price)}
-                    className="bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 text-white py-2 rounded-xl font-semibold transition"
                   >
 		  <ShoppingCart size={16} strokeWidth={2} />
                     Agregar Carro
@@ -675,8 +728,12 @@ if (!formData.region) {
 		 {/* BOTÓN WHATSAPP */}
                   <a
                     href={`${WHATSAPP}?text=${encodeURIComponent(
-                      `Hola! Me interesa este producto 🐶:\n${product.name}\n${size || ""}\nPrecio: ${price ? formatPrice(price) : ""}`
-                    )}`}
+  "🛒 Pedido:\n\n" +
+  cart.map(i =>
+    `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(i.price)}`
+  ).join("\n") +
+  `\n\nTotal: ${formatPrice(totalFinal)}`
+)}`}
 		  target="_blank"
                     className="bg-green-500 text-white flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-green-600 transition"
                   >
@@ -712,15 +769,52 @@ if (!formData.region) {
         {cart.length === 0 && <p>Vacío</p>}
 
         {cart.map((item, i) => (
-          <div key={i} className="flex justify-between text-sm mt-2">
-            <span>
-              {item.name} <br />
-              {item.size} - {formatPrice(item.price)}
-            </span>
+  <div key={i} className="flex justify-between items-center text-sm mt-3 gap-2">
 
-            <button onClick={() => removeItem(i)}>❌</button>
-          </div>
-        ))}
+    <img
+      src={item.images?.[0]}
+      className="w-12 h-12 object-cover rounded-lg"
+    />
+
+    <div className="flex-1">
+      <p className="font-semibold text-xs">{item.name}</p>
+      <p className="text-xs text-gray-500">{item.size}</p>
+
+      {/* 🔥 CONTROL DE CANTIDAD */}
+      <div className="flex items-center gap-2 mt-1">
+        <button
+          onClick={() => decreaseQty(i)}
+          className="bg-gray-200 px-2 rounded"
+        >
+          −
+        </button>
+
+        <span>{item.qty || 1}</span>
+
+        <button
+          onClick={() => increaseQty(i)}
+          className="bg-gray-200 px-2 rounded"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <div className="text-right">
+      <p className="text-xs font-bold">
+        {formatPrice(item.price * (item.qty || 1))}
+      </p>
+
+      <button
+        onClick={() => removeItem(i)}
+        className="text-red-400 text-xs"
+      >
+        Eliminar
+      </button>
+    </div>
+
+  </div>
+))}
 
 {cart.length > 0 && (
   <>
@@ -919,7 +1013,10 @@ function CheckoutWrapper() {
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
-  const total = cart.reduce((acc, i) => acc + i.price, 0);
+  const total = cart.reduce(
+  (acc, i) => acc + i.price * (i.qty || 1),
+  0
+);
 
     const regionesConEnvio = [
   "Región Metropolitana de Santiago",
