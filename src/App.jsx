@@ -351,21 +351,6 @@ const decreaseQty = (index) => {
 
   const addToCart = (product, size, price) => {
 
-const buyNow = (product, size, price) => {
-  if (!size) return alert("Selecciona talla");
-
-  const newItem = { ...product, size, price };
-
-  // reemplaza carrito completo (checkout directo)
-  setCart([newItem]);
-
-  // guardar en localStorage
-  localStorage.setItem("cart", JSON.stringify([newItem]));
-
-  // ir al checkout
-  navigate("/checkout");
-};
-
     if (!size) return alert("Selecciona talla");
     setCart([...cart, { ...product, size, price }]);
   };
@@ -456,7 +441,7 @@ if (!formData.region) {
     
       {/* TOP BAR */}
       <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center text-sm py-1">
-        Envíos a todo Chile • Moda y accesorios para mascotas
+        🚚 Envíos a todo Chile | RM, V y VI: $3.500 | Otras regiones: por pagar • Moda y accesorios para mascotas
       </div>
 
       {/* HEADER */}
@@ -473,10 +458,6 @@ if (!formData.region) {
 		</p>
           </div>
         </div>
-
-<div className="bg-black text-white text-xs text-center py-2">
-  🚚 Envíos a todo Chile | RM, V y VI: $3.500 | Otras regiones: por pagar
-</div>
 
        <div className="hidden md:flex gap-8 text-lg md:text-xl font-bold text-gray-700">
  	<a href="#" className="hover:text-pink-600 transition duration-200">
@@ -708,14 +689,7 @@ if (!formData.region) {
                   ))}
                 </select>
 
-                <div className="grid grid-cols-1 gap-2 mt-4">
-		{/* COMPRAR AHORA (🔥 NUEVO) */}
-		<button
-  		onClick={() => buyNow(product, size, price)}
-  		className="bg-black text-white py-2 rounded-xl font-semibold hover:opacity-90 transition"
-		>
-  		⚡ Comprar ahora
-		</button>
+                <div className="grid grid-cols-2 gap-2 mt-4">
 
 		 {/* BOTÓN AGREGAR */}
                   <button
