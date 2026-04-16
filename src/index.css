@@ -142,3 +142,41 @@ body {
   border: none;
   cursor: pointer;
 }
+/* Input base */
+.input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+}
+
+/* Error */
+.input-error {
+  border: 2px solid #ef4444;
+  background: #fff1f2;
+}
+
+/* Texto error */
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Botón pagar */
+.btn-pagar {
+  width: 100%;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+/* Botón deshabilitado */
+.btn-pagar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

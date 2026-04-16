@@ -985,10 +985,42 @@ function CheckoutWrapper() {
   const [cart, setCart] = useState([]);
 
 const handleMercadoPago = async () => {
+
+  /* ✅ VALIDACIÓN FORMULARIO */
+
+  if (!formData.nombre.trim()) {
+    alert("Ingresa tu nombre");
+    return;
+  }
+
+  if (!formData.rut.trim()) {
+    alert("Ingresa tu RUT");
+    return;
+  }
+
+  if (!formData.direccion.trim()) {
+    alert("Ingresa tu dirección");
+    return;
+  }
+
+  if (!formData.comuna.trim()) {
+    alert("Ingresa tu comuna");
+    return;
+  }
+
+  if (!formData.region) {
+    alert("Selecciona una región");
+    return;
+  }
+
+/* 🛒 VALIDACIÓN CARRITO */
+
   if (cart.length === 0) {
     alert("El carrito está vacío");
     return;
   }
+
+ /* 💳 PAGO */
 
   try {
     const res = await fetch("/.netlify/functions/create-preference", {

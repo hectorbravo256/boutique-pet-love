@@ -16,6 +16,7 @@ export default function Checkout({
   formatPrice
 }) {
 
+const [errors, setErrors] = useState({});
 
 const mensajeEnvio = formData.region
   ? aplicaEnvio
@@ -23,6 +24,32 @@ const mensajeEnvio = formData.region
     : "Envío por pagar (Starken / Blue Express)"
   : "Selecciona tu región";
 
+const validarFormulario = () => {
+  const nuevosErrores = {};
+
+  if (!formData.nombre?.trim()) {
+    nuevosErrores.nombre = "Ingresa tu nombre";
+  }
+
+  if (!formData.rut?.trim()) {
+    nuevosErrores.rut = "Ingresa tu RUT";
+  }
+
+  if (!formData.direccion?.trim()) {
+    nuevosErrores.direccion = "Ingresa tu dirección";
+  }
+
+  if (!formData.comuna?.trim()) {
+    nuevosErrores.comuna = "Ingresa tu comuna";
+  }
+
+  if (!formData.region) {
+    nuevosErrores.region = "Selecciona una región";
+  }
+
+  setErrors(nuevosErrores);
+  return Object.keys(nuevosErrores).length === 0;
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
@@ -107,35 +134,66 @@ const mensajeEnvio = formData.region
         <div className="space-y-3">
 
           <input
-            placeholder="Nombre y Apellidos"
-            className="w-full border p-2 rounded"
-            onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-          />
+  		placeholder="Nombre y Apellidos"
+  		value={formData.nombre || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, nombre: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${errors.nombre ? "border-red-500 bg-red-50" : "border-gray-300"}`}
+		/>
+
+		{errors.nombre && (
+  		<p className="text-red-500 text-xs">{errors.nombre}</p>
+		)}
 
           <input
-            placeholder="RUT"
-            className="w-full border p-2 rounded"
-            onChange={(e) => setFormData({...formData, rut: e.target.value})}
-          />
+  		placeholder="RUT"
+  		value={formData.rut || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, rut: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${errors.rut ? "border-red-500 bg-red-50" : "border-gray-300"}`}
+		/>
+
+		{errors.rut && (
+  		<p className="text-red-500 text-xs">{errors.rut}</p>
+		)}
 
           <input
-            placeholder="Dirección"
-            className="w-full border p-2 rounded"
-            onChange={(e) => setFormData({...formData, direccion: e.target.value})}
-          />
+            	placeholder="Dirección"
+  		value={formData.direccion || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, direccion: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${errors.direccion ? "border-red-500 bg-red-50" : "border-gray-300"}`}
+		/>
+
+		{errors.direccion && (
+  		<p className="text-red-500 text-xs">{errors.direccion}</p>
+		)}
+
 
           <input
-            placeholder="Comuna"
-            className="w-full border p-2 rounded"
-            onChange={(e) => setFormData({...formData, comuna: e.target.value})}
-          />
+		placeholder="Comuna"
+  		value={formData.comuna || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, comuna: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${errors.comuna ? "border-red-500 bg-red-50" : "border-gray-300"}`}
+		/>
+
+		{errors.comuna && (
+  		<p className="text-red-500 text-xs">{errors.comuna}</p>
+		)}
+
 
           <select
-            className="w-full border p-2 rounded"
-            onChange={(e) =>
-              setFormData({ ...formData, region: e.target.value })
-            }
-          >
+           	value={formData.region || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, region: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${errors.region ? "border-red-500 bg-red-50" : "border-gray-300"}`}
+		>
             <option value="">Selecciona Región</option>
             	<option>Región de Arica y Parinacota</option>
   	    	<option>Región de Tarapacá</option>
@@ -152,6 +210,9 @@ const mensajeEnvio = formData.region
   		<option>Región de Los Ríos</option>
   		<option>Región de Los Lagos</option>
   		<option>Región de Aysén del General Carlos Ibáñez del Campo</option>
+		{errors.region && (
+  		<p className="text-red-500 text-xs">{errors.region}</p>
+		)}
           </select>
 
           <textarea
@@ -167,8 +228,12 @@ const mensajeEnvio = formData.region
 </p>
 
         <button
-          onClick={handleMercadoPago}
-          className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+          onClick={() => {
+  	if (validarFormulario()) {
+    	handleMercadoPago();
+  	}
+	}}
+          className="btn-pagar"
         >
           💳 Pagar con MercadoPago
         </button>
