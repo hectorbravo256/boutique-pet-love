@@ -47,6 +47,14 @@ const validarFormulario = () => {
     nuevosErrores.region = "Selecciona una región";
   }
 
+  if (!formData.correo?.includes("@")) {
+    nuevosErrores.correo = "Correo inválido";
+  }
+
+  if (formData.telefono?.length < 8) {
+    nuevosErrores.telefono = "Teléfono inválido";
+  }
+
   setErrors(nuevosErrores);
   return Object.keys(nuevosErrores).length === 0;
 };
@@ -214,6 +222,37 @@ const validarFormulario = () => {
   		<p className="text-red-500 text-xs">{errors.region}</p>
 		)}
           </select>
+
+	   <input
+  		placeholder="Correo electrónico"
+  		value={formData.correo || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, correo: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${
+    		errors.correo ? "border-red-500 bg-red-50" : "border-gray-300"
+  		}`}
+		/>
+
+		{errors.correo && (
+  		<p className="text-red-500 text-xs">{errors.correo}</p>
+		)}
+
+		<input
+  		placeholder="Teléfono"
+  		value={formData.telefono || ""}
+  		onChange={(e) =>
+    		setFormData({ ...formData, telefono: e.target.value })
+  		}
+  		className={`w-full p-2 rounded border ${
+    		errors.telefono ? "border-red-500 bg-red-50" : "border-gray-300"
+  		}`}
+		/>
+
+		{errors.telefono && (
+  		<p className="text-red-500 text-xs">{errors.telefono}</p>
+		)}
+
 
           <textarea
             placeholder="Observación"

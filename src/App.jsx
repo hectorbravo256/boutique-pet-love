@@ -277,6 +277,8 @@ const decreaseQty = (index) => {
   direccion: "",
   comuna: "",
   region: "",
+  correo: "",
+  telefono: "",
   observacion: "",
 });
   const [currentIndex, setCurrentIndex] = useState({});
@@ -1063,8 +1065,15 @@ const formatPrice = (p) =>
   p ? "$" + p.toLocaleString("es-CL") : "";
 
   const [formData, setFormData] = useState({
-    region: "",
-  });
+  nombre: "",
+  rut: "",
+  direccion: "",
+  comuna: "",
+  region: "",
+  correo: "",
+  telefono: "",
+  observacion: "",
+});
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
