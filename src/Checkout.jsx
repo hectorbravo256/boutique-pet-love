@@ -51,9 +51,13 @@ const validarFormulario = () => {
     nuevosErrores.correo = "Correo inválido";
   }
 
-  if (formData.telefono?.length < 8) {
-    nuevosErrores.telefono = "Teléfono inválido";
-  }
+const formatTelefono = (value) => {
+  const digits = value.replace(/\D/g, "");
+
+  if (digits.length < 3) return "+" + digits;
+
+  return `+${digits.slice(0,2)} ${digits.slice(2,3)} ${digits.slice(3,7)} ${digits.slice(7,11)}`;
+};
 
   setErrors(nuevosErrores);
   return Object.keys(nuevosErrores).length === 0;
@@ -239,11 +243,24 @@ const validarFormulario = () => {
 		)}
 
 		<input
-  		placeholder="Teléfono"
+  		placeholder="+56 9 1234 5678"
   		value={formData.telefono || ""}
-  		onChange={(e) =>
-    		setFormData({ ...formData, telefono: e.target.value })
-  		}
+ 	 	onChange={(e) => {
+    		let value = e.target.value.replace(/\D/g, "");
+
+    		// Forzar formato chileno
+    		if (!value.startsWith("56")) {
+      		value = "56" + value;
+    		}
+
+    		// Limitar largo (56 + 9 + 8 dígitos = 11)
+    		value = value.slice(0, 11);
+
+    		setFormData({
+      		...formData,
+      		telefono: formatTelefono(value)
+    		});
+  		}}
   		className={`w-full p-2 rounded border ${
     		errors.telefono ? "border-red-500 bg-red-50" : "border-gray-300"
   		}`}
