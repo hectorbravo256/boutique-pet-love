@@ -689,15 +689,17 @@ if (!formData.region) {
                   ))}
                 </select>
 
-                <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="bloque-botones">
 
 		 {/* BOTÓN AGREGAR */}
-                  <button
-                    onClick={() => addToCart(product, size, price)}
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 text-white py-2 rounded-xl font-semibold transition"
-                  >
-		  <ShoppingCart size={16} strokeWidth={2} />
-                    Agregar Carro
+               <button
+    		onClick={() => addToCart(product, size, price)}
+    		className="btn btn-carrito"
+  		>
+    		<span className="icono">
+      		<ShoppingCart size={18} strokeWidth={2} />
+    		</span>
+                <span>Agregar Carro</span>
                   </button>
 		 {/* BOTÓN WHATSAPP */}
                   <a
@@ -709,9 +711,12 @@ if (!formData.region) {
   `\n\nTotal: ${formatPrice(totalFinal)}`
 )}`}
 		  target="_blank"
-                    className="bg-green-500 text-white flex items-center justify-center gap-2 py-2 rounded-xl hover:bg-green-600 transition"
+                    className="btn btn-whatsapp"
                   >
-  		Consultar por WhatsApp
+		<span className="icono">
+      		<MessageCircle size={18} />
+		</span>
+    		<span>Consultar por WhatsApp</span>
                   </a>
                 </div>
                   
