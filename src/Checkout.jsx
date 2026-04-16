@@ -53,10 +53,9 @@ const validarFormulario = () => {
 
 const telefonoRegex = /^\+569\d{8}$/;
 
-  if (!telefonoRegex.test(formData.telefono || "")) {
-    nuevosErrores.telefono = "Debe ser +56 9 XXXXXXXX";
-  }
-
+if (!telefonoRegex.test(formData.telefono || "")) {
+  nuevosErrores.telefono = "Debe ser +56 9 XXXXXXXX";
+}
   setErrors(nuevosErrores);
   return Object.keys(nuevosErrores).length === 0;
 };
@@ -240,29 +239,33 @@ const telefonoRegex = /^\+569\d{8}$/;
   		<p className="text-red-500 text-xs">{errors.correo}</p>
 		)}
 
-		<input
-  		placeholder="+56 9 1234 5678"
-  		value={formData.telefono || ""}
-  		onChange={(e) => {
-    		let value = e.target.value;
+	<input
+  placeholder="+56 9 1234 5678"
+  value={formData.telefono || ""}
+  onChange={(e) => {
+    let value = e.target.value;
 
-    		// Permitir escribir normal
-    		value = value.replace(/[^\d+]/g, "");
+    // Quitar todo lo que no sea número o +
+    value = value.replace(/[^\d+]/g, "");
 
-    		setFormData({
-      		...formData,
-      		telefono: value
-    		});
-  		}}
-  		className={`w-full p-2 rounded border ${
-    		errors.telefono ? "border-red-500 bg-red-50" : "border-gray-300"
-  		}`}
-		/>
+    // Si no empieza con +56 → lo agregamos
+    if (!value.startsWith("+56")) {
+      value = "+56" + value.replace("+", "").replace(/^56/, "");
+    }
+
+    setFormData({
+      ...formData,
+      telefono: value
+    });
+  }}
+  className={`w-full p-2 rounded border ${
+    errors.telefono ? "border-red-500 bg-red-50" : "border-gray-300"
+  }`}
+/>
 
 {errors.telefono && (
   <p className="text-red-500 text-xs">{errors.telefono}</p>
 )}
-
 
           <textarea
             placeholder="Observación"
