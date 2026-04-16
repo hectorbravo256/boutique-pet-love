@@ -16,8 +16,6 @@ export default function Checkout({
   formatPrice
 }) {
 
-  const formatPrice = (p) =>
-    p ? "$" + p.toLocaleString("es-CL") : "";
 
 const mensajeEnvio = formData.region
   ? aplicaEnvio
