@@ -51,13 +51,11 @@ const validarFormulario = () => {
     nuevosErrores.correo = "Correo inválido";
   }
 
-const formatTelefono = (value) => {
-  const digits = value.replace(/\D/g, "");
+const telefonoRegex = /^\+569\d{8}$/;
 
-  if (digits.length < 3) return "+" + digits;
-
-  return `+${digits.slice(0,2)} ${digits.slice(2,3)} ${digits.slice(3,7)} ${digits.slice(7,11)}`;
-};
+  if (!telefonoRegex.test(formData.telefono || "")) {
+    nuevosErrores.telefono = "Debe ser +56 9 XXXXXXXX";
+  }
 
   setErrors(nuevosErrores);
   return Object.keys(nuevosErrores).length === 0;
@@ -245,20 +243,15 @@ const formatTelefono = (value) => {
 		<input
   		placeholder="+56 9 1234 5678"
   		value={formData.telefono || ""}
- 	 	onChange={(e) => {
-    		let value = e.target.value.replace(/\D/g, "");
+  		onChange={(e) => {
+    		let value = e.target.value;
 
-    		// Forzar formato chileno
-    		if (!value.startsWith("56")) {
-      		value = "56" + value;
-    		}
-
-    		// Limitar largo (56 + 9 + 8 dígitos = 11)
-    		value = value.slice(0, 11);
+    		// Permitir escribir normal
+    		value = value.replace(/[^\d+]/g, "");
 
     		setFormData({
       		...formData,
-      		telefono: formatTelefono(value)
+      		telefono: value
     		});
   		}}
   		className={`w-full p-2 rounded border ${
@@ -266,9 +259,9 @@ const formatTelefono = (value) => {
   		}`}
 		/>
 
-		{errors.telefono && (
-  		<p className="text-red-500 text-xs">{errors.telefono}</p>
-		)}
+{errors.telefono && (
+  <p className="text-red-500 text-xs">{errors.telefono}</p>
+)}
 
 
           <textarea
