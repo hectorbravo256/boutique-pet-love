@@ -1,6 +1,20 @@
 import { useState } from "react";
 
-export default function Checkout({ cart, total, shipping, totalFinal, formData, setFormData, handleMercadoPago, aplicaEnvio }) {
+export default function Checkout({
+  cart,
+  total,
+  shipping,
+  totalFinal,
+  formData,
+  setFormData,
+  handleMercadoPago,
+  aplicaEnvio,
+
+  increaseQty,
+  decreaseQty,
+  removeItem,
+  formatPrice
+}) {
 
   const formatPrice = (p) =>
     p ? "$" + p.toLocaleString("es-CL") : "";
@@ -19,12 +33,45 @@ const mensajeEnvio = formData.region
       <div className="bg-white p-6 rounded-2xl shadow">
         <h2 className="text-xl font-bold mb-4">Resumen del pedido</h2>
 
-        {cart.map((item, i) => (
-          <div key={i} className="flex justify-between text-sm mb-2">
-            <span>{item.name} ({item.size})</span>
-            <span>{formatPrice(item.price)}</span>
-          </div>
-        ))}
+{cart.map((item, i) => (
+  <div key={i} className="checkout-item">
+
+    {/* 🖼 IMAGEN */}
+    <img
+      src={item.images?.[0]}
+      className="checkout-img"
+    />
+
+    {/* 📦 INFO */}
+    <div className="checkout-info">
+      <p className="checkout-name">{item.name}</p>
+      <p className="checkout-size">{item.size}</p>
+
+      {/* 🔢 CANTIDAD */}
+      <div className="checkout-qty">
+        <button onClick={() => decreaseQty(i)}>−</button>
+        <span>{item.qty || 1}</span>
+        <button onClick={() => increaseQty(i)}>+</button>
+      </div>
+    </div>
+
+    {/* 💰 PRECIO + ELIMINAR */}
+    <div className="checkout-actions">
+      <p className="checkout-price">
+        {formatPrice(item.price * (item.qty || 1))}
+      </p>
+
+      <button
+        onClick={() => removeItem(i)}
+        className="checkout-remove"
+      >
+        Eliminar
+      </button>
+    </div>
+
+  </div>
+))}
+
 <div className="bg-gray-50 rounded-xl p-4 mt-4 space-y-2">
 
   <div className="flex justify-between text-sm">

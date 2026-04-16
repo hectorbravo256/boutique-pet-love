@@ -983,6 +983,28 @@ if (!formData.region) {
 /* ================= CHECKOUT WRAPPER ================= */
 function CheckoutWrapper() {
   const [cart, setCart] = useState([]);
+
+const increaseQty = (index) => {
+  const updated = [...cart];
+  updated[index].qty = (updated[index].qty || 1) + 1;
+  setCart(updated);
+};
+
+const decreaseQty = (index) => {
+  const updated = [...cart];
+  if ((updated[index].qty || 1) > 1) {
+    updated[index].qty -= 1;
+  }
+  setCart(updated);
+};
+
+const removeItem = (index) => {
+  setCart(cart.filter((_, i) => i !== index));
+};
+
+const formatPrice = (p) =>
+  p ? "$" + p.toLocaleString("es-CL") : "";
+
   const [formData, setFormData] = useState({
     region: "",
   });
@@ -1012,15 +1034,21 @@ const totalFinal = total + shipping;
 
 return (
   <Checkout
-    cart={cart}
-    total={total}
-    shipping={shipping}
-    totalFinal={totalFinal}
-    formData={formData}
-    setFormData={setFormData}
-    handleMercadoPago={() => alert("Pago en construcción")}
-    aplicaEnvio={aplicaEnvio}
-  />
+  cart={cart}
+  total={total}
+  shipping={shipping}
+  totalFinal={totalFinal}
+  formData={formData}
+  setFormData={setFormData}
+  handleMercadoPago={() => alert("Pago en construcción")}
+  aplicaEnvio={aplicaEnvio}
+
+  /* 🔥 NUEVO */
+  increaseQty={increaseQty}
+  decreaseQty={decreaseQty}
+  removeItem={removeItem}
+  formatPrice={formatPrice}
+/>
   );
 }
 
