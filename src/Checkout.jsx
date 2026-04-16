@@ -117,6 +117,10 @@ const mensajeEnvio = formData.region
 
         </div>
 
+<p className="text-sm text-green-600 font-semibold mt-2">
+  🔒 Pago 100% seguro con MercadoPago
+</p>
+
         <button
           onClick={handleMercadoPago}
           className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
