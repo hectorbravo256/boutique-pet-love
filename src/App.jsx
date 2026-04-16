@@ -2,7 +2,7 @@ import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
-
+import './index.css';
 
 const WHATSAPP = "https://wa.me/56982700002";
 
