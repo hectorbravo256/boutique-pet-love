@@ -51,14 +51,12 @@ const response = await preference.create({
   body: {
     items: items,
 
-    // 🔥 AQUÍ ESTÁ LA CLAVE
     metadata: {
       items: body.items,
       formData: body.formData,
       total: total,
     },
 
-    // 🔥 WEBHOOK
     notification_url:
       "https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/webhook",
   },
