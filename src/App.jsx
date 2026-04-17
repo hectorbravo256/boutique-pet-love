@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 import './index.css';
+import Admin from "./Admin";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -838,7 +839,7 @@ localStorage.setItem(
             `${i.name} - ${i.size} - ${formatPrice(i.price)}`
         )
         .join("\n") +
-      `\nTotal: ${formatPrice(totalFinal)}`
+      `\nTotal: ${formatPrice(total)}`
   )}`}
   target="_blank"
   className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
@@ -996,6 +997,36 @@ localStorage.setItem(
 function CheckoutWrapper() {
   const [cart, setCart] = useState([]);
 
+  const [formData, setFormData] = useState({
+  nombre: "",
+  rut: "",
+  direccion: "",
+  comuna: "",
+  region: "",
+  correo: "",
+  telefono: "",
+  observacion: "",
+});
+
+// 🔥 CALCULAR TOTALES (MOVER AQUÍ)
+const total = cart.reduce(
+  (acc, i) => acc + i.price * (i.qty || 1),
+  0
+);
+
+const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+const aplicaEnvio =
+  cart.length > 0 && regionesConEnvio.includes(formData.region);
+
+const shipping = aplicaEnvio ? 3500 : 0;
+
+const totalFinal = total + shipping;
+
 const handleMercadoPago = async () => {
 
   /* ✅ VALIDACIÓN FORMULARIO */
@@ -1025,6 +1056,16 @@ const handleMercadoPago = async () => {
     return;
   }
 
+if (!formData.correo.includes("@")) {
+  alert("Correo inválido");
+  return;
+}
+
+if (!formData.telefono || formData.telefono.length < 8) {
+  alert("Teléfono inválido");
+  return;
+}
+
 /* 🛒 VALIDACIÓN CARRITO */
 
   if (cart.length === 0) {
@@ -1048,6 +1089,16 @@ const handleMercadoPago = async () => {
 
     const data = await res.json();
 
+// 🔥 GUARDAR PEDIDO (CLAVE)
+localStorage.setItem(
+  "lastOrder",
+  JSON.stringify({
+    cart,
+    formData,
+    total: totalFinal,
+    date: new Date().toISOString(),
+  })
+);
 
     window.location.href = data.init_point;
   } catch (error) {
@@ -1076,39 +1127,13 @@ const removeItem = (index) => {
 const formatPrice = (p) =>
   p ? "$" + p.toLocaleString("es-CL") : "";
 
-  const [formData, setFormData] = useState({
-  nombre: "",
-  rut: "",
-  direccion: "",
-  comuna: "",
-  region: "",
-  correo: "",
-  telefono: "",
-  observacion: "",
-});
+
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
-  const total = cart.reduce(
-  (acc, i) => acc + i.price * (i.qty || 1),
-  0
-);
-
-    const regionesConEnvio = [
-  "Región Metropolitana de Santiago",
-  "Región de Valparaíso",
-  "Región del Libertador General Bernardo O'Higgins",
-];
-
-const aplicaEnvio =
-  cart.length > 0 && regionesConEnvio.includes(formData.region);
-
-const shipping = aplicaEnvio ? 3500 : 0;
-
-const totalFinal = total + shipping;
 
 return (
   <Checkout
@@ -1131,7 +1156,6 @@ return (
 }
 
 function Success() {
-
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
@@ -1140,84 +1164,147 @@ function Success() {
       setOrder(JSON.parse(saved));
     }
 
-    // limpiar carrito
     localStorage.removeItem("cart");
+    localStorage.removeItem("lastOrder");
   }, []);
 
-  const numeroOrden = order
-    ? "ORD-" + new Date(order.date).getTime()
-    : "";
+if (!order || !order.cart) {
+  return <p style={{ padding: 40 }}>Cargando...</p>;
+}
 
-  if (!order) {
-    return <p style={{ padding: 40 }}>Cargando...</p>;
-  }
+  const subtotal = order.cart.reduce(
+    (acc, i) => acc + i.price * (i.qty || 1),
+    0
+  );
+
+  const envio = order.total - subtotal;
+
+  const numeroOrden = "ORD-" + new Date(order.date).getTime();
 
   return (
-    <div style={{ padding: "40px", maxWidth: 600, margin: "auto" }}>
-      
-      {/* 🎉 ANIMACIÓN */}
-      <div style={{ textAlign: "center", fontSize: "50px" }}>
-        🎉
-      </div>
+    <div style={{
+      minHeight: "100vh",
+      background: "#fdf2f8",
+      padding: 20,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center"
+    }}>
 
-      <h1 style={{ textAlign: "center" }}>Pago exitoso</h1>
-
-      <p style={{ textAlign: "center", marginBottom: 20 }}>
-        Gracias por tu compra 🐾
-      </p>
-
-      {/* 🧾 ORDEN */}
       <div style={{
-        background: "#fff",
-        padding: 20,
-        borderRadius: 12,
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+        width: "100%",
+        maxWidth: 500,
+        background: "white",
+        borderRadius: 16,
+        padding: 25,
+        boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
       }}>
-        <p><strong>N° Orden:</strong> {numeroOrden}</p>
-        <p><strong>Nombre:</strong> {order.formData.nombre}</p>
-        <p><strong>Correo:</strong> {order.formData.correo}</p>
+
+        {/* 🐾 HEADER */}
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <h2 style={{ color: "#ec4899", margin: 0 }}>
+            🐾 Boutique Pet Love
+          </h2>
+          <p style={{ fontSize: 12, color: "#999" }}>
+            Confirmación de compra
+          </p>
+        </div>
+
+        {/* ✅ ESTADO */}
+        <div style={{
+          background: "#ecfdf5",
+          color: "#059669",
+          padding: 10,
+          borderRadius: 10,
+          textAlign: "center",
+          fontWeight: "bold",
+          marginBottom: 20
+        }}>
+          ✅ Pago aprobado
+        </div>
+
+        {/* 📄 INFO */}
+        <div style={{ fontSize: 14, marginBottom: 15 }}>
+          <p><strong>N° Orden:</strong> {numeroOrden}</p>
+          <p><strong>Fecha:</strong> {new Date(order.date).toLocaleString()}</p>
+          <p><strong>Cliente:</strong> {order.formData.nombre}</p>
+          <p><strong>Correo:</strong> {order.formData.correo}</p>
+        </div>
 
         <hr />
 
-        <h3>Productos</h3>
+        {/* 🛒 PRODUCTOS */}
+        <div style={{ marginTop: 15 }}>
+          {order.cart.map((item, i) => (
+            <div key={i} style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 8
+            }}>
+              <div>
+                <p style={{ margin: 0, fontWeight: "bold" }}>
+                  {item.name}
+                </p>
+                <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
+                  {item.size} x{item.qty || 1}
+                </p>
+              </div>
 
-        {order.cart.map((item, i) => (
-          <div key={i} style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 5
-          }}>
+              <span>
+                ${(item.price * (item.qty || 1)).toLocaleString("es-CL")}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <hr />
+
+        {/* 💰 TOTALES */}
+        <div style={{ marginTop: 15, fontSize: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Subtotal</span>
+            <span>${subtotal.toLocaleString("es-CL")}</span>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Envío</span>
             <span>
-              {item.name} ({item.size}) x{item.qty || 1}
-            </span>
-            <span>
-              ${item.price.toLocaleString("es-CL")}
+              {envio > 0
+                ? `$${envio.toLocaleString("es-CL")}`
+                : "Por pagar"}
             </span>
           </div>
-        ))}
 
-        <hr />
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: "bold",
+            fontSize: 18,
+            marginTop: 10
+          }}>
+            <span>Total</span>
+            <span>${order.total.toLocaleString("es-CL")}</span>
+          </div>
+        </div>
 
-        <h2>Total: ${order.total.toLocaleString("es-CL")}</h2>
+        {/* 🏠 BOTÓN */}
+        <div style={{ textAlign: "center", marginTop: 25 }}>
+          <a
+            href="/"
+            style={{
+              background: "#ec4899",
+              color: "white",
+              padding: "12px 20px",
+              borderRadius: 10,
+              textDecoration: "none",
+              fontWeight: "bold"
+            }}
+          >
+            Volver a la tienda
+          </a>
+        </div>
+
       </div>
-
-<div style={{ textAlign: "center", marginTop: 20 }}>
-  <a
-    href="/"
-    style={{
-      display: "inline-block",
-      background: "#ec4899",
-      color: "white",
-      padding: "12px 20px",
-      borderRadius: "10px",
-      textDecoration: "none",
-      fontWeight: "bold"
-    }}
-  >
-    🏠 Volver a la tienda
-  </a>
-</div>
-
     </div>
   );
 }
