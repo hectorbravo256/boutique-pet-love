@@ -2,9 +2,12 @@ const nodemailer = require("nodemailer");
 
 exports.handler = async (event) => {
   try {
-    const data = JSON.parse(event.body);
 
-    const { items, formData, total } = data;
+    // 👇 SI NO VIENE BODY (prueba manual)
+    let data = {};
+    if (event.body) {
+      data = JSON.parse(event.body);
+    }
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -14,39 +17,18 @@ exports.handler = async (event) => {
       },
     });
 
-    const productosHTML = items
-      .map(
-        (i) =>
-          `<li>${i.name} (${i.size}) x${i.qty || 1} - $${i.price}</li>`
-      )
-      .join("");
-
-    const html = `
-      <h2>Nuevo Pedido 🐾</h2>
-      <p><strong>Nombre:</strong> ${formData.nombre}</p>
-      <p><strong>Correo:</strong> ${formData.correo}</p>
-      <p><strong>Teléfono:</strong> ${formData.telefono}</p>
-      <p><strong>Dirección:</strong> ${formData.direccion}</p>
-      <p><strong>Comuna:</strong> ${formData.comuna}</p>
-      <p><strong>Región:</strong> ${formData.region}</p>
-
-      <h3>Productos:</h3>
-      <ul>${productosHTML}</ul>
-
-      <h3>Total: $${total}</h3>
-    `;
-
     await transporter.sendMail({
       from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
-      to: `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
-      subject: "Confirmación de compra 🐾",
-      html,
+      to: process.env.EMAIL_USER, // te lo envía a ti mismo
+      subject: "Prueba de correo 🐾",
+      html: "<h2>Correo funcionando correctamente 🚀</h2>",
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ ok: true }),
+      body: "Correo enviado correctamente",
     };
+
   } catch (error) {
     return {
       statusCode: 500,
