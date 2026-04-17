@@ -431,6 +431,16 @@ if (!formData.region) {
 
     const data = await res.json();
 
+localStorage.setItem(
+  "lastOrder",
+  JSON.stringify({
+    cart,
+    formData,
+    total: totalFinal,
+    date: new Date().toISOString(),
+  })
+);
+
     window.location.href = data.init_point;
   } catch (error) {
     alert("Error al iniciar pago");
@@ -1120,6 +1130,98 @@ return (
   );
 }
 
+function Success() {
+
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lastOrder");
+    if (saved) {
+      setOrder(JSON.parse(saved));
+    }
+
+    // limpiar carrito
+    localStorage.removeItem("cart");
+  }, []);
+
+  const numeroOrden = order
+    ? "ORD-" + new Date(order.date).getTime()
+    : "";
+
+  if (!order) {
+    return <p style={{ padding: 40 }}>Cargando...</p>;
+  }
+
+  return (
+    <div style={{ padding: "40px", maxWidth: 600, margin: "auto" }}>
+      
+      {/* 🎉 ANIMACIÓN */}
+      <div style={{ textAlign: "center", fontSize: "50px" }}>
+        🎉
+      </div>
+
+      <h1 style={{ textAlign: "center" }}>Pago exitoso</h1>
+
+      <p style={{ textAlign: "center", marginBottom: 20 }}>
+        Gracias por tu compra 🐾
+      </p>
+
+      {/* 🧾 ORDEN */}
+      <div style={{
+        background: "#fff",
+        padding: 20,
+        borderRadius: 12,
+        boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+      }}>
+        <p><strong>N° Orden:</strong> {numeroOrden}</p>
+        <p><strong>Nombre:</strong> {order.formData.nombre}</p>
+        <p><strong>Correo:</strong> {order.formData.correo}</p>
+
+        <hr />
+
+        <h3>Productos</h3>
+
+        {order.cart.map((item, i) => (
+          <div key={i} style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 5
+          }}>
+            <span>
+              {item.name} ({item.size}) x{item.qty || 1}
+            </span>
+            <span>
+              ${item.price.toLocaleString("es-CL")}
+            </span>
+          </div>
+        ))}
+
+        <hr />
+
+        <h2>Total: ${order.total.toLocaleString("es-CL")}</h2>
+      </div>
+
+<div style={{ textAlign: "center", marginTop: 20 }}>
+  <a
+    href="/"
+    style={{
+      display: "inline-block",
+      background: "#ec4899",
+      color: "white",
+      padding: "12px 20px",
+      borderRadius: "10px",
+      textDecoration: "none",
+      fontWeight: "bold"
+    }}
+  >
+    🏠 Volver a la tienda
+  </a>
+</div>
+
+    </div>
+  );
+}
+
 
 
 /* ================= ROUTER ================= */
@@ -1129,6 +1231,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppContent />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
+	<Route path="/success" element={<Success />} />
+	<Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   );

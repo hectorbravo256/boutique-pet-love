@@ -59,6 +59,15 @@ const response = await preference.create({
 
     notification_url:
       "https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/webhook",
+
+    back_urls: {
+      success: "https://fluffy-daifuku-56b90b.netlify.app/success",
+      failure: "https://fluffy-daifuku-56b90b.netlify.app/failure",
+      pending: "https://fluffy-daifuku-56b90b.netlify.app/pending",
+    },
+
+    auto_return: "approved",
+
   },
 });
 

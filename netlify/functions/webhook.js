@@ -22,10 +22,29 @@ exports.handler = async (event) => {
 
     const payment = await res.json();
 
-    // ✅ SOLO SI ESTÁ APROBADO
-    if (payment.status === "approved") {
+console.log("STATUS DEL PAGO:", payment.status);
 
-      const { items, formData, total } = payment.metadata;
+
+// ✅ VALIDACIÓN PRO (AQUÍ VA)
+if (!payment.metadata || !payment.metadata.items) {
+  console.log("No hay metadata");
+  return { statusCode: 200, body: "ok" };
+}
+
+    // ✅ SOLO SI ESTÁ APROBADO
+    if (payment.status === "approved" || payment.status === "authorized") {
+
+const { items, formData, total } = payment.metadata;
+
+await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", {
+  method: "POST",
+  body: JSON.stringify({
+    items,
+    formData,
+    total,
+    date: new Date(),
+  }),
+});
 
       // 📧 CONFIG EMAIL
       const transporter = nodemailer.createTransport({
