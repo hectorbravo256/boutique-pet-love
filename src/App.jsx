@@ -20,7 +20,7 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo cálido ideal para invierno.",
     sizes: {
-      "Talla 0": 8000,
+      "Talla 0": 10,
       "Talla 1": 8500,
       "Talla 2": 9000,
       "Talla 3": 10000,
