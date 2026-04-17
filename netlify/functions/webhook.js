@@ -3,7 +3,9 @@ const nodemailer = require("nodemailer");
 
 exports.handler = async (event) => {
   try {
-    const body = JSON.parse(event.body);
+    const body = event.body ? JSON.parse(event.body) : {};
+
+    console.log("WEBHOOK BODY:", body);
 
     if (body.type !== "payment") {
       return { statusCode: 200, body: "ok" };
