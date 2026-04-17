@@ -1037,6 +1037,8 @@ const handleMercadoPago = async () => {
     });
 
     const data = await res.json();
+
+
     window.location.href = data.init_point;
   } catch (error) {
     alert("Error al iniciar pago");

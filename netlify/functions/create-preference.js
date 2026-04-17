@@ -42,14 +42,25 @@ if (regionesConEnvio.includes(body.formData.region)) {
 
   const preference = new Preference(client);
 
-    const response = await preference.create({
-  body: {
-	items: items,
+    const total = body.items.reduce(
+  (acc, i) => acc + i.price * (i.qty || 1),
+  0
+);
 
-	// ✅ Guardar datos del cliente
+const response = await preference.create({
+  body: {
+    items: items,
+
+    // 🔥 AQUÍ ESTÁ LA CLAVE
     metadata: {
-      cliente: body.formData,
+      items: body.items,
+      formData: body.formData,
+      total: total,
     },
+
+    // 🔥 WEBHOOK
+    notification_url:
+      "https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/webhook",
   },
 });
 
