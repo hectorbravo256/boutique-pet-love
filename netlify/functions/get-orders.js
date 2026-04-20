@@ -1,17 +1,22 @@
-const fs = require("fs");
-const path = require("path");
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 exports.handler = async () => {
-  const filePath = path.join("/tmp", "orders.json");
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  if (!fs.existsSync(filePath)) {
+  if (error) {
     return {
-      statusCode: 200,
-      body: JSON.stringify([]),
+      statusCode: 500,
+      body: error.message,
     };
   }
-
-  const data = JSON.parse(fs.readFileSync(filePath));
 
   return {
     statusCode: 200,

@@ -1,24 +1,30 @@
-const fs = require("fs");
-const path = require("path");
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 exports.handler = async (event) => {
   try {
     const data = JSON.parse(event.body);
 
-    const filePath = path.join("/tmp", "orders.json");
+    const { formData, items, total } = data;
 
-    let orders = [];
+    const { error } = await supabase.from("orders").insert([
+      {
+        nombre: formData.nombre,
+        correo: formData.correo,
+        telefono: formData.telefono,
+        direccion: formData.direccion,
+        comuna: formData.comuna,
+        region: formData.region,
+        items,
+        total,
+      },
+    ]);
 
-    if (fs.existsSync(filePath)) {
-      orders = JSON.parse(fs.readFileSync(filePath));
-    }
-
-    orders.push({
-      ...data,
-      id: Date.now(),
-    });
-
-    fs.writeFileSync(filePath, JSON.stringify(orders));
+    if (error) throw error;
 
     return {
       statusCode: 200,
@@ -28,7 +34,7 @@ exports.handler = async (event) => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: error.toString(),
+      body: error.message,
     };
   }
 };
