@@ -88,18 +88,19 @@ await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-o
         <h3>Total: $${total}</h3>
       `;
 
-      await transporter.sendMail({
-        from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
-        to: `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
-        subject: "Compra confirmada 🐾",
-        html,
-      });
+try {
+  await transporter.sendMail({
+    from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
+    to: `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
+    subject: "Compra confirmada 🐾",
+    html,
+  });
 
-  console.log("EMAIL ENVIADO");
-} catch (err) {
-  console.log("ERROR EMAIL:", err);
+  console.log("EMAIL ENVIADO OK");
+} catch (error) {
+  console.log("ERROR AL ENVIAR EMAIL:", error);
 }
-    }
+	}
 
     return {
       statusCode: 200,
@@ -112,4 +113,3 @@ await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-o
       body: error.toString(),
     };
   }
-};
