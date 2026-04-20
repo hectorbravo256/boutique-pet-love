@@ -56,13 +56,15 @@ await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-o
 });
 
       // 📧 CONFIG EMAIL
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
       const productosHTML = items
         .map(
