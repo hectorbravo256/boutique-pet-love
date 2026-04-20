@@ -7,11 +7,18 @@ exports.handler = async (event) => {
 
     console.log("WEBHOOK BODY:", body);
 
-    if (body.type !== "payment") {
-      return { statusCode: 200, body: "ok" };
-    }
+  if (body.type !== "payment" && body.topic !== "merchant_order") {
+  return { statusCode: 200, body: "ok" };
+}
 
-    const paymentId = body.data.id;
+    const paymentId =
+  body.data?.id ||
+  (body.resource ? body.resource.split("/").pop() : null);
+
+if (!paymentId) {
+  console.log("No paymentId");
+  return { statusCode: 200 };
+}
 
     // 🔐 CONSULTAR PAGO REAL
     const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
@@ -23,6 +30,8 @@ exports.handler = async (event) => {
     const payment = await res.json();
 
 console.log("STATUS DEL PAGO:", payment.status);
+
+console.log("METADATA COMPLETA:", payment.metadata);
 
 
 // ✅ VALIDACIÓN PRO (AQUÍ VA)
@@ -85,6 +94,11 @@ await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-o
         subject: "Compra confirmada 🐾",
         html,
       });
+
+  console.log("EMAIL ENVIADO");
+} catch (err) {
+  console.log("ERROR EMAIL:", err);
+}
     }
 
     return {
