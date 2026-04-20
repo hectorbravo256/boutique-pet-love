@@ -9,6 +9,7 @@
     "preview": "npx vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.104.0",
     "lucide-react": "^0.511.0",
     "mercadopago": "^2.0.0",
     "nodemailer": "^8.0.5",
