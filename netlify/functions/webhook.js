@@ -43,7 +43,8 @@ if (!payment.metadata || !payment.metadata.items) {
     // ✅ SOLO SI ESTÁ APROBADO
     if (payment.status === "approved" || payment.status === "authorized") {
 
-const { items, formData, total } = payment.metadata;
+const { items, form_data, total } = payment.metadata;
+const formData = form_data;
 
 await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", {
   method: "POST",
