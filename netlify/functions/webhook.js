@@ -46,7 +46,9 @@ if (!payment.metadata || !payment.metadata.items) {
 const { items, form_data, total } = payment.metadata;
 const formData = form_data;
 
-await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", {
+console.log("GUARDANDO EN BD...");
+
+const saveRes = await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", {
   method: "POST",
   body: JSON.stringify({
     items,
@@ -55,6 +57,9 @@ await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-o
     date: new Date(),
   }),
 });
+
+const saveData = await saveRes.text();
+console.log("RESPUESTA SAVE ORDER:", saveData);
 
       // 📧 CONFIG EMAIL
 const transporter = nodemailer.createTransport({
