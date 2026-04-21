@@ -46,20 +46,27 @@ if (!payment.metadata || !payment.metadata.items) {
 const { items, form_data, total } = payment.metadata;
 const formData = form_data;
 
-console.log("GUARDANDO EN BD...");
+console.log("GUARDANDO PEDIDO...");
 
-const saveRes = await fetch("https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", {
+const saveRes = await fetch(
+"https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", 
+{
   method: "POST",
+ headers: {
+      "Content-Type": "application/json",
+    },
   body: JSON.stringify({
     items,
     formData,
     total,
-    date: new Date(),
   }),
-});
+ }
+);
 
-const saveData = await saveRes.text();
-console.log("RESPUESTA SAVE ORDER:", saveData);
+const saveResult = await saveRes.text();
+
+console.log("SAVE ORDER STATUS:", saveRes.status);
+console.log("SAVE ORDER RESPONSE:", saveResult);
 
       // 📧 CONFIG EMAIL
 const transporter = nodemailer.createTransport({
