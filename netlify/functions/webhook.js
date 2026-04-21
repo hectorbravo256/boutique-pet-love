@@ -46,27 +46,32 @@ if (!payment.metadata || !payment.metadata.items) {
 const { items, form_data, total } = payment.metadata;
 const formData = form_data;
 
-console.log("GUARDANDO PEDIDO...");
+const { createClient } = require("@supabase/supabase-js");
 
-const saveRes = await fetch(
-"https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/save-order", 
-{
-  method: "POST",
- headers: {
-      "Content-Type": "application/json",
-    },
-  body: JSON.stringify({
-    items,
-    formData,
-    total,
-  }),
- }
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
 );
 
-const saveResult = await saveRes.text();
+const { error } = await supabase.from("orders").insert([
+  {
+    nombre: formData.nombre,
+    correo: formData.correo,
+    telefono: formData.telefono,
+    direccion: formData.direccion,
+    comuna: formData.comuna,
+    region: formData.region,
+    items,
+    total,
+  },
+]);
 
-console.log("SAVE ORDER STATUS:", saveRes.status);
-console.log("SAVE ORDER RESPONSE:", saveResult);
+if (error) {
+  console.log("❌ ERROR SUPABASE:", error);
+} else {
+  console.log("✅ PEDIDO GUARDADO EN SUPABASE");
+}
+
 
       // 📧 CONFIG EMAIL
 const transporter = nodemailer.createTransport({
