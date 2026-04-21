@@ -22,8 +22,17 @@ export default function Admin() {
           boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
         }}>
           <p><strong>{o.nombre}</strong></p>
+	  <p><strong>RUT:</strong> {o.rut}</p>
           <p>{o.correo}</p>
+	  <p><strong>Teléfono:</strong> {o.telefono}</p>
           <p>{o.direccion}</p>
+	  <p><strong>Comuna:</strong> {o.comuna}</p>
+	  <p><strong>Región:</strong> {o.region}</p>
+
+	  <p>
+  	   <strong>Observación:</strong>{" "}
+  	   {o.observacion ? o.observacion : "Sin observaciones"}
+	 </p>
 
           <h4>Productos:</h4>
           {o.items.map((i, idx) => (
