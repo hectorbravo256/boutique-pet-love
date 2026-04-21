@@ -11,6 +11,7 @@ import Login from "./Login";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
+
 /* ================= PRODUCTOS ================= */
 
 const products = [
@@ -25,19 +26,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo cálido ideal para invierno.",
     sizes: {
-      "Talla 0": 10,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
   {
@@ -51,19 +52,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo tipo corderito suave y abrigador.",
     sizes: {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 {
@@ -77,19 +78,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo tipo corderito suave y abrigador.",
     sizes: {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 {
@@ -103,19 +104,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo tipo corderito suave y abrigador.",
     sizes: {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 {
@@ -129,19 +130,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo tipo corderito suave y abrigador.",
     sizes: {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 {
@@ -157,19 +158,19 @@ const products = [
     badge: "Otoño / Invierno",
     description: "Abrigo tipo corderito suave y abrigador.",
     sizes: {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990,
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 
@@ -184,19 +185,19 @@ const products = [
     "badge": "Otoño / Invierno",
     "description": "Producto de alta calidad para mascotas",
     "sizes": {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
   {
@@ -210,19 +211,19 @@ const products = [
     "badge": "Otoño / Invierno",
     "description": "Producto de alta calidad para mascotas",
     "sizes": {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
   {
@@ -236,19 +237,19 @@ const products = [
     "badge": "Otoño / Invierno",
     "description": "Producto de alta calidad para mascotas",
     "sizes": {
-      "Talla 0": 8000,
-      "Talla 1": 8500,
-      "Talla 2": 9000,
-      "Talla 3": 10000,
-      "Talla 4": 11000,
-      "Talla 5": 12000,
-      "Talla 6": 13000,
-      "Talla 7": 14000,
-      "Talla 8": 15000,
-      "Talla 9": 16000,
-      "Talla 10": 16990,
-      "Talla 11": 17990,
-      "Talla 12": 18990
+      "Talla 0": { price: 10, stock: 5 },
+      "Talla 1": { price: 8990, stock: 5 },
+      "Talla 2": { price: 9990, stock: 5 },
+      "Talla 3": { price: 10990, stock: 5 },
+      "Talla 4": { price: 11990, stock: 5 },
+      "Talla 5": { price: 12990, stock: 5 },
+      "Talla 6": { price: 13990, stock: 5 },
+      "Talla 7": { price: 14990, stock: 5 },
+      "Talla 8": { price: 15990, stock: 5 },
+      "Talla 9": { price: 16990, stock: 5 },
+      "Talla 10": { price: 17990, stock: 5 },
+      "Talla 11": { price: 18990, stock: 5 },
+      "Talla 12": { price: 19990, stock: 5 },
     },
   },
 ];
@@ -275,6 +276,7 @@ const decreaseQty = (index) => {
 
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
+  const [stockDB, setStockDB] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
   const [formData, setFormData] = useState({
   nombre: "",
@@ -318,6 +320,18 @@ const decreaseQty = (index) => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
+
+useEffect(() => {
+  const cargarStock = async () => {
+    const { data } = await supabase
+      .from("product_stock")
+      .select("*");
+
+    setStockDB(data);
+  };
+
+  cargarStock();
+}, []);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -570,7 +584,11 @@ localStorage.setItem(
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => {
             const size = selectedSizes[product.id];
-            const price = size ? product.sizes[size] : null;
+            const price = size
+  ? typeof product.sizes[size] === "object"
+    ? product.sizes[size].price
+    : product.sizes[size]
+  : null;
 
 
 
@@ -688,31 +706,62 @@ localStorage.setItem(
                   {price ? formatPrice(price) : "Selecciona talla"}
                 </p>
 
-                <select
-                  className="w-full mt-3 border p-2 rounded-xl"
-                  value={size || ""}
-                  onChange={(e) =>
-                    setSelectedSizes({
-                      ...selectedSizes,
-                      [product.id]: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">Seleccionar talla</option>
-                  {Object.keys(product.sizes).map((s) => (
-                    <option key={s} value={s}>
-                      {s} - {formatPrice(product.sizes[s])}
-                    </option>
-                  ))}
-                </select>
+               <select
+  className="w-full mt-3 border p-2 rounded-xl"
+  value={size || ""}
+  onChange={(e) =>
+    setSelectedSizes({
+      ...selectedSizes,
+      [product.id]: e.target.value,
+    })
+  }
+>
+  <option value="">Seleccionar talla</option>
+
+{Object.entries(product.sizes).map(([size, data]) => {
+  const price = data.price;
+
+  const stockItem = stockDB.find(
+    (s) =>
+      s.product_id === product.id &&
+      s.size === size
+  );
+
+  const stock = stockItem ? stockItem.stock : 0;
+
+  return (
+    <option
+      key={size}
+      value={size}
+      disabled={stock === 0}
+    >
+      {size} - {formatPrice(price)}
+      {stock === 0 ? " ❌ Sin stock" : ""}
+    </option>
+  );
+})}
+</select>
 
                 <div className="bloque-botones">
 
 		 {/* BOTÓN AGREGAR */}
-               <button
-    		onClick={() => addToCart(product, size, price)}
-    		className="btn btn-carrito"
-  		>
+              <button
+  		onClick={() => {
+    		if (!size) return alert("Selecciona talla");
+
+    		const data = product.sizes[size];
+    		const stock =
+      		typeof data === "object" ? data.stock : 999;
+
+    		if (stock === 0) {
+      		alert("Producto sin stock");
+      		return;
+    		}
+
+    		addToCart(product, size, price);
+  		}}
+  		className="btn btn-carrito"
+		>
     		<span className="icono">
       		<ShoppingCart size={18} strokeWidth={2} />
     		</span>

@@ -44,6 +44,13 @@ if (!payment.metadata || !payment.metadata.items) {
     if (payment.status === "approved" || payment.status === "authorized") {
 
 const { items, form_data, total } = payment.metadata;
+for (const item of items) {
+  await supabase.rpc("descontar_stock", {
+    p_id: item.id,
+    p_size: item.size,
+    cantidad: item.qty || 1,
+  });
+}
 const formData = form_data;
 
 const { createClient } = require("@supabase/supabase-js");

@@ -15,6 +15,16 @@ export default function Admin() {
   
   const [orders, setOrders] = useState([]);
   const [filtro, setFiltro] = useState("todos");
+  const [busqueda, setBusqueda] = useState("");
+  const [busquedaDebounce, setBusquedaDebounce] = useState("");
+
+useEffect(() => {
+  const timeout = setTimeout(() => {
+    setBusquedaDebounce(busqueda);
+  }, 300);
+
+  return () => clearTimeout(timeout);
+}, [busqueda]);
 
   useEffect(() => {
     fetch("/.netlify/functions/get-orders")
@@ -46,9 +56,24 @@ const totalPedidos = orders.length;
 const pendientes = orders.filter(o => o.estado === "pendiente").length;
 const enviados = orders.filter(o => o.estado === "enviado").length;
 
-const pedidosFiltrados = orders.filter((o) => {
-  if (filtro === "todos") return true;
-  return o.estado === filtro;
+const pedidosFiltrados = pedidosOrdenados.filter((o) => {
+  const estado = o.estado || "pendiente";
+
+  const matchFiltro =
+    filtro === "todos" || estado === filtro;
+
+  const texto = `
+    ${o.nombre}
+    ${o.correo}
+    ${o.rut}
+    ${o.comuna}
+  `.toLowerCase();
+
+  const matchBusqueda = texto.includes(
+    busquedaDebounce.toLowerCase()
+  );
+
+  return matchFiltro && matchBusqueda;
 });
 
 const card = {
@@ -111,9 +136,38 @@ const pedidosOrdenados = [...orders].sort(
   (a, b) => new Date(b.created_at) - new Date(a.created_at)
 );
 
+
+const resaltar = (texto) => {
+  if (!busquedaDebounce) return texto;
+
+  const partes = texto.split(
+    new RegExp(`(${busquedaDebounce})`, "gi")
+  );
+
+  return partes.map((parte, i) =>
+    parte.toLowerCase() === busquedaDebounce.toLowerCase() ? (
+      <span key={i} style={{ background: "#fde68a" }}>
+        {parte}
+      </span>
+    ) : (
+      parte
+    )
+  );
+};
+
+
   return (
     <div style={{ padding: 40 }}>
-      <h1>📦 Panel de pedidos</h1>
+      <h1 style={{
+  fontSize: "34px",
+  fontWeight: "900",
+  marginBottom: "25px",
+  background: "linear-gradient(90deg, #ec4899, #f97316)",
+  WebkitBackgroundClip: "text",
+  color: "transparent"
+}}>
+  📦 Panel de pedidos
+</h1>
 
 <button
   onClick={async () => {
@@ -121,14 +175,26 @@ const pedidosOrdenados = [...orders].sort(
     window.location.href = "/login";
   }}
   style={{
-    marginBottom: 20,
-    background: "#111",
+    position: "absolute",
+    top: 40,
+    right: 40,
+
+    background: "linear-gradient(135deg, #ec4899, #db2777)",
     color: "white",
     padding: "10px 16px",
-    borderRadius: "8px",
+    borderRadius: "999px",
     border: "none",
     cursor: "pointer",
-    float: "right"
+    fontWeight: "600",
+    fontSize: "14px",
+    boxShadow: "0 4px 10px rgba(236,72,153,0.4)",
+    transition: "all 0.2s ease"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.05)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
   }}
 >
   🚪 Cerrar sesión
@@ -183,6 +249,23 @@ const pedidosOrdenados = [...orders].sort(
     </LineChart>
   </ResponsiveContainer>
 </div>
+
+
+{/* 🔍 BUSCADOR */}
+<input
+  placeholder="🔍 Buscar cliente, correo, RUT o comuna..."
+  value={busqueda}
+  onChange={(e) => setBusqueda(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "12px",
+    marginBottom: "15px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    fontSize: "14px",
+    outline: "none"
+  }}
+/>
 
 
 <div style={{ marginBottom: 20 }}>
@@ -240,13 +323,13 @@ const pedidosOrdenados = [...orders].sort(
           borderRadius: 10,
           boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
         }}>
-          <p><strong>Nombre:</strong> {o.nombre}</p>
-	  <p><strong>RUT:</strong> {o.rut}</p>
-          <p><strong>Correo:</strong> {o.correo}</p>
-	  <p><strong>Teléfono:</strong> {o.telefono}</p>
-          <p><strong>Dirección:</strong> {o.direccion}</p>
-	  <p><strong>Comuna:</strong> {o.comuna}</p>
-	  <p><strong>Región:</strong> {o.region}</p>
+          <p><strong>Nombre:</strong> {resaltar(o.nombre)}</p>
+	  <p><strong>RUT:</strong> {resaltar(o.rut}</p>
+          <p><strong>Correo:</strong> {resaltar(o.correo)}</p>
+	  <p><strong>Teléfono:</strong> {resaltar(o.telefono)}</p>
+          <p><strong>Dirección:</strong> {resaltar(o.direccion)}</p>
+	  <p><strong>Comuna:</strong> {resaltar(o.comuna)}</p>
+	  <p><strong>Región:</strong> {resaltar(o.region)}</p>
 
 	  <p>
   	   <strong>Observación:</strong>{" "}
