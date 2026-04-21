@@ -324,7 +324,7 @@ const resaltar = (texto) => {
           boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
         }}>
           <p><strong>Nombre:</strong> {resaltar(o.nombre)}</p>
-	  <p><strong>RUT:</strong> {resaltar(o.rut}</p>
+	  <p><strong>RUT:</strong> {resaltar(o.rut)}</p>
           <p><strong>Correo:</strong> {resaltar(o.correo)}</p>
 	  <p><strong>Teléfono:</strong> {resaltar(o.telefono)}</p>
           <p><strong>Dirección:</strong> {resaltar(o.direccion)}</p>
