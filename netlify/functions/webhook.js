@@ -56,11 +56,13 @@ const supabase = createClient(
 const { error } = await supabase.from("orders").insert([
   {
     nombre: formData.nombre,
+    rut: formData.rut,
     correo: formData.correo,
     telefono: formData.telefono,
     direccion: formData.direccion,
     comuna: formData.comuna,
     region: formData.region,
+    observacion: formData.observacion,
     items,
     total,
   },
@@ -96,11 +98,13 @@ const transporter = nodemailer.createTransport({
 
         <h3>Cliente</h3>
         <p><strong>Nombre:</strong> ${formData.nombre}</p>
+	<p><strong>RUT:</strong> ${formData.rut}</p>
         <p><strong>Correo:</strong> ${formData.correo}</p>
         <p><strong>Teléfono:</strong> ${formData.telefono}</p>
         <p><strong>Dirección:</strong> ${formData.direccion}</p>
         <p><strong>Comuna:</strong> ${formData.comuna}</p>
         <p><strong>Región:</strong> ${formData.region}</p>
+	<p><strong>Observación:</strong> ${formData.observacion || "Sin observaciones"}</p>
 
         <h3>Productos</h3>
         <ul>${productosHTML}</ul>

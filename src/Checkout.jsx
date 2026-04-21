@@ -169,7 +169,7 @@ if (!telefonoRegex.test(formData.telefono || "")) {
 		)}
 
           <input
-            	placeholder="Dirección"
+            	placeholder="Dirección exacta (calle, número, casa/depto)"
   		value={formData.direccion || ""}
   		onChange={(e) =>
     		setFormData({ ...formData, direccion: e.target.value })
