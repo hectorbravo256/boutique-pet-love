@@ -1,9 +1,13 @@
+
+
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 import './index.css';
 import Admin from "./Admin";
+import { supabase } from "./lib/supabase";
+import Login from "./Login";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -1309,7 +1313,19 @@ if (!order || !order.cart) {
   );
 }
 
+function ProtectedRoute({ children }) {
+  const [session, setSession] = useState(null);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+    });
+  }, []);
+
+  if (session === null) return <p>Cargando...</p>;
+
+  return session ? children : <Login />;
+}
 
 /* ================= ROUTER ================= */
 export default function App() {
@@ -1320,6 +1336,15 @@ export default function App() {
         <Route path="/checkout" element={<CheckoutWrapper />} />
 	<Route path="/success" element={<Success />} />
 	<Route path="/admin" element={<Admin />} />
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <Admin />
+    </ProtectedRoute>
+  }
+/>
+<Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
