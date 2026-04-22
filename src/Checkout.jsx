@@ -72,9 +72,9 @@ if (!telefonoRegex.test(formData.telefono || "")) {
 
     {/* 🖼 IMAGEN */}
     <img
-      src={item.images?.[0]}
-      className="checkout-img"
-    />
+  	src={item.image || "/placeholder.png"}
+  	className="checkout-img"
+	/>
 
     {/* 📦 INFO */}
     <div className="checkout-info">
