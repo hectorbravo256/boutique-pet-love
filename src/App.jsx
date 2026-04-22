@@ -1,258 +1,19 @@
 
 
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 import './index.css';
 import Admin from "./Admin";
-import { supabase } from "./lib/supabase";
 import Login from "./Login";
+import { supabase } from "./supabaseClient";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
 
 /* ================= PRODUCTOS ================= */
 
-const products = [
-  {
-    id: 1,
-    name: "Abrigo Escocés Rojo",
-    images: [
-"/products/abrigo-escoces-rojo.jpg",
-"/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo cálido ideal para invierno.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-  {
-    id: 2,
-    name: "Corderito de Stitch",
-    images: [
-"/products/corderito-stitch.jpg",
-"/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo tipo corderito suave y abrigador.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-{
-    id: 3,
-    name: "Corderito de Angela",
-    images: [
-"/products/corderito-Angela.jpg",
-"/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo tipo corderito suave y abrigador.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-{
-    id: 4,
-    name: "Traje Mickey Mouse",
-    images: [
-"/products/traje-Mickey-Mouse.jpg",
-"/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo tipo corderito suave y abrigador.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-{
-    id: 5,
-    name: "Traje Minnie Mouse",
-    images: [
- "/products/traje-Minnie-Mouse.jpg",
- "/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo tipo corderito suave y abrigador.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-{
-    id: 6,
-    name: "Traje Hello Kitty",
-    images: [
-  "/products/traje-Hello-Kitty1.jpg",
-  "/products/traje-Hello-Kitty2.jpg",
-  "/products/traje-Hello-Kitty3.jpg",
-  "/products/tallaje.jpg"
-],
-    category: "Ropa",
-    badge: "Otoño / Invierno",
-    description: "Abrigo tipo corderito suave y abrigador.",
-    sizes: {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-
- {
-    "id": 7,
-    "name": "Osita con Tutu",
-    "images":[ 
-"/products/Osita-con-Tutu.jpg",
-  "/products/tallaje.jpg"
-],
-    "category": "Ropa",
-    "badge": "Otoño / Invierno",
-    "description": "Producto de alta calidad para mascotas",
-    "sizes": {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-  {
-    "id": 8,
-    "name": "Cuerina Forrada con Corderito",
-    "images": [ 
-"/products/Cuerina-Forrada.jpg",
-  "/products/tallaje.jpg"
-],
-    "category": "Ropa",
-    "badge": "Otoño / Invierno",
-    "description": "Producto de alta calidad para mascotas",
-    "sizes": {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-  {
-    "id": 9,
-    "name": "Polar Corderito Azul",
-    "images": [
-"/products/Polar-Corderito-Azul.jpg",
-  "/products/tallaje.jpg"
-],
-    "category": "Ropa",
-    "badge": "Otoño / Invierno",
-    "description": "Producto de alta calidad para mascotas",
-    "sizes": {
-      "Talla 0": { price: 10, stock: 5 },
-      "Talla 1": { price: 8990, stock: 5 },
-      "Talla 2": { price: 9990, stock: 5 },
-      "Talla 3": { price: 10990, stock: 5 },
-      "Talla 4": { price: 11990, stock: 5 },
-      "Talla 5": { price: 12990, stock: 5 },
-      "Talla 6": { price: 13990, stock: 5 },
-      "Talla 7": { price: 14990, stock: 5 },
-      "Talla 8": { price: 15990, stock: 5 },
-      "Talla 9": { price: 16990, stock: 5 },
-      "Talla 10": { price: 17990, stock: 5 },
-      "Talla 11": { price: 18990, stock: 5 },
-      "Talla 12": { price: 19990, stock: 5 },
-    },
-  },
-];
 
 /* ================= APP PRINCIPAL ================= */
 
@@ -276,6 +37,7 @@ const decreaseQty = (index) => {
 
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState([]);
   const [stockDB, setStockDB] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
   const [formData, setFormData] = useState({
@@ -291,6 +53,13 @@ const decreaseQty = (index) => {
   const [currentIndex, setCurrentIndex] = useState({});
   const touchStartRef = useRef({});
   const [zoomGallery, setZoomGallery] = useState(null);
+
+const stockMap = useMemo(() =>
+  Object.fromEntries(
+    stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
+  ),
+[stockDB]);
+
   const zoomTouchStart = useRef(0);
   const handleTouchStart = (e, productId) => {
    touchStartRef.current[productId] = e.touches[0].clientX;
@@ -300,17 +69,21 @@ const decreaseQty = (index) => {
   if (!start) return;
   const end = e.changedTouches[0].clientX;
   const diff = start - end;
-  if (Math.abs(diff) > 50 && product.images) {
-    setCurrentIndex((prev) => {
-  const current = prev[product.id] || 0;
-  const next =
-        diff > 0
-          ? (current + 1) % product.images.length
-          : (current - 1 + product.images.length) % product.images.length;
+if (Math.abs(diff) > 50 && product.product_images?.length > 0) {
+  setCurrentIndex((prev) => {
+    const current = prev[product.id] || 0;
+    const images = product.product_images?.map(i => i.url) || [];
 
-   return { ...prev, [product.id]: next };
-      });
-    }
+if (images.length === 0) return prev;
+
+const next =
+  diff > 0
+    ? (current + 1) % images.length
+    : (current - 1 + images.length) % images.length;
+
+    return { ...prev, [product.id]: next };
+  });
+}
 
   delete touchStartRef.current[product.id];
 };
@@ -321,13 +94,32 @@ const decreaseQty = (index) => {
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
+  // 🧩 CARGAR PRODUCTOS
+  useEffect(() => {
+    const cargar = async () => {
+      const { data } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_variants (*),
+          product_images (*)
+        `)
+        .eq("active", true);
+
+      setProducts(data || []);
+    };
+
+    cargar();
+  }, []);
+
+// 🧩 CARGAR STOCK
 useEffect(() => {
   const cargarStock = async () => {
     const { data } = await supabase
       .from("product_stock")
       .select("*");
 
-    setStockDB(data);
+    setStockDB(data || []);
   };
 
   cargarStock();
@@ -351,11 +143,12 @@ useEffect(() => {
       const updated = { ...prev };
 
       products.forEach((product) => {
-        if (product.images) {
-          const current = prev[product.id] || 0;
-          updated[product.id] =
-            current === product.images.length - 1 ? 0 : current + 1;
-        }
+        if (product.product_images?.length > 0) {
+  	  const current = prev[product.id] || 0;
+
+  	  updated[product.id] =
+    	     current === product.product_images.length - 1 ? 0 : current + 1;
+	}
       });
 
       return updated;
@@ -363,32 +156,63 @@ useEffect(() => {
   }, 3000);
 
   return () => clearInterval(interval);
-}, []);
+}, [products]);
 
 
  /* ===== FUNCIONES ===== */
-  const formatPrice = (p) =>
-    p ? "$" + p.toLocaleString("es-CL") : "";
+// 🧩 FORMATEAR PRECIO
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("es-CL", {
+      style: "currency",
+      currency: "CLP",
+    }).format(price);
 
-  const addToCart = (product, size, price) => {
+    // 🧩 AGREGAR AL CARRITO
+  const addToCart = (product) => {
+    const size = selectedSizes[product.id];
 
-const stockItem = stockDB.find(
-  (s) =>
-    s.product_id === product.id &&
-    s.size === size
-);
+    if (!size) {
+      alert("Selecciona una talla");
+      return;
+    }
+ const variant = product.product_variants.find(
+      (v) => v.size === size
+    );
 
-const stock = stockItem
-  ? stockItem.stock
-  : product.sizes[size].stock;
-
-if (stock === 0) {
-  alert("Sin stock real");
+if (!variant) {
+  alert("Error seleccionando producto");
   return;
 }
 
-    if (!size) return alert("Selecciona talla");
-    setCart([...cart, { ...product, size, price }]);
+const stock = stockMap[`${product.id}-${size}`] || 0;
+
+if (stock === 0) {
+  alert("⚠️ Producto sin stock disponible");
+  return;
+}
+
+    const item = {
+      id: product.id,
+      name: product.name,
+      size,
+      price: variant?.price || 0,
+      qty: 1,
+      image: product.product_images?.[0]?.url
+    };
+
+    setCart((prev) => {
+  const existingIndex = prev.findIndex(
+    (i) => i.id === item.id && i.size === item.size
+  );
+
+  if (existingIndex !== -1) {
+    const updated = [...prev];
+    updated[existingIndex].qty += 1;
+    return updated;
+  }
+
+  return [...prev, item];
+});
   };
 
   const removeItem = (i) =>
@@ -597,13 +421,18 @@ localStorage.setItem(
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+
           {products.map((product) => {
+
+	const images = product.product_images?.map(i => i.url) || [];
+
             const size = selectedSizes[product.id];
-            const price = size
-  ? typeof product.sizes[size] === "object"
-    ? product.sizes[size].price
-    : product.sizes[size]
-  : null;
+	    const variant = product.product_variants.find(
+  		(v) => v.size === size
+		);
+
+	    const price = variant?.price;
 
 
 
@@ -622,13 +451,13 @@ localStorage.setItem(
 >
 
 
-{product.images ? (
+{product.product_images?.length > 0 ? (
   <>
     <img
-      src={product.images[currentIndex[product.id] || 0]}
+      src={images[currentIndex[product.id] || 0] || "/placeholder.png"}
       onClick={() =>
   setZoomGallery({
-    images: product.images || [product.image],
+    images: images,
     index: currentIndex[product.id] || 0,
   })
 }
@@ -642,7 +471,7 @@ localStorage.setItem(
       ...prev,
       [product.id]:
         (prev[product.id] || 0) === 0
-          ? product.images.length - 1
+          ? images.length - 1
           : (prev[product.id] || 0) - 1,
     }))
   }
@@ -657,7 +486,7 @@ localStorage.setItem(
     setCurrentIndex((prev) => ({
       ...prev,
       [product.id]:
-        (prev[product.id] || 0) === product.images.length - 1
+        (prev[product.id] || 0) === images.length - 1
           ? 0
           : (prev[product.id] || 0) + 1,
     }))
@@ -669,7 +498,7 @@ localStorage.setItem(
 
     {/* ✅ PUNTITOS (AQUÍ ADENTRO) */}
     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-      {product.images.map((_, index) => (
+      {images.map((_, index) => (
         <div
           key={index}
           className={`w-2 h-2 rounded-full ${
@@ -684,10 +513,10 @@ localStorage.setItem(
   </>
 ) : (
   <img
-  src={product.image}
+  src={images[0] || "/placeholder.png"}
   onClick={() =>
   setZoomGallery({
-    images: [product.image],
+    images: images,
     index: 0,
   })
 }
@@ -733,26 +562,18 @@ localStorage.setItem(
 >
   <option value="">Seleccionar talla</option>
 
-{Object.entries(product.sizes).map(([size, data]) => {
-  const price = data.price;
-
+{product.product_variants.map((v) => {
   const stockItem = stockDB.find(
     (s) =>
       s.product_id === product.id &&
-      s.size === size
+      s.size === v.size
   );
 
-  const stock = stockItem
-  ? stockItem.stock
-  : data.stock; // fallback
+  const stock = stockItem ? stockItem.stock : 0;
 
   return (
-    <option
-      key={size}
-      value={size}
-      disabled={stock === 0}
-    >
-      {size} - {formatPrice(price)}
+    <option key={v.id} value={v.size} disabled={stock === 0}>
+      {v.size} - {formatPrice(v.price)}
       {stock === 0 ? " ❌ Sin stock" : ""}
     </option>
   );
@@ -763,21 +584,11 @@ localStorage.setItem(
 
 		 {/* BOTÓN AGREGAR */}
               <button
-  		onClick={() => {
-    		if (!size) return alert("Selecciona talla");
-
-    		const data = product.sizes[size];
-    		const stock =
-      		typeof data === "object" ? data.stock : 999;
-
-    		if (stock === 0) {
-      		alert("Producto sin stock");
-      		return;
-    		}
-
-    		addToCart(product, size, price);
-  		}}
-  		className="btn btn-carrito"
+  		onClick={() => addToCart(product)}
+  		disabled={!size}
+  		className={`btn btn-carrito ${
+    		!size ? "opacity-50 cursor-not-allowed" : ""
+  		}`}
 		>
     		<span className="icono">
       		<ShoppingCart size={18} strokeWidth={2} />
@@ -789,7 +600,8 @@ localStorage.setItem(
                     href={`${WHATSAPP}?text=${encodeURIComponent(
   "🛒 Pedido:\n\n" +
   cart.map(i =>
-    `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(i.price)}`
+  `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(i.price * (i.qty || 1))}`
+)
   ).join("\n") +
   `\n\nTotal: ${formatPrice(totalFinal)}`
 )}`}
@@ -833,8 +645,7 @@ localStorage.setItem(
         {cart.map((item, i) => (
   <div key={i} className="flex justify-between items-center text-sm mt-3 gap-2">
 
-    <img
-      src={item.images?.[0]}
+    <img src={item.image}
       className="w-12 h-12 object-cover rounded-lg"
     />
 
@@ -906,7 +717,7 @@ localStorage.setItem(
       cart
         .map(
           (i) =>
-            `${i.name} - ${i.size} - ${formatPrice(i.price)}`
+            `${i.name} - ${i.size} - ${formatPrice(i.price * (i.qty || 1))}`
         )
         .join("\n") +
       `\nTotal: ${formatPrice(total)}`
@@ -1401,7 +1212,6 @@ export default function App() {
         <Route path="/" element={<AppContent />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
 	<Route path="/success" element={<Success />} />
-	<Route path="/admin" element={<Admin />} />
 <Route
   path="/admin"
   element={

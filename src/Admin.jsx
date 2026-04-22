@@ -19,6 +19,12 @@ export default function Admin() {
   const [busquedaDebounce, setBusquedaDebounce] = useState("");
   const [stock, setStock] = useState([]);
 
+const productos = {
+  1: "Abrigo Escocés Rojo",
+  2: "Chaqueta Azul",
+  3: "Polerón Invierno",
+};
+
 useEffect(() => {
   const timeout = setTimeout(() => {
     setBusquedaDebounce(busqueda);
@@ -197,7 +203,8 @@ const resaltar = (texto) => {
   }}>
   
 <p>
-  <strong>Producto:</strong> {item.product_id}
+  <strong>Producto:</strong>{" "}
+  {productos[item.product_id] || "Producto desconocido"}
 </p>
 
     <p>
