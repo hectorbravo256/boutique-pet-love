@@ -599,11 +599,15 @@ localStorage.setItem(
                   <a
                     href={`${WHATSAPP}?text=${encodeURIComponent(
   "🛒 Pedido:\n\n" +
-  cart.map(i =>
-  `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(i.price * (i.qty || 1))}`
-)
-  ).join("\n") +
-  `\n\nTotal: ${formatPrice(totalFinal)}`
+    cart
+      .map(
+        (i) =>
+          `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(
+            i.price * (i.qty || 1)
+          )}`
+      )
+      .join("\n") +
+    `\n\nTotal: ${formatPrice(totalFinal)}`
 )}`}
 		  target="_blank"
                     className="btn btn-whatsapp"
