@@ -52,6 +52,27 @@ useEffect(() => {
 }, []);
 
 const cambiarEstado = async (id) => {
+  // 1️⃣ Obtener pedidos actuales
+  const resPedido = await fetch("/.netlify/functions/get-orders");
+  const pedidos = await resPedido.json();
+
+  const pedido = pedidos.find(p => p.id === id);
+
+  if (!pedido) {
+    alert("Pedido no encontrado");
+    return;
+  }
+
+  // 2️⃣ Descontar stock directamente con Supabase
+  for (const item of pedido.items) {
+    await supabase.rpc("descontar_stock", {
+      p_id: item.id,
+      p_size: item.size,
+      cantidad: item.qty || 1,
+    });
+  }
+
+  // 3️⃣ Cambiar estado a enviado
   await fetch("/.netlify/functions/update-order", {
     method: "POST",
     headers: {
@@ -63,7 +84,7 @@ const cambiarEstado = async (id) => {
     }),
   });
 
-  // refrescar lista
+  // 4️⃣ Refrescar lista
   const res = await fetch("/.netlify/functions/get-orders");
   const data = await res.json();
   setOrders(data);

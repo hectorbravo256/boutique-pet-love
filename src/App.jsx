@@ -169,6 +169,7 @@ useEffect(() => {
 
     // 🧩 AGREGAR AL CARRITO
   const addToCart = (product) => {
+
     const size = selectedSizes[product.id];
 
     if (!size) {
@@ -185,6 +186,8 @@ if (!variant) {
 }
 
 const stock = stockMap[`${product.id}-${size}`] || 0;
+
+
 
 if (stock === 0) {
   alert("⚠️ Producto sin stock disponible");
@@ -433,7 +436,7 @@ localStorage.setItem(
 		);
 
 	    const price = variant?.price;
-
+	    const stock = stockMap[`${product.id}-${size}`] || 0;
 
 
 
@@ -550,26 +553,26 @@ localStorage.setItem(
                   {price ? formatPrice(price) : "Selecciona talla"}
                 </p>
 
+{stock > 0 && stock <= 3 && (
+  <p style={{ color: "orange", fontSize: 12 }}>
+    🔥 Últimas {stock} unidades
+  </p>
+)}
+
                <select
-  className="w-full mt-3 border p-2 rounded-xl"
-  value={size || ""}
-  onChange={(e) =>
-    setSelectedSizes({
-      ...selectedSizes,
-      [product.id]: e.target.value,
-    })
-  }
->
-  <option value="">Seleccionar talla</option>
+  			className="w-full mt-3 border p-2 rounded-xl"
+  			value={size || ""}
+  			onChange={(e) =>
+    			setSelectedSizes({
+      			...selectedSizes,
+      			[product.id]: e.target.value,
+    		})
+  		}
+		>
+  		<option value="">Seleccionar talla</option>
 
-{product.product_variants.map((v) => {
-  const stockItem = stockDB.find(
-    (s) =>
-      s.product_id === product.id &&
-      s.size === v.size
-  );
-
-  const stock = stockItem ? stockItem.stock : 0;
+	{product.product_variants.map((v) => {
+  		const stock = stockMap[`${product.id}-${v.size}`] || 0;
 
   return (
     <option key={v.id} value={v.size} disabled={stock === 0}>
@@ -585,38 +588,44 @@ localStorage.setItem(
 		 {/* BOTÓN AGREGAR */}
               <button
   		onClick={() => addToCart(product)}
-  		disabled={!size}
-  		className={`btn btn-carrito ${
-    		!size ? "opacity-50 cursor-not-allowed" : ""
-  		}`}
+  		disabled={!size || stock === 0}
+  		style={{
+    		background: stock === 0 ? "#ccc" : "#ec4899",
+    		cursor: stock === 0 ? "not-allowed" : "pointer"
+  		}}
 		>
-    		<span className="icono">
-      		<ShoppingCart size={18} strokeWidth={2} />
-    		</span>
-                <span>Agregar Carro</span>
-                  </button>
-		 {/* BOTÓN WHATSAPP */}
-                  <a
-                    href={`${WHATSAPP}?text=${encodeURIComponent(
-  "🛒 Pedido:\n\n" +
-    cart
-      .map(
-        (i) =>
-          `${i.name} (${i.size}) x${i.qty || 1} - ${formatPrice(
-            i.price * (i.qty || 1)
-          )}`
-      )
-      .join("\n") +
-    `\n\nTotal: ${formatPrice(totalFinal)}`
-)}`}
-		  target="_blank"
-                    className="btn btn-whatsapp"
-                  >
+
 		<span className="icono">
-      		<MessageCircle size={18} />
-		</span>
-    		<span>Consultar por WhatsApp</span>
-                  </a>
+		    <ShoppingCart size={18} strokeWidth={2} />
+ 		 </span>
+
+  		<span>
+    			{stock === 0 ? "Sin stock" : "Agregar al carrito"}
+  		</span>
+		</button>
+
+{/* MENSAJE SIN STOCK */}
+{size && stock === 0 && (
+  <p style={{ color: "red", fontSize: 12 }}>
+    No disponible • Escríbenos por WhatsApp
+  </p>
+)}
+
+		{/* BOTÓN WHATSAPP SOLO SI NO HAY STOCK */}
+                  {size && stock === 0 && (
+ <a
+  href={`${WHATSAPP}?text=${encodeURIComponent(
+    `Hola, quiero consultar por:\n\n${product.name}\nTalla: ${selectedSizes[product.id] || "No seleccionada"}`
+  )}`}
+  target="_blank"
+  className="btn btn-whatsapp"
+>
+  <span className="icono">
+    <MessageCircle size={18} />
+  </span>
+  <span>Consultar por WhatsApp</span>
+</a>
+)}
                 </div>
                   
 
