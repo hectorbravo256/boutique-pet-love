@@ -17,6 +17,7 @@ export default function Admin() {
   const [filtro, setFiltro] = useState("todos");
   const [busqueda, setBusqueda] = useState("");
   const [busquedaDebounce, setBusquedaDebounce] = useState("");
+  const [stock, setStock] = useState([]);
 
 useEffect(() => {
   const timeout = setTimeout(() => {
@@ -31,6 +32,18 @@ useEffect(() => {
       .then((res) => res.json())
       .then((data) => setOrders(data));
   }, []);
+
+useEffect(() => {
+  const cargarStock = async () => {
+    const { data } = await supabase
+      .from("product_stock")
+      .select("*");
+
+    setStock(data || []);
+  };
+
+  cargarStock();
+}, []);
 
 const cambiarEstado = async (id) => {
   await fetch("/.netlify/functions/update-order", {
@@ -50,31 +63,26 @@ const cambiarEstado = async (id) => {
   setOrders(data);
 };
 
+const actualizarStock = async (id, nuevoStock) => {
+  await supabase
+    .from("product_stock")
+    .update({ stock: nuevoStock })
+    .eq("id", id);
+
+  // 🔥 actualizar SOLO local (más rápido)
+  setStock((prev) =>
+    prev.map((s) =>
+      s.id === id ? { ...s, stock: nuevoStock } : s
+    )
+  );
+};
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
 const totalPedidos = orders.length;
 const pendientes = orders.filter(o => o.estado === "pendiente").length;
 const enviados = orders.filter(o => o.estado === "enviado").length;
 
-const pedidosFiltrados = pedidosOrdenados.filter((o) => {
-  const estado = o.estado || "pendiente";
 
-  const matchFiltro =
-    filtro === "todos" || estado === filtro;
-
-  const texto = `
-    ${o.nombre}
-    ${o.correo}
-    ${o.rut}
-    ${o.comuna}
-  `.toLowerCase();
-
-  const matchBusqueda = texto.includes(
-    busquedaDebounce.toLowerCase()
-  );
-
-  return matchFiltro && matchBusqueda;
-});
 
 const card = {
   background: "#fff",
@@ -169,6 +177,77 @@ const resaltar = (texto) => {
   📦 Panel de pedidos
 </h1>
 
+{/* 📦 PANEL STOCK */}
+
+<div style={{
+  marginBottom: 30,
+  padding: 20,
+  background: "#fafafa",
+  borderRadius: 12
+}}>
+<h2>📦 Gestión de Stock</h2>
+
+{stock.map((item) => (
+  <div key={item.id} style={{
+    background: "#fff",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 8,
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+  }}>
+  
+<p>
+  <strong>Producto:</strong> {item.product_id}
+</p>
+
+    <p>
+      <strong>Talla:</strong> {item.size}
+    </p>
+
+<p style={{
+  color:
+    item.stock === 0
+      ? "red"
+      : item.stock <= 2
+      ? "orange"
+      : "green",
+  fontWeight: "bold",
+
+background:
+    item.stock === 0
+      ? "#fee2e2"
+      : item.stock <= 2
+      ? "#fef3c7"
+      : "#dcfce7",
+  padding: "6px",
+  borderRadius: "6px"
+
+}}>
+  Stock: {item.stock}
+</p>
+
+    <button
+      onClick={() => actualizarStock(item.id, item.stock + 1)}
+      style={{ marginRight: 10 }}
+    >
+      ➕
+    </button>
+
+    <button
+      onClick={() =>
+  actualizarStock(
+    item.id,
+    item.stock > 0 ? item.stock - 1 : 0
+  )
+}
+    >
+      ➖
+    </button>
+  </div>
+))}
+</div>
+
+
 <button
   onClick={async () => {
     await supabase.auth.signOut();
@@ -206,6 +285,7 @@ const resaltar = (texto) => {
   gap: 15,
   marginBottom: 30
 }}>
+
 
   <div style={card}>
     <p>💰 Ventas</p>
@@ -268,7 +348,9 @@ const resaltar = (texto) => {
 />
 
 
+
 <div style={{ marginBottom: 20 }}>
+
 
   <button
     onClick={() => setFiltro("todos")}
@@ -323,6 +405,7 @@ const resaltar = (texto) => {
           borderRadius: 10,
           boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
         }}>
+	  <p><strong>Producto:</strong> {o.items?.[0]?.name}</p>
           <p><strong>Nombre:</strong> {resaltar(o.nombre)}</p>
 	  <p><strong>RUT:</strong> {resaltar(o.rut)}</p>
           <p><strong>Correo:</strong> {resaltar(o.correo)}</p>
@@ -336,12 +419,17 @@ const resaltar = (texto) => {
   	   {o.observacion ? o.observacion : "Sin observaciones"}
 	 </p>
 
-          <h4>Productos:</h4>
-          {o.items?.map((i, idx) => (
-            <p key={idx}>
-              {i.name} x{i.qty || 1}
-            </p>
-          ))}
+         <h4>Productos:</h4>
+
+		{o.items?.length ? (
+ 		 o.items.map((i, idx) => (
+  		  <p key={idx}>
+    		  {i.name} x{i.qty || 1}
+    		</p>
+  		))
+		) : (
+ 		 <p>Sin productos</p>
+		)}
 
           <p><strong>Total:</strong> ${Number(o.total).toLocaleString("es-CL")}</p>
 

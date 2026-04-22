@@ -372,6 +372,21 @@ useEffect(() => {
 
   const addToCart = (product, size, price) => {
 
+const stockItem = stockDB.find(
+  (s) =>
+    s.product_id === product.id &&
+    s.size === size
+);
+
+const stock = stockItem
+  ? stockItem.stock
+  : product.sizes[size].stock;
+
+if (stock === 0) {
+  alert("Sin stock real");
+  return;
+}
+
     if (!size) return alert("Selecciona talla");
     setCart([...cart, { ...product, size, price }]);
   };
@@ -727,7 +742,9 @@ localStorage.setItem(
       s.size === size
   );
 
-  const stock = stockItem ? stockItem.stock : 0;
+  const stock = stockItem
+  ? stockItem.stock
+  : data.stock; // fallback
 
   return (
     <option
