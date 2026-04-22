@@ -5,6 +5,13 @@ exports.handler = async (event) => {
   try {
     const body = event.body ? JSON.parse(event.body) : {};
 
+const { createClient } = require("@supabase/supabase-js");
+
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
+
     console.log("WEBHOOK BODY:", body);
 
   if (body.type !== "payment" && body.topic !== "merchant_order") {
@@ -53,12 +60,6 @@ for (const item of items) {
 }
 const formData = form_data;
 
-const { createClient } = require("@supabase/supabase-js");
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
 
 const { error } = await supabase.from("orders").insert([
   {
