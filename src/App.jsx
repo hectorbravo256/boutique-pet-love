@@ -575,9 +575,9 @@ localStorage.setItem(
   		const stock = stockMap[`${product.id}-${v.size}`] || 0;
 
   return (
-    <option key={v.id} value={v.size} disabled={stock === 0}>
+    <option key={v.id} value={v.size}>
       {v.size} - {formatPrice(v.price)}
-      {stock === 0 ? " ❌ Sin stock" : ""}
+      {stock === 0 ? " ❌ Sin stock - Producto a Pedido" : ""}
     </option>
   );
 })}
@@ -586,23 +586,31 @@ localStorage.setItem(
                 <div className="bloque-botones">
 
 		 {/* BOTÓN AGREGAR */}
-              <button
-  		onClick={() => addToCart(product)}
-  		disabled={!size || stock === 0}
-  		style={{
-    		background: stock === 0 ? "#ccc" : "#ec4899",
-    		cursor: stock === 0 ? "not-allowed" : "pointer"
-  		}}
-		>
+<button
+  onClick={() => addToCart(product)}
+  disabled={!size || stock === 0}
+  className="relative w-full mt-3 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300"
+  style={{
+    background: stock === 0
+      ? "linear-gradient(135deg, #e5e7eb, #d1d5db)"
+      : "linear-gradient(135deg, #ec4899, #d946ef)",
+    color: stock === 0 ? "#9ca3af" : "#fff",
+    boxShadow:
+      stock === 0
+        ? "none"
+        : "0 6px 18px rgba(236,72,153,0.3)",
+  }}
+>
+  <ShoppingCart size={18} />
 
-		<span className="icono">
-		    <ShoppingCart size={18} strokeWidth={2} />
- 		 </span>
-
-  		<span>
-    			{stock === 0 ? "Sin stock" : "Agregar al carrito"}
-  		</span>
-		</button>
+  <span>
+    {stock === 0
+      ? "Sin stock"
+      : !size
+      ? "Selecciona talla"
+      : "Agregar al carrito"}
+  </span>
+</button>
 
 {/* MENSAJE SIN STOCK */}
 {size && stock === 0 && (
