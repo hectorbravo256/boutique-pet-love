@@ -197,7 +197,7 @@ if (stock === 0) {
       size,
       price: variant?.price || 0,
       qty: 1,
-      image: product.product_images?.[0]?.url
+      image: product.product_images?.[0]?.url || "/placeholder.png",
     };
 
     setCart((prev) => {
