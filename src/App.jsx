@@ -610,6 +610,8 @@ localStorage.setItem(
     </span>
 </button>
 
+)} {
+
 {/* MENSAJE SIN STOCK */}
 {size && stock === 0 && (
   <p style={{ color: "red", fontSize: 12 }}>
