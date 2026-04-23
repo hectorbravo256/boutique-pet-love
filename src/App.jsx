@@ -583,41 +583,33 @@ localStorage.setItem(
 })}
 </select>
 
-                <div className="bloque-botones">
+               <div className="bloque-botones">
 
-		 {/* BOTÓN AGREGAR */}
+  {/* BOTÓN AGREGAR SOLO SI HAY STOCK */}
+  {stock > 0 && (
+    <button
+      onClick={() => addToCart(product)}
+      disabled={!size}
+      className="relative w-full mt-3 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300"
+      style={{
+        background: "linear-gradient(135deg, #ec4899, #d946ef)",
+        color: "#fff",
+        boxShadow: "0 6px 18px rgba(236,72,153,0.3)",
+      }}
+    >
+      <ShoppingCart size={18} />
+      <span>
+        {!size ? "Selecciona talla" : "Agregar al carrito"}
+      </span>
+    </button>
+  )}
 
-{stock > 0 && (
-<button
-  onClick={() => addToCart(product)}
-  disabled={!size || stock === 0}
-  className="relative w-full mt-3 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300"
-  style={{
-    background: stock === 0
-      ? "linear-gradient(135deg, #e5e7eb, #d1d5db)"
-      : "linear-gradient(135deg, #ec4899, #d946ef)",
-    color: stock === 0 ? "#9ca3af" : "#fff",
-    boxShadow:
-      stock === 0
-        ? "none"
-        : "0 6px 18px rgba(236,72,153,0.3)",
-  }}
->
-  <ShoppingCart size={18} />
-
-  <span>
-      {!size ? "Selecciona talla" : "Agregar al carrito"}
-    </span>
-</button>
-
-)} {
-
-{/* MENSAJE SIN STOCK */}
-{size && stock === 0 && (
-  <p style={{ color: "red", fontSize: 12 }}>
-    No disponible • Escríbenos por WhatsApp
-  </p>
-)}
+  {/* MENSAJE SIN STOCK */}
+  {size && stock === 0 && (
+    <p style={{ color: "red", fontSize: 12 }}>
+      No disponible • Escríbenos por WhatsApp
+    </p>
+  )}
 
 		{/* BOTÓN WHATSAPP SOLO SI NO HAY STOCK */}
                   {size && stock === 0 && (
