@@ -586,6 +586,8 @@ localStorage.setItem(
                 <div className="bloque-botones">
 
 		 {/* BOTÓN AGREGAR */}
+
+{stock > 0 && (
 <button
   onClick={() => addToCart(product)}
   disabled={!size || stock === 0}
@@ -604,12 +606,8 @@ localStorage.setItem(
   <ShoppingCart size={18} />
 
   <span>
-    {stock === 0
-      ? "Sin stock"
-      : !size
-      ? "Selecciona talla"
-      : "Agregar al carrito"}
-  </span>
+      {!size ? "Selecciona talla" : "Agregar al carrito"}
+    </span>
 </button>
 
 {/* MENSAJE SIN STOCK */}
