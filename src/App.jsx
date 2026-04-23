@@ -583,7 +583,7 @@ localStorage.setItem(
 })}
 </select>
 
-               <div className="bloque-botones">
+               <div className="bloque-botones flex flex-col gap-2">
 
   {/* BOTÓN AGREGAR SOLO SI HAY STOCK */}
   {stock > 0 && (
@@ -606,7 +606,7 @@ localStorage.setItem(
 
   {/* MENSAJE SIN STOCK */}
   {size && stock === 0 && (
-    <p style={{ color: "red", fontSize: 12 }}>
+    <p style={{ color: "red", fontSize: 12, marginTop: 6 }}>
       No disponible • Escríbenos por WhatsApp
     </p>
   )}
@@ -618,7 +618,7 @@ localStorage.setItem(
     `Hola, quiero consultar por:\n\n${product.name}\nTalla: ${selectedSizes[product.id] || "No seleccionada"}`
   )}`}
   target="_blank"
-  className="btn btn-whatsapp"
+  className="btn btn-whatsapp w-full text-center mt-1"
 >
   <span className="icono">
     <MessageCircle size={18} />
