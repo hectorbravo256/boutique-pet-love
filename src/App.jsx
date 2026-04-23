@@ -615,7 +615,7 @@ localStorage.setItem(
                   {size && stock === 0 && (
  <a
   href={`${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, quiero consultar por:\n\n${product.name}\nTalla: ${selectedSizes[product.id] || "No seleccionada"}`
+    `Hola, quiero consultar por:\n\n${product.name}\n${selectedSizes[product.id] || "No seleccionada"}`
   )}`}
   target="_blank"
   className="btn btn-whatsapp w-full text-center mt-1"
