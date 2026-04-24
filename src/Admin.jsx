@@ -208,6 +208,19 @@ const resaltar = (texto) => {
   );
 };
 
+stock.sort((a, b) =>
+  (productos[a.product_id] || "").localeCompare(productos[b.product_id] || "") ||
+  a.size.localeCompare(b.size)
+);
+
+
+const [search, setSearch] = useState("");
+
+const stockFiltrado = stock.filter((item) =>
+  (productos[item.product_id] || "")
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
 
   return (
     <div style={{ padding: 40 }}>
@@ -232,65 +245,123 @@ const resaltar = (texto) => {
 }}>
 <h2>📦 Gestión de Stock</h2>
 
-{stock.map((item) => (
-  <div key={item.id} style={{
-    background: "#fff",
+<input
+  type="text"
+  placeholder="🔍 Buscar producto..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  style={{
+    width: "100%",
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 15,
     borderRadius: 8,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
-  }}>
-  
-<p>
-  <strong>Producto:</strong>{" "}
-  {productos[item.product_id] || "Producto desconocido"}
-</p>
+    border: "1px solid #ddd"
+  }}
+/>
 
-    <p>
-      <strong>Talla:</strong> {item.size}
-    </p>
 
-<p style={{
+<table style={{
+  width: "100%",
+  borderCollapse: "collapse",
+  marginTop: 15
+}}>
+  <thead>
+    <tr style={{ background: "#fce7f3" }}>
+      <th style={{ padding: 10, textAlign: "left" }}>Producto</th>
+      <th style={{ padding: 10, textAlign: "left" }}>Talla</th>
+      <th style={{ padding: 10 }}>Stock</th>
+      <th style={{ padding: 10 }}>Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {stockFiltrado.map((item) => (
+      <tr key={item.id} style={{ borderBottom: "1px solid #eee" }}>
+
+        <td style={{ padding: 10 }}>
+          {productos[item.product_id] || "Producto"}
+        </td>
+
+        <td style={{ padding: 10 }}>
+          {item.size}
+        </td>
+
+        <td style={{
+          padding: 10,
+          fontWeight: "bold",
+          color:
+            item.stock === 0
+              ? "red"
+              : item.stock <= 2
+              ? "orange"
+              : "green"
+        }}>
+          <input
+  type="number"
+  value={item.stock}
+  onChange={(e) =>
+    actualizarStock(item.id, parseInt(e.target.value) || 0)
+  }
+  style={{
+    width: 60,
+    padding: 4,
+    borderRadius: 6,
+    border: "1px solid #ccc"
+  }}
+/>
+        <td style={{
+  padding: 10,
+  fontWeight: "bold",
   color:
     item.stock === 0
-      ? "red"
+      ? "#b91c1c"
       : item.stock <= 2
-      ? "orange"
-      : "green",
-  fontWeight: "bold",
-
-background:
+      ? "#92400e"
+      : "#065f46",
+  background:
     item.stock === 0
       ? "#fee2e2"
       : item.stock <= 2
       ? "#fef3c7"
-      : "#dcfce7",
-  padding: "6px",
-  borderRadius: "6px"
-
+      : "#d1fae5",
+  borderRadius: 6
 }}>
-  Stock: {item.stock}
-</p>
 
-    <button
-      onClick={() => actualizarStock(item.id, item.stock + 1)}
-      style={{ marginRight: 10 }}
-    >
-      ➕
-    </button>
+        <button
+  onClick={() => actualizarStock(item.id, item.stock + 1)}
+  style={{
+    marginRight: 6,
+    background: "#22c55e",
+    color: "#fff",
+    border: "none",
+    borderRadius: 6,
+    padding: "4px 8px"
+  }}
+>
+  +
+</button>
 
-    <button
-      onClick={() =>
-  actualizarStock(
-    item.id,
-    item.stock > 0 ? item.stock - 1 : 0
-  )
-}
-    >
-      ➖
-    </button>
-  </div>
-))}
+<button
+  onClick={() =>
+    actualizarStock(item.id, item.stock > 0 ? item.stock - 1 : 0)
+  }
+  style={{
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    borderRadius: 6,
+    padding: "4px 8px"
+  }}
+>
+  -
+</button>
+        </td>
+
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 </div>
 
 
