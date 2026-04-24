@@ -18,12 +18,26 @@ export default function Admin() {
   const [busqueda, setBusqueda] = useState("");
   const [busquedaDebounce, setBusquedaDebounce] = useState("");
   const [stock, setStock] = useState([]);
+  const [search, setSearch] = useState("");
+  const [stockTemp, setStockTemp] = useState({});
+  const [productos, setProductos] = useState({});
 
-const productos = {
-  1: "Abrigo Escocés Rojo",
-  2: "Chaqueta Azul",
-  3: "Polerón Invierno",
-};
+useEffect(() => {
+  const cargarProductos = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id, name");
+
+    const map = {};
+    data?.forEach((p) => {
+      map[p.id] = p.name;
+    });
+
+    setProductos(map);
+  };
+
+  cargarProductos();
+}, []);
 
 useEffect(() => {
   const timeout = setTimeout(() => {
@@ -114,12 +128,20 @@ const actualizarStock = async (id, nuevoStock) => {
     .update({ stock: nuevoStock })
     .eq("id", id);
 
+
   // 🔥 actualizar SOLO local (más rápido)
   setStock((prev) =>
     prev.map((s) =>
       s.id === id ? { ...s, stock: nuevoStock } : s
     )
   );
+
+setStockTemp((prev) => {
+  const nuevo = { ...prev };
+  delete nuevo[id];
+  return nuevo;
+});
+
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -208,15 +230,15 @@ const resaltar = (texto) => {
   );
 };
 
-stock.sort((a, b) =>
+const stockOrdenado = [...stock].sort((a, b) =>
   (productos[a.product_id] || "").localeCompare(productos[b.product_id] || "") ||
   a.size.localeCompare(b.size)
 );
 
 
-const [search, setSearch] = useState("");
 
-const stockFiltrado = stock.filter((item) =>
+
+const stockFiltrado = stockOrdenado.filter((item) =>
   (productos[item.product_id] || "")
     .toLowerCase()
     .includes(search.toLowerCase())
@@ -274,92 +296,127 @@ const stockFiltrado = stock.filter((item) =>
     </tr>
   </thead>
 
-  <tbody>
-    {stockFiltrado.map((item) => (
-      <tr key={item.id} style={{ borderBottom: "1px solid #eee" }}>
+<tbody>
+  {stockFiltrado.map((item) => (
+    <tr key={item.id} style={{ borderBottom: "1px solid #eee" }}>
 
-        <td style={{ padding: 10 }}>
-          {productos[item.product_id] || "Producto"}
-        </td>
+      {/* PRODUCTO */}
+      <td style={{ padding: 10 }}>
+        {productos[item.product_id] || "Producto"}
+      </td>
 
-        <td style={{ padding: 10 }}>
-          {item.size}
-        </td>
+      {/* TALLA */}
+      <td style={{ padding: 10 }}>
+        {item.size}
+      </td>
 
-        <td style={{
-          padding: 10,
-          fontWeight: "bold",
-          color:
-            item.stock === 0
-              ? "red"
-              : item.stock <= 2
-              ? "orange"
-              : "green"
-        }}>
-          <input
-  type="number"
-  value={item.stock}
-  onChange={(e) =>
-    actualizarStock(item.id, parseInt(e.target.value) || 0)
-  }
-  style={{
-    width: 60,
-    padding: 4,
-    borderRadius: 6,
-    border: "1px solid #ccc"
-  }}
-/>
-        <td style={{
-  padding: 10,
-  fontWeight: "bold",
-  color:
-    item.stock === 0
-      ? "#b91c1c"
-      : item.stock <= 2
-      ? "#92400e"
-      : "#065f46",
-  background:
-    item.stock === 0
-      ? "#fee2e2"
-      : item.stock <= 2
-      ? "#fef3c7"
-      : "#d1fae5",
-  borderRadius: 6
-}}>
+      {/* STOCK */}
+      <td style={{
+        padding: 10,
+        fontWeight: "bold",
+        color:
+          item.stock === 0
+            ? "#b91c1c"
+            : item.stock <= 2
+            ? "#92400e"
+            : "#065f46",
+        background:
+          item.stock === 0
+            ? "#fee2e2"
+            : item.stock <= 2
+            ? "#fef3c7"
+            : "#d1fae5",
+        borderRadius: 6
+      }}>
+
+<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+  {stockTemp[item.id] !== undefined && (
+    <span style={{ color: "#f59e0b", fontSize: 12 }}>
+      ✏️
+    </span>
+  )}
+
+        <input
+          type="number"
+          value={stockTemp[item.id] ?? item.stock}
+          onChange={(e) =>
+  setStockTemp((prev) => ({
+    ...prev,
+    [item.id]: parseInt(e.target.value) || 0,
+  }))
+}
+          style={{
+            width: 60,
+            padding: 4,
+            borderRadius: 6,
+            border: "1px solid #ccc"
+          }}
+        />
+      </td>
+
+      {/* ACCIONES */}
+      <td style={{ padding: 10 }}>
+        <button
+          onClick={() =>
+  actualizarStock(
+    item.id,
+    (stockTemp[item.id] ?? item.stock) + 1
+  )
+}
+          style={{
+            marginRight: 6,
+            background: "#22c55e",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "4px 8px"
+          }}
+        >
+          +
+        </button>
 
         <button
-  onClick={() => actualizarStock(item.id, item.stock + 1)}
-  style={{
-    marginRight: 6,
-    background: "#22c55e",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    padding: "4px 8px"
-  }}
->
-  +
-</button>
+onClick={() =>
+  actualizarStock(
+    item.id,
+    Math.max((stockTemp[item.id] ?? item.stock) - 1, 0)
+  )
+}
+          style={{
+            background: "#ef4444",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "4px 8px"
+          }}
+        >
+          -
+        </button>
 
 <button
   onClick={() =>
-    actualizarStock(item.id, item.stock > 0 ? item.stock - 1 : 0)
+    actualizarStock(
+      item.id,
+      stockTemp[item.id] ?? item.stock
+    )
   }
   style={{
-    background: "#ef4444",
+    marginLeft: 6,
+    background: "#3b82f6",
     color: "#fff",
     border: "none",
     borderRadius: 6,
     padding: "4px 8px"
   }}
 >
-  -
+  💾
 </button>
-        </td>
 
-      </tr>
-    ))}
-  </tbody>
+      </td>
+
+    </tr>
+  ))}
+</tbody>
 </table>
 
 </div>
