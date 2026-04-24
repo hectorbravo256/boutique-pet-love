@@ -123,25 +123,29 @@ const cambiarEstado = async (id) => {
 };
 
 const actualizarStock = async (id, nuevoStock) => {
-  await supabase
+  const { error } = await supabase
     .from("product_stock")
     .update({ stock: nuevoStock })
     .eq("id", id);
 
+  if (error) {
+    console.log("❌ ERROR:", error);
+    return;
+  }
 
-  // 🔥 actualizar SOLO local (más rápido)
+  // actualizar local
   setStock((prev) =>
     prev.map((s) =>
       s.id === id ? { ...s, stock: nuevoStock } : s
     )
   );
 
-setStockTemp((prev) => {
-  const nuevo = { ...prev };
-  delete nuevo[id];
-  return nuevo;
-});
-
+  // limpiar temp
+  setStockTemp((prev) => {
+    const nuevo = { ...prev };
+    delete nuevo[id];
+    return nuevo;
+  });
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -232,7 +236,7 @@ const resaltar = (texto) => {
 
 const stockOrdenado = [...stock].sort((a, b) =>
   (productos[a.product_id] || "").localeCompare(productos[b.product_id] || "") ||
-  a.size.localeCompare(b.size)
+  a.size.localeCompare(b.size, undefined, { numeric: true })
 );
 
 
@@ -281,6 +285,58 @@ const stockFiltrado = stockOrdenado.filter((item) =>
   }}
 />
 
+<button
+  onClick={async () => {
+    const updates = Object.entries(stockTemp).map(([id, stock]) => ({
+      id: Number(id),
+      stock,
+    }));
+
+    if (!updates.length) {
+      console.log("Sin cambios");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("product_stock")
+      .upsert(updates);
+
+    if (error) {
+      console.log(error);
+      console.log("Error al guardar");
+      return;
+    }
+
+    setStock((prev) =>
+      prev.map((item) => {
+        const nuevo = updates.find((u) => u.id === item.id);
+        return nuevo ? { ...item, stock: nuevo.stock } : item;
+      })
+    );
+
+    setStockTemp({});
+    console.log("Stock guardado");
+  }}
+  style={{
+    marginBottom: 15,
+    background: "#2563eb",
+    color: "#fff",
+    padding: "10px 16px",
+    borderRadius: 8,
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "bold"
+  }}
+>
+  💾 Guardar todos los cambios
+</button>
+
+{Object.keys(stockTemp).length > 0 && (
+ <p style={{ color: Object.keys(stockTemp).length > 5 ? "red" : "#f59e0b", fontWeight: "bold" }}>
+  ⚠️ Cambios sin guardar ({Object.keys(stockTemp).length})
+</p>
+)}
+
 
 <table style={{
   width: "100%",
@@ -328,41 +384,44 @@ const stockFiltrado = stockOrdenado.filter((item) =>
             : "#d1fae5",
         borderRadius: 6
       }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
 
-<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-  {stockTemp[item.id] !== undefined && (
-    <span style={{ color: "#f59e0b", fontSize: 12 }}>
-      ✏️
-    </span>
-  )}
+          {stockTemp[item.id] !== undefined && (
+            <span style={{ color: "#f59e0b", fontSize: 12 }}>
+              ✏️
+            </span>
+          )}
 
-        <input
-          type="number"
-          value={stockTemp[item.id] ?? item.stock}
-          onChange={(e) =>
-  setStockTemp((prev) => ({
-    ...prev,
-    [item.id]: parseInt(e.target.value) || 0,
-  }))
-}
-          style={{
-            width: 60,
-            padding: 4,
-            borderRadius: 6,
-            border: "1px solid #ccc"
-          }}
-        />
+          <input
+  type="number"
+  min="0"
+            value={stockTemp[item.id] ?? item.stock}
+            onChange={(e) =>
+              setStockTemp((prev) => ({
+                ...prev,
+                [item.id]: parseInt(e.target.value) || 0,
+              }))
+            }
+            style={{
+              width: 60,
+              padding: 4,
+              borderRadius: 6,
+              border: "1px solid #ccc"
+            }}
+          />
+        </div>
       </td>
 
       {/* ACCIONES */}
       <td style={{ padding: 10 }}>
+
         <button
           onClick={() =>
-  actualizarStock(
-    item.id,
-    (stockTemp[item.id] ?? item.stock) + 1
-  )
-}
+            actualizarStock(
+              item.id,
+              (stockTemp[item.id] ?? item.stock) + 1
+            )
+          }
           style={{
             marginRight: 6,
             background: "#22c55e",
@@ -376,13 +435,14 @@ const stockFiltrado = stockOrdenado.filter((item) =>
         </button>
 
         <button
-onClick={() =>
-  actualizarStock(
-    item.id,
-    Math.max((stockTemp[item.id] ?? item.stock) - 1, 0)
-  )
-}
+          onClick={() =>
+            actualizarStock(
+              item.id,
+              Math.max((stockTemp[item.id] ?? item.stock) - 1, 0)
+            )
+          }
           style={{
+            marginRight: 6,
             background: "#ef4444",
             color: "#fff",
             border: "none",
@@ -393,30 +453,30 @@ onClick={() =>
           -
         </button>
 
-<button
-  onClick={() =>
-    actualizarStock(
-      item.id,
-      stockTemp[item.id] ?? item.stock
-    )
-  }
-  style={{
-    marginLeft: 6,
-    background: "#3b82f6",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    padding: "4px 8px"
-  }}
->
-  💾
-</button>
+        <button
+          onClick={() =>
+            actualizarStock(
+              item.id,
+              stockTemp[item.id] ?? item.stock
+            )
+          }
+          style={{
+            background: "#3b82f6",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "4px 8px"
+          }}
+        >
+          💾
+        </button>
 
       </td>
 
     </tr>
   ))}
 </tbody>
+
 </table>
 
 </div>
