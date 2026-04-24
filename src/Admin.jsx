@@ -21,6 +21,7 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [stockTemp, setStockTemp] = useState({});
   const [productos, setProductos] = useState({});
+  const [loading, setLoading] = useState(false);
 
 useEffect(() => {
   const cargarProductos = async () => {
@@ -248,6 +249,25 @@ const stockFiltrado = stockOrdenado.filter((item) =>
     .includes(search.toLowerCase())
 );
 
+const hoverAnim = {
+  onMouseEnter: (e, shadow) => {
+    e.currentTarget.style.transform = "scale(1.08)";
+    e.currentTarget.style.boxShadow = shadow;
+  },
+  onMouseLeave: (e, shadow) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow = shadow;
+  },
+  onMouseDown: (e) => {
+    e.currentTarget.style.transform = "scale(0.95)";
+  },
+  onMouseUp: (e, shadow) => {
+    e.currentTarget.style.transform = "scale(1.08)";
+    e.currentTarget.style.boxShadow = shadow;
+  }
+};
+
+
   return (
     <div style={{ padding: 40 }}>
       <h1 style={{
@@ -277,16 +297,23 @@ const stockFiltrado = stockOrdenado.filter((item) =>
   value={search}
   onChange={(e) => setSearch(e.target.value)}
   style={{
-    width: "100%",
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 8,
-    border: "1px solid #ddd"
-  }}
+  width: "100%",
+  padding: 10,
+  marginBottom: 15,
+  borderRadius: 8,
+  border: "1px solid #ddd",
+  textAlign: "center",
+  fontSize: 18,
+  fontWeight: "bold"
+}}
 />
 
 <button
+  disabled={loading}
   onClick={async () => {
+ 	try {
+	setLoading(true);
+
     const updates = Object.entries(stockTemp).map(([id, stock]) => ({
       id: Number(id),
       stock,
@@ -297,15 +324,22 @@ const stockFiltrado = stockOrdenado.filter((item) =>
       return;
     }
 
-    const { error } = await supabase
+    const results = await Promise.all(
+  updates.map((u) =>
+    supabase
       .from("product_stock")
-      .upsert(updates);
+      .update({ stock: u.stock })
+      .eq("id", u.id)
+  )
+);
 
-    if (error) {
-      console.log(error);
-      console.log("Error al guardar");
-      return;
-    }
+// validar errores
+const hasError = results.some((r) => r.error);
+
+if (hasError) {
+  console.log("❌ Error al guardar");
+  return;
+}
 
     setStock((prev) =>
       prev.map((item) => {
@@ -315,7 +349,14 @@ const stockFiltrado = stockOrdenado.filter((item) =>
     );
 
     setStockTemp({});
-    console.log("Stock guardado");
+    alert("✅ Stock actualizado");
+
+} catch (err) {
+    console.log("❌ ERROR GENERAL:", err);
+  } finally {
+    setLoading(false);
+  }
+
   }}
   style={{
     marginBottom: 15,
@@ -324,15 +365,26 @@ const stockFiltrado = stockOrdenado.filter((item) =>
     padding: "10px 16px",
     borderRadius: 8,
     border: "none",
-    cursor: "pointer",
-    fontWeight: "bold"
+    cursor: loading ? "not-allowed" : "pointer",
+    fontWeight: "bold",
+    opacity: loading ? 0.6 : 1
   }}
 >
-  💾 Guardar todos los cambios
+  {loading ? "⏳ Guardando..." : "💾 Guardar todos los cambios"}
 </button>
 
 {Object.keys(stockTemp).length > 0 && (
- <p style={{ color: Object.keys(stockTemp).length > 5 ? "red" : "#f59e0b", fontWeight: "bold" }}>
+ <p style={{
+  color: Object.keys(stockTemp).length > 5 ? "red" : "#f59e0b",
+  fontWeight: "bold",
+  position: "sticky",
+  top: 0,
+  zIndex: 10,
+  background: "#fff",
+  padding: "8px",
+  borderRadius: "6px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+}}>
   ⚠️ Cambios sin guardar ({Object.keys(stockTemp).length})
 </p>
 )}
@@ -367,24 +419,14 @@ const stockFiltrado = stockOrdenado.filter((item) =>
       </td>
 
       {/* STOCK */}
-      <td style={{
-        padding: 10,
-        fontWeight: "bold",
-        color:
-          item.stock === 0
-            ? "#b91c1c"
-            : item.stock <= 2
-            ? "#92400e"
-            : "#065f46",
-        background:
-          item.stock === 0
-            ? "#fee2e2"
-            : item.stock <= 2
-            ? "#fef3c7"
-            : "#d1fae5",
-        borderRadius: 6
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+     <td style={{
+  padding: 10,
+  textAlign: "center"
+}}>
+        <div style={{ display: "flex",
+			justifyContent: "center",
+			alignItems: "center",
+			gap: 6 }}>
 
           {stockTemp[item.id] !== undefined && (
             <span style={{ color: "#f59e0b", fontSize: 12 }}>
@@ -399,12 +441,14 @@ const stockFiltrado = stockOrdenado.filter((item) =>
             onChange={(e) =>
               setStockTemp((prev) => ({
                 ...prev,
-                [item.id]: parseInt(e.target.value) || 0,
+                [item.id]: Math.max(parseInt(e.target.value) || 0, 0),
               }))
             }
             style={{
               width: 60,
-              padding: 4,
+              padding: 6,
+	      fontSize: 16,
+	      fontWeight: "bold",
               borderRadius: 6,
               border: "1px solid #ccc"
             }}
@@ -413,65 +457,125 @@ const stockFiltrado = stockOrdenado.filter((item) =>
       </td>
 
       {/* ACCIONES */}
-      <td style={{ padding: 10 }}>
+      <td style={{
+  padding: 10,
+  textAlign: "center"
+}}>
 
-        <button
-          onClick={() =>
-            actualizarStock(
-              item.id,
-              (stockTemp[item.id] ?? item.stock) + 1
-            )
-          }
-          style={{
-            marginRight: 6,
-            background: "#22c55e",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            padding: "4px 8px"
-          }}
-        >
-          +
-        </button>
+  <div style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12
+  }}>
 
-        <button
-          onClick={() =>
-            actualizarStock(
-              item.id,
-              Math.max((stockTemp[item.id] ?? item.stock) - 1, 0)
-            )
-          }
-          style={{
-            marginRight: 6,
-            background: "#ef4444",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            padding: "4px 8px"
-          }}
-        >
-          -
-        </button>
+    {/* BOTÓN + */}
+    <button
+  onClick={() =>
+    actualizarStock(
+      item.id,
+      (stockTemp[item.id] ?? item.stock) + 1
+    )
+  }
+  {...hoverAnim}
+  onMouseEnter={(e) =>
+    hoverAnim.onMouseEnter(e, "0 8px 20px rgba(34,197,94,0.4)")
+  }
+  onMouseLeave={(e) =>
+    hoverAnim.onMouseLeave(e, "0 4px 12px rgba(34,197,94,0.3)")
+  }
+  onMouseUp={(e) =>
+    hoverAnim.onMouseUp(e, "0 8px 20px rgba(34,197,94,0.4)")
+  }
+  style={{
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    background: "linear-gradient(135deg, #22c55e, #16a34a)",
+    color: "#fff",
+    border: "none",
+    fontSize: 22,
+    fontWeight: "bold",
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(34,197,94,0.3)",
+    transition: "all 0.2s ease"
+  }}
+>
+  +
+</button>
 
-        <button
-          onClick={() =>
-            actualizarStock(
-              item.id,
-              stockTemp[item.id] ?? item.stock
-            )
-          }
-          style={{
-            background: "#3b82f6",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            padding: "4px 8px"
-          }}
-        >
-          💾
-        </button>
+    {/* BOTÓN - */}
+    <button
+  onClick={() =>
+    actualizarStock(
+      item.id,
+      Math.max((stockTemp[item.id] ?? item.stock) - 1, 0)
+    )
+  }
+  {...hoverAnim}
+  onMouseEnter={(e) =>
+    hoverAnim.onMouseEnter(e, "0 8px 20px rgba(239,68,68,0.4)")
+  }
+  onMouseLeave={(e) =>
+    hoverAnim.onMouseLeave(e, "0 4px 12px rgba(239,68,68,0.3)")
+  }
+  onMouseUp={(e) =>
+    hoverAnim.onMouseUp(e, "0 8px 20px rgba(239,68,68,0.4)")
+  }
+  style={{
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+    color: "#fff",
+    border: "none",
+    fontSize: 22,
+    fontWeight: "bold",
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(239,68,68,0.3)",
+    transition: "all 0.2s ease"
+  }}
+>
+  −
+</button>
 
-      </td>
+    {/* BOTÓN GUARDAR */}
+    <button
+  onClick={() =>
+    actualizarStock(
+      item.id,
+      stockTemp[item.id] ?? item.stock
+    )
+  }
+  {...hoverAnim}
+  onMouseEnter={(e) =>
+    hoverAnim.onMouseEnter(e, "0 8px 20px rgba(59,130,246,0.4)")
+  }
+  onMouseLeave={(e) =>
+    hoverAnim.onMouseLeave(e, "0 4px 12px rgba(59,130,246,0.3)")
+  }
+  onMouseUp={(e) =>
+    hoverAnim.onMouseUp(e, "0 8px 20px rgba(59,130,246,0.4)")
+  }
+  style={{
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+    color: "#fff",
+    border: "none",
+    fontSize: 18,
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(59,130,246,0.3)",
+    transition: "all 0.2s ease"
+  }}
+>
+  💾
+</button>
+
+  </div>
+
+</td>
 
     </tr>
   ))}
@@ -676,19 +780,32 @@ const stockFiltrado = stockOrdenado.filter((item) =>
 
 {(o.estado || "pendiente") === "pendiente" && (
   <button
-    onClick={() => cambiarEstado(o.id)}
-    style={{
-      marginTop: 10,
-      background: "#22c55e",
-      color: "white",
-      padding: "8px 12px",
-      borderRadius: "8px",
-      border: "none",
-      cursor: "pointer"
-    }}
-  >
-    📦 Marcar como enviado
-  </button>
+  onClick={() => cambiarEstado(o.id)}
+  {...hoverAnim}
+  onMouseEnter={(e) =>
+    hoverAnim.onMouseEnter(e, "0 8px 20px rgba(34,197,94,0.4)")
+  }
+  onMouseLeave={(e) =>
+    hoverAnim.onMouseLeave(e, "0 4px 12px rgba(34,197,94,0.3)")
+  }
+  onMouseUp={(e) =>
+    hoverAnim.onMouseUp(e, "0 8px 20px rgba(34,197,94,0.4)")
+  }
+  style={{
+    marginTop: 10,
+    background: "linear-gradient(135deg, #22c55e, #16a34a)",
+    color: "white",
+    padding: "10px 14px",
+    borderRadius: "10px",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "bold",
+    boxShadow: "0 4px 12px rgba(34,197,94,0.3)",
+    transition: "all 0.2s ease"
+  }}
+>
+  📦 Marcar como enviado
+</button>
 )}
         </div>
       ))}
