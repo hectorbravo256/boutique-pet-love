@@ -53,6 +53,8 @@ useEffect(() => {
 
 const cambiarEstado = async (id) => {
 
+  console.log("CLICK ENVIADO:", id);
+
   // 🔍 1. Obtener pedido
   const resPedido = await fetch("/.netlify/functions/get-orders");
   const pedidos = await resPedido.json();
@@ -73,16 +75,18 @@ const cambiarEstado = async (id) => {
   // 🔥 2. DESCONTAR STOCK
   for (const item of pedido.items) {
 
-	console.log("DESCONTANDO:", item);
+    console.log("ITEM:", item);
 
     const { error } = await supabase.rpc("descontar_stock", {
-      p_id: item.id,
+      p_id: item.product_id || item.id, // 🔥 IMPORTANTE
       p_size: item.size,
       cantidad: item.qty || 1,
     });
 
     if (error) {
       console.log("❌ ERROR STOCK:", error);
+    } else {
+      console.log("✅ STOCK DESCONTADO");
     }
   }
 
