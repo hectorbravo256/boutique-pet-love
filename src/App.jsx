@@ -571,16 +571,22 @@ localStorage.setItem(
 		>
   		<option value="">Seleccionar talla</option>
 
-	{product.product_variants.map((v) => {
-  		const stock = stockMap[`${product.id}-${v.size}`] || 0;
+{[...product.product_variants]
+  .sort((a, b) => {
+    const numA = parseInt(a.size.match(/\d+/)[0]);
+    const numB = parseInt(b.size.match(/\d+/)[0]);
+    return numA - numB;
+  })
+  .map((v) => {
+    const stock = stockMap[`${product.id}-${v.size}`] || 0;
 
-  return (
-    <option key={v.id} value={v.size}>
-      {v.size} - {formatPrice(v.price)}
-      {stock === 0 ? " ❌ Sin stock - Producto a Pedido" : ""}
-    </option>
-  );
-})}
+    return (
+      <option key={v.id} value={v.size}>
+        {v.size} - {formatPrice(v.price)}
+        {stock === 0 ? " ❌ Sin stock - Producto a Pedido" : ""}
+      </option>
+    );
+  })}
 </select>
 
                <div className="bloque-botones flex flex-col gap-2">
