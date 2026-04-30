@@ -61,9 +61,9 @@ const response = await preference.create({
       "https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/webhook",
 
     back_urls: {
-      success: "https://fluffy-daifuku-56b90b.netlify.app/success",
-      failure: "https://fluffy-daifuku-56b90b.netlify.app/failure",
-      pending: "https://fluffy-daifuku-56b90b.netlify.app/pending",
+      success: "https://boutiquepetlove.cl/success",
+      failure: "https://boutiquepetlove.cl/failure",
+      pending: "https://boutiquepetlove.cl/pending",
     },
 
     auto_return: "approved",

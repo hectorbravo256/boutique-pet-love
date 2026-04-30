@@ -1210,17 +1210,29 @@ if (!order || !order.cart) {
 }
 
 function ProtectedRoute({ children }) {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
+    // Obtener sesión inicial
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
     });
+
+    // 🔥 ESCUCHAR CAMBIOS DE LOGIN (CLAVE)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  if (session === null) return <p>Cargando...</p>;
+  if (session === undefined) return <p>Cargando...</p>;
 
-  return session ? children : <Login />;
+  if (!session) return <Login />;
+
+  return children;
 }
 
 /* ================= ROUTER ================= */
