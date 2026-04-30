@@ -22,6 +22,8 @@ export default function Admin() {
   const [stockTemp, setStockTemp] = useState({});
   const [productos, setProductos] = useState({});
   const [loading, setLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [productosFull, setProductosFull] = useState([]);
 
 useEffect(() => {
   const cargarProductos = async () => {
@@ -64,6 +66,21 @@ useEffect(() => {
   };
 
   cargarStock();
+}, []);
+
+useEffect(() => {
+  const cargarProductosFull = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select(`
+        *,
+        product_variants (*)
+      `);
+
+    setProductosFull(data || []);
+  };
+
+  cargarProductosFull();
 }, []);
 
 const cambiarEstado = async (id) => {
@@ -290,6 +307,80 @@ const hoverAnim = {
   borderRadius: 12
 }}>
 <h2>📦 Gestión de Stock</h2>
+
+<div style={{
+  marginTop: 40,
+  padding: 20,
+  background: "#fff",
+  borderRadius: 12
+}}>
+  <h2>🛒 Editor de Productos</h2>
+
+  {productosFull.map((p) => (
+    <div key={p.id} style={{
+      borderBottom: "1px solid #eee",
+      padding: 10
+    }}>
+
+      <h3>{p.name}</h3>
+
+      {/* 🔥 ACTIVAR / DESACTIVAR */}
+      <label>
+        <input
+          type="checkbox"
+          checked={p.active}
+          onChange={async (e) => {
+            const { error } = await supabase
+              .from("products")
+              .update({ active: e.target.checked })
+              .eq("id", p.id);
+
+            if (!error) {
+              setProductosFull((prev) =>
+                prev.map((prod) =>
+                  prod.id === p.id
+                    ? { ...prod, active: e.target.checked }
+                    : prod
+                )
+              );
+            }
+          }}
+        />
+        Activo
+      </label>
+
+      {/* 🔥 VARIANTES (PRECIOS) */}
+      {p.product_variants?.map((v) => (
+        <div key={v.id} style={{ marginTop: 5 }}>
+
+          <span>{v.size}</span>
+
+          <input
+            type="number"
+            defaultValue={v.price}
+            onBlur={async (e) => {
+              const nuevoPrecio = parseInt(e.target.value);
+
+              const { error } = await supabase
+                .from("product_variants")
+                .update({ price: nuevoPrecio })
+                .eq("id", v.id);
+
+              if (!error) {
+                alert("💰 Precio actualizado");
+              }
+            }}
+            style={{
+              marginLeft: 10,
+              padding: 5,
+              width: 100
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
 
 <input
   type="text"
@@ -585,11 +676,62 @@ if (hasError) {
 
 </div>
 
+<div style={{
+  position: "absolute",
+  top: 40,
+  right: 200,
+  background: "#fff",
+  padding: 10,
+  borderRadius: 10,
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+}}>
+  <p style={{ fontWeight: "bold", marginBottom: 5 }}>
+    🔑 Cambiar contraseña
+  </p>
+
+  <input
+    type="password"
+    placeholder="Nueva contraseña"
+    value={newPassword}
+    onChange={(e) => setNewPassword(e.target.value)}
+    style={{
+      padding: 6,
+      borderRadius: 6,
+      border: "1px solid #ccc",
+      marginRight: 5
+    }}
+  />
+
+  <button
+    onClick={async () => {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        alert("❌ " + error.message);
+      } else {
+        alert("✅ Contraseña actualizada");
+        setNewPassword("");
+      }
+    }}
+    style={{
+      background: "#2563eb",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 6,
+      cursor: "pointer"
+    }}
+  >
+    Guardar
+  </button>
+</div>
 
 <button
   onClick={async () => {
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/admin";
   }}
   style={{
     position: "absolute",

@@ -1232,7 +1232,17 @@ function ProtectedRoute({ children }) {
 
   if (!session) return <Login />;
 
-  return children;
+  const allowedEmails = [
+  "contabilidadagenciarebolledo@gmail.com",
+  "hectorbravov@hotmail.es"
+];
+
+
+if (session?.user?.email !== allowedEmail) {
+  return <p style={{ padding: 40 }}>⛔ No tienes acceso</p>;
+}
+
+return children;
 }
 
 /* ================= ROUTER ================= */
