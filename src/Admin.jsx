@@ -244,36 +244,32 @@ if (errVar) {
   }
  
 // 🔥 4. TRAER PRODUCTO COMPLETO
-const { data: productoCompleto } = await supabase
-  .from("products")
-  .select(`
-    *,
-    product_variants (*),
-    product_images (*)
-  `)
-  .eq("id", prod.id)
-  .single();
+// 🔥 construir variantes desde el form
+const nuevasVariantes = newProduct.variants
+  .filter(v => v.size && v.price)
+  .map((v, i) => ({
+    id: Date.now() + i,
+    size: v.size,
+    price: parseInt(v.price)
+  }));
 
-		  if (errFetch || !productoCompleto) {
-    showToast("⚠️ Creado, pero no se pudo actualizar la vista");
-    return;
-  }
+// 🔥 construir producto completo manual
+const productoNuevo = {
+  ...prod,
+  product_variants: nuevasVariantes,
+  product_images: newProduct.image
+    ? [{ url: newProduct.image }]
+    : []
+};
 
- // 🔥 5. ACTUALIZAR UI INMEDIATO
+// 🔥 actualizar UI inmediato
 setProductosFull(prev =>
-  [...prev, productoCompleto].sort((a, b) =>
+  [...prev, productoNuevo].sort((a, b) =>
     a.name.localeCompare(b.name)
   )
 );
 
-  // 6. Limpiar formulario
-setNewProduct({
-  name: "",
-  category: "",
-  image: "",
-  variants: [{ size: "Talla 1", price: "" }]
-});
-		showToast("✅ Producto creado");
+showToast("✅ Producto creado");
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
