@@ -603,79 +603,141 @@ if (hasError) {
 
 </div>
 
+<input
+  placeholder="🔍 Buscar producto..."
+  onChange={(e) => {
+    const val = e.target.value.toLowerCase();
+    setProductosFull((prev) =>
+      prev.filter(p =>
+        p.name.toLowerCase().includes(val)
+      )
+    );
+  }}
+  style={{
+    width: "100%",
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 8,
+    border: "1px solid #ddd"
+  }}
+/>		
+		
 <div style={{
   marginTop: 40,
-  padding: 20,
   background: "#fff",
-  borderRadius: 12
+  borderRadius: 16,
+  padding: 20,
+  boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
 }}>
-  <h2>🛒 Editor de Productos</h2>
 
-  {productosFull.map((p) => (
-    <div key={p.id} style={{
-      borderBottom: "1px solid #eee",
-      padding: 10
-    }}>
+  <h2 style={{
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 15
+  }}>
+    🛒 Editor de Productos
+  </h2>
 
-      <h3>{p.name}</h3>
+  <div style={{
+    display: "grid",
+    gap: 15
+  }}>
 
-      {/* 🔥 ACTIVAR / DESACTIVAR */}
-      <label>
-        <input
-          type="checkbox"
-          checked={p.active}
-          onChange={async (e) => {
-            const { error } = await supabase
-              .from("products")
-              .update({ active: e.target.checked })
-              .eq("id", p.id);
+    {productosFull?.map((p) => (
+      <div key={p.id} style={{
+        border: "1px solid #eee",
+        borderRadius: 12,
+        padding: 15,
+        background: "#fafafa"
+      }}>
 
-            if (!error) {
-              setProductosFull((prev) =>
-                prev.map((prod) =>
-                  prod.id === p.id
-                    ? { ...prod, active: e.target.checked }
-                    : prod
-                )
-              );
-            }
-          }}
-        />
-        Activo
-      </label>
+        {/* NOMBRE */}
+        <h3 style={{ fontSize: 18, marginBottom: 8 }}>
+          {p.name}
+        </h3>
 
-      {/* 🔥 VARIANTES (PRECIOS) */}
-      {p.product_variants?.map((v) => (
-        <div key={v.id} style={{ marginTop: 5 }}>
-
-          <span>{v.size}</span>
-
+        {/* ACTIVO */}
+        <label style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 10,
+          fontWeight: "bold"
+        }}>
           <input
-            type="number"
-            defaultValue={v.price}
-            onBlur={async (e) => {
-              const nuevoPrecio = parseInt(e.target.value);
-
+            type="checkbox"
+            checked={p.active}
+            onChange={async (e) => {
               const { error } = await supabase
-                .from("product_variants")
-                .update({ price: nuevoPrecio })
-                .eq("id", v.id);
+                .from("products")
+                .update({ active: e.target.checked })
+                .eq("id", p.id);
 
               if (!error) {
-                alert("💰 Precio actualizado");
+                setProductosFull((prev) =>
+                  prev.map((prod) =>
+                    prod.id === p.id
+                      ? { ...prod, active: e.target.checked }
+                      : prod
+                  )
+                );
               }
             }}
-            style={{
-              marginLeft: 10,
-              padding: 5,
-              width: 100
-            }}
           />
+          Activo
+        </label>
+
+        {/* VARIANTES */}
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 10
+        }}>
+
+          {p.product_variants?.map((v) => (
+            <div key={v.id} style={{
+              background: "#fff",
+              padding: 10,
+              borderRadius: 10,
+              border: "1px solid #ddd"
+            }}>
+              <div style={{ fontSize: 13, marginBottom: 5 }}>
+                {v.size}
+              </div>
+
+              <input
+                type="number"
+                defaultValue={v.price}
+                onBlur={async (e) => {
+                  const nuevo = parseInt(e.target.value);
+
+                  const { error } = await supabase
+                    .from("product_variants")
+                    .update({ price: nuevo })
+                    .eq("id", v.id);
+
+                  if (!error) {
+                    alert("💰 Precio actualizado");
+                  }
+                }}
+                style={{
+                  width: 90,
+                  padding: 6,
+                  borderRadius: 6,
+                  border: "1px solid #ccc"
+                }}
+              />
+            </div>
+          ))}
+
         </div>
-      ))}
-    </div>
-  ))}
+
+      </div>
+    ))}
+
+  </div>
 </div>
+  
 
 
 <div style={{
