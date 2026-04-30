@@ -24,6 +24,18 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [productosFull, setProductosFull] = useState([]);
+	const recargarProductos = async () => {
+  const { data } = await supabase
+    .from("products")
+    .select(`
+      *,
+      product_variants (*),
+      product_images (*)
+    `)
+    .order("name", { ascending: true });
+
+  setProductosFull(data || []);
+};
   const [newProduct, setNewProduct] = useState({
   name: "",
   category: "",
@@ -78,20 +90,7 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const cargarProductosFull = async () => {
-const { data } = await supabase
-  .from("products")
-.select(`
-  *,
-  product_variants (*),
-  product_images (*)
-`)
-  .order("name", { ascending: true });
-
-    setProductosFull(data || []);
-  };
-
-  cargarProductosFull();
+  recargarProductos();
 }, []);
 
 const cambiarEstado = async (id) => {
@@ -102,6 +101,7 @@ const cambiarEstado = async (id) => {
   setToast(msg);
   setTimeout(() => setToast(""), 2500);
 };
+
 
   // 🔍 1. Obtener pedido
   const resPedido = await fetch("/.netlify/functions/get-orders");
@@ -249,7 +249,7 @@ const actualizarStock = async (id, nuevoStock) => {
     `)
     .order("name", { ascending: true });
 
-  setProductosFull(data || []);
+  recargarProductos();
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -891,7 +891,7 @@ if (hasError) {
 `)
   .order("name", { ascending: true });
 
-  setProductosFull(data || []);
+  recargarProductos();
 }}
           />
           Activo
@@ -949,40 +949,58 @@ if (hasError) {
         }}>
 
           {p.product_variants?.map((v) => (
-            <div key={v.id} style={{
-              background: "#fff",
-              padding: 10,
-              borderRadius: 10,
-              border: "1px solid #ddd"
-            }}>
-              <div style={{ fontSize: 13, marginBottom: 5 }}>
-                {v.size}
-              </div>
+  <div key={v.id} style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6
+  }}>
 
-              <input
-                type="number"
-                defaultValue={v.price}
-                onBlur={async (e) => {
-                  const nuevo = parseInt(e.target.value);
+    <span style={{ minWidth: 80 }}>{v.size}</span>
 
-                  const { error } = await supabase
-                    .from("product_variants")
-                    .update({ price: nuevo })
-                    .eq("id", v.id);
+    <input
+      type="number"
+      defaultValue={v.price}
+      onBlur={async (e) => {
+        const nuevo = parseInt(e.target.value);
 
-                  if (!error) {
-                    showToast("💰 Precio actualizado");
-                  }
-                }}
-                style={{
-                  width: 90,
-                  padding: 6,
-                  borderRadius: 6,
-                  border: "1px solid #ccc"
-                }}
-              />
-            </div>
-          ))}
+        await supabase
+          .from("product_variants")
+          .update({ price: nuevo })
+          .eq("id", v.id);
+
+        showToast("💰 Precio actualizado");
+      }}
+      style={{ width: 90, padding: 5 }}
+    />
+
+    {/* 🔥 BOTÓN ELIMINAR TALLA */}
+    <button
+      onClick={async () => {
+        if (!confirm("¿Eliminar esta talla?")) return;
+
+        await supabase
+          .from("product_variants")
+          .delete()
+          .eq("id", v.id);
+
+        showToast("🗑 Talla eliminada");
+
+        recargarProductos(); // 👈 importante
+      }}
+      style={{
+        background: "#ef4444",
+        color: "#fff",
+        border: "none",
+        padding: "4px 8px",
+        borderRadius: 6,
+        cursor: "pointer"
+      }}
+    >
+      ❌
+    </button>
+  </div>
+))}
 
 			<div style={{ marginTop: 10 }}>
   <input
@@ -1033,7 +1051,7 @@ if (hasError) {
         `)
         .order("name", { ascending: true });
 
-      setProductosFull(data || []);
+      recargarProductos();
     }}
     style={{
       background: "#3b82f6",
