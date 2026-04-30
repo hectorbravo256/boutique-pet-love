@@ -308,79 +308,6 @@ const hoverAnim = {
 }}>
 <h2>📦 Gestión de Stock</h2>
 
-<div style={{
-  marginTop: 40,
-  padding: 20,
-  background: "#fff",
-  borderRadius: 12
-}}>
-  <h2>🛒 Editor de Productos</h2>
-
-  {productosFull.map((p) => (
-    <div key={p.id} style={{
-      borderBottom: "1px solid #eee",
-      padding: 10
-    }}>
-
-      <h3>{p.name}</h3>
-
-      {/* 🔥 ACTIVAR / DESACTIVAR */}
-      <label>
-        <input
-          type="checkbox"
-          checked={p.active}
-          onChange={async (e) => {
-            const { error } = await supabase
-              .from("products")
-              .update({ active: e.target.checked })
-              .eq("id", p.id);
-
-            if (!error) {
-              setProductosFull((prev) =>
-                prev.map((prod) =>
-                  prod.id === p.id
-                    ? { ...prod, active: e.target.checked }
-                    : prod
-                )
-              );
-            }
-          }}
-        />
-        Activo
-      </label>
-
-      {/* 🔥 VARIANTES (PRECIOS) */}
-      {p.product_variants?.map((v) => (
-        <div key={v.id} style={{ marginTop: 5 }}>
-
-          <span>{v.size}</span>
-
-          <input
-            type="number"
-            defaultValue={v.price}
-            onBlur={async (e) => {
-              const nuevoPrecio = parseInt(e.target.value);
-
-              const { error } = await supabase
-                .from("product_variants")
-                .update({ price: nuevoPrecio })
-                .eq("id", v.id);
-
-              if (!error) {
-                alert("💰 Precio actualizado");
-              }
-            }}
-            style={{
-              marginLeft: 10,
-              padding: 5,
-              width: 100
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  ))}
-</div>
 
 <input
   type="text"
@@ -675,6 +602,81 @@ if (hasError) {
 </table>
 
 </div>
+
+<div style={{
+  marginTop: 40,
+  padding: 20,
+  background: "#fff",
+  borderRadius: 12
+}}>
+  <h2>🛒 Editor de Productos</h2>
+
+  {productosFull.map((p) => (
+    <div key={p.id} style={{
+      borderBottom: "1px solid #eee",
+      padding: 10
+    }}>
+
+      <h3>{p.name}</h3>
+
+      {/* 🔥 ACTIVAR / DESACTIVAR */}
+      <label>
+        <input
+          type="checkbox"
+          checked={p.active}
+          onChange={async (e) => {
+            const { error } = await supabase
+              .from("products")
+              .update({ active: e.target.checked })
+              .eq("id", p.id);
+
+            if (!error) {
+              setProductosFull((prev) =>
+                prev.map((prod) =>
+                  prod.id === p.id
+                    ? { ...prod, active: e.target.checked }
+                    : prod
+                )
+              );
+            }
+          }}
+        />
+        Activo
+      </label>
+
+      {/* 🔥 VARIANTES (PRECIOS) */}
+      {p.product_variants?.map((v) => (
+        <div key={v.id} style={{ marginTop: 5 }}>
+
+          <span>{v.size}</span>
+
+          <input
+            type="number"
+            defaultValue={v.price}
+            onBlur={async (e) => {
+              const nuevoPrecio = parseInt(e.target.value);
+
+              const { error } = await supabase
+                .from("product_variants")
+                .update({ price: nuevoPrecio })
+                .eq("id", v.id);
+
+              if (!error) {
+                alert("💰 Precio actualizado");
+              }
+            }}
+            style={{
+              marginLeft: 10,
+              padding: 5,
+              width: 100
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+
 
 <div style={{
   position: "absolute",
