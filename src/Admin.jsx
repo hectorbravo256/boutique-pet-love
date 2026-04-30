@@ -24,7 +24,15 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [productosFull, setProductosFull] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+  name: "",
+  category: "",
+  price: "",
+  size: "Talla 1",
+  image: ""
+});
   const [searchProduct, setSearchProduct] = useState("");
+  const [toast, setToast] = useState("");
 
 useEffect(() => {
   const cargarProductos = async () => {
@@ -71,12 +79,14 @@ useEffect(() => {
 
 useEffect(() => {
   const cargarProductosFull = async () => {
-    const { data } = await supabase
-      .from("products")
-      .select(`
-        *,
-        product_variants (*)
-      `);
+const { data } = await supabase
+  .from("products")
+.select(`
+  *,
+  product_variants (*),
+  product_images (*)
+`)
+  .order("name", { ascending: true });
 
     setProductosFull(data || []);
   };
@@ -87,6 +97,11 @@ useEffect(() => {
 const cambiarEstado = async (id) => {
 
   console.log("CLICK ENVIADO:", id);
+
+	const showToast = (msg) => {
+  setToast(msg);
+  setTimeout(() => setToast(""), 2500);
+};
 
   // 🔍 1. Obtener pedido
   const resPedido = await fetch("/.netlify/functions/get-orders");
@@ -165,6 +180,76 @@ const actualizarStock = async (id, nuevoStock) => {
     delete nuevo[id];
     return nuevo;
   });
+};
+
+	const crearProducto = async () => {
+  if (!newProduct.name || !newProduct.price) {
+    showToast("⚠️ Completa nombre y precio");
+    return;
+  }
+
+  // 1. Crear producto
+  const { data: prod, error: errProd } = await supabase
+    .from("products")
+    .insert([{
+      name: newProduct.name,
+      category: newProduct.category,
+      active: true
+    }])
+    .select()
+    .single();
+
+  if (errProd) {
+    showToast("❌ Error creando producto");
+    return;
+  }
+
+  // 2. Crear variante (talla + precio)
+  const { error: errVar } = await supabase
+    .from("product_variants")
+    .insert([{
+      product_id: prod.id,
+      size: newProduct.size,
+      price: parseInt(newProduct.price)
+    }]);
+
+  if (errVar) {
+    showToast("❌ Error creando variante");
+    return;
+  }
+
+  // 3. Imagen (opcional)
+  if (newProduct.image) {
+    await supabase
+      .from("product_images")
+      .insert([{
+        product_id: prod.id,
+        url: newProduct.image
+      }]);
+  }
+
+  showToast("✅ Producto creado");
+
+  // 4. Limpiar formulario
+  setNewProduct({
+    name: "",
+    category: "",
+    price: "",
+    size: "Talla 1",
+    image: ""
+  });
+
+  // 5. Refrescar lista (ordenada)
+  const { data } = await supabase
+    .from("products")
+    .select(`
+      *,
+      product_variants (*),
+      product_images (*)
+    `)
+    .order("name", { ascending: true });
+
+  setProductosFull(data || []);
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -625,6 +710,78 @@ if (hasError) {
   boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
 }}>
 
+	<div style={{
+  marginBottom: 20,
+  padding: 15,
+  background: "#f9fafb",
+  borderRadius: 12,
+  border: "1px solid #eee"
+}}>
+  <h3 style={{ marginBottom: 10 }}>➕ Crear nuevo producto</h3>
+
+  <input
+    placeholder="Nombre"
+    value={newProduct.name}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, name: e.target.value })
+    }
+    style={{ width: "100%", marginBottom: 8, padding: 6 }}
+  />
+
+  <input
+    placeholder="Categoría"
+    value={newProduct.category}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, category: e.target.value })
+    }
+    style={{ width: "100%", marginBottom: 8, padding: 6 }}
+  />
+
+  <input
+    placeholder="Talla (ej: Talla 1)"
+    value={newProduct.size}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, size: e.target.value })
+    }
+    style={{ width: "100%", marginBottom: 8, padding: 6 }}
+  />
+
+  <input
+    type="number"
+    placeholder="Precio"
+    value={newProduct.price}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, price: e.target.value })
+    }
+    style={{ width: "100%", marginBottom: 8, padding: 6 }}
+  />
+
+  <input
+    placeholder="URL Imagen (opcional)"
+    value={newProduct.image}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, image: e.target.value })
+    }
+    style={{ width: "100%", marginBottom: 10, padding: 6 }}
+  />
+
+  <button
+    onClick={crearProducto}
+    style={{
+      background: "#22c55e",
+      color: "#fff",
+      padding: "8px 14px",
+      borderRadius: 8,
+      border: "none",
+      cursor: "pointer",
+      fontWeight: "bold"
+    }}
+  >
+    Crear producto
+  </button>
+</div>
+	
+
   <h2 style={{
     fontSize: 22,
     fontWeight: "bold",
@@ -650,11 +807,56 @@ if (hasError) {
         background: "#fafafa"
       }}>
 
+		  <img
+  src={p.product_images?.[0]?.url || "/placeholder.png"}
+  style={{
+    width: 80,
+    height: 80,
+    objectFit: "cover",
+    borderRadius: 10,
+    marginBottom: 10
+  }}
+/>
         {/* NOMBRE */}
-        <h3 style={{ fontSize: 18, marginBottom: 8 }}>
-          {p.name}
-        </h3>
+        <input
+  defaultValue={p.name}
+  onBlur={async (e) => {
+    const { error } = await supabase
+      .from("products")
+      .update({ name: e.target.value })
+      .eq("id", p.id);
 
+    if (!error) showToast("✏️ Nombre actualizado");
+  }}
+  style={{
+    fontSize: 16,
+    fontWeight: "bold",
+    padding: 6,
+    width: "100%",
+    marginBottom: 8
+  }}
+/>
+
+		  <input
+  defaultValue={p.category || ""}
+  placeholder="Categoría"
+  onBlur={async (e) => {
+    const { error } = await supabase
+      .from("products")
+      .update({ category: e.target.value })
+      .eq("id", p.id);
+
+    if (!error) showToast("🏷 Categoría actualizada");
+  }}
+  style={{
+    padding: 6,
+    width: "100%",
+    marginBottom: 10,
+    borderRadius: 6,
+    border: "1px solid #ccc"
+  }}
+/>
+		  
         {/* ACTIVO */}
         <label style={{
           display: "flex",
@@ -681,11 +883,13 @@ if (hasError) {
 
   // 🔥 FORZAR REFRESH DESDE BD
   const { data } = await supabase
-    .from("products")
-    .select(`
-      *,
-      product_variants (*)
-    `);
+  .from("products")
+.select(`
+  *,
+  product_variants (*),
+  product_images (*)
+`)
+  .order("name", { ascending: true });
 
   setProductosFull(data || []);
 }}
@@ -723,7 +927,7 @@ if (hasError) {
                     .eq("id", v.id);
 
                   if (!error) {
-                    alert("💰 Precio actualizado");
+                    showToast("💰 Precio actualizado");
                   }
                 }}
                 style={{
@@ -1021,6 +1225,22 @@ if (hasError) {
 )}
         </div>
       ))}
+
+		{toast && (
+  <div style={{
+    position: "fixed",
+    bottom: 20,
+    right: 20,
+    background: "#111",
+    color: "#fff",
+    padding: "10px 16px",
+    borderRadius: 10,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+  }}>
+    {toast}
+  </div>
+)}
+		
     </div>
   );
 }
