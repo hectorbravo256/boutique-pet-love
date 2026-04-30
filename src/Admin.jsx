@@ -36,12 +36,13 @@ export default function Admin() {
 
   setProductosFull(data || []);
 };
-  const [newProduct, setNewProduct] = useState({
+const [newProduct, setNewProduct] = useState({
   name: "",
   category: "",
-  price: "",
-  size: "Talla 1",
-  image: ""
+  image: "",
+  variants: [
+    { size: "Talla 1", price: "" }
+  ]
 });
   const [searchProduct, setSearchProduct] = useState("");
   const [toast, setToast] = useState("");
@@ -205,13 +206,27 @@ const actualizarStock = async (id, nuevoStock) => {
   }
 
   // 2. Crear variante (talla + precio)
-  const { error: errVar } = await supabase
-    .from("product_variants")
-    .insert([{
-      product_id: prod.id,
-      size: newProduct.size,
-      price: parseInt(newProduct.price)
-    }]);
+const variantsToInsert = newProduct.variants
+  .filter(v => v.size && v.price)
+  .map(v => ({
+    product_id: prod.id,
+    size: v.size,
+    price: parseInt(v.price)
+  }));
+
+if (variantsToInsert.length === 0) {
+  showToast("⚠️ Agrega al menos una talla válida");
+  return;
+}
+
+const { error: errVar } = await supabase
+  .from("product_variants")
+  .insert(variantsToInsert);
+
+if (errVar) {
+  showToast("❌ Error creando tallas");
+  return;
+}
 
   if (errVar) {
     showToast("❌ Error creando variante");
@@ -227,39 +242,38 @@ const actualizarStock = async (id, nuevoStock) => {
         url: newProduct.image
       }]);
   }
+ 
+// 🔥 4. TRAER PRODUCTO COMPLETO
+const { data: productoCompleto } = await supabase
+  .from("products")
+  .select(`
+    *,
+    product_variants (*),
+    product_images (*)
+  `)
+  .eq("id", prod.id)
+  .single();
 
-  showToast("✅ Producto creado");
+		  if (errFetch || !productoCompleto) {
+    showToast("⚠️ Creado, pero no se pudo actualizar la vista");
+    return;
+  }
 
-  // 4. Limpiar formulario
-  setNewProduct({
-    name: "",
-    category: "",
-    price: "",
-    size: "Talla 1",
-    image: ""
-  });
+ // 🔥 5. ACTUALIZAR UI INMEDIATO
+setProductosFull(prev =>
+  [...prev, productoCompleto].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )
+);
 
-  // 5. Refrescar lista (ordenada)
-  const { data } = await supabase
-    .from("products")
-    .select(`
-      *,
-      product_variants (*),
-      product_images (*)
-    `)
-    .order("name", { ascending: true });
-
-  recargarProductos();
-
-		setProductosFull(prev => [...prev, {
-  ...prod,
-  product_variants: [{
-    id: Date.now(),
-    size: newProduct.size,
-    price: parseInt(newProduct.price)
-  }],
-  product_images: newProduct.image ? [{ url: newProduct.image }] : []
-}]);
+  // 6. Limpiar formulario
+setNewProduct({
+  name: "",
+  category: "",
+  image: "",
+  variants: [{ size: "Talla 1", price: "" }]
+});
+		showToast("✅ Producto creado");
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -747,25 +761,110 @@ if (hasError) {
     style={{ width: "100%", marginBottom: 8, padding: 6 }}
   />
 
-  <input
-    placeholder="Talla (ej: Talla 1)"
-    value={newProduct.size}
-    onChange={(e) =>
-      setNewProduct({ ...newProduct, size: e.target.value })
-    }
-    style={{ width: "100%", marginBottom: 8, padding: 6 }}
-  />
+  {newProduct.variants.map((v, index) => (
+  <div key={index} style={{
+    display: "flex",
+    gap: 8,
+    marginBottom: 6
+  }}>
 
-  <input
-    type="number"
-    placeholder="Precio"
-    value={newProduct.price}
-    onChange={(e) =>
-      setNewProduct({ ...newProduct, price: e.target.value })
-    }
-    style={{ width: "100%", marginBottom: 8, padding: 6 }}
-  />
+    {/* TALLA */}
+    <input
+      placeholder="Talla"
+      value={v.size}
+      onChange={(e) => {
+        const updated = [...newProduct.variants];
+        updated[index].size = e.target.value;
+        setNewProduct({ ...newProduct, variants: updated });
+      }}
+      style={{ padding: 6 }}
+    />
 
+    {/* PRECIO */}
+    <input
+      type="number"
+      placeholder="Precio"
+      value={v.price}
+      onChange={(e) => {
+        const updated = [...newProduct.variants];
+        updated[index].price = e.target.value;
+        setNewProduct({ ...newProduct, variants: updated });
+      }}
+      style={{ padding: 6, width: 100 }}
+    />
+
+    {/* ELIMINAR FILA */}
+    <button
+      onClick={() => {
+        const updated = newProduct.variants.filter((_, i) => i !== index);
+        setNewProduct({ ...newProduct, variants: updated });
+      }}
+      style={{
+        background: "#ef4444",
+        color: "#fff",
+        border: "none",
+        padding: "4px 8px",
+        borderRadius: 6,
+        cursor: "pointer"
+      }}
+    >
+      ✕
+    </button>
+
+  </div>
+))}
+
+{/* BOTÓN AGREGAR TALLA */}
+<button
+  onClick={() => {
+    setNewProduct({
+      ...newProduct,
+      variants: [...newProduct.variants, { size: "", price: "" }]
+    });
+  }}
+  style={{
+    background: "#3b82f6",
+    color: "#fff",
+    padding: "6px 10px",
+    borderRadius: 6,
+    border: "none",
+    marginTop: 5,
+    cursor: "pointer"
+  }}
+>
+  ➕ Agregar talla
+</button>
+
+		<button
+  onClick={() => {
+    const tallas = [];
+
+    for (let i = 0; i <= 12; i++) {
+      tallas.push({
+        size: `Talla ${i}`,
+        price: ""
+      });
+    }
+
+    setNewProduct({
+      ...newProduct,
+      variants: tallas
+    });
+  }}
+  style={{
+    background: "linear-gradient(135deg, #10b981, #059669)",
+    color: "#fff",
+    padding: "8px 12px",
+    borderRadius: 8,
+    border: "none",
+    marginTop: 10,
+    cursor: "pointer",
+    fontWeight: "bold"
+  }}
+>
+  ⚡ Generar tallas 0–12
+</button>
+		
   <input
     placeholder="URL Imagen (opcional)"
     value={newProduct.image}
