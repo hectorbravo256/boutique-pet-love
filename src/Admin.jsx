@@ -184,10 +184,10 @@ const actualizarStock = async (id, nuevoStock) => {
 };
 
 	const crearProducto = async () => {
-  if (!newProduct.name || !newProduct.price) {
-    showToast("⚠️ Completa nombre y precio");
-    return;
-  }
+  if (!newProduct.name || newProduct.variants.length === 0) {
+  showToast("⚠️ Completa el nombre y al menos una talla");
+  return;
+}
 
   // 1. Crear producto
   const { data: prod, error: errProd } = await supabase
@@ -215,7 +215,7 @@ const variantsToInsert = newProduct.variants
   }));
 
 if (variantsToInsert.length === 0) {
-  showToast("⚠️ Agrega al menos una talla válida");
+  showToast("⚠️ Debes ingresar al menos una talla con precio");
   return;
 }
 
