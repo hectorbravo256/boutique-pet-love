@@ -918,25 +918,36 @@ onClick={async () => {
   showToast("🗑 Producto eliminado");
 }}
   style={{
-    background: "#ef4444",
+    background: "linear-gradient(135deg, #ef4444, #b91c1c)",
     color: "#fff",
-    padding: "5px 10px",
-    borderRadius: 6,
+    padding: "8px 14px",
+    borderRadius: 10,
     border: "none",
-    marginBottom: 10
+    cursor: "pointer",
+    fontWeight: "600",
+    boxShadow: "0 4px 10px rgba(239,68,68,0.3)",
+    transition: "all 0.2s"
   }}
+  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
 >
-  🗑 Eliminar producto
+  🗑 Eliminar
 </button>
 		  
         {/* VARIANTES */}
         <div style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 10
+          gap: 12
         }}>
 
-          {p.product_variants?.map((v) => (
+          {[...p.product_variants]
+  .sort((a, b) => {
+    const numA = parseInt(a.size.match(/\d+/)?.[0] || 0);
+    const numB = parseInt(b.size.match(/\d+/)?.[0] || 0);
+    return numA - numB;
+  })
+  .map((v) => (
   <div key={v.id} style={{
     display: "flex",
     alignItems: "center",
@@ -1000,17 +1011,27 @@ onClick={async () => {
 
   showToast("🗑 Talla eliminada");
 }}
-      style={{
-        background: "#ef4444",
-        color: "#fff",
-        border: "none",
-        padding: "4px 8px",
-        borderRadius: 6,
-        cursor: "pointer"
-      }}
-    >
-      ❌
-    </button>
+  style={{
+    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+    color: "#fff",
+    border: "none",
+    width: 34,
+    height: 34,
+    borderRadius: 8,
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+    transition: "all 0.2s"
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+>
+  ✕
+</button>
   </div>
 ))}
 
@@ -1067,16 +1088,25 @@ onClick={async () => {
 
   showToast("✅ Talla agregada");
 }}
-    style={{
-      background: "#3b82f6",
-      color: "#fff",
-      padding: "5px 10px",
-      borderRadius: 6,
-      border: "none"
-    }}
-  >
-    ➕ Agregar talla
-  </button>
+      style={{
+    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+    color: "#fff",
+    padding: "8px 14px",
+    borderRadius: 10,
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "600",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    boxShadow: "0 4px 10px rgba(59,130,246,0.3)",
+    transition: "all 0.2s"
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+>
+  ➕ Agregar
+</button>
 </div>
 
         </div>
