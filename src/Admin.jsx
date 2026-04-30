@@ -667,21 +667,28 @@ if (hasError) {
             type="checkbox"
             checked={p.active}
             onChange={async (e) => {
-              const { error } = await supabase
-                .from("products")
-                .update({ active: e.target.checked })
-                .eq("id", p.id);
+  const nuevoEstado = e.target.checked;
 
-              if (!error) {
-                setProductosFull((prev) =>
-                  prev.map((prod) =>
-                    prod.id === p.id
-                      ? { ...prod, active: e.target.checked }
-                      : prod
-                  )
-                );
-              }
-            }}
+  const { error } = await supabase
+    .from("products")
+    .update({ active: nuevoEstado })
+    .eq("id", p.id);
+
+  if (error) {
+    alert("❌ Error al actualizar");
+    return;
+  }
+
+  // 🔥 FORZAR REFRESH DESDE BD
+  const { data } = await supabase
+    .from("products")
+    .select(`
+      *,
+      product_variants (*)
+    `);
+
+  setProductosFull(data || []);
+}}
           />
           Activo
         </label>
