@@ -897,6 +897,50 @@ if (hasError) {
           Activo
         </label>
 
+		  <button
+  onClick={async () => {
+    if (!confirm("¿Eliminar producto completo?")) return;
+
+    // eliminar variantes
+    await supabase
+      .from("product_variants")
+      .delete()
+      .eq("product_id", p.id);
+
+    // eliminar imágenes
+    await supabase
+      .from("product_images")
+      .delete()
+      .eq("product_id", p.id);
+
+    // eliminar producto
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", p.id);
+
+    if (error) {
+      showToast("❌ Error eliminando");
+      return;
+    }
+
+    showToast("🗑 Producto eliminado");
+
+    // actualizar UI
+    setProductosFull(prev => prev.filter(prod => prod.id !== p.id));
+  }}
+  style={{
+    background: "#ef4444",
+    color: "#fff",
+    padding: "5px 10px",
+    borderRadius: 6,
+    border: "none",
+    marginBottom: 10
+  }}
+>
+  🗑 Eliminar producto
+</button>
+		  
         {/* VARIANTES */}
         <div style={{
           display: "flex",
@@ -940,6 +984,69 @@ if (hasError) {
             </div>
           ))}
 
+			<div style={{ marginTop: 10 }}>
+  <input
+    placeholder="Nueva talla (ej: Talla 5)"
+    id={`size-${p.id}`}
+    style={{ padding: 5, marginRight: 5 }}
+  />
+
+  <input
+    type="number"
+    placeholder="Precio"
+    id={`price-${p.id}`}
+    style={{ padding: 5, marginRight: 5, width: 90 }}
+  />
+
+  <button
+    onClick={async () => {
+      const size = document.getElementById(`size-${p.id}`).value;
+      const price = document.getElementById(`price-${p.id}`).value;
+
+      if (!size || !price) {
+        showToast("⚠️ Completa talla y precio");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("product_variants")
+        .insert([{
+          product_id: p.id,
+          size,
+          price: parseInt(price)
+        }]);
+
+      if (error) {
+        showToast("❌ Error agregando talla");
+        return;
+      }
+
+      showToast("✅ Talla agregada");
+
+      // 🔄 refrescar productos
+      const { data } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_variants (*),
+          product_images (*)
+        `)
+        .order("name", { ascending: true });
+
+      setProductosFull(data || []);
+    }}
+    style={{
+      background: "#3b82f6",
+      color: "#fff",
+      padding: "5px 10px",
+      borderRadius: 6,
+      border: "none"
+    }}
+  >
+    ➕ Agregar talla
+  </button>
+</div>
+
         </div>
 
       </div>
@@ -948,7 +1055,6 @@ if (hasError) {
   </div>
 </div>
   
-
 
 <div style={{
   position: "absolute",
