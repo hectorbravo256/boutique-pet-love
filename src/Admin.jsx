@@ -24,6 +24,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [productosFull, setProductosFull] = useState([]);
+  const [searchProduct, setSearchProduct] = useState("");
 
 useEffect(() => {
   const cargarProductos = async () => {
@@ -605,14 +606,8 @@ if (hasError) {
 
 <input
   placeholder="🔍 Buscar producto..."
-  onChange={(e) => {
-    const val = e.target.value.toLowerCase();
-    setProductosFull((prev) =>
-      prev.filter(p =>
-        p.name.toLowerCase().includes(val)
-      )
-    );
-  }}
+  value={searchProduct}
+  onChange={(e) => setSearchProduct(e.target.value)}
   style={{
     width: "100%",
     padding: 10,
@@ -643,7 +638,11 @@ if (hasError) {
     gap: 15
   }}>
 
-    {productosFull?.map((p) => (
+    {productosFull
+  ?.filter(p =>
+  p.name.toLowerCase().trim().includes(searchProduct.toLowerCase().trim())
+)
+  .map((p) => (
       <div key={p.id} style={{
         border: "1px solid #eee",
         borderRadius: 12,
