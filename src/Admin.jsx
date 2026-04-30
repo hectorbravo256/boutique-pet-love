@@ -250,6 +250,16 @@ const actualizarStock = async (id, nuevoStock) => {
     .order("name", { ascending: true });
 
   recargarProductos();
+
+		setProductosFull(prev => [...prev, {
+  ...prod,
+  product_variants: [{
+    id: Date.now(),
+    size: newProduct.size,
+    price: parseInt(newProduct.price)
+  }],
+  product_images: newProduct.image ? [{ url: newProduct.image }] : []
+}]);
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -868,67 +878,45 @@ if (hasError) {
           <input
             type="checkbox"
             checked={p.active}
-            onChange={async (e) => {
+onChange={async (e) => {
   const nuevoEstado = e.target.checked;
 
+  // 🔥 UI inmediata
+  setProductosFull(prev =>
+    prev.map(prod =>
+      prod.id === p.id
+        ? { ...prod, active: nuevoEstado }
+        : prod
+    )
+  );
+
+  // 🔥 guardar en BD
   const { error } = await supabase
     .from("products")
     .update({ active: nuevoEstado })
     .eq("id", p.id);
 
-  if (error) {
-    alert("❌ Error al actualizar");
-    return;
-  }
-
-  // 🔥 FORZAR REFRESH DESDE BD
-  const { data } = await supabase
-  .from("products")
-.select(`
-  *,
-  product_variants (*),
-  product_images (*)
-`)
-  .order("name", { ascending: true });
-
-  recargarProductos();
+  if (error) showToast("❌ Error");
 }}
           />
           Activo
         </label>
 
 		  <button
-  onClick={async () => {
-    if (!confirm("¿Eliminar producto completo?")) return;
+onClick={async () => {
+  if (!confirm("¿Eliminar producto?")) return;
 
-    // eliminar variantes
-    await supabase
-      .from("product_variants")
-      .delete()
-      .eq("product_id", p.id);
+  // 🔥 eliminar UI primero
+  setProductosFull(prev =>
+    prev.filter(prod => prod.id !== p.id)
+  );
 
-    // eliminar imágenes
-    await supabase
-      .from("product_images")
-      .delete()
-      .eq("product_id", p.id);
+  await supabase.from("product_variants").delete().eq("product_id", p.id);
+  await supabase.from("product_images").delete().eq("product_id", p.id);
+  await supabase.from("products").delete().eq("id", p.id);
 
-    // eliminar producto
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", p.id);
-
-    if (error) {
-      showToast("❌ Error eliminando");
-      return;
-    }
-
-    showToast("🗑 Producto eliminado");
-
-    // actualizar UI
-    setProductosFull(prev => prev.filter(prod => prod.id !== p.id));
-  }}
+  showToast("🗑 Producto eliminado");
+}}
   style={{
     background: "#ef4444",
     color: "#fff",
@@ -961,33 +949,57 @@ if (hasError) {
     <input
       type="number"
       defaultValue={v.price}
-      onBlur={async (e) => {
-        const nuevo = parseInt(e.target.value);
+onChange={async (e) => {
+  const nuevo = parseInt(e.target.value);
 
-        await supabase
-          .from("product_variants")
-          .update({ price: nuevo })
-          .eq("id", v.id);
+  // 🔥 UI inmediata
+  setProductosFull(prev =>
+    prev.map(prod =>
+      prod.id === p.id
+        ? {
+            ...prod,
+            product_variants: prod.product_variants.map(varr =>
+              varr.id === v.id
+                ? { ...varr, price: nuevo }
+                : varr
+            )
+          }
+        : prod
+    )
+  );
 
-        showToast("💰 Precio actualizado");
-      }}
+  await supabase
+    .from("product_variants")
+    .update({ price: nuevo })
+    .eq("id", v.id);
+}}
       style={{ width: 90, padding: 5 }}
     />
 
     {/* 🔥 BOTÓN ELIMINAR TALLA */}
     <button
-      onClick={async () => {
-        if (!confirm("¿Eliminar esta talla?")) return;
+onClick={async () => {
+  if (!confirm("¿Eliminar talla?")) return;
 
-        await supabase
-          .from("product_variants")
-          .delete()
-          .eq("id", v.id);
+  // 🔥 eliminar UI inmediato
+  setProductosFull(prev =>
+    prev.map(prod =>
+      prod.id === p.id
+        ? {
+            ...prod,
+            product_variants: prod.product_variants.filter(vv => vv.id !== v.id)
+          }
+        : prod
+    )
+  );
 
-        showToast("🗑 Talla eliminada");
+  await supabase
+    .from("product_variants")
+    .delete()
+    .eq("id", v.id);
 
-        recargarProductos(); // 👈 importante
-      }}
+  showToast("🗑 Talla eliminada");
+}}
       style={{
         background: "#ef4444",
         color: "#fff",
@@ -1017,42 +1029,44 @@ if (hasError) {
   />
 
   <button
-    onClick={async () => {
-      const size = document.getElementById(`size-${p.id}`).value;
-      const price = document.getElementById(`price-${p.id}`).value;
+onClick={async () => {
+  const size = document.getElementById(`size-${p.id}`).value;
+  const price = document.getElementById(`price-${p.id}`).value;
 
-      if (!size || !price) {
-        showToast("⚠️ Completa talla y precio");
-        return;
-      }
+  if (!size || !price) {
+    showToast("⚠️ Completa datos");
+    return;
+  }
 
-      const { error } = await supabase
-        .from("product_variants")
-        .insert([{
-          product_id: p.id,
-          size,
-          price: parseInt(price)
-        }]);
+  const { data, error } = await supabase
+    .from("product_variants")
+    .insert([{
+      product_id: p.id,
+      size,
+      price: parseInt(price)
+    }])
+    .select()
+    .single();
 
-      if (error) {
-        showToast("❌ Error agregando talla");
-        return;
-      }
+  if (error) {
+    showToast("❌ Error");
+    return;
+  }
 
-      showToast("✅ Talla agregada");
+  // 🔥 agregar al estado sin recargar
+  setProductosFull(prev =>
+    prev.map(prod =>
+      prod.id === p.id
+        ? {
+            ...prod,
+            product_variants: [...prod.product_variants, data]
+          }
+        : prod
+    )
+  );
 
-      // 🔄 refrescar productos
-      const { data } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_variants (*),
-          product_images (*)
-        `)
-        .order("name", { ascending: true });
-
-      recargarProductos();
-    }}
+  showToast("✅ Talla agregada");
+}}
     style={{
       background: "#3b82f6",
       color: "#fff",
