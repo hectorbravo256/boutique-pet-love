@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
+
+const WHATSAPP = "https://wa.me/56982700002";
+
 export default function Product() {
   const { id } = useParams();
   const [stockDB, setStockDB] = useState([]);
@@ -167,20 +170,20 @@ export default function Product() {
       </div>
 
       {/* WHATSAPP */}
-      <a
-        href={`https://wa.me/569XXXXXXXX?text=${encodeURIComponent(
-  `Hola, quiero el producto:\n${product.name}\nTalla: ${selected || "No seleccionada"}`
-)}`}
-        target="_blank"
-        style={{
-          display: "block",
-          marginTop: 20,
-          color: "green",
-          fontWeight: "bold"
-        }}
-      >
-        💬 Consultar por WhatsApp
-      </a>
+<a
+  href={`${WHATSAPP}?text=${encodeURIComponent(
+    `Hola, quiero el producto:\n${product.name}\nTalla: ${selected || "No seleccionada"}`
+  )}`}
+  target="_blank"
+  style={{
+    display: "block",
+    marginTop: 20,
+    color: "green",
+    fontWeight: "bold"
+  }}
+>
+  💬 Consultar por WhatsApp
+</a>
 
     </div>
   );
