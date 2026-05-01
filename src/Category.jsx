@@ -1,31 +1,72 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 
 export default function Category() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    supabase
-      .from("products")
-      .select("*")
-      .eq("category", slug)
-      .then(({ data }) => setProducts(data || []));
+    const cargar = async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_images (*)
+        `)
+        .eq("category", slug)
+        .eq("active", true);
+
+      if (!error) {
+        setProducts(data || []);
+      }
+    };
+
+    cargar();
   }, [slug]);
 
   return (
-    <div>
-      <h2>Categoría</h2>
+    <div style={{ padding: 30 }}>
 
-      <div style={{ display: "grid", gap: 20 }}>
+      <h2 style={{ marginBottom: 20 }}>
+        Categoría: {slug}
+      </h2>
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        gap: 20
+      }}>
         {products.map(p => (
           <div
             key={p.id}
             onClick={() => navigate(`/producto/${p.id}`)}
+            style={{
+              cursor: "pointer",
+              borderRadius: 12,
+              overflow: "hidden",
+              background: "#fff",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}
           >
-            <p>{p.name}</p>
+            <img
+              src={p.product_images?.[0]?.url || "/placeholder.png"}
+              style={{
+                width: "100%",
+                height: 200,
+                objectFit: "cover"
+              }}
+            />
+
+            <div style={{ padding: 10 }}>
+              <strong>{p.name}</strong>
+            </div>
           </div>
         ))}
       </div>
+
     </div>
   );
 }
