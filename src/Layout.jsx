@@ -131,27 +131,32 @@ useEffect(() => {
     </div>
 
     {/* 🟣 CENTRO → LOGO */}
-    <div className="flex justify-center">
+ <div className="flex justify-center">
   <div
-  onClick={() => navigate("/")}
-  className="flex flex-col items-center cursor-pointer"
->
+    onClick={() => navigate("/")}
+    className="flex items-center gap-4 cursor-pointer"
+  >
+    
+    {/* 🔥 LOGO IZQUIERDA */}
+    <img
+      src="/logo.png"
+      className="w-14 h-14 md:w-16 md:h-16 rounded-full shadow-md"
+    />
 
-  {/* 🔹 FILA: LOGO + NOMBRE */}
-  <div className="flex items-center gap-3 hover:opacity-80 transition">
-    <img src="/logo.png" className="w-9 h-9 rounded-full" />
+    {/* 🔥 TEXTO DERECHA (2 FILAS) */}
+    <div className="flex flex-col justify-center leading-tight">
 
-    <h1 className="text-pink-600 text-lg md:text-xl font-extrabold tracking-wide">
-      BOUTIQUE PET LOVE
-    </h1>
+      <h1 className="text-pink-600 text-lg md:text-xl font-extrabold tracking-wide">
+        BOUTIQUE PET LOVE
+      </h1>
+
+      <p className="text-purple-400 text-xs md:text-sm">
+        Moda y accesorios para mascotas
+      </p>
+
+    </div>
+
   </div>
-
-  {/* 🔹 SUBTEXTO */}
-  <p className="text-purple-400 text-[11px] md:text-xs text-center mt-1">
-    Moda y accesorios para mascotas
-  </p>
-
-</div>
 </div>
 
     {/* 🟢 DERECHA → CARRITO */}
