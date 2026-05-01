@@ -8,6 +8,8 @@ import './index.css';
 import Admin from "./Admin";
 import Login from "./Login";
 import { supabase } from "./supabaseClient";
+import Category from "./Category";
+import Product from "./Product";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
