@@ -2,8 +2,10 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const WHATSAPP = "https://wa.me/56982700002";
 
 export default function Layout() {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -178,6 +180,174 @@ useEffect(() => {
       {/* 🔽 CONTENIDO DINÁMICO */}
       <div>
         <Outlet />
+         <a
+        href={WHATSAPP}
+        className="fixed bottom-5 left-5 bg-green-500 text-white p-4 rounded-full"
+        target="_blank"
+      >
+        <MessageCircle />
+      </a>
+
+        {/* CARRITO */}
+      <div
+  	className={`fixed bottom-5 right-5 bg-white rounded-2xl shadow transition-all duration-300 ${
+    	cartOpen ? "w-64 p-4" : "w-16 h-16 flex items-center justify-center"
+  	}`}
+	>
+	{cartOpen ? (
+    <>
+      {/* BOTÓN CERRAR */}
+<button
+  onClick={() => setCartOpen(false)}
+  className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full shadow-md hover:scale-105 hover:shadow-lg transition"
+>
+  −
+</button>
+
+        <h3 className="font-bold">Carrito</h3>
+
+        {cart.length === 0 && <p>Vacío</p>}
+
+        {cart.map((item, i) => (
+  <div key={i} className="flex justify-between items-center text-sm mt-3 gap-2">
+
+    <img src={item.image}
+      className="w-12 h-12 object-cover rounded-lg"
+    />
+
+    <div className="flex-1">
+      <p className="font-semibold text-xs">{item.name}</p>
+      <p className="text-xs text-gray-500">{item.size}</p>
+
+      {/* 🔥 CONTROL DE CANTIDAD */}
+      <div className="flex items-center gap-2 mt-1">
+        <button
+          onClick={() => decreaseQty(i)}
+          className="bg-gray-200 px-2 rounded"
+        >
+          −
+        </button>
+
+        <span>{item.qty || 1}</span>
+
+        <button
+          onClick={() => increaseQty(i)}
+          className="bg-gray-200 px-2 rounded"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <div className="text-right">
+      <p className="text-xs font-bold">
+        {formatPrice(item.price * (item.qty || 1))}
+      </p>
+
+      <button
+        onClick={() => removeItem(i)}
+        className="text-red-400 text-xs"
+      >
+        Eliminar
+      </button>
+    </div>
+
+  </div>
+))}
+
+{cart.length > 0 && (
+  <>
+ 	{/* TOTALES BONITOS */}
+   <div className="mt-3 border-t pt-2 text-sm space-y-1">
+  <div className="flex justify-between font-bold text-base">
+    <span>Total:</span>
+    <span>{formatPrice(total)}</span>
+  </div>
+</div>
+
+
+
+
+    {/* 💳 BOTÓN MERCADOPAGO */}
+    <button
+  onClick={() => navigate("/checkout")}
+  className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
+>
+  Continuar compra
+</button>
+
+    {/* 🟢 WHATSAPP */}
+   <a
+  href={`${WHATSAPP}?text=${encodeURIComponent(
+    "Pedido:\n" +
+      cart
+        .map(
+          (i) =>
+            `${i.name} - ${i.size} - ${formatPrice(i.price * (i.qty || 1))}`
+        )
+        .join("\n") +
+      `\nTotal: ${formatPrice(total)}`
+  )}`}
+  target="_blank"
+  className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
+>
+  Contactar por WhatsApp
+</a>
+  </>
+)}
+</>
+ ) : (
+  <div
+    onClick={() => setCartOpen(true)}
+    className="relative cursor-pointer bg-pink-600 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-lg"
+  >
+    <ShoppingCart size={24} />
+
+    {/* 🔢 CONTADOR */}
+    {cart.length > 0 && (
+     <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-bounce">
+        {cart.length}
+      </span>
+    )}
+  </div>
+)}
+      </div>
+
+        {/* FOOTER */}
+      <footer id="contacto" className="bg-white mt-10 border-t p-8">
+        <div className="grid md:grid-cols-3 gap-6">
+
+          <div>
+            <img src="/logo.png" className="w-16 rounded-full mb-2" />
+            <h3 className="text-pink-600 font-bold">
+              BOUTIQUE PET LOVE
+            </h3>
+            <p className="text-sm text-gray-500">
+              Moda y accesorios para mascotas con estilo y personalidad.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-2">Contacto</h4>
+            <p className="text-sm">WhatsApp: +56 9 8270 0002</p>
+            <p className="text-sm">Instagram: @boutique_petlove</p>
+            <p className="text-sm">Atención personalizada</p>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-2">Información</h4>
+            <p className="text-sm">Envíos</p>
+            <p className="text-sm">Métodos de pago</p>
+            <p className="text-sm">Preguntas frecuentes</p>
+          </div>
+
+        </div>
+
+        <div className="text-center text-sm text-gray-400 mt-6">
+          © 2026 BOUTIQUE PET LOVE • Sitio listo para publicar en Netlify.
+        </div>
+      </footer>
+        
       </div>
 
     </div>
