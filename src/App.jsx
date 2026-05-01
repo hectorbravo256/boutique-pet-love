@@ -38,6 +38,7 @@ const decreaseQty = (index) => {
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [stockDB, setStockDB] = useState([]);
   const [cartOpen, setCartOpen] = useState(true);
   const [formData, setFormData] = useState({
@@ -112,6 +113,13 @@ const next =
     cargar();
   }, []);
 
+	useEffect(() => {
+  supabase
+    .from("categories")
+    .select("*")
+    .then(({ data }) => setCategories(data || []));
+}, []);
+
 // 🧩 CARGAR STOCK
 useEffect(() => {
   const cargarStock = async () => {
@@ -128,6 +136,7 @@ useEffect(() => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   	}, [cart]);
+
 
   useEffect(() => {
   	document.body.style.overflow = zoomGallery ? "hidden" : "auto";
@@ -423,221 +432,40 @@ localStorage.setItem(
           </a>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-
-          {products.map((product) => {
-
-	const images = product.product_images?.map(i => i.url) || [];
-
-            const size = selectedSizes[product.id];
-	    const variant = product.product_variants.find(
-  		(v) => v.size === size
-		);
-
-	    const price = variant?.price;
-	    const stock = stockMap[`${product.id}-${size}`] || 0;
-
-
-
-
-            return (
-              <div
-  key={product.id}
-  className="bg-white p-4 rounded-2xl shadow hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
->
-
-<div
-  className="relative overflow-hidden rounded-xl touch-pan-y select-none"
-  onTouchStart={(e) => handleTouchStart(e, product.id)}
-  onTouchEnd={(e) => handleTouchEnd(e, product)}
->
-
-
-{product.product_images?.length > 0 ? (
-  <>
-    <img
-      src={images[currentIndex[product.id] || 0] || "/placeholder.png"}
-      onClick={() =>
-  setZoomGallery({
-    images: images,
-    index: currentIndex[product.id] || 0,
-  })
-}
-      className="w-full h-[280px] object-cover rounded-xl bg-gray-100 transition-all duration-300 cursor-zoom-in"
-    />
-
-{/* Flecha izquierda */}
-<button
-  onClick={() =>
-    setCurrentIndex((prev) => ({
-      ...prev,
-      [product.id]:
-        (prev[product.id] || 0) === 0
-          ? images.length - 1
-          : (prev[product.id] || 0) - 1,
-    }))
-  }
-  className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 px-2 py-1 rounded-full"
->
-  ◀
-</button>
-
-{/* Flecha derecha */}
-<button
-  onClick={() =>
-    setCurrentIndex((prev) => ({
-      ...prev,
-      [product.id]:
-        (prev[product.id] || 0) === images.length - 1
-          ? 0
-          : (prev[product.id] || 0) + 1,
-    }))
-  }
-  className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 px-2 py-1 rounded-full"
->
-  ▶
-</button>
-
-    {/* ✅ PUNTITOS (AQUÍ ADENTRO) */}
-    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-      {images.map((_, index) => (
-        <div
-          key={index}
-          className={`w-2 h-2 rounded-full ${
-            (currentIndex[product.id] || 0) === index
-              ? "bg-pink-600"
-              : "bg-white/70"
-          }`}
-        />
-      ))}
-    </div>
-
-  </>
-) : (
-  <img
-  src={images[0] || "/placeholder.png"}
-  onClick={() =>
-  setZoomGallery({
-    images: images,
-    index: 0,
-  })
-}
-  className="w-full h-[280px] object-cover rounded-xl bg-gray-100 cursor-zoom-in"
-/>
-  )}
-
-  {/* BADGE */}
-  <span className="absolute top-2 left-2 bg-white text-pink-600 text-xs px-2 py-1 rounded-full shadow">
-    {product.badge}
-  </span>
-<span className="absolute top-2 right-2 bg-pink-600 text-white text-xs px-2 py-1 rounded-full shadow">
-  🔥 Más vendido
-</span>
-
-</div>
-
-
-
-                <p className="text-xs text-purple-500 mt-2 uppercase">
-                  {product.category}
-                </p>
-
-                <h3 className="font-bold">{product.name}</h3>
-
-                <p className="text-sm text-gray-500">
-                  {product.description}
-                </p>
-
-                <p className="text-pink-600 font-bold mt-2">
-                  {price ? formatPrice(price) : "Selecciona talla"}
-                </p>
-
-{stock > 0 && stock <= 3 && (
-  <p style={{ color: "orange", fontSize: 12 }}>
-    🔥 Últimas {stock} unidades
-  </p>
-)}
-
-               <select
-  			className="w-full mt-3 border p-2 rounded-xl"
-  			value={size || ""}
-  			onChange={(e) =>
-    			setSelectedSizes({
-      			...selectedSizes,
-      			[product.id]: e.target.value,
-    		})
-  		}
-		>
-  		<option value="">Seleccionar talla</option>
-
-{[...product.product_variants]
-  .sort((a, b) => {
-    const numA = parseInt(a.size.match(/\d+/)[0]);
-    const numB = parseInt(b.size.match(/\d+/)[0]);
-    return numA - numB;
-  })
-  .map((v) => {
-    const stock = stockMap[`${product.id}-${v.size}`] || 0;
-
-    return (
-      <option key={v.id} value={v.size}>
-        {v.size} - {formatPrice(v.price)}
-        {stock === 0 ? " ❌ Sin stock - Producto a Pedido" : ""}
-      </option>
-    );
-  })}
-</select>
-
-               <div className="bloque-botones flex flex-col gap-2">
-
-  {/* BOTÓN AGREGAR SOLO SI HAY STOCK */}
-  {stock > 0 && (
-    <button
-      onClick={() => addToCart(product)}
-      disabled={!size}
-      className="relative w-full mt-3 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300"
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  gap: 20
+}}>
+  {categories.map(cat => (
+    <div
+      key={cat.id}
+      onClick={() => navigate(`/categoria/${cat.slug}`)}
       style={{
-        background: "linear-gradient(135deg, #ec4899, #d946ef)",
-        color: "#fff",
-        boxShadow: "0 6px 18px rgba(236,72,153,0.3)",
+        cursor: "pointer",
+        borderRadius: 12,
+        overflow: "hidden",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
       }}
     >
-      <ShoppingCart size={18} />
-      <span>
-        {!size ? "Selecciona talla" : "Agregar al carrito"}
-      </span>
-    </button>
-  )}
+      <img
+        src={cat.image}
+        style={{
+          width: "100%",
+          height: 200,
+          objectFit: "cover"
+        }}
+      />
 
-  {/* MENSAJE SIN STOCK */}
-  {size && stock === 0 && (
-    <p style={{ color: "red", fontSize: 12, marginTop: 6 }}>
-      No disponible • Escríbenos por WhatsApp
-    </p>
-  )}
-
-		{/* BOTÓN WHATSAPP SOLO SI NO HAY STOCK */}
-                  {size && stock === 0 && (
- <a
-  href={`${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, quiero consultar por:\n\n${product.name}\n${selectedSizes[product.id] || "No seleccionada"}`
-  )}`}
-  target="_blank"
-  className="btn btn-whatsapp w-full text-center mt-1"
->
-  <span className="icono">
-    <MessageCircle size={18} />
-  </span>
-  <span>Consultar por WhatsApp</span>
-</a>
-)}
-                </div>
-                  
-
-              </div>
-            );
-     })}
+      <div style={{
+        padding: 10,
+        textAlign: "center",
+        fontWeight: "bold"
+      }}>
+        {cat.name}
+      </div>
+    </div>
+  ))}
 </div>
 </section>
 
@@ -1248,6 +1076,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppContent />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
+		<Route path="/categoria/:slug" element={<Category />} />
+		<Route path="/producto/:id" element={<Product />} />
 	<Route path="/success" element={<Success />} />
 <Route
   path="/admin"
