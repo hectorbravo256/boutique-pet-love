@@ -30,15 +30,40 @@ export default function Layout() {
 
         {/* MENÚ */}
         <div className="hidden md:flex gap-8 text-lg md:text-xl font-bold text-gray-700">
-          <span onClick={() => navigate("/")} className="hover:text-pink-600 cursor-pointer">
-            Inicio
-          </span>
-          <span onClick={() => navigate("/")} className="hover:text-pink-600 cursor-pointer">
-            Tienda
-          </span>
-          <span className="hover:text-pink-600 cursor-pointer">
-            Contacto
-          </span>
+<span
+  onClick={() => navigate("/")}
+  className="hover:text-pink-600 cursor-pointer"
+>
+  Inicio
+</span>
+
+<span
+  onClick={() => {
+    navigate("/");
+    setTimeout(() => {
+      document.getElementById("catalogo")?.scrollIntoView({
+        behavior: "smooth"
+      });
+    }, 100);
+  }}
+  className="hover:text-pink-600 cursor-pointer"
+>
+  Tienda
+</span>
+
+<span
+  onClick={() => {
+    navigate("/");
+    setTimeout(() => {
+      document.getElementById("contacto")?.scrollIntoView({
+        behavior: "smooth"
+      });
+    }, 100);
+  }}
+  className="hover:text-pink-600 cursor-pointer"
+>
+  Contacto
+</span>
         </div>
 
         {/* CARRITO */}
