@@ -10,10 +10,31 @@ export default function Product() {
   const [stockDB, setStockDB] = useState([]);
   const [product, setProduct] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [qty, setQty] = useState(1);
   const stockMap = Object.fromEntries(
   stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
 );
+const handleSelect = (variant) => {
+  setSelected(variant.id);
+  setSelectedVariant(variant);
+  setQty(1); // 🔥 importante
+};
+  const increaseQty = () => {
+  if (!selectedVariant) return;
 
+  const stock = stockMap[`${product.id}-${selectedVariant.size}`] || 0;
+
+  if (qty < stock) {
+    setQty(qty + 1);
+  }
+};
+
+const decreaseQty = () => {
+  if (qty > 1) {
+    setQty(qty - 1);
+  }
+};
   const addToCart = () => {
   if (!selected) {
     alert("Selecciona una talla");
@@ -43,14 +64,14 @@ export default function Product() {
   );
 
   if (existingIndex !== -1) {
-    cart[existingIndex].qty += 1;
+    cart[existingIndex].qty += qty;
   } else {
     cart.push({
       id: product.id,
       name: product.name,
       size,
       price: variant.price,
-      qty: 1,
+      qty: qty,
       image: product.product_images?.[0]?.url
     });
   }
@@ -115,25 +136,105 @@ export default function Product() {
 
       <h1>{product.name}</h1>
 
-      {/* TALLAS ORDENADAS */}
-      <select
-        onChange={(e) => setSelected(e.target.value)}
-        style={{ padding: 10, marginTop: 10 }}
-      >
-        <option>Selecciona talla</option>
+      <h2 style={{ marginTop: 10, color: "#ec4899" }}>
+  {selectedVariant
+    ? `$${selectedVariant.price.toLocaleString("es-CL")}`
+    : "Selecciona una talla"}
+        <p style={{
+  marginTop: 5,
+  fontWeight: "bold",
+  color:
+    !selectedVariant
+      ? "#999"
+      : (stockMap[`${product.id}-${selectedVariant.size}`] || 0) > 0
+        ? "#22c55e"
+        : "#ef4444"
+}}>
+  {!selectedVariant
+  ? "Selecciona una talla"
+  : (stockMap[`${product.id}-${selectedVariant.size}`] || 0) === 0
+    ? "❌ Sin stock"
+    : (stockMap[`${product.id}-${selectedVariant.size}`] || 0) <= 3
+      ? `⚠️ Últimas ${stockMap[`${product.id}-${selectedVariant.size}`]} unidades`
+      : `✔ Stock disponible: ${stockMap[`${product.id}-${selectedVariant.size}`]}`}
+</p>
+</h2>
 
-        {[...product.product_variants]
-          .sort((a, b) =>
-            parseInt(a.size.match(/\d+/)) -
-            parseInt(b.size.match(/\d+/))
-          )
-          .map(v => (
-<option key={v.id} value={v.id}>
-  {v.size} - ${v.price} 
-  ({stockMap[`${product.id}-${v.size}`] || 0} disponibles)
-</option>
-          ))}
-      </select>
+      <div style={{ marginTop: 20 }}>
+  <p style={{ marginBottom: 10 }}>Cantidad</p>
+
+  <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 10
+  }}>
+    
+    <button
+      onClick={decreaseQty}
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        border: "1px solid #ddd"
+      }}
+    >
+      -
+    </button>
+
+    <span style={{ fontSize: 18, minWidth: 20, textAlign: "center" }}>
+      {qty}
+    </span>
+
+    <button
+      onClick={increaseQty}
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        border: "1px solid #ddd"
+      }}
+    >
+      +
+    </button>
+
+  </div>
+</div>
+      
+      {/* TALLAS ORDENADAS */}
+<div style={{ marginTop: 20 }}>
+  <p style={{ marginBottom: 10 }}>Talla</p>
+
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+    {[...product.product_variants]
+      .sort((a, b) =>
+        parseInt(a.size.match(/\d+/)) -
+        parseInt(b.size.match(/\d+/))
+      )
+      .map(v => {
+        const stock = stockMap[`${product.id}-${v.size}`] || 0;
+        const isActive = selected === v.id;
+
+        return (
+          <button
+            key={v.id}
+            onClick={() => handleSelect(v)}
+            disabled={stock === 0}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 20,
+              border: isActive ? "2px solid #ec4899" : "1px solid #ddd",
+              background: isActive ? "#ec4899" : "white",
+              color: isActive ? "white" : "#333",
+              cursor: stock === 0 ? "not-allowed" : "pointer",
+              opacity: stock === 0 ? 0.4 : 1
+            }}
+          >
+            {v.size}
+          </button>
+        );
+      })}
+  </div>
+</div>
 
       <div style={{ marginTop: 20 }}>
 
@@ -172,7 +273,7 @@ export default function Product() {
       {/* WHATSAPP */}
 <a
   href={`${WHATSAPP}?text=${encodeURIComponent(
-    `Hola, quiero el producto:\n${product.name}\nTalla: ${selected || "No seleccionada"}`
+    `Hola, quiero consultar por:\n${product.name}\nTalla: ${selected || "No seleccionada"}`
   )}`}
   target="_blank"
   style={{
