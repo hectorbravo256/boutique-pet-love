@@ -4,9 +4,59 @@ import { supabase } from "./supabaseClient";
 
 export default function Product() {
   const { id } = useParams();
-
+  const [stockDB, setStockDB] = useState([]);
   const [product, setProduct] = useState(null);
   const [selected, setSelected] = useState(null);
+  const stockMap = Object.fromEntries(
+  stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
+);
+
+  const addToCart = () => {
+  if (!selected) {
+    alert("Selecciona una talla");
+    return;
+  }
+
+  const variant = product.product_variants.find(
+    v => v.id == selected
+  );
+    if (!variant) {
+  alert("Error seleccionando talla");
+  return;
+}
+  const size = variant.size;
+
+  const stock = stockMap[`${product.id}-${size}`] || 0;
+
+  if (stock === 0) {
+    alert("⚠️ Sin stock disponible");
+    return;
+  }
+
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const existingIndex = cart.findIndex(
+    i => i.id === product.id && i.size === size
+  );
+
+  if (existingIndex !== -1) {
+    cart[existingIndex].qty += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      size,
+      price: variant.price,
+      qty: 1,
+      image: product.product_images?.[0]?.url
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  window.dispatchEvent(new Event("storage"));
+
+  console.log("Producto agregado");
+};
 
   useEffect(() => {
     const cargar = async () => {
@@ -25,6 +75,30 @@ export default function Product() {
 
     cargar();
   }, [id]);
+
+  useEffect(() => {
+  const cargarStock = async () => {
+    const { data } = await supabase
+      .from("product_stock")
+      .select("*");
+
+    setStockDB(data || []);
+  };
+
+  cargarStock();
+}, []);
+
+  useEffect(() => {
+  if (product?.product_variants?.length > 0) {
+    const firstAvailable = product.product_variants.find(
+      v => (stockMap[`${product.id}-${v.size}`] || 0) > 0
+    );
+
+    if (firstAvailable) {
+      setSelected(firstAvailable.id);
+    }
+  }
+}, [product, stockDB]);
 
   if (!product) return <p>Cargando...</p>;
 
@@ -51,40 +125,52 @@ export default function Product() {
             parseInt(b.size.match(/\d+/))
           )
           .map(v => (
-            <option key={v.id} value={v.id}>
-              {v.size} - ${v.price}
-            </option>
+<option key={v.id} value={v.id}>
+  {v.size} - ${v.price} 
+  ({stockMap[`${product.id}-${v.size}`] || 0} disponibles)
+</option>
           ))}
       </select>
 
       <div style={{ marginTop: 20 }}>
 
-        <button style={{
-          padding: "10px 20px",
-          marginRight: 10,
-          background: "#3b82f6",
-          color: "#fff",
-          border: "none",
-          borderRadius: 8
-        }}>
-          🛒 Agregar al carrito
-        </button>
+<button
+  onClick={addToCart}
+  style={{
+    padding: "10px 20px",
+    marginRight: 10,
+    background: "#3b82f6",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8
+  }}
+>
+  🛒 Agregar al carrito
+</button>
 
-        <button style={{
-          padding: "10px 20px",
-          background: "#22c55e",
-          color: "#fff",
-          border: "none",
-          borderRadius: 8
-        }}>
-          ⚡ Comprar ahora
-        </button>
+        <button
+  onClick={() => {
+    addToCart();
+    window.location.href = "/checkout";
+  }}
+  style={{
+    padding: "10px 20px",
+    background: "#22c55e",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8
+  }}
+>
+  ⚡ Comprar ahora
+</button>
 
       </div>
 
       {/* WHATSAPP */}
       <a
-        href={`https://wa.me/569XXXXXXXX?text=Hola quiero ${product.name}`}
+        href={`https://wa.me/569XXXXXXXX?text=${encodeURIComponent(
+  `Hola, quiero el producto:\n${product.name}\nTalla: ${selected || "No seleccionada"}`
+)}`}
         target="_blank"
         style={{
           display: "block",
