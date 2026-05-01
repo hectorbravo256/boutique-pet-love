@@ -1077,21 +1077,30 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-		  <Route element={<Layout />}>
-        <Route path="/" element={<AppContent />} />
-        <Route path="/checkout" element={<CheckoutWrapper />} />
-		<Route path="/categoria/:slug" element={<Category />} />
-		<Route path="/producto/:id" element={<Product />} />
-	<Route path="/success" element={<Success />} />
-<Route
-  path="/admin"
-  element={
-    <ProtectedRoute>
-      <Admin />
-    </ProtectedRoute>
-  }
-/>
-<Route path="/login" element={<Login />} />
+
+        {/* 🔥 RUTAS CON HEADER */}
+        <Route element={<Layout />}>
+
+          <Route path="/" element={<AppContent />} />
+          <Route path="/checkout" element={<CheckoutWrapper />} />
+          <Route path="/categoria/:slug" element={<Category />} />
+          <Route path="/producto/:id" element={<Product />} />
+          <Route path="/success" element={<Success />} />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+
+        </Route>
+
+        {/* 🔐 RUTAS SIN HEADER */}
+        <Route path="/login" element={<Login />} />
+
       </Routes>
     </BrowserRouter>
   );
