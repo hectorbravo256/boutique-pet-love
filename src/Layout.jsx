@@ -110,7 +110,6 @@ useEffect(() => {
     </div>
 
   </div>
-)}
       
       {/* 🔝 TOP BAR */}
       <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center text-sm py-1">
@@ -134,19 +133,25 @@ useEffect(() => {
     {/* 🟣 CENTRO → LOGO */}
     <div className="flex justify-center">
   <div
-    onClick={() => navigate("/")}
-    className="flex flex-col items-center cursor-pointer"
-  >
-    <img src="/logo.png" className="w-12 h-12 rounded-full" />
+  onClick={() => navigate("/")}
+  className="flex flex-col items-center cursor-pointer"
+>
 
-    <h1 className="text-pink-600 text-lg md:text-xl font-extrabold tracking-wide text-center">
+  {/* 🔹 FILA: LOGO + NOMBRE */}
+  <div className="flex items-center gap-3 hover:opacity-80 transition">
+    <img src="/logo.png" className="w-9 h-9 rounded-full" />
+
+    <h1 className="text-pink-600 text-lg md:text-xl font-extrabold tracking-wide">
       BOUTIQUE PET LOVE
     </h1>
-
-    <p className="text-purple-400 text-[11px] md:text-xs text-center">
-      Moda y accesorios para mascotas
-    </p>
   </div>
+
+  {/* 🔹 SUBTEXTO */}
+  <p className="text-purple-400 text-[11px] md:text-xs text-center mt-1">
+    Moda y accesorios para mascotas
+  </p>
+
+</div>
 </div>
 
     {/* 🟢 DERECHA → CARRITO */}
