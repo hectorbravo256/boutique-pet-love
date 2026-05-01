@@ -10,6 +10,7 @@ import Login from "./Login";
 import { supabase } from "./supabaseClient";
 import Category from "./Category";
 import Product from "./Product";
+import Layout from "./Layout";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -1076,6 +1077,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+		  <Route element={<Layout />}>
         <Route path="/" element={<AppContent />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
 		<Route path="/categoria/:slug" element={<Category />} />
