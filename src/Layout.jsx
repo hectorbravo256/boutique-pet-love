@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag, MessageCircle } from "lucide-react";
+import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -7,14 +7,70 @@ const WHATSAPP = "https://wa.me/56982700002";
 export default function Layout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
+  const [cart, setCart] = useState([]);
+	
+const formatPrice = (price) =>
+  `$${price.toLocaleString("es-CL")}`;
+
+const total = cart.reduce(
+  (acc, item) => acc + item.price * (item.qty || 1),
+  0
+);
+
+const saveCart = (newCart) => {
+  setCart(newCart);
+  localStorage.setItem("cart", JSON.stringify(newCart));
+};
+
+const increaseQty = (i) => {
+  const newCart = [...cart];
+  newCart[i].qty = (newCart[i].qty || 1) + 1;
+  saveCart(newCart);
+};
+
+const decreaseQty = (i) => {
+  const newCart = [...cart];
+  if ((newCart[i].qty || 1) > 1) {
+    newCart[i].qty -= 1;
+    saveCart(newCart);
+  }
+};
+
+const removeItem = (i) => {
+  const newCart = cart.filter((_, index) => index !== i);
+  saveCart(newCart);
+};
+	
 
 useEffect(() => {
   const updateCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const total = cart.reduce((acc, item) => acc + (item.qty || 1), 0);
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(storedCart);
+
+    const total = storedCart.reduce((acc, item) => acc + (item.qty || 1), 0);
+    setCartCount(total);
+  };
+
+  updateCart();
+
+  window.addEventListener("storage", updateCart);
+
+  return () => window.removeEventListener("storage", updateCart);
+}, []);
+
+	useEffect(() => {
+  const updateCart = () => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(storedCart);
+
+    const total = storedCart.reduce(
+      (acc, item) => acc + (item.qty || 1),
+      0
+    );
     setCartCount(total);
   };
 
@@ -163,7 +219,10 @@ useEffect(() => {
 
     {/* 🟢 DERECHA → CARRITO */}
 <div className="flex justify-end">
-  <div className="relative bg-pink-600 hover:bg-pink-700 transition text-white px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer shadow-md">
+  <div
+  onClick={() => setCartOpen(true)}
+  className="relative bg-pink-600 hover:bg-pink-700 transition text-white px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer shadow-md"
+>
     <ShoppingBag size={18} />
 
     <span className="hidden md:inline">Carrito</span>
@@ -181,12 +240,12 @@ useEffect(() => {
       <div>
         <Outlet />
          <a
-        href={WHATSAPP}
-        className="fixed bottom-5 left-5 bg-green-500 text-white p-4 rounded-full"
-        target="_blank"
-      >
-        <MessageCircle />
-      </a>
+  href={WHATSAPP}
+  target="_blank"
+  className="fixed bottom-5 left-5 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg z-50 transition transform hover:scale-110"
+>
+  <MessageCircle size={24} />
+</a>
 
         {/* CARRITO */}
       <div
@@ -306,7 +365,7 @@ useEffect(() => {
     {/* 🔢 CONTADOR */}
     {cart.length > 0 && (
      <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-bounce">
-        {cart.length}
+        {cartCount}
       </span>
     )}
   </div>
