@@ -324,56 +324,8 @@ localStorage.setItem(
   return (
          <div className="bg-pink-50 min-h-screen">
     
-      {/* TOP BAR */}
-      <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center text-sm py-1">
-        🚚 Envíos a todo Chile | RM, V y VI: $3.500 | Otras regiones: por pagar • Moda y accesorios para mascotas
-      </div>
+      
 
-      {/* HEADER */}
-      <header className="bg-white shadow-md flex justify-between items-center px-8 py-5">
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" className="w-12 h-12 rounded-full" />
-          <div>
-            <h1 className="text-pink-600 text-2xl md:text-3xl font-extrabold tracking-wide">
-  		BOUTIQUE PET LOVE
-		</h1>
-
-            <p className="text-purple-400 text-sm md:text-base font-semibold">
-  		Moda y accesorios para mascotas
-		</p>
-          </div>
-        </div>
-
-       <div className="hidden md:flex gap-8 text-lg md:text-xl font-bold text-gray-700">
- 	<a href="#" className="hover:text-pink-600 transition duration-200">
-  	Inicio
-	</a>
-	<a href="#catalogo" className="hover:text-pink-600 transition duration-200">
-  	Tienda
-	</a>
-	<a href="#contacto" className="hover:text-pink-600 transition duration-200">
-  	Contacto
-	</a>
-	</div>
-
-        <div className="flex items-center gap-3">
-          <input
-            placeholder="Buscar"
-            className="border rounded-full px-3 py-1 text-sm"
-          />
-
-          <div
-  		onClick={() => setCartOpen(!cartOpen)}
-  		className="relative bg-pink-600 text-white px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer"
-		>
-            <ShoppingBag size={16} />
-            Carrito
-            <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 rounded-full">
-              {cart.length}
-            </span>
-          </div>
-        </div>
-      </header>
 
       {/* HERO */}
       <section className="p-10 grid md:grid-cols-2 gap-10 items-center">
