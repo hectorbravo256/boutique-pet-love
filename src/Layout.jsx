@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const WHATSAPP = "https://wa.me/56982700002";
