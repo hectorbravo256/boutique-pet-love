@@ -52,7 +52,11 @@ export default function Product() {
   /* ================= CARRITO ================= */
   const addToCart = () => {
     if (!selected) {
-      alert("Selecciona una talla");
+      window.dispatchEvent(
+  new CustomEvent("toast", {
+    detail: "Selecciona una talla"
+  })
+);
       return;
     }
 
@@ -61,7 +65,11 @@ export default function Product() {
     );
 
     if (!variant) {
-      alert("Error seleccionando talla");
+      window.dispatchEvent(
+  new CustomEvent("toast", {
+    detail: "Selecciona una talla"
+  })
+);
       return;
     }
 
@@ -69,7 +77,11 @@ export default function Product() {
     const stock = stockMap[`${product.id}-${size}`] || 0;
 
     if (stock === 0) {
-      alert("⚠️ Sin stock disponible");
+      window.dispatchEvent(
+  new CustomEvent("toast", {
+    detail: "⚠️ Sin stock disponible"
+  })
+);
       return;
     }
 
