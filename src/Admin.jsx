@@ -243,35 +243,28 @@ if (errVar) {
       }]);
   }
  
-// 🔥 4. TRAER PRODUCTO COMPLETO
-// 🔥 construir variantes desde el form
-const nuevasVariantes = newProduct.variants
-  .filter(v => v.size && v.price)
-  .map((v, i) => ({
-    id: Date.now() + i,
-    size: v.size,
-    price: parseInt(v.price)
-  }));
+// 🔥 TRAER PRODUCTO REAL DESDE SUPABASE
+const { data: productoCompleto } = await supabase
+  .from("products")
+  .select(`
+    *,
+    product_variants (*),
+    product_images (*)
+  `)
+  .eq("id", prod.id)
+  .single();
 
-// 🔥 construir producto completo manual
-const productoNuevo = {
-  ...prod,
-  product_variants: nuevasVariantes,
-  product_images: newProduct.image
-    ? [{ url: newProduct.image }]
-    : []
-};
-
-// 🔥 actualizar UI inmediato
+// 🔥 ACTUALIZAR UI
 setProductosFull(prev =>
-  [...prev, productoNuevo].sort((a, b) =>
+  [...prev, productoCompleto].sort((a, b) =>
     a.name.localeCompare(b.name)
   )
 );
 
 showToast("✅ Producto creado");
+await recargarProductos();
 
-		// 🔥 RESET FORMULARIO COMPLETO
+// 🔥 RESET FORMULARIO COMPLETO
 setNewProduct({
   name: "",
   category: "",
