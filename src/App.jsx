@@ -12,6 +12,12 @@ import Category from "./Category";
 import Product from "./Product";
 import Layout from "./Layout";
 import Success from "./Success";
+import AdminLayout from "./admin/AdminLayout";
+import Dashboard from "./admin/Dashboard";
+import Stock from "./admin/Stock";
+import Productos from "./admin/Productos";
+import CrearProducto from "./admin/CrearProducto";
+import Ventas from "./admin/Ventas";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -737,13 +743,19 @@ export default function App() {
           <Route path="/success" element={<Success />} />
 
           <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<Dashboard />} />
+  <Route path="stock" element={<Stock />} />
+  <Route path="productos" element={<Productos />} />
+  <Route path="crear" element={<CrearProducto />} />
+  <Route path="ventas" element={<Ventas />} />
+</Route>
 
         </Route>
 
