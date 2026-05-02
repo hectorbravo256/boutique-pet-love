@@ -49,18 +49,32 @@ export default function Productos() {
       />
 
       {/* 📦 LISTADO */}
-      {productosFull
-        ?.filter(p =>
-          p.name.toLowerCase().includes(searchProduct.toLowerCase())
-        )
-        .map((p) => (
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+  gap: 20
+}}>
+  {productosFull
+    ?.filter(p =>
+      p.name.toLowerCase().includes(searchProduct.toLowerCase())
+    )
+    .map((p) => {
+
+      // 🔥 ORDENAR TALLAS (AQUÍ VA LA MAGIA)
+      const variantesOrdenadas = [...p.product_variants].sort((a, b) => {
+        const numA = parseInt(a.size.replace(/\D/g, ""));
+        const numB = parseInt(b.size.replace(/\D/g, ""));
+        return numA - numB;
+      });
+
+      return (
 
         <div key={p.id} style={{
           border: "1px solid #eee",
           borderRadius: 12,
           padding: 15,
-          marginBottom: 20,
-          background: "#fafafa"
+          marginBottom: 0,
+          background: "#fff"
         }}>
 
           {/* 🖼 IMAGEN */}
@@ -185,78 +199,90 @@ export default function Productos() {
           </button>
 
           {/* 📏 VARIANTES */}
-          {p.product_variants.map((v) => (
-            <div key={v.id} style={{
-              display: "flex",
-              gap: 10,
-              marginBottom: 6
-            }}>
+          <div style={{
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 6,
+  marginTop: 10
+}}>
+  {variantesOrdenadas.map((v) => (
+    <div key={v.id} style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 4,
+      background: "#f3f4f6",
+      padding: "4px 6px",
+      borderRadius: 6,
+      fontSize: 12
+    }}>
 
-              <span style={{ minWidth: 80 }}>{v.size}</span>
+      <span style={{ fontWeight: "bold" }}>{v.size}</span>
 
-              <input
-                type="number"
-                defaultValue={v.price}
-                onChange={async (e) => {
-                  const nuevo = parseInt(e.target.value);
+      <input
+        type="number"
+        defaultValue={v.price}
+        style={{ width: 60, fontSize: 12 }}
+        onChange={async (e) => {
+          const nuevo = parseInt(e.target.value);
 
-                  setProductosFull(prev =>
-                    prev.map(prod =>
-                      prod.id === p.id
-                        ? {
-                            ...prod,
-                            product_variants: prod.product_variants.map(varr =>
-                              varr.id === v.id
-                                ? { ...varr, price: nuevo }
-                                : varr
-                            )
-                          }
-                        : prod
+          setProductosFull(prev =>
+            prev.map(prod =>
+              prod.id === p.id
+                ? {
+                    ...prod,
+                    product_variants: prod.product_variants.map(varr =>
+                      varr.id === v.id
+                        ? { ...varr, price: nuevo }
+                        : varr
                     )
-                  );
+                  }
+                : prod
+            )
+          );
 
-                  await supabase
-                    .from("product_variants")
-                    .update({ price: nuevo })
-                    .eq("id", v.id);
-                }}
-              />
+          await supabase
+            .from("product_variants")
+            .update({ price: nuevo })
+            .eq("id", v.id);
+        }}
+      />
 
-              <button
-                onClick={async () => {
-                  if (!confirm("¿Eliminar talla?")) return;
+      <button
+        onClick={async () => {
+          if (!confirm("¿Eliminar talla?")) return;
 
-                  setProductosFull(prev =>
-                    prev.map(prod =>
-                      prod.id === p.id
-                        ? {
-                            ...prod,
-                            product_variants: prod.product_variants.filter(vv => vv.id !== v.id)
-                          }
-                        : prod
-                    )
-                  );
+          setProductosFull(prev =>
+            prev.map(prod =>
+              prod.id === p.id
+                ? {
+                    ...prod,
+                    product_variants: prod.product_variants.filter(vv => vv.id !== v.id)
+                  }
+                : prod
+            )
+          );
 
-                  await supabase
-                    .from("product_variants")
-                    .delete()
-                    .eq("id", v.id);
+          await supabase
+            .from("product_variants")
+            .delete()
+            .eq("id", v.id);
 
-                  showToast("🗑 Talla eliminada");
-                }}
-                style={{
-                  background: "#ef4444",
-                  color: "#fff",
-                  border: "none",
-                  padding: "4px 8px",
-                  borderRadius: 6
-                }}
-              >
-                ✕
-              </button>
+          showToast("🗑 Talla eliminada");
+        }}
+        style={{
+          background: "#ef4444",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer"
+        }}
+      >
+        ✕
+      </button>
 
-            </div>
-          ))}
+    </div>
+  ))}
+</div>
 
           {/* ➕ AGREGAR TALLA */}
           <div style={{ marginTop: 10 }}>
@@ -310,8 +336,10 @@ export default function Productos() {
             </button>
           </div>
 
-        </div>
-      ))}
+                </div>
+      );
+    })}
+</div>
 
       {/* 🔔 TOAST */}
       {toast && (
