@@ -100,7 +100,7 @@ export default function Product() {
         size,
         price: variant.price,
         qty,
-        image: product.product_images?.[0]?.url
+        image: product.product_images?.[0]?.url + "?width=400&quality=70"
       });
     }
 
@@ -229,7 +229,10 @@ return (
     }}
   >
     <img
-  src={activeImage}
+  src={`${activeImage}?width=800&quality=70`}
+  loading="lazy"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
+  className="opacity-0 transition-opacity duration-500"
   onClick={() => {
     const index = product.product_images.findIndex(
       img => img.url === activeImage
@@ -253,24 +256,27 @@ return (
   }}>
     {product.product_images?.map((img, i) => (
       <img
-        key={i}
-        src={img.url}
-        onClick={() => {
-  setActiveImage(img.url);
-  setCurrentIndex(i);
-}}
-        style={{
-          width: 70,
-          height: 70,
-          objectFit: "cover",
-          borderRadius: 10,
-          cursor: "pointer",
-          border: activeImage === img.url
-            ? "2px solid #ec4899"
-            : "1px solid #ddd",
-          transition: "0.2s"
-        }}
-      />
+  key={i}
+  src={`${img.url}?width=200&quality=60`}
+  loading="lazy"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
+  className="opacity-0 transition-opacity duration-300"
+  onClick={() => {
+    setActiveImage(img.url);
+    setCurrentIndex(i);
+  }}
+  style={{
+    width: 70,
+    height: 70,
+    objectFit: "cover",
+    borderRadius: 10,
+    cursor: "pointer",
+    border: activeImage === img.url
+      ? "2px solid #ec4899"
+      : "1px solid #ddd",
+    transition: "0.2s"
+  }}
+/>
     ))}
   </div>
 
@@ -536,13 +542,13 @@ onMouseOut={(e) => {
 
     {/* IMAGEN */}
     <img
-      src={product.product_images[currentIndex].url}
-      style={{
-        maxWidth: "90%",
-        maxHeight: "90%",
-        borderRadius: 12
-      }}
-    />
+  src={`${product.product_images[currentIndex].url}?width=1200&quality=80`}
+  style={{
+    maxWidth: "90%",
+    maxHeight: "90%",
+    borderRadius: 12
+  }}
+/>
   <div
   style={{
     position: "absolute",
