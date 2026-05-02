@@ -48,298 +48,53 @@ export default function Productos() {
         }}
       />
 
-      {/* 📦 LISTADO */}
-<div style={{
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-  gap: 20
+{/* 📦 LISTADO TABLA PRO */}
+<table style={{
+  width: "100%",
+  borderCollapse: "collapse",
+  background: "#fff",
+  borderRadius: 10,
+  overflow: "hidden"
 }}>
-  {productosFull
-    ?.filter(p =>
-      p.name.toLowerCase().includes(searchProduct.toLowerCase())
-    )
-    .map((p) => {
+  <thead style={{ background: "#f3f4f6" }}>
+    <tr>
+      <th style={{ padding: 12 }}></th>
+      <th style={{ padding: 12, textAlign: "left", fontWeight: "600" }}>Producto</th>
+      <th style={{ padding: 12 }}>Categoría</th>
+      <th style={{ padding: 12 }}>Talla</th>
+      <th style={{ padding: 12 }}>Precio</th>
+      <th style={{ padding: 12 }}>Acciones</th>
+    </tr>
+  </thead>
 
-      // 🔥 ORDENAR TALLAS (AQUÍ VA LA MAGIA)
-      const variantesOrdenadas = [...p.product_variants].sort((a, b) => {
-        const numA = parseInt(a.size.replace(/\D/g, ""));
-        const numB = parseInt(b.size.replace(/\D/g, ""));
-        return numA - numB;
-      });
+  <tbody>
+    {productosFull
+      ?.filter(p =>
+        p.name.toLowerCase().includes(searchProduct.toLowerCase())
+      )
+      .map((p) => {
 
-      return (
+        // 🔥 ordenar tallas
+        const variantesOrdenadas = [...p.product_variants].sort((a, b) => {
+          const numA = parseInt(a.size.replace(/\D/g, ""));
+          const numB = parseInt(b.size.replace(/\D/g, ""));
+          return numA - numB;
+        });
 
-        <div key={p.id} style={{
-          border: "1px solid #eee",
-          borderRadius: 12,
-          padding: 15,
-          marginBottom: 0,
-          background: "#fff"
-        }}>
+        const tallaDefault = variantesOrdenadas[0];
 
-          {/* 🖼 IMAGEN */}
-          <img
-            src={p.product_images?.[0]?.url || "/placeholder.png"}
-            style={{
-              width: 80,
-              height: 80,
-              objectFit: "cover",
-              borderRadius: 10,
-              marginBottom: 10
-            }}
-          />
-
-          {/* 📝 NOMBRE */}
-          <input
-            value={p.name}
-            onChange={(e) => {
-              const value = e.target.value;
-
-              setProductosFull(prev =>
-                prev.map(prod =>
-                  prod.id === p.id ? { ...prod, name: value } : prod
-                )
-              );
-            }}
-            onBlur={async (e) => {
-              await supabase
-                .from("products")
-                .update({ name: e.target.value })
-                .eq("id", p.id);
-
-              showToast("✅ Nombre actualizado");
-            }}
-            style={{
-              width: "100%",
-              marginBottom: 8,
-              padding: 6,
-              fontWeight: "bold"
-            }}
-          />
-
-          {/* 🏷 CATEGORÍA */}
-          <input
-            value={p.category || ""}
-            placeholder="Categoría"
-            onChange={(e) => {
-              const value = e.target.value;
-
-              setProductosFull(prev =>
-                prev.map(prod =>
-                  prod.id === p.id ? { ...prod, category: value } : prod
-                )
-              );
-            }}
-            onBlur={async (e) => {
-              await supabase
-                .from("products")
-                .update({ category: e.target.value })
-                .eq("id", p.id);
-
-              showToast("🏷 Categoría actualizada");
-            }}
-            style={{
-              width: "100%",
-              marginBottom: 10,
-              padding: 6
-            }}
-          />
-
-          {/* 🔘 ACTIVO */}
-          <label style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-            <input
-              type="checkbox"
-              checked={p.active}
-              onChange={async (e) => {
-                const nuevoEstado = e.target.checked;
-
-                setProductosFull(prev =>
-                  prev.map(prod =>
-                    prod.id === p.id
-                      ? { ...prod, active: nuevoEstado }
-                      : prod
-                  )
-                );
-
-                await supabase
-                  .from("products")
-                  .update({ active: nuevoEstado })
-                  .eq("id", p.id);
-              }}
-            />
-            Activo
-          </label>
-
-          {/* 🗑 ELIMINAR */}
-          <button
-            onClick={async () => {
-              if (!confirm("¿Eliminar producto?")) return;
-
-              setProductosFull(prev =>
-                prev.filter(prod => prod.id !== p.id)
-              );
-
-              await supabase.from("product_variants").delete().eq("product_id", p.id);
-              await supabase.from("product_images").delete().eq("product_id", p.id);
-              await supabase.from("products").delete().eq("id", p.id);
-
-              showToast("🗑 Producto eliminado");
-            }}
-            style={{
-              background: "#ef4444",
-              color: "#fff",
-              padding: "6px 10px",
-              borderRadius: 6,
-              border: "none",
-              marginBottom: 10,
-              cursor: "pointer"
-            }}
-          >
-            Eliminar
-          </button>
-
-          {/* 📏 VARIANTES */}
-          <div style={{
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 6,
-  marginTop: 10
-}}>
-  {variantesOrdenadas.map((v) => (
-    <div key={v.id} style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 4,
-      background: "#f3f4f6",
-      padding: "4px 6px",
-      borderRadius: 6,
-      fontSize: 12
-    }}>
-
-      <span style={{ fontWeight: "bold" }}>{v.size}</span>
-
-      <input
-        type="number"
-        defaultValue={v.price}
-        style={{ width: 60, fontSize: 12 }}
-        onChange={async (e) => {
-          const nuevo = parseInt(e.target.value);
-
-          setProductosFull(prev =>
-            prev.map(prod =>
-              prod.id === p.id
-                ? {
-                    ...prod,
-                    product_variants: prod.product_variants.map(varr =>
-                      varr.id === v.id
-                        ? { ...varr, price: nuevo }
-                        : varr
-                    )
-                  }
-                : prod
-            )
-          );
-
-          await supabase
-            .from("product_variants")
-            .update({ price: nuevo })
-            .eq("id", v.id);
-        }}
-      />
-
-      <button
-        onClick={async () => {
-          if (!confirm("¿Eliminar talla?")) return;
-
-          setProductosFull(prev =>
-            prev.map(prod =>
-              prod.id === p.id
-                ? {
-                    ...prod,
-                    product_variants: prod.product_variants.filter(vv => vv.id !== v.id)
-                  }
-                : prod
-            )
-          );
-
-          await supabase
-            .from("product_variants")
-            .delete()
-            .eq("id", v.id);
-
-          showToast("🗑 Talla eliminada");
-        }}
-        style={{
-          background: "#ef4444",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor: "pointer"
-        }}
-      >
-        ✕
-      </button>
-
-    </div>
-  ))}
-</div>
-
-          {/* ➕ AGREGAR TALLA */}
-          <div style={{ marginTop: 10 }}>
-            <input
-              placeholder="Nueva talla"
-              id={`size-${p.id}`}
-              style={{ marginRight: 5 }}
-            />
-            <input
-              type="number"
-              placeholder="Precio"
-              id={`price-${p.id}`}
-              style={{ marginRight: 5, width: 90 }}
-            />
-
-            <button
-              onClick={async () => {
-                const size = document.getElementById(`size-${p.id}`).value;
-                const price = document.getElementById(`price-${p.id}`).value;
-
-                if (!size || !price) {
-                  showToast("⚠️ Completa datos");
-                  return;
-                }
-
-                const { data } = await supabase
-                  .from("product_variants")
-                  .insert([{
-                    product_id: p.id,
-                    size,
-                    price: parseInt(price)
-                  }])
-                  .select()
-                  .single();
-
-                setProductosFull(prev =>
-                  prev.map(prod =>
-                    prod.id === p.id
-                      ? {
-                          ...prod,
-                          product_variants: [...prod.product_variants, data]
-                        }
-                      : prod
-                  )
-                );
-
-                showToast("✅ Talla agregada");
-              }}
-            >
-              ➕
-            </button>
-          </div>
-
-                </div>
-      );
-    })}
-</div>
+        return (
+  <FilaProducto
+    key={p.id}
+    p={p}
+    variantesOrdenadas={variantesOrdenadas}
+    tallaDefault={tallaDefault}
+    setProductosFull={setProductosFull}
+  />
+);
+      })}
+  </tbody>
+</table>
 
       {/* 🔔 TOAST */}
       {toast && (
@@ -357,5 +112,156 @@ export default function Productos() {
       )}
 
     </div>
+  );
+}
+function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull }) {
+
+  const [tallaSeleccionada, setTallaSeleccionada] = useState(tallaDefault);
+
+  return (
+    <tr
+  style={{
+    borderBottom: "1px solid #eee",
+    height: 60,
+    transition: "0.2s"
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.background = "#f9fafb"}
+  onMouseLeave={(e) => e.currentTarget.style.background = "white"}
+>
+
+      {/* ACTIVO */}
+<td>
+  <label style={{ cursor: "pointer" }}>
+    <input
+      type="checkbox"
+      checked={p.active}
+      onChange={async (e) => {
+        const nuevo = e.target.checked;
+
+        setProductosFull(prev =>
+          prev.map(prod =>
+            prod.id === p.id ? { ...prod, active: nuevo } : prod
+          )
+        );
+
+        await supabase
+          .from("products")
+          .update({ active: nuevo })
+          .eq("id", p.id);
+      }}
+      style={{
+        transform: "scale(1.2)",
+        cursor: "pointer"
+      }}
+    />
+  </label>
+</td>
+
+      {/* PRODUCTO */}
+      <td style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <img
+          src={p.product_images?.[0]?.url || "/placeholder.png"}
+          style={{ width: 40, height: 40, borderRadius: 6 }}
+        />
+        <span style={{ fontWeight: "bold" }}>{p.name}</span>
+      </td>
+
+      {/* CATEGORÍA */}
+      <td>{p.category}</td>
+
+      {/* SELECT TALLA */}
+      <td>
+        <select
+          value={tallaSeleccionada?.id}
+          onChange={(e) => {
+            const v = variantesOrdenadas.find(
+              x => x.id === parseInt(e.target.value)
+            );
+            setTallaSeleccionada(v);
+          }}
+        >
+          {variantesOrdenadas.map(v => (
+            <option key={v.id} value={v.id}>
+              {v.size}
+            </option>
+          ))}
+        </select>
+      </td>
+
+      {/* PRECIO */}
+      <td>
+        <input
+          type="number"
+          value={tallaSeleccionada?.price || ""}
+          style={{
+          width: 80,
+          padding: 6,
+          borderRadius: 6,
+          border: "1px solid #ddd"
+        }}
+          onChange={async (e) => {
+            const nuevo = parseInt(e.target.value);
+
+            setProductosFull(prev =>
+              prev.map(prod =>
+                prod.id === p.id
+                  ? {
+                      ...prod,
+                      product_variants: prod.product_variants.map(v =>
+                        v.id === tallaSeleccionada.id
+                          ? { ...v, price: nuevo }
+                          : v
+                      )
+                    }
+                  : prod
+              )
+            );
+
+            await supabase
+              .from("product_variants")
+              .update({ price: nuevo })
+              .eq("id", tallaSeleccionada.id);
+          }}
+          style={{ width: 80 }}
+        />
+      </td>
+
+      {/* ACCIONES */}
+      <td>
+        <button
+          onClick={async () => {
+            if (!confirm("¿Eliminar talla?")) return;
+
+            await supabase
+              .from("product_variants")
+              .delete()
+              .eq("id", tallaSeleccionada.id);
+
+            setProductosFull(prev =>
+              prev.map(prod =>
+                prod.id === p.id
+                  ? {
+                      ...prod,
+                      product_variants: prod.product_variants.filter(
+                        v => v.id !== tallaSeleccionada.id
+                      )
+                    }
+                  : prod
+              )
+            );
+          }}
+          style={{
+            background: "#ef4444",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "4px 8px"
+          }}
+        >
+          ✕
+        </button>
+      </td>
+
+    </tr>
   );
 }
