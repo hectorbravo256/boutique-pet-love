@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Checkout({
@@ -18,10 +19,13 @@ export default function Checkout({
   formatPrice
 }) {
 
+const navigate = useNavigate();
+	
 const [errors, setErrors] = useState({});
 const [coupon, setCoupon] = useState("");
 const [discount, setDiscount] = useState(0);
 const [couponError, setCouponError] = useState("");
+const [stockDB, setStockDB] = useState([]);
 
 const mensajeEnvio = formData.region
   ? aplicaEnvio
@@ -32,6 +36,10 @@ const mensajeEnvio = formData.region
 	const subtotal = total;
 const discountAmount = subtotal * discount;
 const totalConDescuento = subtotal - discountAmount + (aplicaEnvio ? shipping : 0);
+
+	const stockMap = Object.fromEntries(
+  stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
+);
 
 const validarFormulario = () => {
   const nuevosErrores = {};
@@ -107,6 +115,48 @@ const applyCoupon = async () => {
   localStorage.setItem("couponUsed", data.code);
 };
 
+	useEffect(() => {
+  const cargarStock = async () => {
+    const { data } = await supabase
+      .from("product_stock")
+      .select("*");
+
+    setStockDB(data || []);
+  };
+
+  cargarStock();
+}, []);
+
+useEffect(() => {
+  if (!cart || cart.length === 0) {
+
+    window.dispatchEvent(
+      new CustomEvent("toast", {
+        detail: "🛒 Tu carrito está vacío"
+      })
+    );
+
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
+  }
+}, [cart]);
+
+	useEffect(() => {
+  const updatedCart = cart.map(item => {
+    const stock =
+      stockMap[`${item.id}-${item.size}`] || 0;
+
+    if (item.qty > stock) {
+      return { ...item, qty: stock };
+    }
+
+    return item;
+  });
+
+  localStorage.setItem("cart", JSON.stringify(updatedCart));
+}, [stockDB, cart]);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
 
@@ -127,12 +177,38 @@ const applyCoupon = async () => {
     <div className="checkout-info">
       <p className="checkout-name">{item.name}</p>
       <p className="checkout-size">{item.size}</p>
+ 	  <p className="text-xs text-gray-500">
+  {(stockMap[`${item.id}-${item.size}`] || 0) === 0
+  ? "❌ Sin stock"
+  : `Stock disponible: ${stockMap[`${item.id}-${item.size}`]}`}
+</p>
 
       {/* 🔢 CANTIDAD */}
       <div className="checkout-qty">
         <button onClick={() => decreaseQty(i)}>−</button>
         <span>{item.qty || 1}</span>
-        <button onClick={() => increaseQty(i)}>+</button>
+        <button
+  onClick={() => {
+    const stock = stockMap[`${item.id}-${item.size}`] || 0;
+
+    if ((item.qty || 1) >= stock) {
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: "⚠️ No puedes agregar más del stock disponible"
+        })
+      );
+      return;
+    }
+
+    increaseQty(i);
+  }}
+  disabled={
+    (stockMap[`${item.id}-${item.size}`] || 0) === 0 ||
+    (item.qty || 1) >= (stockMap[`${item.id}-${item.size}`] || 0)
+  }
+>
+  +
+</button>
       </div>
     </div>
 
