@@ -237,6 +237,63 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
             }}
           />
 
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+
+  {/* 🔥 ACTIVAR DESCUENTO */}
+  <input
+    type="checkbox"
+    checked={p.discount_active || false}
+    onChange={async (e) => {
+      const activo = e.target.checked;
+
+      setProductosFull(prev =>
+        prev.map(prod =>
+          prod.id === p.id
+            ? { ...prod, discount_active: activo }
+            : prod
+        )
+      );
+
+      await supabase
+        .from("products")
+        .update({ discount_active: activo })
+        .eq("id", p.id);
+    }}
+  />
+
+  {/* % DESCUENTO */}
+  {p.discount_active && (
+    <input
+      type="number"
+      placeholder="%"
+      value={p.discount_percent || ""}
+      onChange={async (e) => {
+        const val = parseInt(e.target.value) || 0;
+
+        setProductosFull(prev =>
+          prev.map(prod =>
+            prod.id === p.id
+              ? { ...prod, discount_percent: val }
+              : prod
+          )
+        );
+
+        await supabase
+          .from("products")
+          .update({ discount_percent: val })
+          .eq("id", p.id);
+      }}
+      style={{
+        width: 60,
+        padding: 4,
+        borderRadius: 6,
+        border: "1px solid #ddd"
+      }}
+    />
+  )}
+
+</div>
+
           <button
             onClick={async () => {
               if (!confirm("¿Eliminar producto completo?")) return;
