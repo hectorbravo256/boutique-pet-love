@@ -947,11 +947,16 @@ if (hasError) {
         prod.id === p.id ? { ...prod, name: value } : prod
       )
     );
+  }}
+  onBlur={async (e) => {
+    const value = e.target.value;
 
-    setDirtyProducts(prev => ({
-      ...prev,
-      [p.id]: true
-    }));
+    await supabase
+      .from("products")
+      .update({ name: value })
+      .eq("id", p.id);
+
+    showToast("✅ Nombre actualizado");
   }}
   style={{
     fontWeight: "bold",
@@ -963,11 +968,6 @@ if (hasError) {
   }}
 />
 
-{dirtyProducts[p.id] && (
-  <div style={{ color: "#f59e0b", fontSize: 12 }}>
-    ✏️ Cambios sin guardar
-  </div>
-)}
 		  
 		  <input
   defaultValue={p.category || ""}
