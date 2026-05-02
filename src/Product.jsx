@@ -228,24 +228,45 @@ return (
       cursor: "zoom-in"
     }}
   >
-    <img
-  src={`${activeImage}?width=800&quality=70`}
-  loading="lazy"
-  onLoad={(e) => e.target.classList.remove("opacity-0")}
-  className="opacity-0 transition-opacity duration-500"
-  onClick={() => {
-    const index = product.product_images.findIndex(
-      img => img.url === activeImage
-    );
-    setCurrentIndex(index);
-    setShowModal(true);
-  }}
-  style={{
-    width: "100%",
-    borderRadius: 16,
-    cursor: "zoom-in"
-  }}
-/>
+<div style={{ position: "relative" }}>
+
+  <img
+    src={`${activeImage}?width=800&quality=70`}
+    loading="lazy"
+    onLoad={(e) => e.target.classList.remove("opacity-0")}
+    className="opacity-0 transition-opacity duration-500"
+    onClick={() => {
+      const index = product.product_images.findIndex(
+        img => img.url === activeImage
+      );
+      setCurrentIndex(index);
+      setShowModal(true);
+    }}
+    style={{
+      width: "100%",
+      borderRadius: 16,
+      cursor: "zoom-in"
+    }}
+  />
+
+  {/* 🔥 BADGE DESCUENTO */}
+  {product.discount_active && product.discount_percent > 0 && (
+    <div style={{
+      position: "absolute",
+      top: 10,
+      right: 10,
+      background: "#ec4899",
+      color: "#fff",
+      padding: "6px 10px",
+      borderRadius: 8,
+      fontSize: 14,
+      fontWeight: "bold"
+    }}>
+      -{product.discount_percent}%
+    </div>
+  )}
+
+</div>
   </div>
 
   {/* MINIATURAS */}
@@ -296,15 +317,57 @@ return (
         </h1>
 
         {/* PRECIO */}
-        <h2 style={{
-          fontSize: 28,
-          color: "#ec4899",
+{selectedVariant ? (() => {
+
+  const precioOriginal = selectedVariant.price;
+
+  const tieneDescuento =
+    product.discount_active && product.discount_percent > 0;
+
+  const precioFinal = tieneDescuento
+    ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
+    : precioOriginal;
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+      {tieneDescuento && (
+        <span style={{
+          textDecoration: "line-through",
+          color: "#999",
+          fontSize: 18
+        }}>
+          ${precioOriginal.toLocaleString("es-CL")}
+        </span>
+      )}
+
+      <span style={{
+        fontSize: 28,
+        fontWeight: "bold",
+        color: tieneDescuento ? "#ec4899" : "#000"
+      }}>
+        ${precioFinal.toLocaleString("es-CL")}
+      </span>
+
+      {tieneDescuento && (
+        <span style={{
+          background: "#ec4899",
+          color: "#fff",
+          padding: "4px 10px",
+          borderRadius: 20,
+          fontSize: 12,
           fontWeight: "bold"
         }}>
-          {selectedVariant
-            ? `$${selectedVariant.price.toLocaleString("es-CL")}`
-            : "Selecciona talla"}
-        </h2>
+          Oferta
+        </span>
+      )}
+
+    </div>
+  );
+
+})() : (
+  <h2>Selecciona talla</h2>
+)}
 
         {/* STOCK */}
         {selectedVariant && (
