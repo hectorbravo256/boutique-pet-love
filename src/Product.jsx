@@ -12,6 +12,8 @@ export default function Product() {
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
+  const [activeImage, setActiveImage] = useState(null);
+  const [zoom, setZoom] = useState(false);
 
   const stockMap = Object.fromEntries(
     stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
@@ -111,6 +113,12 @@ export default function Product() {
   }, [id]);
 
   useEffect(() => {
+  if (product?.product_images?.length > 0) {
+    setActiveImage(product.product_images[0].url);
+  }
+}, [product]);
+
+  useEffect(() => {
     const cargarStock = async () => {
       const { data } = await supabase
         .from("product_stock")
@@ -138,169 +146,286 @@ export default function Product() {
 
   if (!product) return <p>Cargando...</p>;
 
-  return (
+return (
+  <div style={{
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: 20
+  }}>
+
     <div style={{
-      maxWidth: 500,
-      margin: "0 auto",
-      padding: 20
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 40
     }}>
 
-      {/* IMAGEN */}
+      {/* ================= IMAGEN ================= */}
+      <div>
+        <div>
+
+  {/* IMAGEN PRINCIPAL */}
+  <div
+    onMouseEnter={() => setZoom(true)}
+    onMouseLeave={() => setZoom(false)}
+    style={{
+      overflow: "hidden",
+      borderRadius: 16,
+      cursor: "zoom-in"
+    }}
+  >
+    <img
+      src={activeImage}
+      style={{
+        width: "100%",
+        borderRadius: 16,
+        transform: zoom ? "scale(1.2)" : "scale(1)",
+        transition: "transform 0.4s ease"
+      }}
+    />
+  </div>
+
+  {/* MINIATURAS */}
+  <div style={{
+    display: "flex",
+    gap: 10,
+    marginTop: 15
+  }}>
+    {product.product_images?.map((img, i) => (
       <img
-        src={product.product_images?.[0]?.url}
+        key={i}
+        src={img.url}
+        onClick={() => setActiveImage(img.url)}
         style={{
-          width: "100%",
-          borderRadius: 12,
-          marginBottom: 20
+          width: 70,
+          height: 70,
+          objectFit: "cover",
+          borderRadius: 10,
+          cursor: "pointer",
+          border: activeImage === img.url
+            ? "2px solid #ec4899"
+            : "1px solid #ddd",
+          transition: "0.2s"
         }}
       />
+    ))}
+  </div>
 
-      {/* NOMBRE */}
-      <h1 style={{ fontSize: 22, fontWeight: "bold" }}>
-        {product.name}
-      </h1>
+</div>
+      </div>
 
-      {/* PRECIO */}
-      <h2 style={{
-        fontSize: 24,
-        color: "#ec4899",
-        marginTop: 10
-      }}>
-        {selectedVariant
-          ? `$${selectedVariant.price.toLocaleString("es-CL")}`
-          : "Selecciona talla"}
-      </h2>
+      {/* ================= INFO ================= */}
+      <div>
 
-      {/* STOCK */}
-      {selectedVariant && (
-        <p style={{
+        {/* NOMBRE */}
+        <h1 style={{
+          fontSize: 26,
           fontWeight: "bold",
-          color: isOutOfStock ? "#ef4444" : "#22c55e"
+          marginBottom: 10
         }}>
-          {isOutOfStock
-            ? "❌ Sin stock"
-            : currentStock <= 3
-              ? `⚠️ Últimas ${currentStock} unidades`
-              : `✔ Stock disponible: ${currentStock}`}
-        </p>
-      )}
+          {product.name}
+        </h1>
 
-      {/* MENSAJE PEDIDO */}
-      {isOutOfStock && (
-        <p style={{
-          marginTop: 10,
-          color: "#ef4444",
+        {/* PRECIO */}
+        <h2 style={{
+          fontSize: 28,
+          color: "#ec4899",
           fontWeight: "bold"
         }}>
-          ⚠️ Producto a Pedido - Solicitar por WhatsApp
-        </p>
-      )}
+          {selectedVariant
+            ? `$${selectedVariant.price.toLocaleString("es-CL")}`
+            : "Selecciona talla"}
+        </h2>
 
-      {/* TALLAS */}
-      <div style={{ marginTop: 20 }}>
-        <p>Talla</p>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {[...product.product_variants]
-            .sort((a, b) =>
-              parseInt(a.size.match(/\d+/)) -
-              parseInt(b.size.match(/\d+/))
-            )
-            .map(v => {
-              const stock = stockMap[`${product.id}-${v.size}`] || 0;
-              const isActive = selected === v.id;
-
-              return (
-                <button
-                  key={v.id}
-                  onClick={() => handleSelect(v)}
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: 20,
-                    border: isActive ? "2px solid #ec4899" : "1px solid #ddd",
-                    background: isActive ? "#ec4899" : "white",
-                    color: isActive ? "white" : "#333",
-                    opacity: stock === 0 ? 0.5 : 1
-                  }}
-                >
-                  {v.size}
-                </button>
-              );
-            })}
-        </div>
-      </div>
-
-      {/* CANTIDAD */}
-      <div style={{ marginTop: 20 }}>
-        <p>Cantidad</p>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={decreaseQty} style={btnQty}>-</button>
-          <span>{qty}</span>
-          <button onClick={increaseQty} style={btnQty}>+</button>
-        </div>
-      </div>
-
-      {/* BOTONES */}
-      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-        <button
-          onClick={addToCart}
-          disabled={!selectedVariant || isOutOfStock}
-          style={{
-            flex: 1,
-            padding: 12,
-            background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#ec4899",
-            color: "#fff",
-            border: "none",
-            borderRadius: 10
-          }}
-        >
-          🛒 Agregar
-        </button>
-
-        <button
-          onClick={() => {
-            addToCart();
-            window.location.href = "/checkout";
-          }}
-          disabled={!selectedVariant || isOutOfStock}
-          style={{
-            flex: 1,
-            padding: 12,
-            background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#22c55e",
-            color: "#fff",
-            border: "none",
-            borderRadius: 10
-          }}
-        >
-          ⚡ Comprar
-        </button>
-      </div>
-
-      {/* WHATSAPP */}
-      {isOutOfStock && (
-        <a
-          href={`${WHATSAPP}?text=${encodeURIComponent(
-            `Hola, quiero consultar por:\n${product.name}\nTalla: ${selectedVariant?.size}`
-          )}`}
-          target="_blank"
-          style={{
-            display: "block",
-            marginTop: 15,
-            background: "#22c55e",
-            color: "white",
-            padding: 12,
-            borderRadius: 10,
-            textAlign: "center",
+        {/* STOCK */}
+        {selectedVariant && (
+          <p style={{
+            marginTop: 5,
             fontWeight: "bold",
-            textDecoration: "none"
+            color: isOutOfStock ? "#ef4444" : "#22c55e"
+          }}>
+            {isOutOfStock
+              ? "❌ Sin stock"
+              : currentStock <= 3
+                ? `⚠️ Últimas ${currentStock} unidades`
+                : `✔ Stock disponible: ${currentStock}`}
+          </p>
+        )}
+
+        {/* MENSAJE PEDIDO */}
+        {isOutOfStock && (
+          <p style={{
+            marginTop: 10,
+            color: "#ef4444",
+            fontWeight: "bold"
+          }}>
+            ⚠️ Producto a Pedido - Solicitar por WhatsApp
+          </p>
+        )}
+
+        {/* TALLAS */}
+        <div style={{ marginTop: 25 }}>
+          <p style={{ marginBottom: 10 }}>Talla</p>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {[...product.product_variants]
+              .sort((a, b) =>
+                parseInt(a.size.match(/\d+/)) -
+                parseInt(b.size.match(/\d+/))
+              )
+              .map(v => {
+                const stock = stockMap[`${product.id}-${v.size}`] || 0;
+                const isActive = selected === v.id;
+
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => handleSelect(v)}
+                    onMouseOver={(e) => {
+  if (!e.currentTarget.disabled) {
+    e.currentTarget.style.transform = "scale(1.05)";
+  }
+}}
+onMouseOut={(e) => {
+  e.currentTarget.style.transform = "scale(1)";
+}}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: 25,
+                      border: isActive ? "2px solid #ec4899" : "1px solid #ddd",
+                      background: isActive ? "#ec4899" : "white",
+                      color: isActive ? "white" : "#333",
+                      opacity: stock === 0 ? 0.5 : 1,
+                      transition: "0.2s",
+                      transform: "scale(1)"
+                    }}
+                  >
+                    {v.size}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* CANTIDAD */}
+        <div style={{ marginTop: 25 }}>
+          <p style={{ marginBottom: 10 }}>Cantidad</p>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={decreaseQty} style={btnQty}>-</button>
+            <span style={{ fontSize: 18 }}>{qty}</span>
+            <button onClick={increaseQty} style={btnQty}>+</button>
+          </div>
+        </div>
+
+        {/* BOTONES */}
+        <div style={{ marginTop: 30, display: "flex", gap: 10 }}>
+          <button
+            onClick={addToCart}
+            onMouseOver={(e) => {
+  if (!e.currentTarget.disabled) {
+    e.currentTarget.style.transform = "scale(1.05)";
+  }
+}}
+onMouseOut={(e) => {
+  e.currentTarget.style.transform = "scale(1)";
+}}
+            disabled={!selectedVariant || isOutOfStock}
+            style={{
+              flex: 1,
+              padding: 14,
+              background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#ec4899",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              transform: "scale(1)"
+            }}
+          >
+            🛒 Agregar
+          </button>
+
+          <button
+            onClick={() => {
+              addToCart();
+              window.location.href = "/checkout";
+            }}
+            onMouseOver={(e) => {
+  if (!e.currentTarget.disabled) {
+    e.currentTarget.style.transform = "scale(1.05)";
+  }
+}}
+onMouseOut={(e) => {
+  e.currentTarget.style.transform = "scale(1)";
+}}
+            disabled={!selectedVariant || isOutOfStock}
+            style={{
+              flex: 1,
+              padding: 14,
+              background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#22c55e",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              transform: "scale(1)"
           }}
-        >
-          💬 Solicitar por WhatsApp
-        </a>
-      )}
+          >
+            ⚡ Comprar
+          </button>
+        </div>
+
+        {/* WHATSAPP */}
+        {isOutOfStock && (
+          <a
+            href={`${WHATSAPP}?text=${encodeURIComponent(
+              `Hola, quiero consultar por:\n${product.name}\nTalla: ${selectedVariant?.size}`
+            )}`}
+            target="_blank"
+            onMouseOver={(e) => {
+  if (!e.currentTarget.disabled) {
+    e.currentTarget.style.transform = "scale(1.05)";
+  }
+}}
+onMouseOut={(e) => {
+  e.currentTarget.style.transform = "scale(1)";
+}}
+            style={{
+              display: "block",
+              marginTop: 15,
+              background: "#22c55e",
+              color: "white",
+              padding: 14,
+              borderRadius: 12,
+              textAlign: "center",
+              fontWeight: "bold",
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+              transform: "scale(1)"
+            }}
+          >
+            💬 Solicitar por WhatsApp
+          </a>
+        )}
+
+      </div>
     </div>
-  );
+
+    {/* RESPONSIVE */}
+    <style>
+      {`
+        @media (max-width: 768px) {
+          div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}
+    </style>
+
+  </div>
+);
 }
 
 /* BOTONES CANTIDAD */
