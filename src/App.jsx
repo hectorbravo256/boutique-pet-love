@@ -5,7 +5,6 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 import './index.css';
-import Admin from "./Admin";
 import Login from "./Login";
 import { supabase } from "./supabaseClient";
 import Category from "./Category";
