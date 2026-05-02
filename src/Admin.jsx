@@ -24,7 +24,6 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [productosFull, setProductosFull] = useState([]);
-  const [dirtyProducts, setDirtyProducts] = useState({});
 	const recargarProductos = async () => {
   const { data } = await supabase
     .from("products")
@@ -903,35 +902,6 @@ if (hasError) {
   }}>
     🛒 Editor de Productos
   </h2>
-
-	<button
-  onClick={async () => {
-    for (const p of productosFull) {
-      if (dirtyProducts[p.id]) {
-        await supabase
-          .from("products")
-          .update({
-            name: p.name,
-            category: p.category
-          })
-          .eq("id", p.id);
-      }
-    }
-
-    setDirtyProducts({});
-    showToast("💾 Cambios guardados");
-  }}
-  style={{
-    background: "#22c55e",
-    color: "#fff",
-    padding: "10px 16px",
-    borderRadius: 10,
-    marginBottom: 20,
-    fontWeight: "bold"
-  }}
->
-  💾 Guardar cambios
-</button>
 	
   <div style={{
     display: "grid",
