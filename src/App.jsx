@@ -27,15 +27,22 @@ function AppContent() {
 const increaseQty = (index) => {
   const updated = [...cart];
   updated[index].qty = (updated[index].qty || 1) + 1;
+
   setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage"));
 };
 
 const decreaseQty = (index) => {
   const updated = [...cart];
+
   if ((updated[index].qty || 1) > 1) {
     updated[index].qty -= 1;
   }
+
   setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage"));
 };
 
 
@@ -185,7 +192,11 @@ useEffect(() => {
     const size = selectedSizes[product.id];
 
     if (!size) {
-      alert("Selecciona una talla");
+      window.dispatchEvent(
+  new CustomEvent("toast", {
+    detail: "Selecciona una talla"
+  })
+);
       return;
     }
  const variant = product.product_variants.find(
@@ -230,8 +241,13 @@ if (stock === 0) {
 });
   };
 
-  const removeItem = (i) =>
-    setCart(cart.filter((_, idx) => idx !== i));
+const removeItem = (i) => {
+  const updated = cart.filter((_, idx) => idx !== i);
+
+  setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage"));
+};
 
   const total = cart.reduce(
   (acc, i) => acc + i.price * (i.qty || 1),
@@ -597,19 +613,32 @@ localStorage.setItem(
 const increaseQty = (index) => {
   const updated = [...cart];
   updated[index].qty = (updated[index].qty || 1) + 1;
+
   setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage"));
 };
 
 const decreaseQty = (index) => {
   const updated = [...cart];
+
   if ((updated[index].qty || 1) > 1) {
     updated[index].qty -= 1;
   }
+
   setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage"));
 };
 
 const removeItem = (index) => {
-  setCart(cart.filter((_, i) => i !== index));
+  const updated = cart.filter((_, i) => i !== index);
+
+  setCart(updated);
+  localStorage.setItem("cart", JSON.stringify(updated));
+
+  // 🔥 sincroniza con layout / carrito flotante
+  window.dispatchEvent(new Event("storage"));
 };
 
 const formatPrice = (p) =>
@@ -621,6 +650,17 @@ const formatPrice = (p) =>
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
+
+	useEffect(() => {
+  const updateCart = () => {
+    const stored = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(stored);
+  };
+
+  window.addEventListener("storage", updateCart);
+
+  return () => window.removeEventListener("storage", updateCart);
+}, []);
 
 
 return (
