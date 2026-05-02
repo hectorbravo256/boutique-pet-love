@@ -46,6 +46,10 @@ const [newProduct, setNewProduct] = useState({
 });
   const [searchProduct, setSearchProduct] = useState("");
   const [toast, setToast] = useState("");
+  const showToast = (msg) => {
+  setToast(msg);
+  setTimeout(() => setToast(""), 2500);
+};
 
 useEffect(() => {
   const cargarProductos = async () => {
@@ -98,10 +102,6 @@ const cambiarEstado = async (id) => {
 
   console.log("CLICK ENVIADO:", id);
 
-	const showToast = (msg) => {
-  setToast(msg);
-  setTimeout(() => setToast(""), 2500);
-};
 
 
   // 🔍 1. Obtener pedido
@@ -152,9 +152,13 @@ const cambiarEstado = async (id) => {
   });
 
   // 🔄 4. Refrescar lista
-  const res = await fetch("/.netlify/functions/get-orders");
-  const data = await res.json();
-  setOrders(data);
+setOrders(prev =>
+  prev.map(o =>
+    o.id === id
+      ? { ...o, estado: "enviado" }
+      : o
+  )
+);
 };
 
 const actualizarStock = async (id, nuevoStock) => {
@@ -228,10 +232,6 @@ if (errVar) {
   return;
 }
 
-  if (errVar) {
-    showToast("❌ Error creando variante");
-    return;
-  }
 
   // 3. Imagen (opcional)
   if (newProduct.image) {
@@ -243,23 +243,7 @@ if (errVar) {
       }]);
   }
  
-// 🔥 TRAER PRODUCTO REAL DESDE SUPABASE
-const { data: productoCompleto } = await supabase
-  .from("products")
-  .select(`
-    *,
-    product_variants (*),
-    product_images (*)
-  `)
-  .eq("id", prod.id)
-  .single();
-
 // 🔥 ACTUALIZAR UI
-setProductosFull(prev =>
-  [...prev, productoCompleto].sort((a, b) =>
-    a.name.localeCompare(b.name)
-  )
-);
 
 showToast("✅ Producto creado");
 await recargarProductos();
@@ -271,6 +255,9 @@ setNewProduct({
   image: "",
   variants: [{ size: "Talla 1", price: "" }]
 });
+		setTimeout(() => {
+  document.querySelector('input[placeholder="Nombre"]')?.focus();
+}, 0);
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -744,8 +731,11 @@ if (hasError) {
     placeholder="Nombre"
     value={newProduct.name}
     onChange={(e) =>
-      setNewProduct({ ...newProduct, name: e.target.value })
-    }
+  setNewProduct(prev => ({
+    ...prev,
+    name: e.target.value
+  }))
+}
     style={{ width: "100%", marginBottom: 8, padding: 6 }}
   />
 
@@ -753,8 +743,11 @@ if (hasError) {
     placeholder="Categoría"
     value={newProduct.category}
     onChange={(e) =>
-      setNewProduct({ ...newProduct, category: e.target.value })
-    }
+  setNewProduct(prev => ({
+    ...prev,
+    category: e.target.value
+  }))
+}
     style={{ width: "100%", marginBottom: 8, padding: 6 }}
   />
 
@@ -770,9 +763,15 @@ if (hasError) {
       placeholder="Talla"
       value={v.size}
       onChange={(e) => {
-        const updated = [...newProduct.variants];
-        updated[index].size = e.target.value;
-        setNewProduct({ ...newProduct, variants: updated });
+        setNewProduct(prev => {
+  const updated = [...prev.variants];
+  updated[index].size = e.target.value;
+
+  return {
+    ...prev,
+    variants: updated
+  };
+});
       }}
       style={{ padding: 6 }}
     />
@@ -783,30 +782,40 @@ if (hasError) {
       placeholder="Precio"
       value={v.price}
       onChange={(e) => {
-        const updated = [...newProduct.variants];
-        updated[index].price = e.target.value;
-        setNewProduct({ ...newProduct, variants: updated });
-      }}
+  const value = e.target.value;
+
+  setNewProduct(prev => {
+    const updated = [...prev.variants];
+    updated[index].price = value;
+
+    return {
+      ...prev,
+      variants: updated
+    };
+  });
+}}
       style={{ padding: 6, width: 100 }}
     />
 
     {/* ELIMINAR FILA */}
     <button
-      onClick={() => {
-        const updated = newProduct.variants.filter((_, i) => i !== index);
-        setNewProduct({ ...newProduct, variants: updated });
-      }}
-      style={{
-        background: "#ef4444",
-        color: "#fff",
-        border: "none",
-        padding: "4px 8px",
-        borderRadius: 6,
-        cursor: "pointer"
-      }}
-    >
-      ✕
-    </button>
+  onClick={() => {
+    setNewProduct(prev => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index)
+    }));
+  }}
+  style={{
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    padding: "4px 8px",
+    borderRadius: 6,
+    cursor: "pointer"
+  }}
+>
+  ✕
+</button>
 
   </div>
 ))}
@@ -814,10 +823,10 @@ if (hasError) {
 {/* BOTÓN AGREGAR TALLA */}
 <button
   onClick={() => {
-    setNewProduct({
-      ...newProduct,
-      variants: [...newProduct.variants, { size: "", price: "" }]
-    });
+    setNewProduct(prev => ({
+  ...prev,
+  variants: [...prev.variants, { size: "", price: "" }]
+}));
   }}
   style={{
     background: "#3b82f6",
@@ -843,10 +852,10 @@ if (hasError) {
       });
     }
 
-    setNewProduct({
-      ...newProduct,
-      variants: tallas
-    });
+    setNewProduct(prev => ({
+  ...prev,
+  variants: tallas
+}));
   }}
   style={{
     background: "linear-gradient(135deg, #10b981, #059669)",
@@ -866,8 +875,11 @@ if (hasError) {
     placeholder="URL Imagen (opcional)"
     value={newProduct.image}
     onChange={(e) =>
-      setNewProduct({ ...newProduct, image: e.target.value })
-    }
+  setNewProduct(prev => ({
+    ...prev,
+    image: e.target.value
+  }))
+}
     style={{ width: "100%", marginBottom: 10, padding: 6 }}
   />
 
@@ -962,8 +974,17 @@ if (hasError) {
 />
 
 		  
-		  <input
-  defaultValue={p.category || ""}
+<input
+  value={p.category || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    setProductosFull(prev =>
+      prev.map(prod =>
+        prod.id === p.id ? { ...prod, category: value } : prod
+      )
+    );
+  }}
   placeholder="Categoría"
   onBlur={async (e) => {
     const { error } = await supabase
