@@ -11,6 +11,7 @@ import { supabase } from "./supabaseClient";
 import Category from "./Category";
 import Product from "./Product";
 import Layout from "./Layout";
+import Success from "./Success";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
