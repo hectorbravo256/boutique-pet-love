@@ -20,7 +20,10 @@ export default function Success() {
       }
 
       // 🔥 ACTUALIZAR CUPÓN
-      const code = localStorage.getItem("couponUsed");
+      const alreadyUsed = sessionStorage.getItem("couponProcessed");
+if (alreadyUsed) return;
+
+const code = localStorage.getItem("couponUsed");
 
       if (code) {
         const { data } = await supabase
@@ -39,6 +42,7 @@ export default function Success() {
         }
 
         localStorage.removeItem("couponUsed");
+        sessionStorage.setItem("couponProcessed", "true");
       }
 
       // 🔥 LIMPIAR CARRITO
