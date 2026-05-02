@@ -51,14 +51,21 @@ export default function Category() {
               boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
             }}
           >
-            <img
-              src={p.product_images?.[0]?.url || "/placeholder.png"}
-              style={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover"
-              }}
-            />
+<img
+  src={
+    p.product_images?.[0]?.url
+      ? `${p.product_images[0].url}?width=600&quality=70`
+      : "/placeholder.png"
+  }
+  loading="lazy"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
+  className="opacity-0 transition-opacity duration-500"
+  style={{
+    width: "100%",
+    height: 200,
+    objectFit: "cover"
+  }}
+/>
 
             <div style={{ padding: 10 }}>
               <strong>{p.name}</strong>
