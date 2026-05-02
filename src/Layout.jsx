@@ -12,6 +12,7 @@ export default function Layout() {
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [cart, setCart] = useState([]);
+  const [toast, setToast] = useState(null);
 	
 const formatPrice = (price) =>
   `$${price.toLocaleString("es-CL")}`;
@@ -44,6 +45,14 @@ const decreaseQty = (i) => {
 const removeItem = (i) => {
   const newCart = cart.filter((_, index) => index !== i);
   saveCart(newCart);
+};
+
+const showToast = (message) => {
+  setToast(message);
+
+  setTimeout(() => {
+    setToast(null);
+  }, 2500);
 };
 
 	useEffect(() => {
@@ -94,6 +103,16 @@ useEffect(() => {
     setCartOpen(false);
   }
 }, [location.pathname]);
+
+	useEffect(() => {
+  const handleToast = (e) => {
+    showToast(e.detail);
+  };
+
+  window.addEventListener("toast", handleToast);
+
+  return () => window.removeEventListener("toast", handleToast);
+}, []);
 
   return (
     <div className="bg-pink-50 min-h-screen">
@@ -415,6 +434,26 @@ useEffect(() => {
         
       </div>
 
+		{toast && (
+  <div
+    style={{
+      position: "fixed",
+      bottom: 30,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#111",
+      color: "white",
+      padding: "12px 20px",
+      borderRadius: 10,
+      boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+      zIndex: 9999,
+      animation: "fadeIn 0.3s ease"
+    }}
+  >
+    {toast}
+  </div>
+)}
+		
     </div>
   );
 }
