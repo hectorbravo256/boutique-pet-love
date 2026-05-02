@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 
-const COUPONS = {
-  DESCUENTO10: 0.10,
-  BIENVENIDA20: 0.20,
-  VIP30: 0.30
-};
 
 export default function Checkout({
   cart,
@@ -109,7 +104,7 @@ const applyCoupon = async () => {
 
   setDiscount(data.discount);
   setCouponError("");
-  localStorage.setItem("couponUsed", coupon);
+  localStorage.setItem("couponUsed", data.code);
 };
 
   return (
