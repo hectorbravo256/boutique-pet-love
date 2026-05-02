@@ -729,39 +729,38 @@ return children;
 /* ================= ROUTER ================= */
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+  <BrowserRouter>
+  <Routes>
 
-        {/* 🔥 RUTAS CON HEADER */}
-        <Route element={<Layout />}>
+    {/* 🟢 PÚBLICO (CON HEADER) */}
+    <Route element={<Layout />}>
+      <Route path="/" element={<AppContent />} />
+      <Route path="/checkout" element={<CheckoutWrapper />} />
+      <Route path="/categoria/:slug" element={<Category />} />
+      <Route path="/producto/:id" element={<Product />} />
+      <Route path="/success" element={<Success />} />
+    </Route>
 
-          <Route path="/" element={<AppContent />} />
-          <Route path="/checkout" element={<CheckoutWrapper />} />
-          <Route path="/categoria/:slug" element={<Category />} />
-          <Route path="/producto/:id" element={<Product />} />
-          <Route path="/success" element={<Success />} />
+    {/* 🔴 ADMIN (SIN HEADER) */}
+    <Route
+      path="/admin"
+      element={
+        <ProtectedRoute>
+          <AdminLayout />
+        </ProtectedRoute>
+      }
+    >
+      <Route index element={<Dashboard />} />
+      <Route path="stock" element={<Stock />} />
+      <Route path="productos" element={<Productos />} />
+      <Route path="crear" element={<CrearProducto />} />
+      <Route path="ventas" element={<Ventas />} />
+    </Route>
 
-          <Route
-  path="/admin"
-  element={
-    <ProtectedRoute>
-      <AdminLayout />
-    </ProtectedRoute>
-  }
->
-  <Route index element={<Dashboard />} />
-  <Route path="stock" element={<Stock />} />
-  <Route path="productos" element={<Productos />} />
-  <Route path="crear" element={<CrearProducto />} />
-  <Route path="ventas" element={<Ventas />} />
-</Route>
+    {/* 🔐 LOGIN */}
+    <Route path="/login" element={<Login />} />
 
-        </Route>
-
-        {/* 🔐 RUTAS SIN HEADER */}
-        <Route path="/login" element={<Login />} />
-
-      </Routes>
-    </BrowserRouter>
+  </Routes>
+</BrowserRouter>    
   );
 }
