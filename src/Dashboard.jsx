@@ -11,7 +11,6 @@ import {
 } from "recharts";
 
 export default function Dashboard() {
-
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -40,31 +39,30 @@ export default function Dashboard() {
       fecha,
       total: ventasPorDia[fecha]
     }));
-
   }, [orders]);
 
   return (
     <div>
-
       <h1>📊 Dashboard</h1>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
-        <div>💰 {totalVentas}</div>
+        <div>💰 ${totalVentas.toLocaleString("es-CL")}</div>
         <div>📦 {totalPedidos}</div>
         <div>⏳ {pendientes}</div>
         <div>✅ {enviados}</div>
       </div>
 
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={dataGrafico}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="fecha" />
-          <YAxis />
-          <Tooltip />
-          <Line type="monotone" dataKey="total" stroke="#ec4899" />
-        </LineChart>
-      </ResponsiveContainer>
-
+      <div style={{ marginTop: 30 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={dataGrafico}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="fecha" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="total" stroke="#ec4899" strokeWidth={3}/>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
