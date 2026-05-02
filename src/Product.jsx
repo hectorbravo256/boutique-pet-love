@@ -436,6 +436,7 @@ onMouseOut={(e) => {
               `Hola, quiero consultar por:\n${product.name}\nTalla: ${selectedVariant?.size}`
             )}`}
             target="_blank"
+            rel="noopener noreferrer"
             onMouseOver={(e) => {
   if (!e.currentTarget.disabled) {
     e.currentTarget.style.transform = "scale(1.05)";
