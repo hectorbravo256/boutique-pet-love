@@ -1,4 +1,11 @@
 import { useState } from "react";
+import { supabase } from "./supabaseClient";
+
+const COUPONS = {
+  DESCUENTO10: 0.10,
+  BIENVENIDA20: 0.20,
+  VIP30: 0.30
+};
 
 export default function Checkout({
   cart,
@@ -17,12 +24,19 @@ export default function Checkout({
 }) {
 
 const [errors, setErrors] = useState({});
+const [coupon, setCoupon] = useState("");
+const [discount, setDiscount] = useState(0);
+const [couponError, setCouponError] = useState("");
 
 const mensajeEnvio = formData.region
   ? aplicaEnvio
     ? "Envío $3.500 por PAKET"
     : "Envío por pagar (Starken / Blue Express)"
   : "Selecciona tu región";
+
+	const subtotal = total;
+const discountAmount = subtotal * discount;
+const totalConDescuento = subtotal - discountAmount + (aplicaEnvio ? shipping : 0);
 
 const validarFormulario = () => {
   const nuevosErrores = {};
@@ -58,6 +72,44 @@ if (!telefonoRegex.test(formData.telefono || "")) {
 }
   setErrors(nuevosErrores);
   return Object.keys(nuevosErrores).length === 0;
+};
+
+const applyCoupon = async () => {
+  const code = coupon.trim().toUpperCase();
+
+  if (!code) {
+    setCouponError("Ingresa un código");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("coupons")
+    .select("*")
+    .eq("code", code)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (error || !data) {
+    setDiscount(0);
+    setCouponError("❌ Código inválido");
+    return;
+  }
+
+  // 🔥 VALIDAR EXPIRACIÓN
+  if (data.expires_at && new Date(data.expires_at) < new Date()) {
+    setDiscount(0);
+    setCouponError("⏳ Cupón expirado");
+    return;
+  }
+  if (data.max_uses && data.used_count >= data.max_uses) {
+  setDiscount(0);
+  setCouponError("⚠️ Cupón agotado");
+  return;
+}
+
+  setDiscount(data.discount);
+  setCouponError("");
+  localStorage.setItem("couponUsed", coupon);
 };
 
   return (
@@ -127,9 +179,47 @@ if (!telefonoRegex.test(formData.telefono || "")) {
   {mensajeEnvio}
 </p>
 
+	{/* 🎟 CUPÓN */}
+<div className="mt-3">
+  <p className="text-sm font-semibold">Código de descuento</p>
+
+  <div className="flex gap-2 mt-1">
+    <input
+      value={coupon}
+      onChange={(e) => setCoupon(e.target.value)}
+      placeholder="Ingresa tu código"
+      className="flex-1 border rounded px-2 py-1 text-sm"
+    />
+
+    <button
+      onClick={applyCoupon}
+      className="bg-pink-500 text-white px-3 rounded text-sm"
+    >
+      Aplicar
+    </button>
+  </div>
+
+  {couponError && (
+    <p className="text-red-500 text-xs mt-1">{couponError}</p>
+  )}
+
+  {discount > 0 && (
+    <p className="text-green-600 text-xs mt-1">
+      ✅ Descuento aplicado ({discount * 100}%)
+    </p>
+  )}
+</div>
+
+	{discount > 0 && (
+  <div className="flex justify-between text-green-600 text-sm">
+    <span>Descuento</span>
+    <span>-{formatPrice(discountAmount)}</span>
+  </div>
+)}
+	
   <div className="border-t pt-2 flex justify-between font-bold text-lg">
     <span>Total</span>
-    <span>{formatPrice(totalFinal)}</span>
+    <span>{formatPrice(totalConDescuento)}</span>
   </div>
 
 </div>
