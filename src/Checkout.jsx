@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-import { useNavigate } from "react-router-dom";
 
 
 export default function Checkout({
@@ -18,8 +17,6 @@ export default function Checkout({
   removeItem,
   formatPrice
 }) {
-
-const navigate = useNavigate();
 	
 const [errors, setErrors] = useState({});
 const [coupon, setCoupon] = useState("");
@@ -126,21 +123,6 @@ const applyCoupon = async () => {
 
   cargarStock();
 }, []);
-
-useEffect(() => {
-  if (!cart || cart.length === 0) {
-
-    window.dispatchEvent(
-      new CustomEvent("toast", {
-        detail: "🛒 Tu carrito está vacío"
-      })
-    );
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
-  }
-}, [cart]);
 
 	useEffect(() => {
   const updatedCart = cart.map(item => {
