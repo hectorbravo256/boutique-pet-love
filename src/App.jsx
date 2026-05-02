@@ -223,7 +223,10 @@ if (stock === 0) {
       size,
       price: variant?.price || 0,
       qty: 1,
-      image: product.product_images?.[0]?.url || "/placeholder.png",
+      image:
+  (product.product_images?.[0]?.url
+    ? product.product_images[0].url + "?width=400&quality=70"
+    : "/placeholder.png"),
     };
 
     setCart((prev) => {
@@ -350,9 +353,10 @@ localStorage.setItem(
         </div>
 
         <img
-          src="/logo.png"
-          className="w-96 mx-auto rounded-2xl shadow-xl"
-        />
+  src="/logo.png"
+  loading="eager"
+  className="w-96 mx-auto rounded-2xl shadow-xl"
+/>
       </section>
 
       {/* CATÁLOGO */}
@@ -392,13 +396,16 @@ localStorage.setItem(
       }}
     >
       <img
-        src={cat.image}
-        style={{
-          width: "100%",
-          height: 200,
-          objectFit: "cover"
-        }}
-      />
+  src={`${cat.image}?width=600&quality=70`}
+  loading="lazy"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
+  className="opacity-0 transition-opacity duration-500"
+  style={{
+    width: "100%",
+    height: 200,
+    objectFit: "cover"
+  }}
+/>
 
       <div style={{
         padding: 10,
@@ -453,8 +460,9 @@ localStorage.setItem(
 </button>
 
 <img
-  src={zoomGallery.images[zoomGallery.index]}
-  className="max-w-[90%] max-h-[90%] rounded-xl z-50 transition-all duration-300"
+  src={`${zoomGallery.images[zoomGallery.index]}?width=1200&quality=80`}
+  className="max-w-[90%] max-h-[90%] rounded-xl z-50 transition-opacity duration-300 opacity-0"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
   onClick={(e) => e.stopPropagation()}
 />
 
