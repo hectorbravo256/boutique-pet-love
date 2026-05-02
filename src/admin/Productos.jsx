@@ -129,32 +129,68 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
   onMouseLeave={(e) => e.currentTarget.style.background = "white"}
 >
 
-      {/* ACTIVO */}
-<td>
-  <label style={{ cursor: "pointer" }}>
-    <input
-      type="checkbox"
-      checked={p.active}
-      onChange={async (e) => {
-        const nuevo = e.target.checked;
+<td style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-        setProductosFull(prev =>
-          prev.map(prod =>
-            prod.id === p.id ? { ...prod, active: nuevo } : prod
-          )
-        );
+  {/* 🔘 ACTIVO */}
+  <input
+    type="checkbox"
+    checked={p.active}
+    onChange={async (e) => {
+      const nuevo = e.target.checked;
 
-        await supabase
-          .from("products")
-          .update({ active: nuevo })
-          .eq("id", p.id);
-      }}
-      style={{
-        transform: "scale(1.2)",
-        cursor: "pointer"
-      }}
-    />
-  </label>
+      setProductosFull(prev =>
+        prev.map(prod =>
+          prod.id === p.id ? { ...prod, active: nuevo } : prod
+        )
+      );
+
+      await supabase
+        .from("products")
+        .update({ active: nuevo })
+        .eq("id", p.id);
+    }}
+  />
+
+  {/* 🗑 ELIMINAR PRODUCTO */}
+  <button
+    onClick={async () => {
+      if (!confirm("¿Eliminar producto completo?")) return;
+
+      // eliminar variantes
+      await supabase
+        .from("product_variants")
+        .delete()
+        .eq("product_id", p.id);
+
+      // eliminar imágenes
+      await supabase
+        .from("product_images")
+        .delete()
+        .eq("product_id", p.id);
+
+      // eliminar producto
+      await supabase
+        .from("products")
+        .delete()
+        .eq("id", p.id);
+
+      // actualizar UI
+      setProductosFull(prev =>
+        prev.filter(prod => prod.id !== p.id)
+      );
+    }}
+    style={{
+      background: "#ef4444",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      padding: "4px 6px",
+      cursor: "pointer"
+    }}
+  >
+    🗑
+  </button>
+
 </td>
 
       {/* PRODUCTO */}
@@ -227,40 +263,85 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
       </td>
 
       {/* ACCIONES */}
-      <td>
-        <button
-          onClick={async () => {
-            if (!confirm("¿Eliminar talla?")) return;
+      <td style={{ display: "flex", gap: 6 }}>
 
-            await supabase
-              .from("product_variants")
-              .delete()
-              .eq("id", tallaSeleccionada.id);
+  {/* ❌ ELIMINAR TALLA */}
+  <button
+    onClick={async () => {
+      if (!confirm("¿Eliminar talla?")) return;
 
-            setProductosFull(prev =>
-              prev.map(prod =>
-                prod.id === p.id
-                  ? {
-                      ...prod,
-                      product_variants: prod.product_variants.filter(
-                        v => v.id !== tallaSeleccionada.id
-                      )
-                    }
-                  : prod
-              )
-            );
-          }}
-          style={{
-            background: "#ef4444",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            padding: "4px 8px"
-          }}
-        >
-          ✕
-        </button>
-      </td>
+      await supabase
+        .from("product_variants")
+        .delete()
+        .eq("id", tallaSeleccionada.id);
+
+      setProductosFull(prev =>
+        prev.map(prod =>
+          prod.id === p.id
+            ? {
+                ...prod,
+                product_variants: prod.product_variants.filter(
+                  v => v.id !== tallaSeleccionada.id
+                )
+              }
+            : prod
+        )
+      );
+    }}
+    style={{
+      background: "#ef4444",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      padding: "4px 8px",
+      cursor: "pointer"
+    }}
+  >
+    ✕
+  </button>
+
+  {/* ➕ NUEVA TALLA */}
+  <button
+    onClick={async () => {
+      const size = prompt("Nueva talla (ej: Talla 13)");
+      const price = prompt("Precio");
+
+      if (!size || !price) return;
+
+      const { data } = await supabase
+        .from("product_variants")
+        .insert([{
+          product_id: p.id,
+          size,
+          price: parseInt(price)
+        }])
+        .select()
+        .single();
+
+      setProductosFull(prev =>
+        prev.map(prod =>
+          prod.id === p.id
+            ? {
+                ...prod,
+                product_variants: [...prod.product_variants, data]
+              }
+            : prod
+        )
+      );
+    }}
+    style={{
+      background: "#22c55e",
+      color: "#fff",
+      border: "none",
+      borderRadius: 6,
+      padding: "4px 8px",
+      cursor: "pointer"
+    }}
+  >
+    ➕
+  </button>
+
+</td>
 
     </tr>
   );
