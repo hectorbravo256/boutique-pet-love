@@ -89,6 +89,12 @@ useEffect(() => {
   }
 }, [location]);
 
+useEffect(() => {
+  if (location.pathname === "/checkout") {
+    setCartOpen(false);
+  }
+}, [location.pathname]);
+
   return (
     <div className="bg-pink-50 min-h-screen">
 
@@ -325,7 +331,10 @@ useEffect(() => {
 
     {/* 💳 BOTÓN MERCADOPAGO */}
     <button
-  onClick={() => navigate("/checkout")}
+  onClick={() => {
+  setCartOpen(false);
+  window.location.href = "/checkout";
+}}
   className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
 >
   Continuar compra
