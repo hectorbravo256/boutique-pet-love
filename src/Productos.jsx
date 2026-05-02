@@ -7,7 +7,8 @@ export default function Productos() {
   const cargar = async () => {
     const { data } = await supabase
       .from("products")
-      .select(`*, product_variants(*), product_images(*)`);
+      .select(`*, product_variants(*), product_images(*)`)
+      .order("name");
 
     setProductosFull(data || []);
   };
@@ -21,10 +22,10 @@ export default function Productos() {
       <h1>🛒 Productos</h1>
 
       {productosFull.map(p => (
-        <div key={p.id}>
+        <div key={p.id} style={{ marginBottom: 20 }}>
           <input
             value={p.name}
-            onChange={async (e) => {
+            onChange={(e) => {
               const value = e.target.value;
 
               setProductosFull(prev =>
@@ -32,8 +33,9 @@ export default function Productos() {
                   prod.id === p.id ? { ...prod, name: value } : prod
                 )
               );
-
-              await supabase.from("products").update({ name: value }).eq("id", p.id);
+            }}
+            onBlur={async (e) => {
+              await supabase.from("products").update({ name: e.target.value }).eq("id", p.id);
             }}
           />
         </div>
