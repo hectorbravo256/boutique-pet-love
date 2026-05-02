@@ -2,27 +2,80 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 
 export default function Productos() {
-  const [productosFull, setProductosFull] = useState([]);
 
-  const cargar = async () => {
+  const [productosFull, setProductosFull] = useState([]);
+  const [searchProduct, setSearchProduct] = useState("");
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  const recargarProductos = async () => {
     const { data } = await supabase
       .from("products")
-      .select(`*, product_variants(*), product_images(*)`)
-      .order("name");
+      .select(`
+        *,
+        product_variants (*),
+        product_images (*)
+      `)
+      .order("name", { ascending: true });
 
     setProductosFull(data || []);
   };
 
   useEffect(() => {
-    cargar();
+    recargarProductos();
   }, []);
 
   return (
-    <div>
-      <h1>🛒 Productos</h1>
+    <div style={{ padding: 20 }}>
 
-      {productosFull.map(p => (
-        <div key={p.id} style={{ marginBottom: 20 }}>
+      <h1>🛒 Editor de Productos</h1>
+
+      {/* 🔍 BUSCADOR */}
+      <input
+        placeholder="🔍 Buscar producto..."
+        value={searchProduct}
+        onChange={(e) => setSearchProduct(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 10,
+          marginBottom: 20,
+          borderRadius: 8,
+          border: "1px solid #ddd"
+        }}
+      />
+
+      {/* 📦 LISTADO */}
+      {productosFull
+        ?.filter(p =>
+          p.name.toLowerCase().includes(searchProduct.toLowerCase())
+        )
+        .map((p) => (
+
+        <div key={p.id} style={{
+          border: "1px solid #eee",
+          borderRadius: 12,
+          padding: 15,
+          marginBottom: 20,
+          background: "#fafafa"
+        }}>
+
+          {/* 🖼 IMAGEN */}
+          <img
+            src={p.product_images?.[0]?.url || "/placeholder.png"}
+            style={{
+              width: 80,
+              height: 80,
+              objectFit: "cover",
+              borderRadius: 10,
+              marginBottom: 10
+            }}
+          />
+
+          {/* 📝 NOMBRE */}
           <input
             value={p.name}
             onChange={(e) => {
@@ -35,11 +88,246 @@ export default function Productos() {
               );
             }}
             onBlur={async (e) => {
-              await supabase.from("products").update({ name: e.target.value }).eq("id", p.id);
+              await supabase
+                .from("products")
+                .update({ name: e.target.value })
+                .eq("id", p.id);
+
+              showToast("✅ Nombre actualizado");
+            }}
+            style={{
+              width: "100%",
+              marginBottom: 8,
+              padding: 6,
+              fontWeight: "bold"
             }}
           />
+
+          {/* 🏷 CATEGORÍA */}
+          <input
+            value={p.category || ""}
+            placeholder="Categoría"
+            onChange={(e) => {
+              const value = e.target.value;
+
+              setProductosFull(prev =>
+                prev.map(prod =>
+                  prod.id === p.id ? { ...prod, category: value } : prod
+                )
+              );
+            }}
+            onBlur={async (e) => {
+              await supabase
+                .from("products")
+                .update({ category: e.target.value })
+                .eq("id", p.id);
+
+              showToast("🏷 Categoría actualizada");
+            }}
+            style={{
+              width: "100%",
+              marginBottom: 10,
+              padding: 6
+            }}
+          />
+
+          {/* 🔘 ACTIVO */}
+          <label style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+            <input
+              type="checkbox"
+              checked={p.active}
+              onChange={async (e) => {
+                const nuevoEstado = e.target.checked;
+
+                setProductosFull(prev =>
+                  prev.map(prod =>
+                    prod.id === p.id
+                      ? { ...prod, active: nuevoEstado }
+                      : prod
+                  )
+                );
+
+                await supabase
+                  .from("products")
+                  .update({ active: nuevoEstado })
+                  .eq("id", p.id);
+              }}
+            />
+            Activo
+          </label>
+
+          {/* 🗑 ELIMINAR */}
+          <button
+            onClick={async () => {
+              if (!confirm("¿Eliminar producto?")) return;
+
+              setProductosFull(prev =>
+                prev.filter(prod => prod.id !== p.id)
+              );
+
+              await supabase.from("product_variants").delete().eq("product_id", p.id);
+              await supabase.from("product_images").delete().eq("product_id", p.id);
+              await supabase.from("products").delete().eq("id", p.id);
+
+              showToast("🗑 Producto eliminado");
+            }}
+            style={{
+              background: "#ef4444",
+              color: "#fff",
+              padding: "6px 10px",
+              borderRadius: 6,
+              border: "none",
+              marginBottom: 10,
+              cursor: "pointer"
+            }}
+          >
+            Eliminar
+          </button>
+
+          {/* 📏 VARIANTES */}
+          {p.product_variants.map((v) => (
+            <div key={v.id} style={{
+              display: "flex",
+              gap: 10,
+              marginBottom: 6
+            }}>
+
+              <span style={{ minWidth: 80 }}>{v.size}</span>
+
+              <input
+                type="number"
+                defaultValue={v.price}
+                onChange={async (e) => {
+                  const nuevo = parseInt(e.target.value);
+
+                  setProductosFull(prev =>
+                    prev.map(prod =>
+                      prod.id === p.id
+                        ? {
+                            ...prod,
+                            product_variants: prod.product_variants.map(varr =>
+                              varr.id === v.id
+                                ? { ...varr, price: nuevo }
+                                : varr
+                            )
+                          }
+                        : prod
+                    )
+                  );
+
+                  await supabase
+                    .from("product_variants")
+                    .update({ price: nuevo })
+                    .eq("id", v.id);
+                }}
+              />
+
+              <button
+                onClick={async () => {
+                  if (!confirm("¿Eliminar talla?")) return;
+
+                  setProductosFull(prev =>
+                    prev.map(prod =>
+                      prod.id === p.id
+                        ? {
+                            ...prod,
+                            product_variants: prod.product_variants.filter(vv => vv.id !== v.id)
+                          }
+                        : prod
+                    )
+                  );
+
+                  await supabase
+                    .from("product_variants")
+                    .delete()
+                    .eq("id", v.id);
+
+                  showToast("🗑 Talla eliminada");
+                }}
+                style={{
+                  background: "#ef4444",
+                  color: "#fff",
+                  border: "none",
+                  padding: "4px 8px",
+                  borderRadius: 6
+                }}
+              >
+                ✕
+              </button>
+
+            </div>
+          ))}
+
+          {/* ➕ AGREGAR TALLA */}
+          <div style={{ marginTop: 10 }}>
+            <input
+              placeholder="Nueva talla"
+              id={`size-${p.id}`}
+              style={{ marginRight: 5 }}
+            />
+            <input
+              type="number"
+              placeholder="Precio"
+              id={`price-${p.id}`}
+              style={{ marginRight: 5, width: 90 }}
+            />
+
+            <button
+              onClick={async () => {
+                const size = document.getElementById(`size-${p.id}`).value;
+                const price = document.getElementById(`price-${p.id}`).value;
+
+                if (!size || !price) {
+                  showToast("⚠️ Completa datos");
+                  return;
+                }
+
+                const { data } = await supabase
+                  .from("product_variants")
+                  .insert([{
+                    product_id: p.id,
+                    size,
+                    price: parseInt(price)
+                  }])
+                  .select()
+                  .single();
+
+                setProductosFull(prev =>
+                  prev.map(prod =>
+                    prod.id === p.id
+                      ? {
+                          ...prod,
+                          product_variants: [...prod.product_variants, data]
+                        }
+                      : prod
+                  )
+                );
+
+                showToast("✅ Talla agregada");
+              }}
+            >
+              ➕
+            </button>
+          </div>
+
         </div>
       ))}
+
+      {/* 🔔 TOAST */}
+      {toast && (
+        <div style={{
+          position: "fixed",
+          bottom: 20,
+          right: 20,
+          background: "#111",
+          color: "#fff",
+          padding: "10px 16px",
+          borderRadius: 10
+        }}>
+          {toast}
+        </div>
+      )}
+
     </div>
   );
 }
