@@ -24,6 +24,7 @@ const total = cart.reduce(
 const saveCart = (newCart) => {
   setCart(newCart);
   localStorage.setItem("cart", JSON.stringify(newCart));
+  window.dispatchEvent(new Event("storage"));
 };
 
 const increaseQty = (i) => {
@@ -44,23 +45,6 @@ const removeItem = (i) => {
   const newCart = cart.filter((_, index) => index !== i);
   saveCart(newCart);
 };
-	
-
-useEffect(() => {
-  const updateCart = () => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
-
-    const total = storedCart.reduce((acc, item) => acc + (item.qty || 1), 0);
-    setCartCount(total);
-  };
-
-  updateCart();
-
-  window.addEventListener("storage", updateCart);
-
-  return () => window.removeEventListener("storage", updateCart);
-}, []);
 
 	useEffect(() => {
   const updateCart = () => {
@@ -81,9 +65,20 @@ useEffect(() => {
   return () => window.removeEventListener("storage", updateCart);
 }, []);
 
-  useEffect(() => {
-  document.body.style.overflow = menuOpen ? "hidden" : "auto";
-}, [menuOpen]);
+	useEffect(() => {
+  const openCart = () => {
+    setCartOpen(true);
+  };
+
+  window.addEventListener("openCart", openCart);
+
+  return () => window.removeEventListener("openCart", openCart);
+}, []);
+
+useEffect(() => {
+  document.body.style.overflow =
+    menuOpen || cartOpen ? "hidden" : "auto";
+}, [menuOpen, cartOpen]);
 
   useEffect(() => {
   if (location.state?.scrollTo) {
@@ -242,6 +237,7 @@ useEffect(() => {
          <a
   href={WHATSAPP}
   target="_blank"
+  rel="noopener noreferrer"
   className="fixed bottom-5 left-5 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg z-50 transition transform hover:scale-110"
 >
   <MessageCircle size={24} />
@@ -348,6 +344,7 @@ useEffect(() => {
       `\nTotal: ${formatPrice(total)}`
   )}`}
   target="_blank"
+  rel="noopener noreferrer"
   className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
 >
   Contactar por WhatsApp
