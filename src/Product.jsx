@@ -94,6 +94,7 @@ export default function Product() {
 
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("openCart"));
   };
 
   const handleTouchStart = (e) => {
