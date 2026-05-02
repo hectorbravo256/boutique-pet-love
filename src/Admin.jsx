@@ -24,6 +24,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [productosFull, setProductosFull] = useState([]);
+  const [dirtyProducts, setDirtyProducts] = useState({});
 	const recargarProductos = async () => {
   const { data } = await supabase
     .from("products")
@@ -270,6 +271,14 @@ setProductosFull(prev =>
 );
 
 showToast("✅ Producto creado");
+
+		// 🔥 RESET FORMULARIO COMPLETO
+setNewProduct({
+  name: "",
+  category: "",
+  image: "",
+  variants: [{ size: "Talla 1", price: "" }]
+});
 };
 
 const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
@@ -895,6 +904,35 @@ if (hasError) {
     🛒 Editor de Productos
   </h2>
 
+	<button
+  onClick={async () => {
+    for (const p of productosFull) {
+      if (dirtyProducts[p.id]) {
+        await supabase
+          .from("products")
+          .update({
+            name: p.name,
+            category: p.category
+          })
+          .eq("id", p.id);
+      }
+    }
+
+    setDirtyProducts({});
+    showToast("💾 Cambios guardados");
+  }}
+  style={{
+    background: "#22c55e",
+    color: "#fff",
+    padding: "10px 16px",
+    borderRadius: 10,
+    marginBottom: 20,
+    fontWeight: "bold"
+  }}
+>
+  💾 Guardar cambios
+</button>
+	
   <div style={{
     display: "grid",
     gap: 15
@@ -912,36 +950,55 @@ if (hasError) {
         background: "#fafafa"
       }}>
 
-		  <img
-  src={p.product_images?.[0]?.url || "/placeholder.png"}
+<img
+  src={
+    p.product_images?.[0]?.url
+      ? `${p.product_images[0].url}?width=300&quality=70`
+      : "/placeholder.png"
+  }
+  loading="lazy"
+  onLoad={(e) => e.target.classList.remove("opacity-0")}
+  className="opacity-0 transition-opacity duration-500"
   style={{
     width: 80,
     height: 80,
     objectFit: "cover",
-    borderRadius: 10,
-    marginBottom: 10
+    borderRadius: 10
   }}
 />
         {/* NOMBRE */}
-        <input
-  defaultValue={p.name}
-  onBlur={async (e) => {
-    const { error } = await supabase
-      .from("products")
-      .update({ name: e.target.value })
-      .eq("id", p.id);
+<input
+  value={p.name}
+  onChange={(e) => {
+    const value = e.target.value;
 
-    if (!error) showToast("✏️ Nombre actualizado");
+    setProductosFull(prev =>
+      prev.map(prod =>
+        prod.id === p.id ? { ...prod, name: value } : prod
+      )
+    );
+
+    setDirtyProducts(prev => ({
+      ...prev,
+      [p.id]: true
+    }));
   }}
   style={{
-    fontSize: 16,
     fontWeight: "bold",
-    padding: 6,
+    fontSize: 16,
     width: "100%",
-    marginBottom: 8
+    border: "1px solid #ddd",
+    borderRadius: 6,
+    padding: 5
   }}
 />
 
+{dirtyProducts[p.id] && (
+  <div style={{ color: "#f59e0b", fontSize: 12 }}>
+    ✏️ Cambios sin guardar
+  </div>
+)}
+		  
 		  <input
   defaultValue={p.category || ""}
   placeholder="Categoría"
