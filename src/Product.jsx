@@ -13,7 +13,10 @@ export default function Product() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(null);
-  const [zoom, setZoom] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchEndX, setTouchEndX] = useState(0);
 
   const stockMap = Object.fromEntries(
     stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
@@ -93,6 +96,46 @@ export default function Product() {
     window.dispatchEvent(new Event("storage"));
   };
 
+  const handleTouchStart = (e) => {
+  setTouchStartX(e.targetTouches[0].clientX);
+};
+
+const handleTouchMove = (e) => {
+  setTouchEndX(e.targetTouches[0].clientX);
+};
+
+const handleTouchEnd = () => {
+  if (!touchStartX || !touchEndX) return;
+
+const distance = touchStartX - touchEndX;
+
+  // 🔥 sensibilidad (puedes ajustar)
+  if (distance > 50) {
+    // swipe izquierda → siguiente
+    nextImage();
+  }
+
+  if (distance < -50) {
+    // swipe derecha → anterior
+    prevImage();
+  }
+};
+
+  const nextImage = () => {
+  const next = (currentIndex + 1) % product.product_images.length;
+  setCurrentIndex(next);
+  setActiveImage(product.product_images[next].url);
+};
+
+const prevImage = () => {
+  const prev =
+    (currentIndex - 1 + product.product_images.length) %
+    product.product_images.length;
+
+  setCurrentIndex(prev);
+  setActiveImage(product.product_images[prev].url);
+};
+
   /* ================= CARGA DATOS ================= */
   useEffect(() => {
     const cargar = async () => {
@@ -147,6 +190,7 @@ export default function Product() {
   if (!product) return <p>Cargando...</p>;
 
 return (
+  <>
   <div style={{
     maxWidth: 1100,
     margin: "0 auto",
@@ -165,8 +209,6 @@ return (
 
   {/* IMAGEN PRINCIPAL */}
   <div
-    onMouseEnter={() => setZoom(true)}
-    onMouseLeave={() => setZoom(false)}
     style={{
       overflow: "hidden",
       borderRadius: 16,
@@ -174,14 +216,20 @@ return (
     }}
   >
     <img
-      src={activeImage}
-      style={{
-        width: "100%",
-        borderRadius: 16,
-        transform: zoom ? "scale(1.2)" : "scale(1)",
-        transition: "transform 0.4s ease"
-      }}
-    />
+  src={activeImage}
+  onClick={() => {
+    const index = product.product_images.findIndex(
+      img => img.url === activeImage
+    );
+    setCurrentIndex(index);
+    setShowModal(true);
+  }}
+  style={{
+    width: "100%",
+    borderRadius: 16,
+    cursor: "zoom-in"
+  }}
+/>
   </div>
 
   {/* MINIATURAS */}
@@ -194,7 +242,10 @@ return (
       <img
         key={i}
         src={img.url}
-        onClick={() => setActiveImage(img.url)}
+        onClick={() => {
+  setActiveImage(img.url);
+  setCurrentIndex(i);
+}}
         style={{
           width: 70,
           height: 70,
@@ -425,6 +476,91 @@ onMouseOut={(e) => {
     </style>
 
   </div>
+
+    {showModal && (
+<div
+  onClick={(e) => {
+  if (e.target.tagName === "IMG") {
+    nextImage();
+  }
+}}
+  onTouchStart={handleTouchStart}
+  onTouchMove={handleTouchMove}
+  onTouchEnd={handleTouchEnd}
+  style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.9)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999,
+    cursor: "pointer"
+  }}
+>
+
+    {/* BOTÓN CERRAR */}
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowModal(false);
+      }}
+      style={{
+        position: "absolute",
+        top: 20,
+        right: 30,
+        color: "white",
+        fontSize: 30,
+        cursor: "pointer"
+      }}
+    >
+      ✕
+    </div>
+
+    {/* IMAGEN */}
+    <img
+      src={product.product_images[currentIndex].url}
+      style={{
+        maxWidth: "90%",
+        maxHeight: "90%",
+        borderRadius: 12
+      }}
+    />
+  <div
+  style={{
+    position: "absolute",
+    bottom: 30,
+    display: "flex",
+    gap: 8
+  }}
+>
+  {product.product_images.map((_, i) => (
+    <div
+      key={i}
+      onClick={(e) => {
+        e.stopPropagation();
+        setCurrentIndex(i);
+        setActiveImage(product.product_images[i].url);
+      }}
+      style={{
+        width: i === currentIndex ? 14 : 10,
+        height: i === currentIndex ? 14 : 10,
+        transform: i === currentIndex ? "scale(1.2)" : "scale(1)",
+        borderRadius: "50%",
+        background: i === currentIndex ? "#fff" : "#777",
+        cursor: "pointer",
+        transition: "0.2s"
+      }}
+    />
+  ))}
+</div>
+
+  </div>
+)}
+  </>
 );
 }
 
