@@ -258,37 +258,9 @@ if (stock === 0) {
   const totalFinal = total + shipping;
 
   const handleMercadoPago = async () => {
+	  
   	// ✅ VALIDACIÓN FORMULARIO
 
-if (!formData.nombre) {
-  alert("Ingresa tu nombre");
-  return;
-}
-
-if (!formData.rut) {
-  alert("Ingresa tu RUT");
-  return;
-}
-
-if (!formData.direccion) {
-  alert("Ingresa tu Dirección");
-  return;
-}
-
-if (!formData.comuna) {
-  alert("Ingresa tu Comuna");
-  return;
-}
-
-if (!formData.region) {
-  alert("Selecciona una región");
-  return;
-}
-
-  if (cart.length === 0) {
-    alert("El carrito está vacío");
-    return;
-  }
 
   try {
   const res = await fetch("/.netlify/functions/create-preference", {
