@@ -499,7 +499,10 @@ localStorage.setItem(
 
 /* ================= CHECKOUT WRAPPER ================= */
 function CheckoutWrapper() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+  const stored = localStorage.getItem("cart");
+  return stored ? JSON.parse(stored) : [];
+});
 
   const [formData, setFormData] = useState({
   nombre: "",
@@ -644,12 +647,6 @@ const removeItem = (index) => {
 const formatPrice = (p) =>
   p ? "$" + p.toLocaleString("es-CL") : "";
 
-
-
-  useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
 
 	useEffect(() => {
   const updateCart = () => {
