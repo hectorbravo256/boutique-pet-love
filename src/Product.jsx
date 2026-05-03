@@ -377,9 +377,6 @@ const precioBase = tieneDescuento
 const precioFinal = precioBase * cantidad;
 
 
-const precioFinal = tieneDescuento
-  ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
-  : precioOriginal;
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
