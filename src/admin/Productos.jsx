@@ -215,59 +215,83 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
     >
 
       {/* ACTIVO + ELIMINAR */}
-      <td style={{ padding: "10px 12px", verticalAlign: "middle" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+<td style={{ padding: "10px 12px", verticalAlign: "middle" }}>
+  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
 
-          <input
-            type="checkbox"
-            checked={p.active}
-            onChange={async (e) => {
-              const nuevo = e.target.checked;
+    {/* 🔹 FILA 1: CONTROLES PRINCIPALES */}
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
-              setProductosFull(prev =>
-                prev.map(prod =>
-                  prod.id === p.id ? { ...prod, active: nuevo } : prod
-                )
-              );
+      {/* ✅ ACTIVO */}
+      <input
+        type="checkbox"
+        checked={p.active}
+        onChange={async (e) => {
+          const nuevo = e.target.checked;
 
-              await supabase
-                .from("products")
-                .update({ active: nuevo })
-                .eq("id", p.id);
-            }}
-          />
+          setProductosFull(prev =>
+            prev.map(prod =>
+              prod.id === p.id ? { ...prod, active: nuevo } : prod
+            )
+          );
 
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          await supabase
+            .from("products")
+            .update({ active: nuevo })
+            .eq("id", p.id);
+        }}
+      />
 
-  {/* 🔥 ACTIVAR DESCUENTO */}
-  <input
-    type="checkbox"
-    checked={p.discount_active || false}
-    onChange={async (e) => {
-      const activo = e.target.checked;
+      {/* 🔥 ACTIVAR DESCUENTO */}
+      <label style={{
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 12,
+  fontWeight: "bold"
+}}>
+      <input
+        type="checkbox"
+        checked={p.discount_active || false}
+        onChange={async (e) => {
+          const activo = e.target.checked;
 
-      setProductosFull(prev =>
-        prev.map(prod =>
-          prod.id === p.id
-            ? { ...prod, discount_active: activo }
-            : prod
-        )
-      );
+setProductosFull(prev =>
+  prev.map(prod =>
+    prod.id === p.id
+      ? {
+          ...prod,
+          discount_active: activo,
+          discount_percent: activo ? prod.discount_percent : 0,
+          discount_start: activo ? prod.discount_start : null,
+          discount_end: activo ? prod.discount_end : null
+        }
+      : prod
+  )
+);
 
-      await supabase
-        .from("products")
-        .update({ discount_active: activo })
-        .eq("id", p.id);
-    }}
-  />
+await supabase
+  .from("products")
+  .update({
+       discount_active: activo,
+    discount_percent: activo ? (p.discount_percent || 0) : 0,
+    discount_start: activo ? p.discount_start : null,
+    discount_end: activo ? p.discount_end : null
+  })
+  .eq("id", p.id);
+        }}
+      />
+        Descuento
+</label>
 
-  {/* % DESCUENTO */}
-  {p.discount_active && (
+      {/* 💰 % DESCUENTO */}
+{p.discount_active && (
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+
     <input
       type="number"
       placeholder="%"
-      value={p.discount_percent || ""}
-      onChange={async (e) => {
+      value={p.discount_percent ?? ""}
+      onBlur={async (e) => {
         const val = parseInt(e.target.value) || 0;
 
         setProductosFull(prev =>
@@ -290,36 +314,137 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
         border: "1px solid #ddd"
       }}
     />
-  )}
 
-</div>
+    {/* 🔥 PORCENTAJE VISUAL */}
+    <span style={{
+      fontSize: 12,
+      fontWeight: "bold",
+      color: "#ec4899"
+    }}>
+      {p.discount_percent ?? 0}%
+    </span>
 
-          <button
-            onClick={async () => {
-              if (!confirm("¿Eliminar producto completo?")) return;
+  </div>
+)}
 
-              await supabase.from("product_variants").delete().eq("product_id", p.id);
-              await supabase.from("product_images").delete().eq("product_id", p.id);
-              await supabase.from("products").delete().eq("id", p.id);
+      
 
-              setProductosFull(prev =>
-                prev.filter(prod => prod.id !== p.id)
-              );
-            }}
-            style={{
-              background: "#ef4444",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 6px",
-              cursor: "pointer"
-            }}
-          >
-            🗑
-          </button>
+      {/* 🗑 ELIMINAR PRODUCTO */}
+      <button
+        onClick={async () => {
+          if (!confirm("¿Eliminar producto completo?")) return;
 
-        </div>
-      </td>
+          await supabase.from("product_variants").delete().eq("product_id", p.id);
+          await supabase.from("product_images").delete().eq("product_id", p.id);
+          await supabase.from("products").delete().eq("id", p.id);
+
+          setProductosFull(prev =>
+            prev.filter(prod => prod.id !== p.id)
+          );
+        }}
+        style={{
+          background: "#ef4444",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "4px 6px",
+          cursor: "pointer"
+        }}
+      >
+        🗑
+      </button>
+
+    </div>
+
+    {/* 🔹 FILA 2: FECHAS (SOLO SI HAY DESCUENTO Y %) */}
+{p.discount_active && p.discount_percent > 0 && (
+  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+
+    <small style={{ fontSize: 10, color: "#666" }}>
+      Inicio / Fin
+    </small>
+
+    <div style={{ display: "flex", gap: 6 }}>
+
+      {/* ⏱ FECHA INICIO */}
+      <input
+        type="datetime-local"
+        value={p.discount_start ? p.discount_start.slice(0, 16) : ""}
+        onChange={async (e) => {
+          const val = e.target.value;
+
+          setProductosFull(prev =>
+            prev.map(prod =>
+              prod.id === p.id
+                ? { ...prod, discount_start: val }
+                : prod
+            )
+          );
+
+          await supabase
+            .from("products")
+            .update({ discount_start: val })
+            .eq("id", p.id);
+        }}
+        style={{
+          padding: 4,
+          borderRadius: 6,
+          border: "1px solid #ddd"
+        }}
+      />
+
+      {/* ⏱ FECHA FIN */}
+      <input
+        type="datetime-local"
+        value={p.discount_end ? p.discount_end.slice(0, 16) : ""}
+        onChange={async (e) => {
+          const val = e.target.value;
+
+          setProductosFull(prev =>
+            prev.map(prod =>
+              prod.id === p.id
+                ? { ...prod, discount_end: val }
+                : prod
+            )
+          );
+
+          await supabase
+            .from("products")
+            .update({ discount_end: val })
+            .eq("id", p.id);
+        }}
+        style={{
+          padding: 4,
+          borderRadius: 6,
+          border: "1px solid #ddd"
+        }}
+      />
+
+    </div>
+
+    {/* 🔥 ESTADO DESCUENTO */}
+    <small style={{
+      color: "#ec4899",
+      fontWeight: "bold"
+    }}>
+      {(() => {
+        const ahora = new Date();
+        const inicio = p.discount_start ? new Date(p.discount_start) : null;
+        const fin = p.discount_end ? new Date(p.discount_end) : null;
+
+        const activo =
+          (!inicio || ahora >= inicio) &&
+          (!fin || ahora <= fin);
+
+        return activo ? "🔥 Activo ahora" : "⏳ Programado";
+      })()}
+    </small>
+
+  </div>
+)}
+
+  </div>
+</td>
 
       {/* PRODUCTO */}
       <td style={{ padding: "10px 12px" }}>
@@ -361,7 +486,7 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
         <input
           type="number"
           value={tallaSeleccionada?.price || ""}
-          onChange={async (e) => {
+          onBlur={async (e) => {
             const nuevo = parseInt(e.target.value);
 
             setProductosFull(prev =>
