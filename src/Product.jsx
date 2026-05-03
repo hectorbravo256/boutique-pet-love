@@ -366,8 +366,6 @@ return (
         {/* PRECIO */}
 {selectedVariant ? (() => {
 
-  const precioOriginal = selectedVariant.price;
-
   const cantidad = qty || 1;
 
 const precioBase = tieneDescuento
@@ -375,7 +373,9 @@ const precioBase = tieneDescuento
   : selectedVariant.price;
 
 const precioFinal = precioBase * cantidad;
-
+const selectedVariant = product.product_variants?.find(
+  v => v.id == selected
+);
 
 
   return (
@@ -387,7 +387,7 @@ const precioFinal = precioBase * cantidad;
           color: "#999",
           fontSize: 18
         }}>
-          ${precioOriginal.toLocaleString("es-CL")}
+          ${(selectedVariant.price * cantidad).toLocaleString("es-CL")}
         </span>
       )}
 
@@ -396,11 +396,7 @@ const precioFinal = precioBase * cantidad;
         fontWeight: "bold",
         color: tieneDescuento ? "#ec4899" : "#000"
       }}>
-        {tieneDescuento && (
-  <span style={{ textDecoration: "line-through" }}>
-    ${(selectedVariant.price * cantidad).toLocaleString("es-CL")}
-  </span>
-)}
+     ${precioFinal.toLocaleString("es-CL")}
       </span>
 
       {tieneDescuento && (
