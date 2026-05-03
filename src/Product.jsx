@@ -206,11 +206,11 @@ const prevImage = () => {
 const ahora = new Date();
 
 const inicio = product?.discount_start
-  ? new Date(product.discount_start + "Z")
+  ? new Date(product.discount_start)
   : null;
 
 const fin = product?.discount_end
-  ? new Date(product.discount_end + "Z")
+  ? new Date(product.discount_end)
   : null;
 
 const dentroDeFecha =
