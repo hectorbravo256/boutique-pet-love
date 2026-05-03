@@ -8,11 +8,13 @@ export default function Layout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [stockDB, setStockDB] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
+  
 	
 const formatPrice = (price) =>
   `$${price.toLocaleString("es-CL")}`;
@@ -20,6 +22,10 @@ const formatPrice = (price) =>
 const total = cart.reduce(
   (acc, item) => acc + item.price * (item.qty || 1),
   0
+);
+
+	const stockMap = Object.fromEntries(
+  stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
 );
 
 const saveCart = (newCart) => {
@@ -112,6 +118,18 @@ useEffect(() => {
   window.addEventListener("toast", handleToast);
 
   return () => window.removeEventListener("toast", handleToast);
+}, []);
+
+	useEffect(() => {
+  const fetchStock = async () => {
+    const { data } = await supabase
+      .from("product_stock")
+      .select("*");
+
+    setStockDB(data || []);
+  };
+
+  fetchStock();
 }, []);
 
   return (
@@ -311,7 +329,24 @@ useEffect(() => {
         <span>{item.qty || 1}</span>
 
         <button
-          onClick={() => increaseQty(i)}
+  onClick={() => {
+    const stock = stockMap[`${item.id}-${item.size}`] || 0;
+
+    if ((item.qty || 1) >= stock) {
+      window.dispatchEvent(
+        new CustomEvent("toast", {
+          detail: "⚠️ Stock máximo alcanzado"
+        })
+      );
+      return;
+    }
+
+    increaseQty(i);
+  }}
+			disabled={
+    (stockMap[`${item.id}-${item.size}`] || 0) === 0 ||
+    (item.qty || 1) >= (stockMap[`${item.id}-${item.size}`] || 0)
+  }
           className="bg-gray-200 px-2 rounded"
         >
           +
