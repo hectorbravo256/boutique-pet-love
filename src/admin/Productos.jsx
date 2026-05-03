@@ -104,7 +104,17 @@ export default function Productos() {
 }}>
   <thead style={{ background: "#f3f4f6" }}>
     <tr>
-      <th style={{ padding: 12 }}></th>
+      <th style={{ padding: 12 }}>
+  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+    <span style={{ fontSize: 12, fontWeight: "bold" }}>
+      Activar Descuento
+    </span>
+
+    <span style={{ fontSize: 12, fontWeight: "bold" }}>
+      Borrar
+    </span>
+  </div>
+</th>
 
 <th
   style={{ padding: 12, cursor: "pointer" }}
@@ -280,7 +290,6 @@ await supabase
   .eq("id", p.id);
         }}
       />
-        Descuento
 </label>
 
       {/* 💰 % DESCUENTO */}
@@ -291,22 +300,25 @@ await supabase
       type="number"
       placeholder="%"
       value={p.discount_percent ?? ""}
-      onBlur={async (e) => {
-        const val = parseInt(e.target.value) || 0;
+      onChange={(e) => {
+  const val = parseInt(e.target.value) || 0;
 
-        setProductosFull(prev =>
-          prev.map(prod =>
-            prod.id === p.id
-              ? { ...prod, discount_percent: val }
-              : prod
-          )
-        );
+  setProductosFull(prev =>
+    prev.map(prod =>
+      prod.id === p.id
+        ? { ...prod, discount_percent: val }
+        : prod
+    )
+  );
+}}
+onBlur={async (e) => {
+  const val = parseInt(e.target.value) || 0;
 
-        await supabase
-          .from("products")
-          .update({ discount_percent: val })
-          .eq("id", p.id);
-      }}
+  await supabase
+    .from("products")
+    .update({ discount_percent: val })
+    .eq("id", p.id);
+}}
       style={{
         width: 60,
         padding: 4,
@@ -343,9 +355,9 @@ await supabase
           );
         }}
         style={{
-          background: "#ef4444",
-          color: "#fff",
-          border: "none",
+          background: "#fff",
+          color: "#ef4444",
+          border: "1px solid #ef4444",
           borderRadius: 6,
           padding: "4px 6px",
           cursor: "pointer"
@@ -486,7 +498,7 @@ await supabase
         <input
           type="number"
           value={tallaSeleccionada?.price || ""}
-          onBlur={async (e) => {
+          onChange={async (e) => {
             const nuevo = parseInt(e.target.value);
 
             setProductosFull(prev =>
