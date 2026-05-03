@@ -202,6 +202,26 @@ const prevImage = () => {
 
   if (!product) return <p>Cargando...</p>;
 
+  // 🔥 LÓGICA GLOBAL DESCUENTO
+const ahora = new Date();
+
+const inicio = product?.discount_start
+  ? new Date(product.discount_start + "Z")
+  : null;
+
+const fin = product?.discount_end
+  ? new Date(product.discount_end + "Z")
+  : null;
+
+const dentroDeFecha =
+  (!inicio || ahora >= inicio) &&
+  (!fin || ahora <= fin);
+
+const tieneDescuento =
+  product?.discount_active &&
+  product?.discount_percent > 0 &&
+  dentroDeFecha;
+
 return (
   <>
   <div style={{
@@ -321,26 +341,6 @@ return (
 
   const precioOriginal = selectedVariant.price;
 
-const ahora = new Date();
-
-// ⚠️ importante: convertir bien fechas
-const inicio = product.discount_start
-  ? new Date(product.discount_start + "Z")
-  : null;
-
-const fin = product.discount_end
-  ? new Date(product.discount_end + "Z")
-  : null;
-
-// 🔥 lógica real
-const dentroDeFecha =
-  (!inicio || ahora >= inicio) &&
-  (!fin || ahora <= fin);
-
-const tieneDescuento =
-  product.discount_active &&
-  product.discount_percent > 0 &&
-  dentroDeFecha;
 
 const precioFinal = tieneDescuento
   ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
