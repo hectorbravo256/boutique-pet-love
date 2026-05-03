@@ -196,17 +196,40 @@ const applyCoupon = async () => {
 
     {/* 💰 PRECIO + ELIMINAR */}
     <div className="checkout-actions">
-      <p className="checkout-price">
-        {formatPrice(item.price * (item.qty || 1))}
-      </p>
 
-      <button
-        onClick={() => removeItem(i)}
-        className="checkout-remove"
-      >
-        Eliminar
-      </button>
-    </div>
+  {/* 💰 PRECIO ORIGINAL */}
+  {item.discount > 0 && (
+    <p
+      style={{
+        textDecoration: "line-through",
+        color: "#999",
+        fontSize: 12
+      }}
+    >
+      {formatPrice(item.originalPrice * (item.qty || 1))}
+    </p>
+  )}
+
+  {/* 💸 PRECIO FINAL */}
+  <p className="checkout-price" style={{ color: "#ec4899", fontWeight: "bold" }}>
+    {formatPrice(item.price * (item.qty || 1))}
+  </p>
+
+  {/* 🔥 PORCENTAJE */}
+  {item.discount > 0 && (
+    <p style={{ fontSize: 11, color: "#ec4899", fontWeight: "bold" }}>
+      -{item.discount}%
+    </p>
+  )}
+
+  <button
+    onClick={() => removeItem(i)}
+    className="checkout-remove"
+  >
+    Eliminar
+  </button>
+
+</div>
 
   </div>
 ))}
