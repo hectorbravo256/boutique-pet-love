@@ -330,7 +330,12 @@ useEffect(() => {
 
         <button
   onClick={() => {
-    const stock = stockMap[`${item.id}-${item.size}`] || 0;
+    const stock = stockMap[`${item.id}-${item.size}`];
+
+if (stock === undefined) {
+  increaseQty(i); // deja pasar si no hay info aún
+  return;
+}
 
     if ((item.qty || 1) >= stock) {
       window.dispatchEvent(
@@ -344,9 +349,9 @@ useEffect(() => {
     increaseQty(i);
   }}
 			disabled={
-    (stockMap[`${item.id}-${item.size}`] || 0) === 0 ||
-    (item.qty || 1) >= (stockMap[`${item.id}-${item.size}`] || 0)
-  }
+  stockMap[`${item.id}-${item.size}`] !== undefined &&
+  (item.qty || 1) >= stockMap[`${item.id}-${item.size}`]
+}
           className="bg-gray-200 px-2 rounded"
         >
           +
