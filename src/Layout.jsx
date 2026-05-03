@@ -1,6 +1,7 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
