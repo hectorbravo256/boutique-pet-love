@@ -30,9 +30,20 @@ const mensajeEnvio = formData.region
     : "Envío por pagar (Starken / Blue Express)"
   : "Selecciona tu región";
 
-	const subtotal = total;
-const discountAmount = subtotal * discount;
-const totalConDescuento = subtotal - discountAmount + (aplicaEnvio ? shipping : 0);
+	const subtotal = cart.reduce((acc, item) => {
+  return acc + item.price * item.qty;
+}, 0);
+
+// 🔥 SOLO APLICA CUPÓN A PRODUCTOS SIN DESCUENTO
+const subtotalSinOferta = cart.reduce((acc, item) => {
+  if (item.discount > 0) return acc; // ❌ excluir productos en oferta
+  return acc + item.price * item.qty;
+}, 0);
+
+const discountAmount = subtotalSinOferta * discount;
+
+const totalConDescuento =
+  subtotal - discountAmount + (aplicaEnvio ? shipping : 0);
 
 	const stockMap = Object.fromEntries(
   stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
