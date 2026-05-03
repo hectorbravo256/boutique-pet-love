@@ -320,17 +320,40 @@ useEffect(() => {
     </div>
 
     <div className="text-right">
-      <p className="text-xs font-bold">
-        {formatPrice(item.price * (item.qty || 1))}
-      </p>
 
-      <button
-        onClick={() => removeItem(i)}
-        className="text-red-400 text-xs"
-      >
-        Eliminar
-      </button>
-    </div>
+  {/* 💰 PRECIO ORIGINAL */}
+  {item.discount > 0 && (
+    <p
+      className="text-xs"
+      style={{
+        textDecoration: "line-through",
+        color: "#999"
+      }}
+    >
+      {formatPrice(item.originalPrice * (item.qty || 1))}
+    </p>
+  )}
+
+  {/* 💸 PRECIO FINAL */}
+  <p className="text-xs font-bold text-pink-600">
+    {formatPrice(item.price * (item.qty || 1))}
+  </p>
+
+  {/* 🔥 BADGE DESCUENTO */}
+  {item.discount > 0 && (
+    <p className="text-[10px] text-pink-500 font-bold">
+      -{item.discount}%
+    </p>
+  )}
+
+  <button
+    onClick={() => removeItem(i)}
+    className="text-red-400 text-xs"
+  >
+    Eliminar
+  </button>
+
+</div>
 
   </div>
 ))}
