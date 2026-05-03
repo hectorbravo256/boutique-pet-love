@@ -250,7 +250,7 @@ return (
   />
 
   {/* 🔥 BADGE DESCUENTO */}
-  {product.discount_active && product.discount_percent > 0 && (
+  {tieneDescuento && product.discount_percent > 0 && (
     <div style={{
       position: "absolute",
       top: 10,
@@ -321,8 +321,9 @@ return (
 
   const precioOriginal = selectedVariant.price;
 
-  const ahora = new Date();
+const ahora = new Date();
 
+// ⚠️ importante: convertir bien fechas
 const inicio = product.discount_start
   ? new Date(product.discount_start + "Z")
   : null;
@@ -331,6 +332,7 @@ const fin = product.discount_end
   ? new Date(product.discount_end + "Z")
   : null;
 
+// 🔥 lógica real
 const dentroDeFecha =
   (!inicio || ahora >= inicio) &&
   (!fin || ahora <= fin);
@@ -340,9 +342,9 @@ const tieneDescuento =
   product.discount_percent > 0 &&
   dentroDeFecha;
 
-  const precioFinal = tieneDescuento
-    ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
-    : precioOriginal;
+const precioFinal = tieneDescuento
+  ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
+  : precioOriginal;
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
