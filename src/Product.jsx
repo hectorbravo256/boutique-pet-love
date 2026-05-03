@@ -373,9 +373,7 @@ const precioBase = tieneDescuento
   : selectedVariant.price;
 
 const precioFinal = precioBase * cantidad;
-const selectedVariant = product.product_variants?.find(
-  v => v.id == selected
-);
+
 
 
   return (
