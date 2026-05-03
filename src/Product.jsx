@@ -64,6 +64,31 @@ export default function Product() {
       v => v.id == selected
     );
 
+    // 🔥 LÓGICA DESCUENTO (IGUAL QUE PRODUCTO)
+const ahora = new Date();
+
+const inicio = product.discount_start
+  ? new Date(product.discount_start)
+  : null;
+
+const fin = product.discount_end
+  ? new Date(product.discount_end)
+  : null;
+
+const dentroDeFecha =
+  (!inicio || ahora >= inicio) &&
+  (!fin || ahora <= fin);
+
+const tieneDescuento =
+  product.discount_active &&
+  product.discount_percent > 0 &&
+  dentroDeFecha;
+
+// 💰 PRECIO FINAL
+const precioFinal = tieneDescuento
+  ? Math.round(variant.price * (1 - product.discount_percent / 100))
+  : variant.price;
+
     if (!variant) {
       window.dispatchEvent(
   new CustomEvent("toast", {
@@ -95,13 +120,15 @@ export default function Product() {
       cart[existingIndex].qty += qty;
     } else {
       cart.push({
-        id: product.id,
-        name: product.name,
-        size,
-        price: variant.price,
-        qty,
-        image: product.product_images?.[0]?.url + "?width=400&quality=70"
-      });
+  id: product.id,
+  name: product.name,
+  size,
+  price: precioFinal, // 🔥 precio con descuento
+  originalPrice: variant.price, // 💰 precio original
+  discount: tieneDescuento ? product.discount_percent : 0,
+  qty,
+  image: product.product_images?.[0]?.url + "?width=400&quality=70"
+});
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
