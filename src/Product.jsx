@@ -368,6 +368,14 @@ return (
 
   const precioOriginal = selectedVariant.price;
 
+  const cantidad = qty || 1;
+
+const precioBase = tieneDescuento
+  ? Math.round(selectedVariant.price * (1 - product.discount_percent / 100))
+  : selectedVariant.price;
+
+const precioFinal = precioBase * cantidad;
+
 
 const precioFinal = tieneDescuento
   ? Math.round(precioOriginal * (1 - product.discount_percent / 100))
@@ -391,7 +399,11 @@ const precioFinal = tieneDescuento
         fontWeight: "bold",
         color: tieneDescuento ? "#ec4899" : "#000"
       }}>
-        ${precioFinal.toLocaleString("es-CL")}
+        {tieneDescuento && (
+  <span style={{ textDecoration: "line-through" }}>
+    ${(selectedVariant.price * cantidad).toLocaleString("es-CL")}
+  </span>
+)}
       </span>
 
       {tieneDescuento && (
