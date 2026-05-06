@@ -20,7 +20,7 @@ export default function Layout() {
 const formatPrice = (price) =>
   `$${price.toLocaleString("es-CL")}`;
 
-const total = cart.reduce(
+const total = (cart || []).reduce(
   (acc, item) => acc + item.price * (item.qty || 1),
   0
 );
@@ -68,7 +68,7 @@ const showToast = (message) => {
 	  
 setCart(Array.isArray(savedCart) ? savedCart : []);
 
-    const total = savedCart.reduce(
+    const total = saved(cart || []).reduce(
       (acc, item) => acc + (item.qty || 1),
       0
     );
@@ -308,7 +308,7 @@ useEffect(() => {
 
         {cart.length === 0 && <p>Vacío</p>}
 
-        {cart.map((item, i) => (
+        {(cart || []).map((item, i) => (
   <div key={i} className="flex justify-between items-center text-sm mt-3 gap-2">
 
     <img src={item.image}
