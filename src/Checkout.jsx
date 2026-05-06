@@ -23,6 +23,12 @@ const [coupon, setCoupon] = useState("");
 const [discount, setDiscount] = useState(0);
 const [couponError, setCouponError] = useState("");
 const [stockDB, setStockDB] = useState([]);
+const [loading, setLoading] = useState(false);
+
+const discountPercent =
+  discount <= 1
+    ? discount * 100
+    : discount;
 
 const mensajeEnvio = formData.region
   ? aplicaEnvio
@@ -32,6 +38,19 @@ const mensajeEnvio = formData.region
 
 	const subtotal = cart.reduce((acc, item) => {
   return acc + item.price * item.qty;
+}, 0);
+
+	// 💰 AHORRO TOTAL
+const ahorroTotal = cart.reduce((acc, item) => {
+
+  if (item.discount > 0) {
+    return acc + (
+      (item.originalPrice - item.price) * item.qty
+    );
+  }
+
+  return acc;
+
 }, 0);
 
 // 🔥 SOLO APLICA CUPÓN A PRODUCTOS SIN DESCUENTO
@@ -44,6 +63,12 @@ const discountAmount = subtotalSinOferta * discount;
 
 const totalConDescuento =
   subtotal - discountAmount + (aplicaEnvio ? shipping : 0);
+
+	// 💰 AHORRO TOTAL REAL
+const ahorroCupon = discountAmount;
+
+const ahorroCompleto =
+  ahorroTotal + ahorroCupon;
 
 	const stockMap = Object.fromEntries(
   stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
@@ -153,8 +178,19 @@ const applyCoupon = async () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
 
+    
       {/* 🧾 RESUMEN */}
-      <div className="bg-white p-6 rounded-2xl shadow">
+<div
+  className="bg-white p-6 rounded-2xl shadow max-h-[90vh] overflow-y-auto"
+style={{
+  position: typeof window !== "undefined" &&
+window.innerWidth >= 768
+  ? "sticky"
+  : "relative",
+  top: 20,
+  alignSelf: "start"
+}}
+>
         <h2 className="text-xl font-bold mb-4">Resumen del pedido</h2>
 
 {cart.map((item, i) => (
@@ -249,8 +285,27 @@ const applyCoupon = async () => {
 
   <div className="flex justify-between text-sm">
     <span>Subtotal</span>
-    <span>{formatPrice(total)}</span>
+    <span>{formatPrice(subtotal)}</span>
   </div>
+
+{/* 💰 AHORRO TOTAL */}
+{ahorroCompleto > 0 && (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      marginTop: 8,
+      color: "#16a34a",
+      fontWeight: "bold"
+    }}
+  >
+    <span>Total ahorrado</span>
+
+    <span>
+      -{formatPrice(ahorroCompleto)}
+    </span>
+  </div>
+)}
 
   <div className="flex justify-between text-sm">
     <span>Envío</span>
@@ -290,12 +345,44 @@ const applyCoupon = async () => {
     <p className="text-red-500 text-xs mt-1">{couponError}</p>
   )}
 
-  {discount > 0 && (
-    <p className="text-green-600 text-xs mt-1">
-      ✅ Descuento aplicado ({discount * 100}%)
+  {coupon && (() => {
+
+  const productosSinOferta = cart.filter(
+    item => item.discount <= 0
+  );
+
+  const aplicaCupon = productosSinOferta.length > 0;
+
+  return (
+    <p
+      style={{
+        color: aplicaCupon ? "#16a34a" : "#f97316",
+        fontSize: 14,
+        fontWeight: "bold"
+      }}
+    >
+      {aplicaCupon
+        ? `✅ Descuento aplicado (${discountPercent}%)`
+        : "⚠️ El cupón no aplica a productos en oferta"}
+		
     </p>
-  )}
+  );
+
+})()}
 </div>
+
+	{cart.some(i => i.discount > 0) && (
+  <p
+    style={{
+      fontSize: 12,
+      color: "#666",
+      marginTop: 4
+    }}
+  >
+    * Productos en oferta no combinan descuentos
+  </p>
+)}
+	
 
 	{discount > 0 && (
   <div className="flex justify-between text-green-600 text-sm">
@@ -314,7 +401,7 @@ const applyCoupon = async () => {
       </div>
 
       {/* 📋 FORMULARIO */}
-      <div className="bg-white p-6 rounded-2xl shadow">
+      <div className="bg-white p-6 rounded-2xl shadow max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Datos de envío</h2>
 
         <div className="space-y-3">
@@ -396,10 +483,14 @@ const applyCoupon = async () => {
   		<option>Región de Los Ríos</option>
   		<option>Región de Los Lagos</option>
   		<option>Región de Aysén del General Carlos Ibáñez del Campo</option>
-		{errors.region && (
-  		<p className="text-red-500 text-xs">{errors.region}</p>
-		)}
+	
           </select>
+
+{errors.region && (
+  <p className="text-red-500 text-xs">
+    {errors.region}
+  </p>
+)}
 
 	   <input
   		placeholder="Correo electrónico"
@@ -452,19 +543,62 @@ const applyCoupon = async () => {
 
         </div>
 
-<p className="text-sm text-green-600 font-semibold mt-2">
-  🔒 Pago 100% seguro con MercadoPago
-</p>
+<div className="mt-4 text-sm text-gray-500 space-y-1">
+  <p>🔒 Pago protegido SSL</p>
+  <p>🚚 Envíos a todo Chile</p>
+  <p>💳 Hasta 6 cuotas</p>
+</div>
 
         <button
-          onClick={() => {
-  	if (validarFormulario()) {
-    	handleMercadoPago();
-  	}
-	}}
-          className="btn-pagar"
+          onClick={async () => {
+
+  // 🔥 VALIDAR STOCK REAL
+  for (const item of cart) {
+
+    const stock =
+  stockMap[`${item.id}-${item.size}`];
+
+if (stock === undefined) {
+  continue;
+}
+
+    if (item.qty > stock) {
+
+      alert(
+        `⚠️ No hay stock suficiente para ${item.name}`
+      );
+
+      return;
+    }
+  }
+
+  // ✅ VALIDAR FORMULARIO
+  if (validarFormulario()) {
+
+    try {
+
+      setLoading(true);
+
+      await handleMercadoPago();
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+}}
+			className="btn-pagar transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            disabled={loading}
         >
-          💳 Pagar con MercadoPago
+          {loading ? (
+  <div className="flex items-center justify-center gap-2">
+    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+    <span>Procesando...</span>
+  </div>
+) : (
+  "💳 Pagar con MercadoPago"
+)}
         </button>
       </div>
     </div>
