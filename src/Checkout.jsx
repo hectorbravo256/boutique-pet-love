@@ -4,6 +4,7 @@ import { supabase } from "./supabaseClient";
 
 export default function Checkout({
   cart,
+	const safeCart = Array.isArray(cart) ? cart : [];
   total,
   shipping,
   totalFinal,
@@ -17,7 +18,8 @@ export default function Checkout({
   removeItem,
   formatPrice
 }) {
-	
+
+
 const [errors, setErrors] = useState({});
 const [coupon, setCoupon] = useState("");
 const [discount, setDiscount] = useState(0);
@@ -36,12 +38,12 @@ const mensajeEnvio = formData.region
     : "Envío por pagar (Starken / Blue Express)"
   : "Selecciona tu región";
 
-	const subtotal = cart.reduce((acc, item) => {
+	const subtotal = safeCart.reduce((acc, item) => {
   return acc + item.price * item.qty;
 }, 0);
 
 	// 💰 AHORRO TOTAL
-const ahorroTotal = cart.reduce((acc, item) => {
+const ahorroTotal = safeCart.reduce((acc, item) => {
 
   if (item.discount > 0) {
     return acc + (
@@ -54,7 +56,7 @@ const ahorroTotal = cart.reduce((acc, item) => {
 }, 0);
 
 // 🔥 SOLO APLICA CUPÓN A PRODUCTOS SIN DESCUENTO
-const subtotalSinOferta = cart.reduce((acc, item) => {
+const subtotalSinOferta = safeCart.reduce((acc, item) => {
   if (item.discount > 0) return acc; // ❌ excluir productos en oferta
   return acc + item.price * item.qty;
 }, 0);
@@ -161,7 +163,7 @@ const applyCoupon = async () => {
 }, []);
 
 	useEffect(() => {
-  const updatedCart = cart.map(item => {
+  const updatedCart = safeCart.map(item => {
     const stock =
       stockMap[`${item.id}-${item.size}`] || 0;
 
@@ -193,7 +195,7 @@ window.innerWidth >= 768
 >
         <h2 className="text-xl font-bold mb-4">Resumen del pedido</h2>
 
-{cart.map((item, i) => (
+{safeCart.map((item, i) => (
   <div key={i} className="checkout-item">
 
     {/* 🖼 IMAGEN */}
@@ -371,7 +373,7 @@ window.innerWidth >= 768
 })()}
 </div>
 
-	{cart.some(i => i.discount > 0) && (
+	{safeCart.some(i => i.discount > 0) && (
   <p
     style={{
       fontSize: 12,
