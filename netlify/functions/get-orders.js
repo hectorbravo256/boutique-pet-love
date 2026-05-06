@@ -6,20 +6,63 @@ const supabase = createClient(
 );
 
 exports.handler = async () => {
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false });
 
-  if (error) {
+  try {
+
+    // 🔥 validar variables
+    if (
+      !process.env.SUPABASE_URL ||
+      !process.env.SUPABASE_KEY
+    ) {
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Faltan variables de entorno Supabase"
+        }),
+      };
+    }
+
+    // 🔥 obtener pedidos
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+    // 🔥 error Supabase
+    if (error) {
+
+      console.error("Supabase error:", error);
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: error.message
+        }),
+      };
+    }
+
+    // ✅ éxito
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        Array.isArray(data)
+          ? data
+          : []
+      ),
+    };
+
+  } catch (err) {
+
+    console.error("Function crash:", err);
+
     return {
       statusCode: 500,
-      body: error.message,
+      body: JSON.stringify({
+        error: err.message || "Error interno servidor"
+      }),
     };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(data),
-  };
 };
