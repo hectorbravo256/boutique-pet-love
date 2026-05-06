@@ -64,8 +64,9 @@ const showToast = (message) => {
 
 	useEffect(() => {
   const updateCart = () => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
+    const savedCart = = JSON.parse(localStorage.getItem("cart"));
+	  
+setCart(Array.isArray(savedCart) ? savedCart : []);
 
     const total = storedCart.reduce(
       (acc, item) => acc + (item.qty || 1),
