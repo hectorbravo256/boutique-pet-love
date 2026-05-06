@@ -15,18 +15,20 @@ export default function Layout() {
   const [cartCount, setCartCount] = useState(0);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
-  
+  const [toastTimeout, setToastTimeout] = useState(null);
 	
-const formatPrice = (price) =>
-  `$${price.toLocaleString("es-CL")}`;
+const formatPrice = (price = 0) =>
+  `$${Number(price).toLocaleString("es-CL")}`;
 
 const total = (cart || []).reduce(
   (acc, item) => acc + item.price * (item.qty || 1),
   0
 );
 
-	const stockMap = Object.fromEntries(
-  stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
+const stockMap = Object.fromEntries(
+  (stockDB || []).map(
+    s => [`${s.product_id}-${s.size}`, s.stock]
+  )
 );
 
 const saveCart = (newCart) => {
@@ -36,13 +38,24 @@ const saveCart = (newCart) => {
 };
 
 const increaseQty = (i) => {
-  const newCart = [...cart];
-  newCart[i].qty = (newCart[i].qty || 1) + 1;
+  const newCart = [...(cart || [])];
+	if (!newCart[i]) return;
+  const stock =
+  stockMap[`${newCart[i].id}-${newCart[i].size}`];
+
+const currentQty = newCart[i].qty || 1;
+
+if (stock !== undefined && currentQty >= stock) {
+  return;
+}
+
+newCart[i].qty = currentQty + 1;
   saveCart(newCart);
 };
 
 const decreaseQty = (i) => {
-  const newCart = [...cart];
+  const newCart = [...(cart || [])];
+	if (!newCart[i]) return;
   if ((newCart[i].qty || 1) > 1) {
     newCart[i].qty -= 1;
     saveCart(newCart);
@@ -50,16 +63,23 @@ const decreaseQty = (i) => {
 };
 
 const removeItem = (i) => {
-  const newCart = cart.filter((_, index) => index !== i);
+  const newCart = (cart || []).filter((_, index) => index !== i);
   saveCart(newCart);
 };
 
 const showToast = (message) => {
+
   setToast(message);
 
-  setTimeout(() => {
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+  }
+
+  const timeout = setTimeout(() => {
     setToast(null);
   }, 2500);
+
+  setToastTimeout(timeout);
 };
 
 	useEffect(() => {
@@ -68,7 +88,7 @@ const showToast = (message) => {
 	  
 setCart(Array.isArray(savedCart) ? savedCart : []);
 
-    const total = saved(cart || []).reduce(
+    const total = (savedCart || []).reduce(
       (acc, item) => acc + (item.qty || 1),
       0
     );
@@ -93,8 +113,14 @@ setCart(Array.isArray(savedCart) ? savedCart : []);
 }, []);
 
 useEffect(() => {
+
   document.body.style.overflow =
     menuOpen || cartOpen ? "hidden" : "auto";
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+
 }, [menuOpen, cartOpen]);
 
   useEffect(() => {
@@ -106,10 +132,8 @@ useEffect(() => {
   }
 }, [location]);
 
-useEffect(() => {
-  if (location.pathname === "/checkout") {
-    setCartOpen(false);
-  }
+	useEffect(() => {
+  setCartOpen(false);
 }, [location.pathname]);
 
 	useEffect(() => {
@@ -215,7 +239,7 @@ useEffect(() => {
       </div>
 
       {/* 🔝 HEADER */}
-      <header className="bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 sticky top-0 z-40">
+      <header className="bg-white/90 backdrop-blur-xl shadow-sm px-4 md:px-6 py-3 md:py-4 sticky top-0 z-40 border-b border-pink-100">
   <div className="grid grid-cols-[auto_1fr_auto] items-center">
 
     {/* ☰ IZQUIERDA → MENÚ */}
@@ -244,7 +268,7 @@ useEffect(() => {
     {/* 🔥 TEXTO DERECHA (2 FILAS) */}
     <div className="flex flex-col justify-center leading-tight">
 
-      <h1 className="text-pink-600 text-lg md:text-xl font-extrabold tracking-wide">
+      <h1 className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
         BOUTIQUE PET LOVE
       </h1>
 
@@ -290,8 +314,8 @@ useEffect(() => {
 
         {/* CARRITO */}
       <div
-  	className={`fixed bottom-5 right-5 bg-white rounded-2xl shadow transition-all duration-300 ${
-    	cartOpen ? "w-64 p-4" : "w-16 h-16 flex items-center justify-center"
+  	className={`fixed bottom-5 right-5 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+    	cartOpen ? "w-[92vw] max-w-sm p-4 max-h-[80vh] overflow-y-auto" : "w-16 h-16 flex items-center justify-center"
   	}`}
 	>
 	{cartOpen ? (
@@ -306,10 +330,10 @@ useEffect(() => {
 
         <h3 className="font-bold">Carrito</h3>
 
-        {cart.length === 0 && <p>Vacío</p>}
+        {(cart || []).length === 0 && <p>Vacío</p>}
 
         {(cart || []).map((item, i) => (
-  <div key={i} className="flex justify-between items-center text-sm mt-3 gap-2">
+  <div key={i} className="flex justify-between items-center text-sm mt-4 gap-3 pb-3 border-b border-pink-100">
 
     <img src={item.image}
       className="w-12 h-12 object-cover rounded-lg"
@@ -323,7 +347,7 @@ useEffect(() => {
       <div className="flex items-center gap-2 mt-1">
         <button
           onClick={() => decreaseQty(i)}
-          className="bg-gray-200 px-2 rounded"
+          className="w-8 h-8 md:w-7 md:h-7 flex items-center justify-center rounded-full bg-pink-100 hover:bg-pink-200 transition font-bold"
         >
           −
         </button>
@@ -354,7 +378,12 @@ if (stock === undefined) {
   stockMap[`${item.id}-${item.size}`] !== undefined &&
   (item.qty || 1) >= stockMap[`${item.id}-${item.size}`]
 }
-          className="bg-gray-200 px-2 rounded"
+          className={`w-8 h-8 md:w-7 md:h-7 flex items-center justify-center rounded-full transition font-bold ${
+  stockMap[`${item.id}-${item.size}`] !== undefined &&
+  (item.qty || 1) >= stockMap[`${item.id}-${item.size}`]
+    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+    : "bg-pink-100 hover:bg-pink-200"
+}`}
         >
           +
         </button>
@@ -390,7 +419,7 @@ if (stock === undefined) {
 
   <button
     onClick={() => removeItem(i)}
-    className="text-red-400 text-xs"
+   className="text-red-500 text-xs font-semibold hover:text-red-700 transition"
   >
     Eliminar
   </button>
@@ -400,7 +429,7 @@ if (stock === undefined) {
   </div>
 ))}
 
-{cart.length > 0 && (
+{(cart || []).length > 0 && (
   <>
  	{/* TOTALES BONITOS */}
    <div className="mt-3 border-t pt-2 text-sm space-y-1">
@@ -419,17 +448,16 @@ if (stock === undefined) {
   setCartOpen(false);
   window.location.href = "/checkout";
 }}
-  className="block mt-3 bg-blue-500 text-white text-center py-2 rounded-xl w-full"
+  className="block mt-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-90 text-white text-center py-3 rounded-2xl w-full font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02]"
 >
-  Continuar compra
+  💳 Finalizar compra segura
 </button>
 
     {/* 🟢 WHATSAPP */}
    <a
   href={`${WHATSAPP}?text=${encodeURIComponent(
     "Pedido:\n" +
-      cart
-        .map(
+      (cart || []).map(
           (i) =>
             `${i.name} - ${i.size} - ${formatPrice(i.price * (i.qty || 1))}`
         )
@@ -438,7 +466,7 @@ if (stock === undefined) {
   )}`}
   target="_blank"
   rel="noopener noreferrer"
-  className="bg-green-500 text-white py-2 rounded-xl flex justify-center items-center font-semibold"
+  className="mt-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white py-3 rounded-2xl flex justify-center items-center font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02]"
 >
   Contactar por WhatsApp
 </a>
@@ -448,12 +476,32 @@ if (stock === undefined) {
  ) : (
   <div
     onClick={() => setCartOpen(true)}
-    className="relative cursor-pointer bg-pink-600 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-lg"
+    className="
+relative
+cursor-pointer
+bg-gradient-to-r
+from-pink-500
+to-purple-500
+text-white
+w-16
+h-16
+flex
+items-center
+justify-center
+rounded-full
+shadow-2xl
+transition-all
+duration-300
+hover:scale-105
+active:scale-95
+md:w-14
+md:h-14
+"
   >
     <ShoppingCart size={24} />
 
     {/* 🔢 CONTADOR */}
-    {cart.length > 0 && (
+    {(cart || []).length > 0 && (
      <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-bounce">
         {cartCount}
       </span>
@@ -502,18 +550,19 @@ if (stock === undefined) {
 		{toast && (
   <div
     style={{
-      position: "fixed",
-      bottom: 30,
-      left: "50%",
-      transform: "translateX(-50%)",
-      background: "#111",
-      color: "white",
-      padding: "12px 20px",
-      borderRadius: 10,
-      boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-      zIndex: 9999,
-      animation: "fadeIn 0.3s ease"
-    }}
+  position: "fixed",
+  bottom: 30,
+  left: "50%",
+  transform: "translateX(-50%)",
+  background: "#111",
+  color: "white",
+  padding: "12px 20px",
+  borderRadius: 10,
+  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+  zIndex: 9999,
+  animation: "fadeIn 0.3s ease",
+  transition: "all 0.3s ease"
+}}
   >
     {toast}
   </div>
