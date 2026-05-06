@@ -24,10 +24,13 @@ export default function Productos() {
       `)
       .order("name", { ascending: true });
 
-    setProductosFull(data || []);
+    setProductosFull(
+  Array.isArray(data) ? data : []
+);
   };
 
   const ordenarProductos = (lista) => {
+    if (!Array.isArray(lista)) return [];
   return [...lista].sort((a, b) => {
     let valA, valB;
 
@@ -87,7 +90,14 @@ export default function Productos() {
 >
   <option value="">Todas las categorías</option>
 
-  {[...new Set(productosFull.map(p => p.category))].map(cat => (
+  {[
+  ...new Set(
+    (Array.isArray(productosFull)
+      ? productosFull
+      : []
+    ).map(p => p.category)
+  )
+].map(cat => (
     <option key={cat} value={cat}>
       {cat}
     </option>
@@ -170,7 +180,11 @@ export default function Productos() {
 ).map((p) => {
 
         // 🔥 ordenar tallas
-        const variantesOrdenadas = [...p.product_variants].sort((a, b) => {
+        const variantesOrdenadas = [
+  ...(Array.isArray(p.product_variants)
+    ? p.product_variants
+    : [])
+].sort((a, b) => {
           const numA = parseInt(a.size.replace(/\D/g, ""));
           const numB = parseInt(b.size.replace(/\D/g, ""));
           return numA - numB;
