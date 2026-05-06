@@ -64,7 +64,7 @@ const showToast = (message) => {
 
 	useEffect(() => {
   const updateCart = () => {
-    const savedCart = = JSON.parse(localStorage.getItem("cart"));
+    const savedCart = JSON.parse(localStorage.getItem("cart"));
 	  
 setCart(Array.isArray(savedCart) ? savedCart : []);
 
