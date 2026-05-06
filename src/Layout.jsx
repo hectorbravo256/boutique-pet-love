@@ -68,7 +68,7 @@ const showToast = (message) => {
 	  
 setCart(Array.isArray(savedCart) ? savedCart : []);
 
-    const total = storedCart.reduce(
+    const total = savedCart.reduce(
       (acc, item) => acc + (item.qty || 1),
       0
     );
