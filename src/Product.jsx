@@ -227,7 +227,50 @@ const prevImage = () => {
     }
   }, [product, stockDB]);
 
-  if (!product) return <p>Cargando...</p>;
+  if (!product) {
+  return (
+    <div className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      bg-pink-50
+    ">
+
+      <div className="
+        animate-pulse
+        bg-white
+        p-10
+        rounded-3xl
+        shadow-xl
+        text-center
+      ">
+
+        <div className="
+          w-16
+          h-16
+          border-4
+          border-pink-200
+          border-t-pink-500
+          rounded-full
+          animate-spin
+          mx-auto
+          mb-5
+        " />
+
+        <p className="
+          text-pink-600
+          font-bold
+          text-lg
+        ">
+          Cargando producto...
+        </p>
+
+      </div>
+
+    </div>
+  );
+}
 
   // 🔥 LÓGICA GLOBAL DESCUENTO
 const ahora = new Date();
@@ -251,17 +294,23 @@ const tieneDescuento =
 
 return (
   <>
-  <div style={{
-    maxWidth: 1100,
-    margin: "0 auto",
-    padding: 20
-  }}>
+  <div className="
+  max-w-7xl
+  mx-auto
+  px-4
+  md:px-8
+  py-8
+  pb-36
+  md:pb-8
+">
 
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 40
-    }}>
+<div className="
+  grid
+  grid-cols-1
+  lg:grid-cols-2
+  gap-10
+  items-start
+">
 
       {/* ================= IMAGEN ================= */}
       <div>
@@ -281,7 +330,7 @@ return (
     src={`${activeImage}?width=800&quality=70`}
     loading="lazy"
     onLoad={(e) => e.target.classList.remove("opacity-0")}
-    className="opacity-0 transition-opacity duration-500"
+    
     onClick={() => {
       const index = product.product_images.findIndex(
         img => img.url === activeImage
@@ -289,27 +338,37 @@ return (
       setCurrentIndex(index);
       setShowModal(true);
     }}
-    style={{
-      width: "100%",
-      borderRadius: 16,
-      cursor: "zoom-in"
-    }}
+    className="
+  opacity-0
+  transition-all
+  duration-700
+  w-full
+  rounded-3xl
+  shadow-2xl
+  object-cover
+  hover:scale-[1.02]
+"
   />
 
   {/* 🔥 BADGE DESCUENTO */}
   {tieneDescuento && product.discount_percent > 0 && (
-    <div style={{
-      position: "absolute",
-      top: 10,
-      right: 10,
-      background: "#ec4899",
-      color: "#fff",
-      padding: "6px 10px",
-      borderRadius: 8,
-      fontSize: 14,
-      fontWeight: "bold"
-    }}>
-      -{product.discount_percent}%
+    <div 
+      className="
+  absolute
+  top-4
+  right-4
+  bg-gradient-to-r
+  from-pink-500
+  to-purple-500
+  text-white
+  px-4
+  py-2
+  rounded-full
+  text-sm
+  font-black
+  shadow-xl
+">
+      🔥 -{product.discount_percent}% OFF
     </div>
   )}
 
@@ -328,22 +387,27 @@ return (
   src={`${img.url}?width=200&quality=60`}
   loading="lazy"
   onLoad={(e) => e.target.classList.remove("opacity-0")}
-  className="opacity-0 transition-opacity duration-300"
   onClick={() => {
     setActiveImage(img.url);
     setCurrentIndex(i);
   }}
-  style={{
-    width: 70,
-    height: 70,
-    objectFit: "cover",
-    borderRadius: 10,
-    cursor: "pointer",
-    border: activeImage === img.url
-      ? "2px solid #ec4899"
-      : "1px solid #ddd",
-    transition: "0.2s"
-  }}
+  className={`
+  opacity-0
+  w-20
+  h-20
+  object-cover
+  rounded-2xl
+  cursor-pointer
+  transition-all
+  duration-300
+  border-2
+  hover:scale-105
+  ${
+    activeImage === img.url
+      ? "border-pink-500 shadow-xl scale-105"
+      : "border-transparent opacity-80 hover:opacity-100"
+  }
+`}
 />
     ))}
   </div>
@@ -355,11 +419,14 @@ return (
       <div>
 
         {/* NOMBRE */}
-        <h1 style={{
-          fontSize: 26,
-          fontWeight: "bold",
-          marginBottom: 10
-        }}>
+        <h1 className="
+  text-3xl
+  md:text-5xl
+  font-black
+  text-gray-900
+  leading-tight
+  mb-4
+">
           {product.name}
         </h1>
 
@@ -377,7 +444,13 @@ const precioFinal = precioBase * cantidad;
 
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div className="
+  flex
+  items-center
+  gap-3
+  flex-wrap
+  mt-4
+">
 
       {tieneDescuento && (
         <span style={{
@@ -389,25 +462,29 @@ const precioFinal = precioBase * cantidad;
         </span>
       )}
 
-      <span style={{
-        fontSize: 28,
-        fontWeight: "bold",
-        color: tieneDescuento ? "#ec4899" : "#000"
-      }}>
+      <span className="
+  text-4xl
+  font-black
+  text-pink-600
+">
      ${precioFinal.toLocaleString("es-CL")}
       </span>
 
       {tieneDescuento && (
-        <span style={{
-          background: "#ec4899",
-          color: "#fff",
-          padding: "4px 10px",
-          borderRadius: 20,
-          fontSize: 12,
-          fontWeight: "bold"
-        }}>
-          Oferta
-        </span>
+        <span className="
+  bg-gradient-to-r
+  from-pink-500
+  to-purple-500
+  text-white
+  px-3
+  py-1
+  rounded-full
+  text-xs
+  font-black
+  shadow-md
+">
+  🔥 Oferta
+</span>
       )}
 
     </div>
@@ -419,17 +496,35 @@ const precioFinal = precioBase * cantidad;
 
         {/* STOCK */}
         {selectedVariant && (
-          <p style={{
-            marginTop: 5,
-            fontWeight: "bold",
-            color: isOutOfStock ? "#ef4444" : "#22c55e"
-          }}>
-            {isOutOfStock
-              ? "❌ Sin stock"
-              : currentStock <= 3
-                ? `⚠️ Últimas ${currentStock} unidades`
-                : `✔ Stock disponible: ${currentStock}`}
-          </p>
+          <div className="mt-4">
+
+  <div className={`
+    inline-flex
+    items-center
+    gap-2
+    px-4
+    py-2
+    rounded-full
+    text-sm
+    font-semibold
+    ${
+      isOutOfStock
+        ? "bg-red-100 text-red-600"
+        : currentStock <= 3
+          ? "bg-yellow-100 text-yellow-700"
+          : "bg-emerald-100 text-emerald-700"
+    }
+  `}>
+
+    {isOutOfStock
+      ? "❌ Sin stock"
+      : currentStock <= 3
+        ? `⚠️ Últimas ${currentStock} unidades`
+        : `✔ ${currentStock} disponibles`}
+
+  </div>
+
+</div>
         )}
 
         {/* MENSAJE PEDIDO */}
@@ -469,16 +564,25 @@ const precioFinal = precioBase * cantidad;
 onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
-                    style={{
-                      padding: "10px 16px",
-                      borderRadius: 25,
-                      border: isActive ? "2px solid #ec4899" : "1px solid #ddd",
-                      background: isActive ? "#ec4899" : "white",
-                      color: isActive ? "white" : "#333",
-                      opacity: stock === 0 ? 0.5 : 1,
-                      transition: "0.2s",
-                      transform: "scale(1)"
-                    }}
+                    className={`
+  px-5
+  py-3
+  rounded-2xl
+  font-semibold
+  transition-all
+  duration-300
+  border
+  ${
+    isActive
+      ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white border-transparent shadow-lg scale-105"
+      : "bg-white border-pink-100 hover:border-pink-300 hover:shadow-md"
+  }
+  ${
+    stock === 0
+      ? "opacity-40 cursor-not-allowed"
+      : ""
+  }
+`}
                   >
                     {v.size}
                   </button>
@@ -491,10 +595,41 @@ onMouseOut={(e) => {
         <div style={{ marginTop: 25 }}>
           <p style={{ marginBottom: 10 }}>Cantidad</p>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={decreaseQty} style={btnQty}>-</button>
-            <span style={{ fontSize: 18 }}>{qty}</span>
-            <button onClick={increaseQty} style={btnQty}>+</button>
+          <div className="
+  flex
+  items-center
+  gap-4
+">
+            <button 
+              onClick={decreaseQty} 
+              style={btnQty}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseOut={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+              -
+            </button>
+            
+            <span style={{ fontSize: 18 }}>
+            {qty}
+            </span>
+            
+            <button 
+              onClick={increaseQty} 
+              style={btnQty}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseOut={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+              +
+            </button>
+            
           </div>
         </div>
 
@@ -511,18 +646,23 @@ onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
             disabled={!selectedVariant || isOutOfStock}
-            style={{
-              flex: 1,
-              padding: 14,
-              background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#ec4899",
-              color: "#fff",
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              transform: "scale(1)"
-            }}
+            className={`
+  flex-1
+  py-4
+  rounded-2xl
+  font-bold
+  text-white
+  transition-all
+  duration-300
+  shadow-xl
+  hover:scale-[1.02]
+  active:scale-[0.98]
+  ${
+    (!selectedVariant || isOutOfStock)
+      ? "bg-gray-300 cursor-not-allowed"
+      : "bg-gradient-to-r from-gray-800 to-black"
+  }
+`}
           >
             🛒 Agregar
           </button>
@@ -541,18 +681,23 @@ onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
             disabled={!selectedVariant || isOutOfStock}
-            style={{
-              flex: 1,
-              padding: 14,
-              background: (!selectedVariant || isOutOfStock) ? "#ccc" : "#22c55e",
-              color: "#fff",
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              transform: "scale(1)"
-          }}
+            className={`
+  flex-1
+  py-4
+  rounded-2xl
+  font-bold
+  text-white
+  transition-all
+  duration-300
+  shadow-xl
+  hover:scale-[1.02]
+  active:scale-[0.98]
+  ${
+    (!selectedVariant || isOutOfStock)
+      ? "bg-gray-300 cursor-not-allowed"
+      : "bg-gradient-to-r from-emerald-500 to-green-500"
+  }
+`}
           >
             ⚡ Comprar
           </button>
@@ -574,19 +719,22 @@ onMouseOut={(e) => {
 onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
-            style={{
-              display: "block",
-              marginTop: 15,
-              background: "#22c55e",
-              color: "white",
-              padding: 14,
-              borderRadius: 12,
-              textAlign: "center",
-              fontWeight: "bold",
-              textDecoration: "none",
-              transition: "all 0.2s ease",
-              transform: "scale(1)"
-            }}
+            className="
+  block
+  mt-5
+  bg-gradient-to-r
+  from-green-500
+  to-emerald-500
+  text-white
+  py-4
+  rounded-2xl
+  text-center
+  font-bold
+  shadow-xl
+  transition-all
+  duration-300
+  hover:scale-[1.02]
+"
           >
             💬 Solicitar por WhatsApp
           </a>
@@ -594,17 +742,6 @@ onMouseOut={(e) => {
 
       </div>
     </div>
-
-    {/* RESPONSIVE */}
-    <style>
-      {`
-        @media (max-width: 768px) {
-          div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}
-    </style>
 
   </div>
 
@@ -624,36 +761,104 @@ onMouseOut={(e) => {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "rgba(0,0,0,0.9)",
+    background: "rgba(0,0,0,0.85)",
+    backdropFilter: "blur(8px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 9999,
+    transition: "all 0.3s ease",
     cursor: "pointer"
   }}
 >
 
-    {/* BOTÓN CERRAR */}
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        setShowModal(false);
-      }}
-      style={{
-        position: "absolute",
-        top: 20,
-        right: 30,
-        color: "white",
-        fontSize: 30,
-        cursor: "pointer"
-      }}
-    >
-      ✕
-    </div>
+  
+{/* BOTÓN CERRAR */}
+<div
+  onClick={(e) => {
+    e.stopPropagation();
+    setShowModal(false);
+  }}
+  className="
+    absolute
+    top-5
+    right-5
+    w-12
+    h-12
+    rounded-full
+    bg-white/10
+    backdrop-blur-lg
+    text-white
+    text-2xl
+    flex
+    items-center
+    justify-center
+    hover:bg-white/20
+    transition-all
+    duration-300
+    cursor-pointer
+  "
+>
+  ✕
+</div>
 
     {/* IMAGEN */}
+  {/* ⬅ ANTERIOR */}
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    prevImage();
+  }}
+  className="
+    absolute
+    left-5
+    top-1/2
+    -translate-y-1/2
+    w-14
+    h-14
+    rounded-full
+    bg-white/10
+    backdrop-blur-lg
+    text-white
+    text-2xl
+    hover:bg-white/20
+    transition-all
+    duration-300
+  "
+>
+  ‹
+</button>
+
+{/* ➡ SIGUIENTE */}
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    nextImage();
+  }}
+  className="
+    absolute
+    right-5
+    top-1/2
+    -translate-y-1/2
+    w-14
+    h-14
+    rounded-full
+    bg-white/10
+    backdrop-blur-lg
+    text-white
+    text-2xl
+    hover:bg-white/20
+    transition-all
+    duration-300
+  "
+>
+  ›
+</button>
     <img
   src={`${product.product_images[currentIndex].url}?width=1200&quality=80`}
+      className="
+    animate-[fadeZoom_.3s_ease]
+  "
   style={{
     maxWidth: "90%",
     maxHeight: "90%",
@@ -691,15 +896,153 @@ onMouseOut={(e) => {
 
   </div>
 )}
+
+    {/* 🔥 STICKY MOBILE CTA */}
+{!showModal && (
+<div className="
+  fixed
+  bottom-0
+  left-0
+  right-0
+  z-50
+  bg-white/95
+  backdrop-blur-xl
+  border-t
+  border-pink-100
+  p-4 
+  pb-[calc(1rem+env(safe-area-inset-bottom))]
+  shadow-2xl
+  md:hidden
+  animate-[slideUp_.35s_ease]
+  relative
+
+  before:absolute
+  before:top-0
+  before:left-0
+  before:right-0
+  before:h-px
+  before:bg-gradient-to-r
+  before:from-transparent
+  before:via-pink-200
+  before:to-transparent
+">
+
+  <div className="
+    flex
+    items-center
+    justify-between
+    gap-3
+  ">
+
+    {/* 💰 PRECIO */}
+    <div>
+
+      {selectedVariant && (
+        <>
+          <p className="
+            text-xs
+            text-gray-400
+          ">
+            Total
+          </p>
+
+          <p className="
+            text-2xl
+            font-black
+            text-pink-600
+          ">
+            $
+            {(
+              (
+                tieneDescuento
+                  ? Math.round(
+                      selectedVariant.price *
+                      (1 - product.discount_percent / 100)
+                    )
+                  : selectedVariant.price
+              ) * qty
+            ).toLocaleString("es-CL")}
+          </p>
+        </>
+      )}
+
+    </div>
+
+    {/* 🔥 BOTÓN */}
+    <button
+      onClick={() => {
+        addToCart();
+      }}
+      disabled={!selectedVariant || isOutOfStock}
+      className={`
+        flex-1
+        py-4
+        rounded-2xl
+        font-bold
+        text-white
+        shadow-xl
+        transition-all
+        duration-300
+        hover:scale-[1.02]
+        active:scale-[0.98]
+        ${
+          (!selectedVariant || isOutOfStock)
+            ? "bg-gray-300"
+            : "bg-gradient-to-r from-pink-500 to-purple-500"
+        }
+      `}
+    >
+      🛒 Agregar
+    </button>
+
+  </div>
+
+</div>
+  
+)}
+
+    <style>
+{`
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+`}
+</style>
+    
   </>
 );
 }
 
 /* BOTONES CANTIDAD */
 const btnQty = {
-  width: 40,
-  height: 40,
-  borderRadius: 8,
-  border: "1px solid #ddd",
-  background: "white"
+  width: 48,
+  height: 48,
+  borderRadius: 16,
+  border: "1px solid #fbcfe8",
+  background: "white",
+  fontSize: 20,
+  fontWeight: "bold",
+  cursor: "pointer",
+  transition: "0.2s",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
 };
