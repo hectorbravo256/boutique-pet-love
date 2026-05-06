@@ -9,13 +9,37 @@ export default function Ventas() {
   const [busquedaDebounce, setBusquedaDebounce] = useState("");
 
   // 🔄 cargar pedidos
-  useEffect(() => {
-    fetch("/.netlify/functions/get-orders")
-      .then((res) => res.json())
-      .then((data) => {
-  setOrders(Array.isArray(data) ? data : []);
-});
-  }, []);
+useEffect(() => {
+
+  fetch("/.netlify/functions/get-orders")
+
+    .then(async (res) => {
+
+      if (!res.ok) {
+        console.error("Error Netlify:", res.status);
+
+        setOrders([]);
+        return [];
+      }
+
+      const data = await res.json();
+
+      return Array.isArray(data)
+        ? data
+        : [];
+    })
+
+    .then((data) => {
+      setOrders(data);
+    })
+
+    .catch((err) => {
+      console.error("Error cargando pedidos:", err);
+
+      setOrders([]);
+    });
+
+}, []);
 
   // ⏳ debounce buscador
   useEffect(() => {
@@ -32,7 +56,11 @@ export default function Ventas() {
     const resPedido = await fetch("/.netlify/functions/get-orders");
     const pedidos = await resPedido.json();
 
-    const pedido = pedidos.find(p => p.id === id);
+    const pedido = (
+  Array.isArray(pedidos)
+    ? pedidos
+    : []
+).find(p => p.id === id);
 
     if (!pedido) {
       alert("Pedido no encontrado");
@@ -45,7 +73,11 @@ export default function Ventas() {
     }
 
     // 🔥 descontar stock
-    for (const item of pedido.items) {
+    for (const item of (
+  Array.isArray(pedido.items)
+    ? pedido.items
+    : []
+)) {
 
       await supabase.rpc("descontar_stock", {
         p_id: item.product_id || item.id,
@@ -68,7 +100,7 @@ export default function Ventas() {
 
     // 🔄 actualizar UI
     setOrders(prev =>
-      prev.map(o =>
+      (Array.isArray(prev) ? prev : []).map(o =>
         o.id === id
           ? { ...o, estado: "enviado" }
           : o
@@ -192,8 +224,8 @@ export default function Ventas() {
 
           <h4>Productos:</h4>
 
-          {o.items?.length ? (
-            o.items.map((i, idx) => (
+          {Array.isArray(o.items) && o.items.length ? (
+  o.items.map((i, idx) => (
               <p key={idx}>
                 {i.name} x{i.qty || 1}
               </p>
