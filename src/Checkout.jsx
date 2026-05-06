@@ -4,7 +4,6 @@ import { supabase } from "./supabaseClient";
 
 export default function Checkout({
   cart,
-	const safeCart = Array.isArray(cart) ? cart : [];
   total,
   shipping,
   totalFinal,
@@ -19,6 +18,7 @@ export default function Checkout({
   formatPrice
 }) {
 
+const safeCart = Array.isArray(cart) ? cart : [];
 
 const [errors, setErrors] = useState({});
 const [coupon, setCoupon] = useState("");
