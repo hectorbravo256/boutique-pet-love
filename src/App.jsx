@@ -17,6 +17,7 @@ import Stock from "./admin/Stock";
 import Productos from "./admin/Productos";
 import CrearProducto from "./admin/CrearProducto";
 import Ventas from "./admin/Ventas";
+import ScrollToTop from "./ScrollToTop";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -730,6 +731,7 @@ return children;
 export default function App() {
   return (
   <BrowserRouter>
+	  <ScrollToTop />
   <Routes>
 
     {/* 🟢 PÚBLICO (CON HEADER) */}
