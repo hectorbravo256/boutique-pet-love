@@ -34,7 +34,9 @@ export default function Stock() {
         .from("product_stock")
         .select("*");
 
-      setStock(data || []);
+      setStock(
+  Array.isArray(data) ? data : []
+);
     };
 
     cargarStock();
@@ -67,7 +69,9 @@ export default function Stock() {
     try {
       setLoading(true);
 
-      const updates = Object.entries(stockTemp).map(([id, stock]) => ({
+      const updates = Object.entries(
+  stockTemp || {}
+).map(([id, stock]) => ({
         id: Number(id),
         stock,
       }));
@@ -104,12 +108,18 @@ export default function Stock() {
   };
 
   // 🔍 ordenar + filtrar
-  const stockOrdenado = [...stock].sort((a, b) =>
+  const stockOrdenado = [
+  ...(Array.isArray(stock) ? stock : [])
+].sort((a, b) =>
     (productos[a.product_id] || "").localeCompare(productos[b.product_id] || "") ||
     a.size.localeCompare(b.size, undefined, { numeric: true })
   );
 
-  const stockFiltrado = stockOrdenado.filter((item) =>
+  const stockFiltrado = (
+  Array.isArray(stockOrdenado)
+    ? stockOrdenado
+    : []
+).filter((item) =>
     (productos[item.product_id] || "")
       .toLowerCase()
       .includes(search.toLowerCase())
