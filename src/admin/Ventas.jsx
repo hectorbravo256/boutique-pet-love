@@ -12,7 +12,9 @@ export default function Ventas() {
   useEffect(() => {
     fetch("/.netlify/functions/get-orders")
       .then((res) => res.json())
-      .then((data) => setOrders(data));
+      .then((data) => {
+  setOrders(Array.isArray(data) ? data : []);
+});
   }, []);
 
   // ⏳ debounce buscador
@@ -75,10 +77,10 @@ export default function Ventas() {
   };
 
   // 📊 métricas
-  const totalVentas = orders.reduce((acc, o) => acc + Number(o.total || 0), 0);
-  const totalPedidos = orders.length;
-  const pendientes = orders.filter(o => o.estado === "pendiente").length;
-  const enviados = orders.filter(o => o.estado === "enviado").length;
+  const totalVentas = (Array.isArray(orders) ? orders : []).reduce((acc, o) => acc + Number(o.total || 0), 0);
+  const totalPedidos = Array.isArray(orders)   ? orders.length   : 0;
+  const pendientes = (Array.isArray(orders) ? orders : []).filter(o => o.estado === "pendiente").length;
+  const enviados = (Array.isArray(orders) ? orders : []).filter(o => o.estado === "enviado").length;
 
   // 🔍 resaltar búsqueda
   const resaltar = (texto) => {
@@ -98,7 +100,7 @@ export default function Ventas() {
   };
 
   // 📅 ordenar por fecha
-  const pedidosOrdenados = [...orders].sort(
+  const pedidosOrdenados = [   ...(Array.isArray(orders) ? orders : []) ].sort(
     (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
 
