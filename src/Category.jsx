@@ -28,7 +28,7 @@ export default function Category() {
   }, [slug]);
 
 return (
-  <div className="px-4 md:px-8 py-8 bg-pink-50 min-h-screen">
+  <div className="px-4 md:px-8 py-8 bg-gradient-to-b from-pink-50 via-white to-pink-100 min-h-screen">
 
   <h2 className="
   text-3xl
@@ -48,7 +48,21 @@ return (
   xl:grid-cols-4
   gap-5
 ">
-        {products.map(p => (
+        {products.map(p => {
+
+  const precios = p.sizes
+    ? Object.values(p.sizes)
+        .map(v => Number(v))
+        .filter(v => !isNaN(v))
+    : [];
+
+  const precioBase =
+    precios.length > 0
+      ? Math.min(...precios)
+      : Number(p.price || 0);
+
+  return (
+    
 <div
   key={p.id}
   onClick={() => navigate(`/producto/${p.id}`)}
@@ -66,6 +80,14 @@ return (
     transition-all
     duration-500
     hover:-translate-y-1
+
+  before:absolute
+  before:inset-0
+  before:bg-gradient-to-b
+  before:from-white/40
+  before:to-transparent
+  before:pointer-events-none
+  relative
   "
 >
 
@@ -109,7 +131,7 @@ return (
           rounded-full
           shadow-lg
         ">
-          OFERTA
+          🔥 -{p.discount_percent}% OFF
         </div>
 
       </div>
@@ -131,71 +153,138 @@ return (
       {p.name}
     </h3>
 
-    {/* 💰 PRECIOS */}
-    <div className="flex items-center gap-2 flex-wrap">
+    {/* 💰 PRECIOS PREMIUM */}
+<div className="mt-2">
 
-      {p.discount_active ? (
-        <>
-          <span className="
-            text-sm
-            text-gray-400
-            line-through
-          ">
-            ${Number(p.price).toLocaleString("es-CL")}
-          </span>
+  {p.discount_active ? (
 
-          <span className="
-            text-lg
-            font-black
-            text-pink-600
-          ">
-            $
-            {Math.round(
-              p.price *
-              (1 - p.discount_percent / 100)
-            ).toLocaleString("es-CL")}
-          </span>
-        </>
-      ) : (
+    <div className="flex flex-col">
+
+      {/* PRECIO ORIGINAL */}
+      <span className="
+        text-sm
+        text-gray-400
+        line-through
+      ">
+        Desde ${precioBase.toLocaleString("es-CL")}
+      </span>
+
+      {/* PRECIO FINAL */}
+      <div className="
+        flex
+        items-end
+        gap-2
+      ">
+
         <span className="
-          text-lg
+          text-[10px]
+          uppercase
+          tracking-[0.25em]
+          text-gray-400
+          font-bold
+          mb-1
+        ">
+          Desde
+        </span>
+
+        <span className="
+          text-2xl
+          md:text-3xl
           font-black
           text-pink-600
+          leading-none
         ">
-          ${Number(p.price).toLocaleString("es-CL")}
+          $
+          {Math.round(
+            precioBase *
+            (1 - p.discount_percent / 100)
+          ).toLocaleString("es-CL")}
         </span>
-      )}
+
+      </div>
 
     </div>
 
-    {/* 🔥 BOTÓN */}
-    <button
-      className="
-        mt-3
-        w-full
-        bg-gradient-to-r
-        from-pink-500
-        to-purple-500
-        hover:opacity-90
-        text-white
-        py-3
-        rounded-2xl
-        font-semibold
-        shadow-lg
-        transition-all
-        duration-300
-        hover:scale-[1.02]
-        active:scale-[0.98]
-      "
-    >
-      Ver producto
-    </button>
+  ) : (
+
+    <div className="
+      flex
+      items-end
+      gap-2
+    ">
+
+      <span className="
+        text-[10px]
+        uppercase
+        tracking-[0.25em]
+        text-gray-400
+        font-bold
+        mb-1
+      ">
+        Desde
+      </span>
+
+      <span className="
+        text-2xl
+        md:text-3xl
+        font-black
+        text-pink-600
+        leading-none
+      ">
+        $
+        {precioBase.toLocaleString("es-CL")}
+      </span>
+
+    </div>
+
+  )}
+
+</div>
+
+{/* 🔥 BOTÓN PREMIUM */}
+<div className="
+  mt-4
+  opacity-100
+  md:opacity-0
+  md:translate-y-3
+  group-hover:opacity-100
+  group-hover:translate-y-0
+  transition-all
+  duration-500
+">
+
+  <button
+    onClick={(e) => {
+  e.stopPropagation();
+  navigate(`/producto/${p.id}`);
+}}
+    className="
+      w-full
+      bg-gradient-to-r
+      from-pink-500
+      to-purple-500
+      hover:opacity-90
+      text-white
+      py-3
+      rounded-2xl
+      font-semibold
+      shadow-lg
+      transition-all
+      duration-300
+      hover:scale-[1.02]
+      active:scale-[0.98]
+    "
+  >
+    Ver producto
+  </button>
+
+</div>
 
   </div>
 
 </div>
-
-))}
+  );
+})}
 
 </div>
 
