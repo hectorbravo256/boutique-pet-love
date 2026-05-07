@@ -12,7 +12,6 @@ export default function Product() {
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
-  const [activeImage, setActiveImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
@@ -161,19 +160,23 @@ const distance = touchStartX - touchEndX;
   }
 };
 
-  const nextImage = () => {
-  const next = (currentIndex + 1) % product.product_images.length;
+const nextImage = () => {
+  const next =
+    (currentIndex + 1) %
+    product.product_images.length;
+
   setCurrentIndex(next);
-  setActiveImage(product.product_images[next].url);
 };
 
 const prevImage = () => {
   const prev =
-    (currentIndex - 1 + product.product_images.length) %
+    (
+      currentIndex - 1 +
+      product.product_images.length
+    ) %
     product.product_images.length;
 
   setCurrentIndex(prev);
-  setActiveImage(product.product_images[prev].url);
 };
 
   /* ================= CARGA DATOS ================= */
@@ -196,9 +199,14 @@ const prevImage = () => {
   }, [id]);
 
   useEffect(() => {
-  if (product?.product_images?.length > 0) {
-    setActiveImage(product.product_images[0].url);
-  }
+
+  if (!product?.product_images) return;
+
+  product.product_images.forEach((img) => {
+    const preload = new Image();
+    preload.src = `${img.url}?width=1200&quality=80`;
+  });
+
 }, [product]);
 
   useEffect(() => {
@@ -212,6 +220,22 @@ const prevImage = () => {
 
     cargarStock();
   }, []);
+
+  useEffect(() => {
+
+  const handleEsc = (e) => {
+    if (e.key === "Escape") {
+      setShowModal(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleEsc);
+
+  return () => {
+    window.removeEventListener("keydown", handleEsc);
+  };
+
+}, []);
 
   /* ================= AUTO SELECT ================= */
   useEffect(() => {
@@ -326,29 +350,35 @@ return (
   >
 <div style={{ position: "relative" }}>
 
-  <img
-    src={`${activeImage}?width=800&quality=70`}
-    loading="lazy"
-    onLoad={(e) => e.target.classList.remove("opacity-0")}
-    
-    onClick={() => {
-      const index = product.product_images.findIndex(
-        img => img.url === activeImage
-      );
-      setCurrentIndex(index);
-      setShowModal(true);
-    }}
-    className="
-  opacity-0
-  transition-all
-  duration-700
-  w-full
-  rounded-3xl
-  shadow-2xl
-  object-cover
-  hover:scale-[1.02]
-"
-  />
+<img
+  key={currentIndex}
+  src={`${product.product_images[currentIndex]?.url}?width=1200&quality=80`}
+  loading="eager"
+
+  onClick={() => {
+    setShowModal(true);
+  }}
+
+  className="
+    w-full
+    rounded-3xl
+    shadow-2xl
+    object-cover
+
+    transition-all
+    duration-700
+    ease-out
+
+    hover:scale-[1.03]
+
+    animate-[fadeImage_.45s_ease]
+  "
+
+  style={{
+    aspectRatio: "1 / 1",
+    cursor: "zoom-in"
+  }}
+/>
 
   {/* 🔥 BADGE DESCUENTO */}
   {tieneDescuento && product.discount_percent > 0 && (
@@ -376,41 +406,67 @@ return (
   </div>
 
   {/* MINIATURAS */}
-  <div style={{
-    display: "flex",
-    gap: 10,
-    marginTop: 15
-  }}>
-    {product.product_images?.map((img, i) => (
+<div className="
+  flex
+  gap-3
+  mt-5
+  overflow-x-auto
+  pb-2
+  scrollbar-hide
+">
+
+  {product.product_images?.map((img, i) => (
+
+    <button
+      key={i}
+      onClick={() => {
+        setCurrentIndex(i);
+      }}
+
+      className={`
+        relative
+        flex-shrink-0
+        rounded-2xl
+        overflow-hidden
+        transition-all
+        duration-300
+
+        ${
+          currentIndex === i
+            ? "ring-2 ring-pink-500 scale-105 shadow-2xl"
+            : "opacity-70 hover:opacity-100"
+        }
+      `}
+    >
+
       <img
-  key={i}
-  src={`${img.url}?width=200&quality=60`}
-  loading="lazy"
-  onLoad={(e) => e.target.classList.remove("opacity-0")}
-  onClick={() => {
-    setActiveImage(img.url);
-    setCurrentIndex(i);
-  }}
-  className={`
-  opacity-0
-  w-20
-  h-20
-  object-cover
-  rounded-2xl
-  cursor-pointer
-  transition-all
-  duration-300
-  border-2
-  hover:scale-105
-  ${
-    activeImage === img.url
-      ? "border-pink-500 shadow-xl scale-105"
-      : "border-transparent opacity-80 hover:opacity-100"
-  }
-`}
-/>
-    ))}
-  </div>
+        src={`${img.url}?width=200&quality=60`}
+        className="
+          w-20
+          h-20
+          object-cover
+          transition-all
+          duration-500
+          hover:scale-110
+        "
+      />
+
+      {/* GLOW PREMIUM */}
+      {currentIndex === i && (
+        <div className="
+          absolute
+          inset-0
+          bg-gradient-to-tr
+          from-pink-500/20
+          to-purple-500/20
+        " />
+      )}
+
+    </button>
+
+  ))}
+
+</div>
 
 </div>
       </div>
@@ -761,7 +817,7 @@ onMouseOut={(e) => {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "rgba(0,0,0,0.85)",
+    background:   "linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.98))",
     backdropFilter: "blur(8px)",
     display: "flex",
     alignItems: "center",
@@ -810,6 +866,8 @@ onMouseOut={(e) => {
     prevImage();
   }}
   className="
+    hidden
+    md:flex
     absolute
     left-5
     top-1/2
@@ -836,6 +894,8 @@ onMouseOut={(e) => {
     nextImage();
   }}
   className="
+    hidden
+    md:flex
     absolute
     right-5
     top-1/2
@@ -855,7 +915,7 @@ onMouseOut={(e) => {
   ›
 </button>
     <img
-  src={`${product.product_images[currentIndex].url}?width=1200&quality=80`}
+  src={`${product.product_images?.[currentIndex]?.url}?width=1200&quality=80`}
       className="
     animate-[fadeZoom_.3s_ease]
   "
@@ -879,7 +939,6 @@ onMouseOut={(e) => {
       onClick={(e) => {
         e.stopPropagation();
         setCurrentIndex(i);
-        setActiveImage(product.product_images[i].url);
       }}
       style={{
         width: i === currentIndex ? 14 : 10,
@@ -1026,6 +1085,19 @@ onMouseOut={(e) => {
     transform: scale(1);
   }
 }
+
+@keyframes fadeImage {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 `}
 </style>
     
