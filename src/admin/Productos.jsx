@@ -194,12 +194,13 @@ export default function Productos() {
 
         return (
   <FilaProducto
-    key={p.id}
-    p={p}
-    variantesOrdenadas={variantesOrdenadas}
-    tallaDefault={tallaDefault}
-    setProductosFull={setProductosFull}
-  />
+  key={p.id}
+  p={p}
+  variantesOrdenadas={variantesOrdenadas}
+  tallaDefault={tallaDefault}
+  setProductosFull={setProductosFull}
+  recargarProductos={recargarProductos}
+/>
 );
       })}
   </tbody>
@@ -223,7 +224,13 @@ export default function Productos() {
     </div>
   );
 }
-function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull }) {
+function FilaProducto({
+  p,
+  variantesOrdenadas,
+  tallaDefault,
+  setProductosFull,
+  recargarProductos
+}) {
 
   const [tallaSeleccionada, setTallaSeleccionada] = useState(tallaDefault);
   const [precioTemporal, setPrecioTemporal] = useState(tallaDefault?.price || "");
@@ -251,7 +258,7 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
       {/* ✅ ACTIVO */}
       <input
         type="checkbox"
-        checked={p.active}
+        checked={Boolean(p.active)}
         onChange={async (e) => {
           const nuevo = e.target.checked;
 
@@ -261,10 +268,16 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
             )
           );
 
-          await supabase
-            .from("products")
-            .update({ active: nuevo })
-            .eq("id", p.id);
+          const { error } = await supabase
+  .from("products")
+  .update({ active: nuevo })
+  .eq("id", p.id);
+
+if (error) {
+  console.error(error);
+  alert("No se pudo guardar");
+}
+    await recargarProductos();
         }}
       />
 
@@ -278,7 +291,7 @@ function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull })
 }}>
       <input
         type="checkbox"
-        checked={p.discount_active || false}
+        checked={Boolean(p.discount_active)}
         onChange={async (e) => {
           const activo = e.target.checked;
 
@@ -296,15 +309,30 @@ setProductosFull(prev =>
   )
 );
 
-await supabase
+const { error } = await supabase
   .from("products")
   .update({
-       discount_active: activo,
-    discount_percent: activo ? (p.discount_percent || 0) : 0,
-    discount_start: activo ? p.discount_start : null,
-    discount_end: activo ? p.discount_end : null
+    discount_active: activo,
+
+    discount_percent: activo
+      ? (p.discount_percent || 0)
+      : 0,
+
+    discount_start: activo
+      ? p.discount_start
+      : null,
+
+    discount_end: activo
+      ? p.discount_end
+      : null
   })
   .eq("id", p.id);
+
+if (error) {
+  console.error(error);
+  alert("No se pudo guardar descuento");
+}
+   await recargarProductos();
         }}
       />
 </label>
