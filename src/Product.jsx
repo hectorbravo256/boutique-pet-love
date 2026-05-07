@@ -869,17 +869,33 @@ onMouseOut={(e) => {
     hidden
     md:flex
     absolute
-    left-5
+    left-6
     top-1/2
     -translate-y-1/2
+
     w-14
     h-14
+
+    items-center
+    justify-center
+
     rounded-full
+
     bg-white/10
-    backdrop-blur-lg
+    backdrop-blur-2xl
+
+    border
+    border-white/10
+
     text-white
-    text-2xl
+    text-5xl
+    font-light
+
+    shadow-[0_8px_30px_rgba(0,0,0,0.25)]
+
     hover:bg-white/20
+    hover:scale-110
+
     transition-all
     duration-300
   "
@@ -897,17 +913,33 @@ onMouseOut={(e) => {
     hidden
     md:flex
     absolute
-    right-5
+    right-6
     top-1/2
     -translate-y-1/2
+
     w-14
     h-14
+
+    items-center
+    justify-center
+
     rounded-full
+
     bg-white/10
-    backdrop-blur-lg
+    backdrop-blur-2xl
+
+    border
+    border-white/10
+
     text-white
-    text-2xl
+    text-5xl
+    font-light
+
+    shadow-[0_8px_30px_rgba(0,0,0,0.25)]
+
     hover:bg-white/20
+    hover:scale-110
+
     transition-all
     duration-300
   "
