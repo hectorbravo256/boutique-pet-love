@@ -143,103 +143,21 @@ return (
   <div className="p-4 space-y-2">
 
     <h3 className="
-      font-bold
-      text-gray-800
-      text-sm
-      md:text-base
-      line-clamp-2
-      min-h-[48px]
-    ">
+  font-black
+  text-gray-800
+  text-lg
+  md:text-xl
+  leading-tight
+  tracking-tight
+  line-clamp-2
+  min-h-[56px]
+  transition-all
+  duration-300
+  group-hover:text-pink-600
+">
       {p.name}
     </h3>
 
-    {/* 💰 PRECIOS PREMIUM */}
-<div className="mt-2">
-
-  {p.discount_active ? (
-
-    <div className="flex flex-col">
-
-      {/* PRECIO ORIGINAL */}
-      <span className="
-        text-sm
-        text-gray-400
-        line-through
-      ">
-        Desde ${precioBase.toLocaleString("es-CL")}
-      </span>
-
-      {/* PRECIO FINAL */}
-      <div className="
-        flex
-        items-end
-        gap-2
-      ">
-
-        <span className="
-          text-[10px]
-          uppercase
-          tracking-[0.25em]
-          text-gray-400
-          font-bold
-          mb-1
-        ">
-          Desde
-        </span>
-
-        <span className="
-          text-2xl
-          md:text-3xl
-          font-black
-          text-pink-600
-          leading-none
-        ">
-          $
-          {Math.round(
-            precioBase *
-            (1 - p.discount_percent / 100)
-          ).toLocaleString("es-CL")}
-        </span>
-
-      </div>
-
-    </div>
-
-  ) : (
-
-    <div className="
-      flex
-      items-end
-      gap-2
-    ">
-
-      <span className="
-        text-[10px]
-        uppercase
-        tracking-[0.25em]
-        text-gray-400
-        font-bold
-        mb-1
-      ">
-        Desde
-      </span>
-
-      <span className="
-        text-2xl
-        md:text-3xl
-        font-black
-        text-pink-600
-        leading-none
-      ">
-        $
-        {precioBase.toLocaleString("es-CL")}
-      </span>
-
-    </div>
-
-  )}
-
-</div>
 
 {/* 🔥 BOTÓN PREMIUM */}
 <div className="
