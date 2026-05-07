@@ -354,31 +354,102 @@ onBlur={async (e) => {
 )}
 
       
+      {/* 🗑 ELIMINAR PRODUCTO PREMIUM */}
+<button
+  onClick={async () => {
+    if (!confirm("¿Eliminar producto completo?")) return;
 
-      {/* 🗑 ELIMINAR PRODUCTO */}
-      <button
-        onClick={async () => {
-          if (!confirm("¿Eliminar producto completo?")) return;
+    await supabase
+      .from("product_variants")
+      .delete()
+      .eq("product_id", p.id);
 
-          await supabase.from("product_variants").delete().eq("product_id", p.id);
-          await supabase.from("product_images").delete().eq("product_id", p.id);
-          await supabase.from("products").delete().eq("id", p.id);
+    await supabase
+      .from("product_images")
+      .delete()
+      .eq("product_id", p.id);
 
-          setProductosFull(prev =>
-            prev.filter(prod => prod.id !== p.id)
-          );
-        }}
-        style={{
-          background: "#fff",
-          color: "#ef4444",
-          border: "1px solid #ef4444",
-          borderRadius: 6,
-          padding: "4px 6px",
-          cursor: "pointer"
-        }}
-      >
-        🗑
-      </button>
+    await supabase
+      .from("products")
+      .delete()
+      .eq("id", p.id);
+
+    setProductosFull(prev =>
+      prev.filter(prod => prod.id !== p.id)
+    );
+  }}
+
+  style={{
+    width: 38,
+    height: 38,
+
+    borderRadius: 14,
+
+    border: "1px solid rgba(239,68,68,0.15)",
+
+    background:
+      "linear-gradient(135deg, #fff5f5, #ffe4e6)",
+
+    color: "#ef4444",
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    cursor: "pointer",
+
+    transition: "all .25s ease",
+
+    boxShadow:
+      "0 4px 15px rgba(239,68,68,0.08)"
+  }}
+
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(-2px) scale(1.05)";
+
+    e.currentTarget.style.boxShadow =
+      "0 10px 25px rgba(239,68,68,0.20)";
+
+    e.currentTarget.style.background =
+      "linear-gradient(135deg, #ef4444, #ec4899)";
+
+    e.currentTarget.style.color = "#fff";
+  }}
+
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(0px) scale(1)";
+
+    e.currentTarget.style.boxShadow =
+      "0 4px 15px rgba(239,68,68,0.08)";
+
+    e.currentTarget.style.background =
+      "linear-gradient(135deg, #fff5f5, #ffe4e6)";
+
+    e.currentTarget.style.color = "#ef4444";
+  }}
+>
+
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2.3}
+    stroke="currentColor"
+    style={{
+      width: 17,
+      height: 17
+    }}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+
+</button>
 
     </div>
 
