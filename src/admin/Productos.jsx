@@ -226,6 +226,9 @@ export default function Productos() {
 function FilaProducto({ p, variantesOrdenadas, tallaDefault, setProductosFull }) {
 
   const [tallaSeleccionada, setTallaSeleccionada] = useState(tallaDefault);
+  const [precioTemporal, setPrecioTemporal] = useState(tallaDefault?.price || "");
+  const [estadoGuardado, setEstadoGuardado] =
+  useState("idle");
 
   return (
     <tr
@@ -568,6 +571,7 @@ onBlur={async (e) => {
               x => x.id === parseInt(e.target.value)
             );
             setTallaSeleccionada(v);
+            setPrecioTemporal(v?.price || "");
           }}
         >
           {variantesOrdenadas.map(v => (
@@ -581,38 +585,152 @@ onBlur={async (e) => {
       {/* PRECIO */}
       <td style={{ padding: "10px 12px" }}>
         <input
-          type="number"
-          value={tallaSeleccionada?.price || ""}
-          onChange={async (e) => {
-            const nuevo = parseInt(e.target.value);
+  type="number"
+  value={precioTemporal}
 
-            setProductosFull(prev =>
-              prev.map(prod =>
-                prod.id === p.id
-                  ? {
-                      ...prod,
-                      product_variants: prod.product_variants.map(v =>
-                        v.id === tallaSeleccionada.id
-                          ? { ...v, price: nuevo }
-                          : v
-                      )
-                    }
-                  : prod
-              )
-            );
+  onChange={(e) => {
+    setPrecioTemporal(e.target.value);
+  }}
 
-            await supabase
-              .from("product_variants")
-              .update({ price: nuevo })
-              .eq("id", tallaSeleccionada.id);
-          }}
-          style={{
-            width: 80,
-            padding: 6,
-            borderRadius: 6,
-            border: "1px solid #ddd"
-          }}
-        />
+    onFocus={(e) => {
+    e.target.style.border =
+      "1px solid #ec4899";
+
+    e.target.style.boxShadow =
+      "0 0 0 4px rgba(236,72,153,0.12)";
+  }}
+
+  onBlurCapture={(e) => {
+    e.target.style.border =
+      "1px solid #f1f5f9";
+
+    e.target.style.boxShadow =
+      "0 2px 10px rgba(0,0,0,0.04)";
+  }}
+          
+  onBlur={async () => {
+
+    const nuevo = parseInt(precioTemporal);
+
+    if (isNaN(nuevo)) return;
+
+    setProductosFull(prev =>
+      prev.map(prod =>
+        prod.id === p.id
+          ? {
+              ...prod,
+              product_variants:
+                prod.product_variants.map(v =>
+                  v.id === tallaSeleccionada.id
+                    ? { ...v, price: nuevo }
+                    : v
+                )
+            }
+          : prod
+      )
+    );
+
+setEstadoGuardado("saving");
+
+await supabase
+  .from("product_variants")
+  .update({ price: nuevo })
+  .eq("id", tallaSeleccionada.id);
+
+setEstadoGuardado("saved");
+
+setTimeout(() => {
+  setEstadoGuardado("idle");
+}, 1800);
+
+  }}
+
+style={{
+  width: 100,
+
+  padding: "10px 12px",
+
+  borderRadius: 14,
+
+  border: "1px solid #f1f5f9",
+
+  background: "#fff",
+
+  fontWeight: "700",
+  fontSize: 15,
+
+  outline: "none",
+
+  transition: "all .25s ease",
+
+  boxShadow:
+    "0 2px 10px rgba(0,0,0,0.04)"
+}}
+/>
+
+<div
+  style={{
+    position: "relative",
+    height: 20,
+    marginTop: 6
+  }}
+>
+
+  {/* ⏳ GUARDANDO */}
+  <span
+    style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+      opacity:
+        estadoGuardado === "saving"
+          ? 1
+          : 0,
+
+      transform:
+        estadoGuardado === "saving"
+          ? "translateY(0)"
+          : "translateY(4px)",
+
+      transition: "all .35s ease",
+
+      color: "#f59e0b",
+      fontSize: 12,
+      fontWeight: "600"
+    }}
+  >
+    ⏳ Guardando...
+  </span>
+
+  {/* ✅ GUARDADO */}
+  <span
+    style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+
+      opacity:
+        estadoGuardado === "saved"
+          ? 1
+          : 0,
+
+      transform:
+        estadoGuardado === "saved"
+          ? "translateY(0)"
+          : "translateY(4px)",
+
+      transition: "all .35s ease",
+
+      color: "#22c55e",
+      fontSize: 12,
+      fontWeight: "700"
+    }}
+  >
+    ✓ Guardado
+  </span>
+
+</div>
+        
       </td>
 
       {/* ACCIONES */}
