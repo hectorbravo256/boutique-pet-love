@@ -93,25 +93,42 @@ const productosAgrupados = Object.values(
 
     acc[item.product_id].variants.sort((a, b) => {
 
-  const ordenTallas = {
-    XXS: 1,
-    XS: 2,
-    S: 3,
-    M: 4,
-    L: 5,
-    XL: 6,
-    XXL: 7
-  };
+const ordenTallas = {
+  XXS: 1,
+  XS: 2,
+  S: 3,
+  M: 4,
+  L: 5,
+  XL: 6,
+  XXL: 7,
+  XXXL: 8,
+
+  "TALLA 0": 20,
+    "TALLA 1": 21,
+    "TALLA 2": 22,
+    "TALLA 3": 23,
+    "TALLA 4": 24,
+    "TALLA 5": 25,
+    "TALLA 6": 26,
+    "TALLA 7": 27,
+    "TALLA 8": 28,
+    "TALLA 9": 29,
+    "TALLA 10": 30,
+    "TALLA 11": 31,
+    "TALLA 12": 32
+};
+
+acc[item.product_id].variants.sort((a, b) => {
 
   const tallaA =
-    ordenTallas[a.size] ||
-    parseInt(a.size.replace(/\D/g, "")) ||
-    999;
+    ordenTallas[
+      a.size?.toUpperCase()
+    ] || 999;
 
   const tallaB =
-    ordenTallas[b.size] ||
-    parseInt(b.size.replace(/\D/g, "")) ||
-    999;
+    ordenTallas[
+      b.size?.toUpperCase()
+    ] || 999;
 
   return tallaA - tallaB;
 
