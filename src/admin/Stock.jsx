@@ -5,8 +5,7 @@ export default function Stock() {
 
   const [stock, setStock] = useState([]);
   const [productos, setProductos] = useState({});
-  const [stockTemp, setStockTemp] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [estadoGuardado, setEstadoGuardado] = useState({});
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] =
   useState("Todas");
@@ -74,50 +73,6 @@ setProductos(map);
     });
   };
 
-  // 💾 guardar todos
-  const guardarCambios = async () => {
-    try {
-      setLoading(true);
-
-      const updates = Object.entries(
-  stockTemp || {}
-).map(([id, stock]) => ({
-        id: Number(id),
-        stock,
-      }));
-
-      if (!updates.length) return;
-
-      const results = await Promise.all(
-        updates.map((u) =>
-          supabase
-            .from("product_stock")
-            .update({ stock: u.stock })
-            .eq("id", u.id)
-        )
-      );
-
-      const hasError = results.some((r) => r.error);
-      if (hasError) return;
-
-      setStock((prev) =>
-        prev.map((item) => {
-          const nuevo = updates.find(
-  (u) => u.id === item.id
-);
-          return nuevo ? { ...item, stock: nuevo.stock } : item;
-        })
-      );
-
-      setStockTemp({});
-      alert("✅ Stock actualizado");
-
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 🔍 ordenar + filtrar
 const productosAgrupados = Object.values(
@@ -135,6 +90,32 @@ const productosAgrupados = Object.values(
 
     acc[item.product_id]
       .variants.push(item);
+
+    acc[item.product_id].variants.sort((a, b) => {
+
+  const ordenTallas = {
+    XXS: 1,
+    XS: 2,
+    S: 3,
+    M: 4,
+    L: 5,
+    XL: 6,
+    XXL: 7
+  };
+
+  const tallaA =
+    ordenTallas[a.size] ||
+    parseInt(a.size.replace(/\D/g, "")) ||
+    999;
+
+  const tallaB =
+    ordenTallas[b.size] ||
+    parseInt(b.size.replace(/\D/g, "")) ||
+    999;
+
+  return tallaA - tallaB;
+
+});
 
     return acc;
 
@@ -253,32 +234,9 @@ const productosFiltrados =
 </select>
 
       {/* 💾 BOTÓN GUARDAR */}
-      <button
-        disabled={loading}
-        onClick={guardarCambios}
-        style={{
-          marginBottom: 15,
-          background: "#2563eb",
-          color: "#fff",
-          padding: "10px 16px",
-          borderRadius: 8,
-          border: "none",
-          cursor: "pointer",
-          fontWeight: "bold"
-        }}
-      >
-        {loading ? "⏳ Guardando..." : "💾 Guardar todos los cambios"}
-      </button>
 
       {/* ⚠️ cambios pendientes */}
-      {Object.keys(stockTemp).length > 0 && (
-        <p style={{
-          color: "#f59e0b",
-          fontWeight: "bold"
-        }}>
-          ⚠️ Cambios sin guardar ({Object.keys(stockTemp).length})
-        </p>
-      )}
+  
 
       {/* 📊 TABLA */}
       <table style={{
@@ -430,41 +388,161 @@ onMouseLeave={(e) => {
 
               <td style={{ textAlign: "center" }}>
                 <input
-                  type="number"
-                  value={stockTemp[tallaActual.id] ?? tallaActual.stock}
-                  onChange={(e) =>
-                    setStockTemp((prev) => ({
-                      ...prev,
-                      [tallaActual.id]: Math.max(parseInt(e.target.value) || 0, 0),
-                    }))
-                  }
-                  style={{
-  width: 80,
+  type="number"
+  value={tallaActual.stock}
 
-  padding: "10px 12px",
+  onChange={(e) => {
 
-  borderRadius: 12,
+    const nuevo =
+      Math.max(
+        parseInt(e.target.value) || 0,
+        0
+      );
 
-  border: "1px solid #e5e7eb",
+    setStock(prev =>
+      prev.map(item =>
+        item.id === tallaActual.id
+          ? { ...item, stock: nuevo }
+          : item
+      )
+    );
 
-  textAlign: "center",
+  }}
 
-  fontWeight: "700",
+  onBlur={async (e) => {
 
-  fontSize: 15,
+    const nuevo =
+      Math.max(
+        parseInt(e.target.value) || 0,
+        0
+      );
 
-  background: "#fff",
+    setEstadoGuardado(prev => ({
+      ...prev,
+      [tallaActual.id]: "saving"
+    }));
 
-  boxShadow:
-    "0 4px 12px rgba(0,0,0,0.04)"
-}}
-                />
+    const { error } = await supabase
+      .from("product_stock")
+      .update({ stock: nuevo })
+      .eq("id", tallaActual.id);
+
+    if (!error) {
+
+      setEstadoGuardado(prev => ({
+        ...prev,
+        [tallaActual.id]: "saved"
+      }));
+
+      setTimeout(() => {
+        setEstadoGuardado(prev => ({
+          ...prev,
+          [tallaActual.id]: "idle"
+        }));
+      }, 1800);
+
+    }
+
+  }}
+
+  onFocus={(e) => {
+    e.target.style.border =
+      "1px solid #ec4899";
+
+    e.target.style.boxShadow =
+      "0 0 0 4px rgba(236,72,153,0.12)";
+  }}
+
+  onBlurCapture={(e) => {
+    e.target.style.border =
+      "1px solid #e5e7eb";
+
+    e.target.style.boxShadow =
+      "0 4px 12px rgba(0,0,0,0.04)";
+  }}
+
+  style={{
+    width: 80,
+
+    padding: "10px 12px",
+
+    borderRadius: 12,
+
+    border: "1px solid #e5e7eb",
+
+    textAlign: "center",
+
+    fontWeight: "700",
+
+    fontSize: 15,
+
+    background: "#fff",
+
+    transition: "all .25s ease",
+
+    boxShadow:
+      "0 4px 12px rgba(0,0,0,0.04)"
+  }}
+/>
 
                 <div
   style={{
     marginTop: 6
   }}
 >
+
+                  <div
+  style={{
+    position: "relative",
+    height: 20,
+    marginTop: 6
+  }}
+>
+
+  <span
+    style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+
+      opacity:
+        estadoGuardado[tallaActual.id] === "saving"
+          ? 1
+          : 0,
+
+      transition: "all .35s ease",
+
+      color: "#f59e0b",
+      fontSize: 12,
+      fontWeight: "600"
+    }}
+  >
+    ⏳ Guardando...
+  </span>
+
+  <span
+    style={{
+      position: "absolute",
+      left: 0,
+      top: 0,
+
+      opacity:
+        estadoGuardado[tallaActual.id] === "saved"
+          ? 1
+          : 0,
+
+      transition: "all .35s ease",
+
+      color: "#22c55e",
+      fontSize: 12,
+      fontWeight: "700"
+    }}
+  >
+    ✓ Guardado
+  </span>
+
+</div>
+                  
 
   {tallaActual.stock <= 0 ? (
 
