@@ -52,26 +52,6 @@ setProductos(map);
   }, []);
 
   // 🔥 actualizar stock individual
-  const actualizarStock = async (id, nuevoStock) => {
-    const { error } = await supabase
-      .from("product_stock")
-      .update({ stock: nuevoStock })
-      .eq("id", id);
-
-    if (error) return;
-
-    setStock((prev) =>
-      prev.map((s) =>
-        s.id === id ? { ...s, stock: nuevoStock } : s
-      )
-    );
-
-    setStockTemp((prev) => {
-      const nuevo = { ...prev };
-      delete nuevo[id];
-      return nuevo;
-    });
-  };
 
 
   // 🔍 ordenar + filtrar
@@ -91,48 +71,46 @@ const productosAgrupados = Object.values(
     acc[item.product_id]
       .variants.push(item);
 
+    const ordenTallas = {
+      XXS: 1,
+      XS: 2,
+      S: 3,
+      M: 4,
+      L: 5,
+      XL: 6,
+      XXL: 7,
+      XXXL: 8,
+
+      "TALLA 0": 20,
+      "TALLA 1": 21,
+      "TALLA 2": 22,
+      "TALLA 3": 23,
+      "TALLA 4": 24,
+      "TALLA 5": 25,
+      "TALLA 6": 26,
+      "TALLA 7": 27,
+      "TALLA 8": 28,
+      "TALLA 9": 29,
+      "TALLA 10": 30,
+      "TALLA 11": 31,
+      "TALLA 12": 32
+    };
+
     acc[item.product_id].variants.sort((a, b) => {
 
-const ordenTallas = {
-  XXS: 1,
-  XS: 2,
-  S: 3,
-  M: 4,
-  L: 5,
-  XL: 6,
-  XXL: 7,
-  XXXL: 8,
+      const tallaA =
+        ordenTallas[
+          a.size?.trim().toUpperCase()
+        ] || 999;
 
-  "TALLA 0": 20,
-    "TALLA 1": 21,
-    "TALLA 2": 22,
-    "TALLA 3": 23,
-    "TALLA 4": 24,
-    "TALLA 5": 25,
-    "TALLA 6": 26,
-    "TALLA 7": 27,
-    "TALLA 8": 28,
-    "TALLA 9": 29,
-    "TALLA 10": 30,
-    "TALLA 11": 31,
-    "TALLA 12": 32
-};
+      const tallaB =
+        ordenTallas[
+          b.size?.trim().toUpperCase()
+        ] || 999;
 
-acc[item.product_id].variants.sort((a, b) => {
+      return tallaA - tallaB;
 
-  const tallaA =
-    ordenTallas[
-      a.size?.toUpperCase()
-    ] || 999;
-
-  const tallaB =
-    ordenTallas[
-      b.size?.toUpperCase()
-    ] || 999;
-
-  return tallaA - tallaB;
-
-});
+    });
 
     return acc;
 
@@ -603,7 +581,7 @@ onMouseLeave={(e) => {
                   {/* + */}
                   <button
                     onClick={() =>
-                      actualizarStock(tallaActual.id, (stockTemp[tallaActual.id] ?? tallaActual.stock) + 1)
+                      actualizarStock(tallaActual.id, tallaActual.stock + 1)
                     }
                     {...hoverAnim}
                     onMouseEnter={(e) => hoverAnim.onMouseEnter(e, "0 8px 20px rgba(34,197,94,0.4)")}
@@ -624,7 +602,7 @@ onMouseLeave={(e) => {
                   {/* - */}
                   <button
                     onClick={() =>
-                      actualizarStock(tallaActual.id, Math.max((stockTemp[tallaActual.id] ?? tallaActual.stock) - 1, 0))
+                      actualizarStock(tallaActual.id, Math.max(tallaActual.stock - 1, 0))
                     }
                     {...hoverAnim}
                     onMouseEnter={(e) => hoverAnim.onMouseEnter(e, "0 8px 20px rgba(239,68,68,0.4)")}
@@ -642,23 +620,8 @@ onMouseLeave={(e) => {
                     −
                   </button>
 
-                  {/* guardar */}
-                  <button
-                    onClick={() =>
-                      actualizarStock(tallaActual.id, stockTemp[tallaActual.id] ?? tallaActual.stock)
-                    }
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: "#3b82f6",
-                      color: "#fff",
-                      border: "none",
-                      cursor: "pointer"
-                    }}
-                  >
-                    💾
-                  </button>
+    
+                  
 
                 </div>
               </td>
