@@ -51,6 +51,49 @@ setProductos(map);
     cargarStock();
   }, []);
 
+  const actualizarStock = async (id, nuevoStock) => {
+
+  // 🔥 actualizar UI instantánea
+  setStock(prev =>
+    prev.map(item =>
+      item.id === id
+        ? { ...item, stock: nuevoStock }
+        : item
+    )
+  );
+
+  // 🔥 estado guardando
+  setEstadoGuardado(prev => ({
+    ...prev,
+    [id]: "saving"
+  }));
+
+  // 🔥 guardar en Supabase
+  const { error } = await supabase
+    .from("product_stock")
+    .update({ stock: nuevoStock })
+    .eq("id", id);
+
+  if (!error) {
+
+    setEstadoGuardado(prev => ({
+      ...prev,
+      [id]: "saved"
+    }));
+
+    setTimeout(() => {
+
+      setEstadoGuardado(prev => ({
+        ...prev,
+        [id]: "idle"
+      }));
+
+    }, 1800);
+
+  }
+
+};
+
   // 🔥 actualizar stock individual
 
 
@@ -311,25 +354,41 @@ onMouseLeave={(e) => {
 >
         
 
-              <td>
+  <td style={{ padding: "10px 12px" }}>
 
   <div
     style={{
-      fontWeight: "700",
-      color: "#111827"
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      flexWrap: "wrap"
     }}
   >
-    {info?.name}
-  </div>
 
-  <div
-    style={{
-      fontSize: 12,
-      color: "#9ca3af",
-      marginTop: 4
-    }}
-  >
-    {info?.category}
+    <span
+      style={{
+        fontWeight: "700",
+        color: "#111827",
+        fontSize: 15
+      }}
+    >
+      {info?.name}
+    </span>
+
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: "700",
+        padding: "4px 10px",
+        borderRadius: 999,
+        background: "#f3f4f6",
+        color: "#6b7280",
+        border: "1px solid #e5e7eb"
+      }}
+    >
+      {info?.category}
+    </span>
+
   </div>
 
 </td>
