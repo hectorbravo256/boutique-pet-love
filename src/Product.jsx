@@ -7,7 +7,7 @@ const WHATSAPP = "https://wa.me/56982700002";
 export default function Product() {
   const { id } = useParams();
 
-  const [stockDB, setStockDB] = useState([]);
+  
   const [product, setProduct] = useState(null);
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -17,9 +17,7 @@ export default function Product() {
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchEndX, setTouchEndX] = useState(0);
 
-  const stockMap = Object.fromEntries(
-    stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
-  );
+  
 
   /* ================= SELECT TALLA ================= */
   const handleSelect = (variant) => {
@@ -32,7 +30,7 @@ export default function Product() {
   const increaseQty = () => {
     if (!selectedVariant) return;
 
-    const stock = stockMap[`${product.id}-${selectedVariant.size}`] || 0;
+    const stock = selectedVariant.stock || 0;
 
     if (qty < stock) setQty(qty + 1);
   };
@@ -42,9 +40,8 @@ export default function Product() {
   };
 
   /* ================= STOCK ================= */
-  const currentStock = selectedVariant
-    ? stockMap[`${product.id}-${selectedVariant.size}`] || 0
-    : 0;
+  const currentStock =
+  selectedVariant?.stock || 0;
 
   const isOutOfStock = selectedVariant && currentStock === 0;
 
@@ -98,7 +95,7 @@ const precioFinal = tieneDescuento
     }
 
     const size = variant.size;
-    const stock = stockMap[`${product.id}-${size}`] || 0;
+    const stock = variant.stock || 0;
 
     if (stock === 0) {
       window.dispatchEvent(
@@ -191,6 +188,13 @@ const prevImage = () => {
         `)
         .eq("id", id)
         .single();
+      
+      data.product_images?.sort(
+  (a, b) =>
+    (a.sort_order || 0)
+    -
+    (b.sort_order || 0)
+);
 
       setProduct(data);
     };
@@ -209,17 +213,7 @@ const prevImage = () => {
 
 }, [product]);
 
-  useEffect(() => {
-    const cargarStock = async () => {
-      const { data } = await supabase
-        .from("product_stock")
-        .select("*");
 
-      setStockDB(data || []);
-    };
-
-    cargarStock();
-  }, []);
 
   useEffect(() => {
 
@@ -239,17 +233,17 @@ const prevImage = () => {
 
   /* ================= AUTO SELECT ================= */
   useEffect(() => {
-    if (!product || stockDB.length === 0) return;
+    if (!product) return;
 
     const firstAvailable = product.product_variants.find(
-      v => (stockMap[`${product.id}-${v.size}`] || 0) > 0
+      v => (v.stock || 0) > 0
     );
 
     if (firstAvailable) {
       setSelected(firstAvailable.id);
       setSelectedVariant(firstAvailable);
     }
-  }, [product, stockDB]);
+  }, [product]);
 
   if (!product) {
   return (
@@ -600,12 +594,42 @@ const precioFinal = precioBase * cantidad;
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {[...product.product_variants]
-              .sort((a, b) =>
-                parseInt(a.size.match(/\d+/)) -
-                parseInt(b.size.match(/\d+/))
-              )
+              .sort((a, b) => {
+
+  const orden = [
+    "XXS",
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL",
+    "XXXL",
+
+    "Talla 0",
+    "Talla 1",
+    "Talla 2",
+    "Talla 3",
+    "Talla 4",
+    "Talla 5",
+    "Talla 6",
+    "Talla 7",
+    "Talla 8",
+    "Talla 9",
+    "Talla 10",
+    "Talla 11",
+    "Talla 12"
+  ];
+
+  return (
+    orden.indexOf(a.size)
+    -
+    orden.indexOf(b.size)
+  );
+
+})
               .map(v => {
-                const stock = stockMap[`${product.id}-${v.size}`] || 0;
+                const stock = v.stock || 0;
                 const isActive = selected === v.id;
 
                 return (
