@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
+import { Link } from "react-router-dom";
 
 export default function Productos() {
 
@@ -584,10 +585,19 @@ onBlur={async (e) => {
           <Link
   to={`/admin/producto/${p.id}`}
   style={{
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#111827",
     textDecoration: "none",
-    cursor: "pointer"
+    cursor: "pointer",
+    transition: "all .2s ease"
+  }}
+
+  onMouseEnter={(e) => {
+    e.target.style.color = "#ec4899";
+  }}
+
+  onMouseLeave={(e) => {
+    e.target.style.color = "#111827";
   }}
 >
   {p.name}
