@@ -1823,6 +1823,302 @@ const precioPromedio =
 
 </div>
 
+      {/* DESCUENTOS PREMIUM */}
+<div
+  style={{
+    background: "#fff",
+
+    borderRadius: 28,
+
+    padding: 24,
+
+    marginBottom: 26,
+
+    boxShadow:
+      "0 10px 35px rgba(0,0,0,0.05)"
+  }}
+>
+
+  {/* título */}
+  <div
+    style={{
+      marginBottom: 24
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+
+        fontSize: 24,
+
+        fontWeight: "800"
+      }}
+    >
+      🔥 Descuentos
+    </h2>
+
+    <p
+      style={{
+        marginTop: 8,
+
+        color: "#6b7280"
+      }}
+    >
+      Configura promociones del producto
+    </p>
+
+  </div>
+
+  {/* activar */}
+  <div
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: 12,
+
+      marginBottom: 24
+    }}
+  >
+
+    <label
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: 10,
+
+        background:
+          producto.discount_active
+            ? "#fef2f2"
+            : "#f9fafb",
+
+        color:
+          producto.discount_active
+            ? "#dc2626"
+            : "#374151",
+
+        padding: "14px 18px",
+
+        borderRadius: 18,
+
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(
+            producto.discount_active
+          )
+        }
+
+        onChange={(e) =>
+          actualizarProducto(
+            "discount_active",
+            e.target.checked
+          )
+        }
+      />
+
+      🔥 Activar descuento
+
+    </label>
+
+  </div>
+
+  {/* porcentaje */}
+  <div
+    style={{
+      maxWidth: 280
+    }}
+  >
+
+    <label
+      style={{
+        display: "block",
+
+        marginBottom: 8,
+
+        fontWeight: "700"
+      }}
+    >
+      % descuento
+    </label>
+
+    <input
+      type="number"
+
+      value={
+        producto.discount_percent || 0
+      }
+
+      onChange={(e) =>
+        setProducto(prev => ({
+          ...prev,
+          discount_percent:
+            parseInt(e.target.value)
+            || 0
+        }))
+      }
+
+      onBlur={(e) =>
+        actualizarProducto(
+          "discount_percent",
+          parseInt(e.target.value)
+          || 0
+        )
+      }
+
+      min={0}
+      max={90}
+
+      style={{
+        width: "100%",
+
+        padding: "16px 18px",
+
+        borderRadius: 18,
+
+        border:
+          "1px solid #e5e7eb",
+
+        fontSize: 18,
+
+        fontWeight: "800"
+      }}
+    />
+
+  </div>
+
+  {/* preview */}
+  <div
+    style={{
+      marginTop: 28,
+
+      background:
+        "linear-gradient(135deg,#fff1f2,#ffe4e6)",
+
+      borderRadius: 24,
+
+      padding: 24
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: 14,
+
+        fontWeight: "700",
+
+        color: "#9f1239",
+
+        marginBottom: 14
+      }}
+    >
+      PREVIEW DESCUENTO
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: 14,
+
+        flexWrap: "wrap"
+      }}
+    >
+
+      {/* precio original */}
+      <div
+        style={{
+          fontSize: 24,
+
+          textDecoration: "line-through",
+
+          color: "#9ca3af",
+
+          fontWeight: "700"
+        }}
+      >
+        $
+        {
+          precioPromedio.toLocaleString(
+            "es-CL"
+          )
+        }
+      </div>
+
+      {/* precio descuento */}
+      <div
+        style={{
+          fontSize: 36,
+
+          fontWeight: "900",
+
+          color: "#e11d48"
+        }}
+      >
+        $
+        {
+          Math.round(
+
+            precioPromedio *
+
+            (
+              1 -
+              (
+                (
+                  producto.discount_percent
+                  || 0
+                ) / 100
+              )
+            )
+
+          ).toLocaleString("es-CL")
+        }
+      </div>
+
+      {/* badge */}
+      {producto.discount_active && (
+
+        <div
+          style={{
+            background:
+              "#e11d48",
+
+            color: "#fff",
+
+            padding: "10px 14px",
+
+            borderRadius: 999,
+
+            fontWeight: "800",
+
+            fontSize: 14
+          }}
+        >
+          🔥 -
+          {
+            producto.discount_percent
+          }%
+        </div>
+
+      )}
+
+    </div>
+
+  </div>
+
+</div>
+
       {/* IMÁGENES PREMIUM */}
 <div
   style={{
