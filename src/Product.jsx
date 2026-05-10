@@ -187,14 +187,12 @@ const prevImage = () => {
           product_images (*)
         `)
         .eq("id", id)
-        .single();
+        .order("sort_order", {
+  foreignTable: "product_images",
+  ascending: true
+})
+.single();
       
-      data.product_images?.sort(
-  (a, b) =>
-    (a.sort_order || 0)
-    -
-    (b.sort_order || 0)
-);
 
       setProduct(data);
     };
