@@ -700,6 +700,16 @@ const handleDragEnd = async (
 
 };
 
+  if (!producto) {
+
+    return (
+      <div style={{ padding: 30 }}>
+        Cargando...
+      </div>
+    );
+
+  }
+
   const stockTotal =
   producto.product_variants.reduce(
     (acc, v) =>
@@ -750,15 +760,7 @@ const precioPromedio =
 
     : 0;
   
-  if (!producto) {
-
-    return (
-      <div style={{ padding: 30 }}>
-        Cargando...
-      </div>
-    );
-
-  }
+  
 
   return (
 
