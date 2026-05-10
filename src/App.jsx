@@ -18,6 +18,7 @@ import Productos from "./admin/Productos";
 import CrearProducto from "./admin/CrearProducto";
 import Ventas from "./admin/Ventas";
 import ScrollToTop from "./ScrollToTop";
+import ProductoDetalle from "./admin/ProductoDetalle";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
