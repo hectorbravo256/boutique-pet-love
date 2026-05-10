@@ -757,6 +757,10 @@ export default function App() {
       <Route path="productos" element={<Productos />} />
       <Route path="crear" element={<CrearProducto />} />
       <Route path="ventas" element={<Ventas />} />
+	  <Route
+  path="/admin/producto/:id"
+  element={<ProductoDetalle />}
+/>
     </Route>
 
     {/* 🔐 LOGIN */}
