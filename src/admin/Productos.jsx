@@ -581,7 +581,17 @@ onBlur={async (e) => {
             src={p.product_images?.[0]?.url || "/placeholder.png"}
             style={{ width: 40, height: 40, borderRadius: 6 }}
           />
-          <span style={{ fontWeight: "bold" }}>{p.name}</span>
+          <Link
+  to={`/admin/producto/${p.id}`}
+  style={{
+    fontWeight: "bold",
+    color: "#111827",
+    textDecoration: "none",
+    cursor: "pointer"
+  }}
+>
+  {p.name}
+</Link>
         </div>
       </td>
 
