@@ -168,39 +168,38 @@ const precioBase =
 
   {p.discount_active ? (
 
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2 mt-2">
 
-      <span className="
-        text-gray-400
-        line-through
-        text-sm
-      ">
-        ${precioBase.toLocaleString("es-CL")}
-      </span>
+  <span className="
+    text-xs
+    uppercase
+    tracking-wide
+    text-gray-400
+    font-semibold
+  ">
+    Precio desde
+  </span>
 
-      <span className="
-        text-pink-600
-        font-black
-        text-xl
-      ">
-        $
-        {Math.round(
-          precioBase *
-          (1 - p.discount_percent / 100)
-        ).toLocaleString("es-CL")}
-      </span>
+  <span className="
+    text-pink-600
+    font-black
+    text-xl
+  ">
+    ${precioBase.toLocaleString("es-CL")}
+  </span>
 
-    </div>
+</div>
 
   ) : (
 
     <span className="
-      text-pink-600
-      font-black
-      text-xl
-    ">
-      ${precioBase.toLocaleString("es-CL")}
-    </span>
+  text-pink-600
+  font-black
+  text-xl
+">
+  Precio desde $
+  {precioBase.toLocaleString("es-CL")}
+</span>
 
   )}
 
