@@ -27,7 +27,6 @@ export default function AdminLayout() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <Link to="/admin" style={linkStyle("/admin")}>📊 Dashboard</Link>
-          <Link to="/admin/stock" style={linkStyle("/admin/stock")}>📦 Stock</Link>
           <Link to="/admin/productos" style={linkStyle("/admin/productos")}>🛒 Productos</Link>
           <Link to="/admin/crear" style={linkStyle("/admin/crear")}>➕ Crear</Link>
           <Link to="/admin/ventas" style={linkStyle("/admin/ventas")}>💰 Ventas</Link>
