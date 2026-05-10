@@ -10,6 +10,21 @@ export default function ProductoDetalle() {
 
   const [estadoGuardado, setEstadoGuardado] =
     useState({});
+  
+  const [mostrarModal, setMostrarModal] =
+  useState(false);
+
+const [nuevaTalla, setNuevaTalla] =
+  useState("");
+
+const [nuevoPrecio, setNuevoPrecio] =
+  useState("");
+
+const [nuevoStock, setNuevoStock] =
+  useState("");
+
+  const [subiendoImagen, setSubiendoImagen] =
+  useState(false);
 
   // 🔄 cargar producto
   useEffect(() => {
@@ -73,7 +88,14 @@ export default function ProductoDetalle() {
 
     });
 
-    setProducto(data);
+    data.product_images.sort(
+  (a, b) =>
+    (a.sort_order || 0)
+    -
+    (b.sort_order || 0)
+);
+
+setProducto(data);
 
   };
 
@@ -182,35 +204,148 @@ export default function ProductoDetalle() {
   };
 
   // 🔥 agregar talla
+
   const agregarVariante = async () => {
 
-    const size =
-      prompt("Nueva talla");
+  if (!nuevaTalla) {
+    alert("Selecciona una talla");
+    return;
+  }
 
-    if (!size) return;
+  // 🔥 evitar duplicados
+  const existe =
+    producto.product_variants.some(
+      v =>
+        v.size?.trim().toUpperCase()
+        ===
+        nuevaTalla.trim().toUpperCase()
+    );
 
-    const { data } = await supabase
-      .from("product_variants")
-      .insert([{
-        product_id: producto.id,
-        size,
-        price: 0,
-        stock: 0
-      }])
-      .select()
-      .single();
+  if (existe) {
+    alert("La talla ya existe");
+    return;
+  }
 
+  const { data } = await supabase
+    .from("product_variants")
+    .insert([{
+      product_id: producto.id,
+
+      size: nuevaTalla,
+
+      price:
+        parseInt(nuevoPrecio)
+        || 0,
+
+      stock:
+        parseInt(nuevoStock)
+        || 0
+    }])
+    .select()
+    .single();
+
+  setProducto(prev => ({
+    ...prev,
+    product_variants: [
+      ...prev.product_variants,
+      data
+    ]
+  }));
+
+  // reset
+  setNuevaTalla("");
+  setNuevoPrecio("");
+  setNuevoStock("");
+
+  setMostrarModal(false);
+
+  cargarProducto();
+
+};
+
+  const subirImagen = async (file) => {
+
+  if (!file) return;
+
+  try {
+
+    setSubiendoImagen(true);
+
+    const nombre =
+      `${Date.now()}-${file.name}`;
+
+    // 🔥 subir storage
+    const { error: uploadError } =
+      await supabase.storage
+        .from("productos")
+        .upload(nombre, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      alert("Error subiendo imagen");
+      return;
+    }
+
+    // 🔥 obtener url
+    const { data } =
+      supabase.storage
+        .from("productos")
+        .getPublicUrl(nombre);
+
+    const url =
+      data.publicUrl;
+
+    // 🔥 guardar db
+    const { data: nueva } =
+      await supabase
+        .from("product_images")
+        .insert([{
+          product_id: producto.id,
+          url
+        }])
+        .select()
+        .single();
+
+    // 🔥 actualizar UI
     setProducto(prev => ({
       ...prev,
-      product_variants: [
-        ...prev.product_variants,
-        data
+      product_images: [
+        ...prev.product_images,
+        nueva
       ]
     }));
 
-    cargarProducto();
+  } catch (err) {
 
-  };
+    console.error(err);
+
+  } finally {
+
+    setSubiendoImagen(false);
+
+  }
+
+};
+
+  const eliminarImagen = async (id) => {
+
+  if (!confirm("¿Eliminar imagen?"))
+    return;
+
+  await supabase
+    .from("product_images")
+    .delete()
+    .eq("id", id);
+
+  setProducto(prev => ({
+    ...prev,
+    product_images:
+      prev.product_images.filter(
+        img => img.id !== id
+      )
+  }));
+
+};
 
   if (!producto) {
 
@@ -233,379 +368,1264 @@ export default function ProductoDetalle() {
       }}
     >
 
-      {/* HEADER */}
-      <div
-        style={{
-          marginBottom: 30
-        }}
-      >
+     {/* HEADER PREMIUM */}
+<div
+  style={{
+    marginBottom: 30
+  }}
+>
 
-        <Link
-          to="/admin/productos"
+  {/* volver */}
+  <Link
+    to="/admin/productos"
+    style={{
+      textDecoration: "none",
+      color: "#ec4899",
+      fontWeight: "700",
+      fontSize: 15
+    }}
+  >
+    ← Volver a productos
+  </Link>
+
+  {/* card principal */}
+  <div
+    style={{
+      marginTop: 18,
+
+      background: "#fff",
+
+      borderRadius: 28,
+
+      padding: 24,
+
+      boxShadow:
+        "0 10px 35px rgba(0,0,0,0.06)",
+
+      border:
+        "1px solid rgba(236,72,153,0.08)"
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+        gap: 24,
+        alignItems: "center",
+        flexWrap: "wrap"
+      }}
+    >
+
+      {/* imagen */}
+      <img
+        src={
+          producto.product_images?.[0]?.url
+          || "/placeholder.png"
+        }
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: 24,
+          objectFit: "cover",
+
+          boxShadow:
+            "0 10px 25px rgba(0,0,0,0.10)"
+        }}
+      />
+
+      {/* info */}
+      <div style={{ flex: 1 }}>
+
+        <h1
           style={{
-            textDecoration: "none",
-            color: "#ec4899",
-            fontWeight: "700"
+            margin: 0,
+            fontSize: 34,
+            fontWeight: "800",
+            color: "#111827"
           }}
         >
-          ← Volver
-        </Link>
+          {producto.name}
+        </h1>
 
+        {/* badges */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 14,
-            marginTop: 16
+            gap: 10,
+            marginTop: 12,
+            flexWrap: "wrap"
           }}
         >
 
-          <img
-            src={
-              producto.product_images?.[0]?.url
-              || "/placeholder.png"
-            }
+          {/* categoría */}
+          <span
             style={{
-              width: 70,
-              height: 70,
-              borderRadius: 18,
-              objectFit: "cover"
+              background: "#f3f4f6",
+              color: "#374151",
+
+              padding: "8px 14px",
+
+              borderRadius: 999,
+
+              fontSize: 12,
+              fontWeight: "700"
             }}
-          />
+          >
+            {producto.category}
+          </span>
 
-          <div>
+          {/* variantes */}
+          <span
+            style={{
+              background: "#ecfeff",
+              color: "#0891b2",
 
-            <h1
-              style={{
-                margin: 0,
-                fontSize: 28
-              }}
-            >
-              {producto.name}
-            </h1>
+              padding: "8px 14px",
 
-            <div
-              style={{
-                display: "flex",
-                gap: 10,
-                marginTop: 8
-              }}
-            >
+              borderRadius: 999,
 
-              <span
-                style={{
-                  background: "#f3f4f6",
-                  padding: "6px 12px",
-                  borderRadius: 999,
-                  fontSize: 12,
-                  fontWeight: "700"
-                }}
-              >
-                {producto.category}
-              </span>
+              fontSize: 12,
+              fontWeight: "700"
+            }}
+          >
+            {producto.product_variants.length}
+            {" "}variantes
+          </span>
 
-              <span
-                style={{
-                  background: "#ecfeff",
-                  color: "#0891b2",
-                  padding: "6px 12px",
-                  borderRadius: 999,
-                  fontSize: 12,
-                  fontWeight: "700"
-                }}
-              >
-                {producto.product_variants.length}
-                {" "}variantes
-              </span>
+          {/* activo */}
+          <span
+            style={{
+              background:
+                producto.active
+                  ? "#ecfdf5"
+                  : "#fef2f2",
 
-            </div>
+              color:
+                producto.active
+                  ? "#059669"
+                  : "#dc2626",
 
+              padding: "8px 14px",
+
+              borderRadius: 999,
+
+              fontSize: 12,
+              fontWeight: "700"
+            }}
+          >
+            {producto.active
+              ? "● Activo"
+              : "● Oculto"}
+          </span>
+
+        </div>
+
+      </div>
+
+      {/* KPIs */}
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          flexWrap: "wrap"
+        }}
+      >
+
+        {/* stock total */}
+        <div
+          style={{
+            minWidth: 130,
+
+            background:
+              "linear-gradient(135deg,#fff7ed,#ffedd5)",
+
+            borderRadius: 22,
+
+            padding: 18
+          }}
+        >
+
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: "700",
+              color: "#9a3412"
+            }}
+          >
+            STOCK TOTAL
+          </div>
+
+          <div
+            style={{
+              marginTop: 8,
+
+              fontSize: 30,
+              fontWeight: "800",
+
+              color: "#111827"
+            }}
+          >
+            {
+              producto.product_variants.reduce(
+                (acc, v) =>
+                  acc + (v.stock || 0),
+                0
+              )
+            }
+          </div>
+
+        </div>
+
+        {/* precio desde */}
+        <div
+          style={{
+            minWidth: 160,
+
+            background:
+              "linear-gradient(135deg,#eff6ff,#dbeafe)",
+
+            borderRadius: 22,
+
+            padding: 18
+          }}
+        >
+
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: "700",
+              color: "#1d4ed8"
+            }}
+          >
+            PRECIO DESDE
+          </div>
+
+          <div
+            style={{
+              marginTop: 8,
+
+              fontSize: 28,
+              fontWeight: "800",
+
+              color: "#111827"
+            }}
+          >
+            $
+            {Math.min(
+              ...producto.product_variants.map(
+                v => v.price || 0
+              )
+            ).toLocaleString("es-CL")}
           </div>
 
         </div>
 
       </div>
 
-      {/* TABLA */}
-      <table
+    </div>
+
+  </div>
+
+</div>
+
+      {/* IMÁGENES PREMIUM */}
+<div
+  style={{
+    background: "#fff",
+
+    borderRadius: 28,
+
+    padding: 24,
+
+    marginBottom: 26,
+
+    boxShadow:
+      "0 10px 35px rgba(0,0,0,0.05)"
+  }}
+>
+
+  {/* título */}
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+
+      marginBottom: 22
+    }}
+  >
+
+    <div>
+
+      <h2
         style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          borderRadius: 20,
-          overflow: "hidden"
+          margin: 0,
+          fontSize: 22,
+          fontWeight: "800"
         }}
       >
+        📸 Imágenes
+      </h2>
 
-        <thead
+      <p
+        style={{
+          marginTop: 6,
+          color: "#6b7280"
+        }}
+      >
+        Gestiona imágenes del producto
+      </p>
+
+    </div>
+
+    {/* subir */}
+    <label
+      style={{
+        background:
+          "linear-gradient(135deg,#ec4899,#db2777)",
+
+        color: "#fff",
+
+        padding: "14px 18px",
+
+        borderRadius: 16,
+
+        fontWeight: "700",
+
+        cursor: "pointer",
+
+        boxShadow:
+          "0 10px 25px rgba(236,72,153,0.25)"
+      }}
+    >
+
+      {subiendoImagen
+        ? "Subiendo..."
+        : "➕ Subir imagen"}
+
+      <input
+        type="file"
+        accept="image/*"
+
+        hidden
+
+        onChange={(e) =>
+          subirImagen(
+            e.target.files?.[0]
+          )
+        }
+      />
+
+    </label>
+
+  </div>
+
+  {/* grid */}
+  <div
+    style={{
+      display: "grid",
+
+      gridTemplateColumns:
+        "repeat(auto-fill,minmax(180px,1fr))",
+
+      gap: 18
+    }}
+  >
+
+    {producto.product_images.map(
+      (img, index) => (
+
+        <div
+          key={img.id}
+
           style={{
-            background: "#f9fafb"
+            position: "relative",
+
+            borderRadius: 22,
+
+            overflow: "hidden",
+
+            background: "#f9fafb",
+
+            border:
+              "1px solid #f3f4f6",
+
+            boxShadow:
+              "0 6px 18px rgba(0,0,0,0.04)"
           }}
         >
 
-          <tr>
+          {/* imagen */}
+          <img
+            src={img.url}
 
-            <th style={{ padding: 16 }}>
-              Talla
-            </th>
+            style={{
+              width: "100%",
+              height: 220,
 
-            <th style={{ padding: 16 }}>
-              Precio
-            </th>
+              objectFit: "cover"
+            }}
+          />
 
-            <th style={{ padding: 16 }}>
-              Stock
-            </th>
+          {/* portada */}
+          {index === 0 && (
 
-            <th style={{ padding: 16 }}>
-              Estado
-            </th>
-
-            <th style={{ padding: 16 }}>
-              Acciones
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {producto.product_variants.map(v => (
-
-            <tr
-              key={v.id}
+            <div
               style={{
-                borderBottom:
-                  "1px solid #f3f4f6"
+                position: "absolute",
+
+                top: 12,
+                left: 12,
+
+                background:
+                  "#111827",
+
+                color: "#fff",
+
+                padding: "6px 10px",
+
+                borderRadius: 999,
+
+                fontSize: 11,
+
+                fontWeight: "700"
               }}
             >
+              Portada
+            </div>
 
-              {/* TALLA */}
-              <td
-                style={{
-                  padding: 16,
-                  fontWeight: "700"
-                }}
-              >
-                {v.size}
-              </td>
+          )}
 
-              {/* PRECIO */}
-              <td style={{ padding: 16 }}>
+          {/* eliminar */}
+          <button
+            onClick={() =>
+              eliminarImagen(img.id)
+            }
 
-                <input
-                  type="number"
-                  value={v.price || 0}
+            style={{
+              position: "absolute",
 
-                  onChange={(e) => {
+              top: 12,
+              right: 12,
 
-                    const nuevo =
-                      parseInt(e.target.value)
-                      || 0;
+              width: 36,
+              height: 36,
 
-                    setProducto(prev => ({
-                      ...prev,
-                      product_variants:
-                        prev.product_variants.map(x =>
-                          x.id === v.id
-                            ? {
-                                ...x,
-                                price: nuevo
-                              }
-                            : x
-                        )
-                    }));
+              borderRadius: 12,
 
-                  }}
+              border: "none",
 
-                  onBlur={(e) => {
+              background:
+                "rgba(255,255,255,0.92)",
 
-                    actualizarPrecio(
-                      v.id,
-                      parseInt(e.target.value) || 0
-                    );
+              color: "#ef4444",
 
-                  }}
+              fontWeight: "700",
 
-                  style={{
-                    width: 120,
-                    padding: "10px 14px",
-                    borderRadius: 12,
-                    border: "1px solid #e5e7eb",
-                    fontWeight: "700"
-                  }}
-                />
+              cursor: "pointer"
+            }}
+          >
+            ✕
+          </button>
 
-              </td>
+        </div>
 
-              {/* STOCK */}
-              <td style={{ padding: 16 }}>
+      )
+    )}
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10
-                  }}
-                >
+  </div>
 
-                  <button
-                    onClick={() =>
-                      actualizarStock(
-                        v.id,
-                        Math.max((v.stock || 0) - 1, 0)
-                      )
-                    }
-                  >
-                    −
-                  </button>
+</div>
+      
+{/* TABLA PREMIUM */}
+<div
+  style={{
+    background: "#fff",
 
-                  <input
-                    type="number"
-                    value={v.stock || 0}
+    borderRadius: 28,
 
-                    onChange={(e) => {
+    padding: 20,
 
-                      const nuevo =
-                        parseInt(e.target.value)
-                        || 0;
+    boxShadow:
+      "0 10px 35px rgba(0,0,0,0.05)"
+  }}
+>
 
-                      setProducto(prev => ({
-                        ...prev,
-                        product_variants:
-                          prev.product_variants.map(x =>
-                            x.id === v.id
-                              ? {
-                                  ...x,
-                                  stock: nuevo
-                                }
-                              : x
-                          )
-                      }));
+  {/* encabezado */}
+  <div
+    style={{
+      display: "grid",
 
-                    }}
+      gridTemplateColumns:
+        "1fr 1fr 1fr 1fr 120px",
 
-                    onBlur={(e) => {
+      padding: "0 16px 18px 16px",
 
-                      actualizarStock(
-                        v.id,
-                        parseInt(e.target.value)
-                        || 0
-                      );
+      borderBottom:
+        "1px solid #f3f4f6",
 
-                    }}
+      fontSize: 13,
 
-                    style={{
-                      width: 80,
-                      padding: "10px 14px",
-                      borderRadius: 12,
-                      border: "1px solid #e5e7eb",
-                      textAlign: "center",
-                      fontWeight: "700"
-                    }}
-                  />
+      fontWeight: "700",
 
-                  <button
-                    onClick={() =>
-                      actualizarStock(
-                        v.id,
-                        (v.stock || 0) + 1
-                      )
-                    }
-                  >
-                    +
-                  </button>
+      color: "#6b7280"
+    }}
+  >
 
-                </div>
+    <div>Talla</div>
 
-              </td>
+    <div>Precio</div>
 
-              {/* ESTADO */}
-              <td style={{ padding: 16 }}>
+    <div>Stock</div>
 
-                {(v.stock || 0) <= 0 ? (
+    <div>Estado</div>
 
-                  <span
-                    style={{
-                      color: "#ef4444",
-                      fontWeight: "700"
-                    }}
-                  >
-                    ● Agotado
-                  </span>
+    <div>Acciones</div>
 
-                ) : (v.stock || 0) <= 3 ? (
+  </div>
 
-                  <span
-                    style={{
-                      color: "#f59e0b",
-                      fontWeight: "700"
-                    }}
-                  >
-                    ● Bajo stock
-                  </span>
+  {/* filas */}
+  <div
+    style={{
+      marginTop: 8,
 
-                ) : (
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }}
+  >
 
-                  <span
-                    style={{
-                      color: "#22c55e",
-                      fontWeight: "700"
-                    }}
-                  >
-                    ● En stock
-                  </span>
+    {producto.product_variants.map(v => (
 
-                )}
+      <div
+        key={v.id}
 
-              </td>
+        style={{
+          display: "grid",
 
-              {/* ACCIONES */}
-              <td style={{ padding: 16 }}>
+          gridTemplateColumns:
+            "1fr 1fr 1fr 1fr 120px",
 
-                <button
-                  onClick={() =>
-                    eliminarVariante(v.id)
-                  }
-                  style={{
-                    background: "#ef4444",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "8px 12px",
-                    cursor: "pointer"
-                  }}
-                >
-                  Eliminar
-                </button>
+          alignItems: "center",
 
-              </td>
+          padding: 16,
 
-            </tr>
+          borderRadius: 22,
+
+          background:
+            "linear-gradient(to right,#fff,#fcfcfc)",
+
+          border:
+            "1px solid #f3f4f6",
+
+          transition:
+            "all .25s ease",
+
+          boxShadow:
+            "0 4px 12px rgba(0,0,0,0.03)"
+        }}
+
+        onMouseEnter={(e) => {
+
+          e.currentTarget.style.transform =
+            "translateY(-2px)";
+
+          e.currentTarget.style.boxShadow =
+            "0 12px 24px rgba(0,0,0,0.06)";
+
+        }}
+
+        onMouseLeave={(e) => {
+
+          e.currentTarget.style.transform =
+            "translateY(0px)";
+
+          e.currentTarget.style.boxShadow =
+            "0 4px 12px rgba(0,0,0,0.03)";
+
+        }}
+      >
+
+        {/* TALLA */}
+        <div>
+
+          <span
+            style={{
+              background:
+                "#f9fafb",
+
+              border:
+                "1px solid #e5e7eb",
+
+              padding: "10px 16px",
+
+              borderRadius: 999,
+
+              fontWeight: "700",
+
+              fontSize: 14
+            }}
+          >
+            {v.size}
+          </span>
+
+        </div>
+
+        {/* PRECIO */}
+        <div>
+
+          <input
+            type="number"
+
+            value={v.price || 0}
+
+            onChange={(e) => {
+
+              const nuevo =
+                parseInt(e.target.value)
+                || 0;
+
+              setProducto(prev => ({
+                ...prev,
+                product_variants:
+                  prev.product_variants.map(x =>
+                    x.id === v.id
+                      ? {
+                          ...x,
+                          price: nuevo
+                        }
+                      : x
+                  )
+              }));
+
+            }}
+
+            onBlur={(e) => {
+
+              actualizarPrecio(
+                v.id,
+                parseInt(e.target.value)
+                || 0
+              );
+
+            }}
+
+            style={{
+              width: 140,
+
+              padding: "12px 16px",
+
+              borderRadius: 16,
+
+              border:
+                "1px solid #e5e7eb",
+
+              fontWeight: "700",
+
+              fontSize: 15,
+
+              background: "#fff",
+
+              transition:
+                "all .2s ease"
+            }}
+          />
+
+        </div>
+
+        {/* STOCK */}
+        <div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10
+            }}
+          >
+
+            {/* - */}
+            <button
+              onClick={() =>
+                actualizarStock(
+                  v.id,
+                  Math.max(
+                    (v.stock || 0) - 1,
+                    0
+                  )
+                )
+              }
+
+              style={{
+                width: 38,
+                height: 38,
+
+                borderRadius: 12,
+
+                border: "none",
+
+                background:
+                  "#fef2f2",
+
+                color: "#ef4444",
+
+                fontSize: 18,
+                fontWeight: "700",
+
+                cursor: "pointer"
+              }}
+            >
+              −
+            </button>
+
+            {/* input */}
+            <input
+              type="number"
+
+              value={v.stock || 0}
+
+              onChange={(e) => {
+
+                const nuevo =
+                  parseInt(e.target.value)
+                  || 0;
+
+                setProducto(prev => ({
+                  ...prev,
+                  product_variants:
+                    prev.product_variants.map(x =>
+                      x.id === v.id
+                        ? {
+                            ...x,
+                            stock: nuevo
+                          }
+                        : x
+                    )
+                }));
+
+              }}
+
+              onBlur={(e) => {
+
+                actualizarStock(
+                  v.id,
+                  parseInt(e.target.value)
+                  || 0
+                );
+
+              }}
+
+              style={{
+                width: 80,
+
+                padding: "12px 14px",
+
+                borderRadius: 16,
+
+                border:
+                  "1px solid #e5e7eb",
+
+                textAlign: "center",
+
+                fontWeight: "700",
+
+                fontSize: 15
+              }}
+            />
+
+            {/* + */}
+            <button
+              onClick={() =>
+                actualizarStock(
+                  v.id,
+                  (v.stock || 0) + 1
+                )
+              }
+
+              style={{
+                width: 38,
+                height: 38,
+
+                borderRadius: 12,
+
+                border: "none",
+
+                background:
+                  "#ecfdf5",
+
+                color: "#22c55e",
+
+                fontSize: 18,
+                fontWeight: "700",
+
+                cursor: "pointer"
+              }}
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* ESTADO */}
+        <div>
+
+          {(v.stock || 0) <= 0 ? (
+
+            <span
+              style={{
+                background:
+                  "#fef2f2",
+
+                color: "#dc2626",
+
+                padding: "8px 14px",
+
+                borderRadius: 999,
+
+                fontWeight: "700",
+
+                fontSize: 12
+              }}
+            >
+              ● Agotado
+            </span>
+
+          ) : (v.stock || 0) <= 3 ? (
+
+            <span
+              style={{
+                background:
+                  "#fff7ed",
+
+                color: "#ea580c",
+
+                padding: "8px 14px",
+
+                borderRadius: 999,
+
+                fontWeight: "700",
+
+                fontSize: 12
+              }}
+            >
+              ● Bajo stock
+            </span>
+
+          ) : (
+
+            <span
+              style={{
+                background:
+                  "#ecfdf5",
+
+                color: "#059669",
+
+                padding: "8px 14px",
+
+                borderRadius: 999,
+
+                fontWeight: "700",
+
+                fontSize: 12
+              }}
+            >
+              ● En stock
+            </span>
+
+          )}
+
+        </div>
+
+        {/* ACCIONES */}
+        <div>
+
+          <button
+            onClick={() =>
+              eliminarVariante(v.id)
+            }
+
+            style={{
+              width: 42,
+              height: 42,
+
+              borderRadius: 14,
+
+              border: "none",
+
+              background:
+                "#fef2f2",
+
+              color: "#ef4444",
+
+              fontWeight: "700",
+
+              cursor: "pointer",
+
+              transition:
+                "all .2s ease"
+            }}
+
+            onMouseEnter={(e) => {
+
+              e.currentTarget.style.background =
+                "#ef4444";
+
+              e.currentTarget.style.color =
+                "#fff";
+
+            }}
+
+            onMouseLeave={(e) => {
+
+              e.currentTarget.style.background =
+                "#fef2f2";
+
+              e.currentTarget.style.color =
+                "#ef4444";
+
+            }}
+          >
+            ✕
+          </button>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
+
+{/* BOTÓN ABRIR MODAL */}
+<button
+  onClick={() =>
+    setMostrarModal(true)
+  }
+
+  style={{
+    marginTop: 24,
+
+    background:
+      "linear-gradient(135deg,#22c55e,#16a34a)",
+
+    color: "#fff",
+
+    border: "none",
+
+    borderRadius: 18,
+
+    padding: "16px 22px",
+
+    fontWeight: "700",
+
+    fontSize: 15,
+
+    cursor: "pointer",
+
+    boxShadow:
+      "0 10px 25px rgba(34,197,94,0.25)"
+  }}
+>
+  ➕ Agregar talla
+</button>
+
+      {/* MODAL PREMIUM */}
+{mostrarModal && (
+
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+
+      background:
+        "rgba(0,0,0,0.45)",
+
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+
+      zIndex: 9999,
+
+      backdropFilter: "blur(6px)"
+    }}
+  >
+
+    <div
+      style={{
+        width: 420,
+
+        background: "#fff",
+
+        borderRadius: 30,
+
+        padding: 28,
+
+        boxShadow:
+          "0 20px 60px rgba(0,0,0,0.18)"
+      }}
+    >
+
+      {/* título */}
+      <h2
+        style={{
+          marginTop: 0,
+          marginBottom: 24,
+
+          fontSize: 26,
+
+          fontWeight: "800",
+
+          color: "#111827"
+        }}
+      >
+        Nueva variante
+      </h2>
+
+      {/* talla */}
+      <div style={{ marginBottom: 18 }}>
+
+        <label
+          style={{
+            display: "block",
+
+            marginBottom: 8,
+
+            fontWeight: "700",
+
+            fontSize: 14
+          }}
+        >
+          Talla
+        </label>
+
+        <select
+          value={nuevaTalla}
+
+          onChange={(e) =>
+            setNuevaTalla(e.target.value)
+          }
+
+          style={{
+            width: "100%",
+
+            padding: "14px 16px",
+
+            borderRadius: 16,
+
+            border:
+              "1px solid #e5e7eb",
+
+            fontWeight: "600",
+
+            fontSize: 15
+          }}
+        >
+
+          <option value="">
+            Seleccionar talla
+          </option>
+
+          {[
+            "XXS",
+            "XS",
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL",
+            "XXXL",
+
+            "Talla 0",
+            "Talla 1",
+            "Talla 2",
+            "Talla 3",
+            "Talla 4",
+            "Talla 5",
+            "Talla 6",
+            "Talla 7",
+            "Talla 8",
+            "Talla 9",
+            "Talla 10",
+            "Talla 11",
+            "Talla 12"
+          ].map(t => (
+
+            <option
+              key={t}
+              value={t}
+            >
+              {t}
+            </option>
 
           ))}
 
-        </tbody>
+        </select>
 
-      </table>
+      </div>
 
-      {/* AGREGAR */}
-      <button
-        onClick={agregarVariante}
+      {/* precio */}
+      <div style={{ marginBottom: 18 }}>
+
+        <label
+          style={{
+            display: "block",
+
+            marginBottom: 8,
+
+            fontWeight: "700",
+
+            fontSize: 14
+          }}
+        >
+          Precio
+        </label>
+
+        <input
+          type="number"
+
+          value={nuevoPrecio}
+
+          onChange={(e) =>
+            setNuevoPrecio(e.target.value)
+          }
+
+          placeholder="24990"
+
+          style={{
+            width: "100%",
+
+            padding: "14px 16px",
+
+            borderRadius: 16,
+
+            border:
+              "1px solid #e5e7eb",
+
+            fontWeight: "600",
+
+            fontSize: 15
+          }}
+        />
+
+      </div>
+
+      {/* stock */}
+      <div style={{ marginBottom: 26 }}>
+
+        <label
+          style={{
+            display: "block",
+
+            marginBottom: 8,
+
+            fontWeight: "700",
+
+            fontSize: 14
+          }}
+        >
+          Stock inicial
+        </label>
+
+        <input
+          type="number"
+
+          value={nuevoStock}
+
+          onChange={(e) =>
+            setNuevoStock(e.target.value)
+          }
+
+          placeholder="0"
+
+          style={{
+            width: "100%",
+
+            padding: "14px 16px",
+
+            borderRadius: 16,
+
+            border:
+              "1px solid #e5e7eb",
+
+            fontWeight: "600",
+
+            fontSize: 15
+          }}
+        />
+
+      </div>
+
+      {/* acciones */}
+      <div
         style={{
-          marginTop: 24,
-          background: "#22c55e",
-          color: "#fff",
-          border: "none",
-          borderRadius: 14,
-          padding: "14px 18px",
-          fontWeight: "700",
-          cursor: "pointer"
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 12
         }}
       >
-        ➕ Agregar talla
-      </button>
+
+        {/* cancelar */}
+        <button
+          onClick={() =>
+            setMostrarModal(false)
+          }
+
+          style={{
+            padding: "14px 18px",
+
+            borderRadius: 16,
+
+            border:
+              "1px solid #e5e7eb",
+
+            background: "#fff",
+
+            fontWeight: "700",
+
+            cursor: "pointer"
+          }}
+        >
+          Cancelar
+        </button>
+
+        {/* guardar */}
+        <button
+          onClick={agregarVariante}
+
+          style={{
+            padding: "14px 20px",
+
+            borderRadius: 16,
+
+            border: "none",
+
+            background:
+              "linear-gradient(135deg,#ec4899,#db2777)",
+
+            color: "#fff",
+
+            fontWeight: "700",
+
+            cursor: "pointer",
+
+            boxShadow:
+              "0 10px 25px rgba(236,72,153,0.25)"
+          }}
+        >
+          Guardar variante
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
     </div>
 
