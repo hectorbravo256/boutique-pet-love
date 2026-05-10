@@ -182,6 +182,9 @@ export default function ProductoDetalle() {
 
   const [producto, setProducto] = useState(null);
 
+  const [guardandoInfo, setGuardandoInfo] =
+  useState(false);
+
   const [estadoGuardado, setEstadoGuardado] =
     useState({});
   
@@ -224,6 +227,27 @@ const [nuevoStock, setNuevoStock] =
       .single();
 
     if (!data) return;
+
+    if (!data.slug) {
+
+  data.slug =
+    generarSlug(data.name);
+
+}
+
+if (!data.meta_title) {
+
+  data.meta_title =
+    data.name;
+
+}
+
+if (!data.meta_description) {
+
+  data.meta_description =
+    data.description || "";
+
+}
 
     const ordenTallas = {
       XXS: 1,
@@ -487,9 +511,13 @@ setProducto(data);
       await supabase
         .from("product_images")
         .insert([{
-          product_id: producto.id,
-          url
-        }])
+  product_id: producto.id,
+
+  url,
+
+  sort_order:
+    producto.product_images.length
+}])
         .select()
         .single();
 
@@ -531,6 +559,69 @@ setProducto(data);
         img => img.id !== id
       )
   }));
+
+};
+
+  const generarSlug = (texto) => {
+
+  return texto
+    ?.toLowerCase()
+
+    .normalize("NFD")
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+
+    .replace(
+      /[^a-z0-9\s-]/g,
+      ""
+    )
+
+    .replace(/\s+/g, "-")
+
+    .replace(/-+/g, "-");
+
+};
+
+  const actualizarProducto = async (
+  campo,
+  valor
+) => {
+
+  try {
+
+    setGuardandoInfo(true);
+
+    // 🔥 UI inmediata
+    setProducto(prev => ({
+      ...prev,
+      [campo]: valor
+    }));
+
+    // 🔥 guardar db
+    const { error } =
+      await supabase
+        .from("products")
+        .update({
+          [campo]: valor
+        })
+        .eq("id", producto.id);
+
+    if (error) {
+      console.error(error);
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+  } finally {
+
+    setGuardandoInfo(false);
+
+  }
 
 };
 
@@ -609,6 +700,56 @@ const handleDragEnd = async (
 
 };
 
+  const stockTotal =
+  producto.product_variants.reduce(
+    (acc, v) =>
+      acc + (v.stock || 0),
+    0
+  );
+
+const valorInventario =
+  producto.product_variants.reduce(
+    (acc, v) =>
+      acc +
+      (
+        (v.stock || 0)
+        *
+        (v.price || 0)
+      ),
+    0
+  );
+
+const variantesAgotadas =
+  producto.product_variants.filter(
+    v => (v.stock || 0) <= 0
+  ).length;
+
+const variantesBajoStock =
+  producto.product_variants.filter(
+    v =>
+      (v.stock || 0) > 0
+      &&
+      (v.stock || 0) <= 3
+  ).length;
+
+const precioPromedio =
+  producto.product_variants.length > 0
+
+    ? Math.round(
+
+        producto.product_variants.reduce(
+          (acc, v) =>
+            acc + (v.price || 0),
+          0
+        )
+
+        /
+
+        producto.product_variants.length
+      )
+
+    : 0;
+  
   if (!producto) {
 
     return (
@@ -695,94 +836,286 @@ const handleDragEnd = async (
         }}
       />
 
-      {/* info */}
-      <div style={{ flex: 1 }}>
+{/* INFO PREMIUM */}
+<div
+  style={{
+    flex: 1,
+    minWidth: 320
+  }}
+>
 
-        <h1
-          style={{
-            margin: 0,
-            fontSize: 34,
-            fontWeight: "800",
-            color: "#111827"
-          }}
-        >
-          {producto.name}
-        </h1>
+  {/* NOMBRE */}
+  <input
+    value={producto.name || ""}
 
-        {/* badges */}
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            marginTop: 12,
-            flexWrap: "wrap"
-          }}
-        >
+    onChange={(e) =>
+      setProducto(prev => ({
+        ...prev,
+        name: e.target.value
+      }))
+    }
 
-          {/* categoría */}
-          <span
-            style={{
-              background: "#f3f4f6",
-              color: "#374151",
+    onBlur={(e) =>
+      actualizarProducto(
+        "name",
+        e.target.value
+      )
+    }
 
-              padding: "8px 14px",
+    style={{
+      width: "100%",
 
-              borderRadius: 999,
+      border: "none",
 
-              fontSize: 12,
-              fontWeight: "700"
-            }}
-          >
-            {producto.category}
-          </span>
+      fontSize: 38,
 
-          {/* variantes */}
-          <span
-            style={{
-              background: "#ecfeff",
-              color: "#0891b2",
+      fontWeight: "900",
 
-              padding: "8px 14px",
+      color: "#111827",
 
-              borderRadius: 999,
+      outline: "none",
 
-              fontSize: 12,
-              fontWeight: "700"
-            }}
-          >
-            {producto.product_variants.length}
-            {" "}variantes
-          </span>
+      marginBottom: 18,
 
-          {/* activo */}
-          <span
-            style={{
-              background:
-                producto.active
-                  ? "#ecfdf5"
-                  : "#fef2f2",
+      background: "transparent"
+    }}
+  />
 
-              color:
-                producto.active
-                  ? "#059669"
-                  : "#dc2626",
+  {/* BADGES */}
+  <div
+    style={{
+      display: "flex",
+      gap: 12,
+      flexWrap: "wrap",
 
-              padding: "8px 14px",
+      marginBottom: 18
+    }}
+  >
 
-              borderRadius: 999,
+    {/* categoría */}
+    <input
+      value={
+        producto.category || ""
+      }
 
-              fontSize: 12,
-              fontWeight: "700"
-            }}
-          >
-            {producto.active
-              ? "● Activo"
-              : "● Oculto"}
-          </span>
+      onChange={(e) =>
+        setProducto(prev => ({
+          ...prev,
+          category:
+            e.target.value
+        }))
+      }
 
-        </div>
+      onBlur={(e) =>
+        actualizarProducto(
+          "category",
+          e.target.value
+        )
+      }
 
-      </div>
+      placeholder="Categoría"
+
+      style={{
+        padding:
+          "10px 16px",
+
+        borderRadius: 999,
+
+        border:
+          "1px solid #e5e7eb",
+
+        background:
+          "#f9fafb",
+
+        fontWeight: "700"
+      }}
+    />
+
+    {/* variantes */}
+    <div
+      style={{
+        background: "#ecfeff",
+        color: "#0891b2",
+
+        padding: "10px 16px",
+
+        borderRadius: 999,
+
+        fontWeight: "700",
+
+        fontSize: 13
+      }}
+    >
+      {
+        producto.product_variants
+          .length
+      } variantes
+    </div>
+
+    {/* activo */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+
+        background:
+          producto.active
+            ? "#dcfce7"
+            : "#fee2e2",
+
+        color:
+          producto.active
+            ? "#166534"
+            : "#991b1b",
+
+        padding:
+          "10px 16px",
+
+        borderRadius: 999,
+
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(
+            producto.active
+          )
+        }
+
+        onChange={(e) =>
+          actualizarProducto(
+            "active",
+            e.target.checked
+          )
+        }
+      />
+
+      {producto.active
+        ? "Activo"
+        : "Inactivo"}
+
+    </label>
+
+    {/* destacado */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+
+        background:
+          producto.featured
+            ? "#fef3c7"
+            : "#f3f4f6",
+
+        color:
+          producto.featured
+            ? "#92400e"
+            : "#374151",
+
+        padding:
+          "10px 16px",
+
+        borderRadius: 999,
+
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(
+            producto.featured
+          )
+        }
+
+        onChange={(e) =>
+          actualizarProducto(
+            "featured",
+            e.target.checked
+          )
+        }
+      />
+
+      ⭐ Destacado
+
+    </label>
+
+  </div>
+
+  {/* DESCRIPCIÓN */}
+  <textarea
+    value={
+      producto.description || ""
+    }
+
+    onChange={(e) =>
+      setProducto(prev => ({
+        ...prev,
+        description:
+          e.target.value
+      }))
+    }
+
+    onBlur={(e) =>
+      actualizarProducto(
+        "description",
+        e.target.value
+      )
+    }
+
+    placeholder="
+      Describe el producto...
+    "
+
+    rows={4}
+
+    style={{
+      width: "100%",
+
+      padding: 18,
+
+      borderRadius: 20,
+
+      border:
+        "1px solid #e5e7eb",
+
+      background:
+        "#f9fafb",
+
+      resize: "vertical",
+
+      fontSize: 15,
+
+      outline: "none"
+    }}
+  />
+
+  {/* GUARDANDO */}
+  {guardandoInfo && (
+
+    <div
+      style={{
+        marginTop: 12,
+
+        color: "#ec4899",
+
+        fontWeight: "700"
+      }}
+    >
+      Guardando...
+    </div>
+
+  )}
+
+</div>
 
       {/* KPIs */}
       <div
@@ -872,17 +1205,615 @@ const handleDragEnd = async (
               color: "#111827"
             }}
           >
-            $
-            {Math.min(
-              ...producto.product_variants.map(
-                v => v.price || 0
-              )
-            ).toLocaleString("es-CL")}
+            {
+  producto.product_variants.length > 0
+    ? `$${Math.min(
+        ...producto.product_variants.map(
+          v => v.price || 0
+        )
+      ).toLocaleString("es-CL")}`
+
+    : "$0"
+}
           </div>
 
         </div>
 
       </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+      {/* SEO PREMIUM */}
+<div
+  style={{
+    background: "#fff",
+
+    borderRadius: 28,
+
+    padding: 24,
+
+    marginBottom: 26,
+
+    boxShadow:
+      "0 10px 35px rgba(0,0,0,0.05)"
+  }}
+>
+
+  {/* título */}
+  <div
+    style={{
+      marginBottom: 22
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+        fontSize: 24,
+        fontWeight: "800"
+      }}
+    >
+      🔎 SEO Producto
+    </h2>
+
+    <p
+      style={{
+        marginTop: 8,
+        color: "#6b7280"
+      }}
+    >
+      Optimiza este producto para Google
+    </p>
+
+  </div>
+
+  {/* grid */}
+  <div
+    style={{
+      display: "grid",
+
+      gridTemplateColumns:
+        "repeat(auto-fit,minmax(280px,1fr))",
+
+      gap: 20
+    }}
+  >
+
+    {/* slug */}
+    <div>
+
+      <label
+        style={{
+          display: "block",
+
+          marginBottom: 8,
+
+          fontWeight: "700"
+        }}
+      >
+        URL / Slug
+      </label>
+
+      <input
+        value={
+          producto.slug || ""
+        }
+
+        onChange={(e) =>
+          setProducto(prev => ({
+            ...prev,
+            slug:
+              generarSlug(
+                e.target.value
+              )
+          }))
+        }
+
+        onBlur={(e) =>
+          actualizarProducto(
+            "slug",
+            generarSlug(
+              e.target.value
+            )
+          )
+        }
+
+        placeholder="producto-premium"
+
+        style={{
+          width: "100%",
+
+          padding: "14px 16px",
+
+          borderRadius: 16,
+
+          border:
+            "1px solid #e5e7eb",
+
+          fontWeight: "600"
+        }}
+      />
+
+    </div>
+
+    {/* meta title */}
+    <div>
+
+      <label
+        style={{
+          display: "block",
+
+          marginBottom: 8,
+
+          fontWeight: "700"
+        }}
+      >
+        Meta title
+      </label>
+
+      <input
+        value={
+          producto.meta_title || ""
+        }
+
+        onChange={(e) =>
+          setProducto(prev => ({
+            ...prev,
+            meta_title:
+              e.target.value
+          }))
+        }
+
+        onBlur={(e) =>
+          actualizarProducto(
+            "meta_title",
+            e.target.value
+          )
+        }
+
+        placeholder="
+          Título SEO Google
+        "
+
+        style={{
+          width: "100%",
+
+          padding: "14px 16px",
+
+          borderRadius: 16,
+
+          border:
+            "1px solid #e5e7eb",
+
+          fontWeight: "600"
+        }}
+      />
+
+    </div>
+
+  </div>
+
+  {/* descripción */}
+  <div
+    style={{
+      marginTop: 20
+    }}
+  >
+
+    <label
+      style={{
+        display: "block",
+
+        marginBottom: 8,
+
+        fontWeight: "700"
+      }}
+    >
+      Meta description
+    </label>
+
+    <textarea
+      value={
+        producto.meta_description
+        || ""
+      }
+
+      onChange={(e) =>
+        setProducto(prev => ({
+          ...prev,
+          meta_description:
+            e.target.value
+        }))
+      }
+
+      onBlur={(e) =>
+        actualizarProducto(
+          "meta_description",
+          e.target.value
+        )
+      }
+
+      rows={4}
+
+      placeholder="
+        Descripción SEO Google
+      "
+
+      style={{
+        width: "100%",
+
+        padding: 18,
+
+        borderRadius: 20,
+
+        border:
+          "1px solid #e5e7eb",
+
+        resize: "vertical",
+
+        fontSize: 15
+      }}
+    />
+
+  </div>
+
+  {/* keywords */}
+  <div
+    style={{
+      marginTop: 20
+    }}
+  >
+
+    <label
+      style={{
+        display: "block",
+
+        marginBottom: 8,
+
+        fontWeight: "700"
+      }}
+    >
+      Keywords SEO
+    </label>
+
+    <input
+      value={
+        producto.seo_keywords || ""
+      }
+
+      onChange={(e) =>
+        setProducto(prev => ({
+          ...prev,
+          seo_keywords:
+            e.target.value
+        }))
+      }
+
+      onBlur={(e) =>
+        actualizarProducto(
+          "seo_keywords",
+          e.target.value
+        )
+      }
+
+      placeholder="
+        ropa mascotas, luxury pet...
+      "
+
+      style={{
+        width: "100%",
+
+        padding: "14px 16px",
+
+        borderRadius: 16,
+
+        border:
+          "1px solid #e5e7eb",
+
+        fontWeight: "600"
+      }}
+    />
+
+  </div>
+
+  {/* preview google */}
+  <div
+    style={{
+      marginTop: 28,
+
+      background: "#f9fafb",
+
+      borderRadius: 22,
+
+      padding: 22,
+
+      border:
+        "1px solid #f3f4f6"
+    }}
+  >
+
+    <div
+      style={{
+        color: "#1a0dab",
+
+        fontSize: 22,
+
+        fontWeight: "500"
+      }}
+    >
+      {
+        producto.meta_title
+        || producto.name
+      }
+    </div>
+
+    <div
+      style={{
+        marginTop: 6,
+
+        color: "#15803d",
+
+        fontSize: 14
+      }}
+    >
+      boutiquepetlove.cl/producto/
+      {
+        producto.slug
+        || generarSlug(
+          producto.name
+        )
+      }
+    </div>
+
+    <div
+      style={{
+        marginTop: 10,
+
+        color: "#4b5563",
+
+        lineHeight: 1.6
+      }}
+    >
+      {
+        producto.meta_description
+        || producto.description
+      }
+    </div>
+
+  </div>
+
+</div>
+
+      {/* ANALYTICS PREMIUM */}
+<div
+  style={{
+    display: "grid",
+
+    gridTemplateColumns:
+      "repeat(auto-fit,minmax(220px,1fr))",
+
+    gap: 20,
+
+    marginBottom: 26
+  }}
+>
+
+  {/* STOCK */}
+  <div
+    style={{
+      background: "#fff",
+
+      borderRadius: 26,
+
+      padding: 24,
+
+      boxShadow:
+        "0 10px 35px rgba(0,0,0,0.05)"
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: 13,
+        fontWeight: "700",
+        color: "#6b7280"
+      }}
+    >
+      STOCK TOTAL
+    </div>
+
+    <div
+      style={{
+        marginTop: 12,
+
+        fontSize: 36,
+
+        fontWeight: "900",
+
+        color: "#111827"
+      }}
+    >
+      {stockTotal}
+    </div>
+
+  </div>
+
+  {/* INVENTARIO */}
+  <div
+    style={{
+      background: "#fff",
+
+      borderRadius: 26,
+
+      padding: 24,
+
+      boxShadow:
+        "0 10px 35px rgba(0,0,0,0.05)"
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: 13,
+        fontWeight: "700",
+        color: "#6b7280"
+      }}
+    >
+      VALOR INVENTARIO
+    </div>
+
+    <div
+      style={{
+        marginTop: 12,
+
+        fontSize: 28,
+
+        fontWeight: "900",
+
+        color: "#059669"
+      }}
+    >
+      $
+      {valorInventario.toLocaleString(
+        "es-CL"
+      )}
+    </div>
+
+  </div>
+
+  {/* PROMEDIO */}
+  <div
+    style={{
+      background: "#fff",
+
+      borderRadius: 26,
+
+      padding: 24,
+
+      boxShadow:
+        "0 10px 35px rgba(0,0,0,0.05)"
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: 13,
+        fontWeight: "700",
+        color: "#6b7280"
+      }}
+    >
+      PRECIO PROMEDIO
+    </div>
+
+    <div
+      style={{
+        marginTop: 12,
+
+        fontSize: 28,
+
+        fontWeight: "900",
+
+        color: "#2563eb"
+      }}
+    >
+      $
+      {precioPromedio.toLocaleString(
+        "es-CL"
+      )}
+    </div>
+
+  </div>
+
+  {/* ALERTAS */}
+  <div
+    style={{
+      background: "#fff",
+
+      borderRadius: 26,
+
+      padding: 24,
+
+      boxShadow:
+        "0 10px 35px rgba(0,0,0,0.05)"
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: 13,
+        fontWeight: "700",
+        color: "#6b7280"
+      }}
+    >
+      ALERTAS
+    </div>
+
+    <div
+      style={{
+        marginTop: 14,
+
+        display: "flex",
+
+        flexDirection: "column",
+
+        gap: 10
+      }}
+    >
+
+      {variantesAgotadas > 0 && (
+
+        <div
+          style={{
+            color: "#dc2626",
+            fontWeight: "700"
+          }}
+        >
+          🔴 {variantesAgotadas}
+          {" "}agotadas
+        </div>
+
+      )}
+
+      {variantesBajoStock > 0 && (
+
+        <div
+          style={{
+            color: "#ea580c",
+            fontWeight: "700"
+          }}
+        >
+          🟠 {variantesBajoStock}
+          {" "}bajo stock
+        </div>
+
+      )}
+
+      {!producto.meta_title && (
+        <div
+          style={{
+            color: "#9333ea",
+            fontWeight: "700"
+          }}
+        >
+          🟣 SEO incompleto
+        </div>
+      )}
+
+      {producto.product_images
+        .length === 0 && (
+        <div
+          style={{
+            color: "#2563eb",
+            fontWeight: "700"
+          }}
+        >
+          🔵 Sin imágenes
+        </div>
+      )}
 
     </div>
 
