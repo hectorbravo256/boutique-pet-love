@@ -458,11 +458,20 @@ setProducto(data);
         .from("products")
         .upload(nombre, file);
 
-    if (uploadError) {
-      console.error(uploadError);
-      alert("Error subiendo imagen");
-      return;
-    }
+   if (uploadError) {
+
+  console.error(
+    "SUPABASE STORAGE ERROR:",
+    uploadError
+  );
+
+  alert(
+    uploadError.message ||
+    JSON.stringify(uploadError)
+  );
+
+  return;
+}
 
     // 🔥 obtener url
     const { data } =
