@@ -455,7 +455,7 @@ setProducto(data);
     // 🔥 subir storage
     const { error: uploadError } =
       await supabase.storage
-        .from("productos")
+        .from("products")
         .upload(nombre, file);
 
     if (uploadError) {
@@ -467,7 +467,7 @@ setProducto(data);
     // 🔥 obtener url
     const { data } =
       supabase.storage
-        .from("productos")
+        .from("products")
         .getPublicUrl(nombre);
 
     const url =
