@@ -14,12 +14,23 @@ export default function Category() {
         .from("products")
         .select(`
           *,
-          product_images (*)
+          product_images (*),
+          product_variants (*)
         `)
         .eq("category", slug)
         .eq("active", true);
 
       if (!error) {
+        (data || []).forEach(product => {
+
+  product.product_images?.sort(
+    (a, b) =>
+      (a.sort_order || 0)
+      -
+      (b.sort_order || 0)
+  );
+
+});
         setProducts(data || []);
       }
     };
@@ -50,16 +61,16 @@ return (
 ">
         {products.map(p => {
 
-  const precios = p.sizes
-    ? Object.values(p.sizes)
-        .map(v => Number(v))
-        .filter(v => !isNaN(v))
-    : [];
+  const precios =
+  p.product_variants
+    ?.map(v => Number(v.price))
+    .filter(v => !isNaN(v))
+  || [];
 
-  const precioBase =
-    precios.length > 0
-      ? Math.min(...precios)
-      : Number(p.price || 0);
+const precioBase =
+  precios.length > 0
+    ? Math.min(...precios)
+    : 0;
 
   return (
     
@@ -142,7 +153,7 @@ return (
   {/* 🔥 CONTENIDO */}
   <div className="p-4 space-y-2">
 
-    <h3 className="
+<h3 className="
   font-black
   text-gray-800
   text-lg
@@ -155,8 +166,50 @@ return (
   duration-300
   group-hover:text-pink-600
 ">
-      {p.name}
-    </h3>
+  {p.name}
+</h3>
+
+<div className="mt-2">
+
+  {p.discount_active ? (
+
+    <div className="flex items-center gap-2 flex-wrap">
+
+      <span className="
+        text-gray-400
+        line-through
+        text-sm
+      ">
+        ${precioBase.toLocaleString("es-CL")}
+      </span>
+
+      <span className="
+        text-pink-600
+        font-black
+        text-xl
+      ">
+        $
+        {Math.round(
+          precioBase *
+          (1 - p.discount_percent / 100)
+        ).toLocaleString("es-CL")}
+      </span>
+
+    </div>
+
+  ) : (
+
+    <span className="
+      text-pink-600
+      font-black
+      text-xl
+    ">
+      ${precioBase.toLocaleString("es-CL")}
+    </span>
+
+  )}
+
+</div>
 
 
 {/* 🔥 BOTÓN PREMIUM */}
