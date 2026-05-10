@@ -23,7 +23,11 @@ export default function Productos() {
         product_variants (*),
         product_images (*)
       `)
-      .order("name", { ascending: true });
+      .order("sort_order", {
+  foreignTable: "product_images",
+  ascending: true
+})
+.order("name", { ascending: true });
 
     setProductosFull(
   Array.isArray(data) ? data : []
