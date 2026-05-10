@@ -1007,9 +1007,6 @@ setProducto(data);
 
 </DndContext>
 
-
-  </div>
-
 </div>
       
 {/* TABLA PREMIUM */}
