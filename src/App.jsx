@@ -13,7 +13,6 @@ import Layout from "./Layout";
 import Success from "./Success";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/Dashboard";
-import Stock from "./admin/Stock";
 import Productos from "./admin/Productos";
 import CrearProducto from "./admin/CrearProducto";
 import Ventas from "./admin/Ventas";
@@ -754,7 +753,6 @@ export default function App() {
       }
     >
       <Route index element={<Dashboard />} />
-      <Route path="stock" element={<Stock />} />
       <Route path="productos" element={<Productos />} />
       <Route path="crear" element={<CrearProducto />} />
       <Route path="ventas" element={<Ventas />} />
