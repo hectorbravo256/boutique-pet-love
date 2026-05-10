@@ -217,6 +217,10 @@ const [nuevoStock, setNuevoStock] =
         product_images (*)
       `)
       .eq("id", id)
+      .order("sort_order", {
+  foreignTable: "product_images",
+  ascending: true
+})
       .single();
 
     if (!data) return;
@@ -521,7 +525,7 @@ setProducto(data);
 
 };
 
-  const handleDragEnd = async (
+const handleDragEnd = async (
   event
 ) => {
 
@@ -551,27 +555,33 @@ setProducto(data);
         newIndex
       );
 
-    // actualizar UI
+    // 🔥 actualizar sort_order local
+    const actualizadas =
+      nuevas.map((img, index) => ({
+        ...img,
+        sort_order: index
+      }));
+
+    // 🔥 UI inmediata
     setProducto(prev => ({
       ...prev,
-      product_images: nuevas
+      product_images: actualizadas
     }));
 
-    // guardar orden db
-    for (
-      let i = 0;
-      i < nuevas.length;
-      i++
-    ) {
+    // 🔥 guardar DB
+    for (const img of actualizadas) {
 
       await supabase
         .from("product_images")
         .update({
-          sort_order: i
+          sort_order: img.sort_order
         })
-        .eq("id", nuevas[i].id);
+        .eq("id", img.id);
 
     }
+
+    // 🔥 recargar desde DB
+    await cargarProducto();
 
   }
 
