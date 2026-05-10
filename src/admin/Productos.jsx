@@ -150,22 +150,14 @@ export default function Productos() {
 >
   Categoría ⬍
 </th>
-
-<th style={{ padding: 12 }}>Talla</th>
-
-<th
-  style={{ padding: 12, cursor: "pointer" }}
-  onClick={() =>
-    setOrden(prev => ({
-      campo: "price",
-      direccion: prev.direccion === "asc" ? "desc" : "asc"
-    }))
-  }
->
-  Precio ⬍
+      <th style={{ padding: 12 }}>
+  Variantes
 </th>
 
-<th style={{ padding: 12 }}>Acciones</th>
+<th style={{ padding: 12 }}>
+  Precio desde
+</th>
+
     </tr>
   </thead>
 
@@ -180,25 +172,12 @@ export default function Productos() {
     )
 ).map((p) => {
 
-        // 🔥 ordenar tallas
-        const variantesOrdenadas = [
-  ...(Array.isArray(p.product_variants)
-    ? p.product_variants
-    : [])
-].sort((a, b) => {
-          const numA = parseInt(a.size.replace(/\D/g, ""));
-          const numB = parseInt(b.size.replace(/\D/g, ""));
-          return numA - numB;
-        });
 
-        const tallaDefault = variantesOrdenadas[0];
 
         return (
-  <FilaProducto
+ <FilaProducto
   key={p.id}
   p={p}
-  variantesOrdenadas={variantesOrdenadas}
-  tallaDefault={tallaDefault}
   setProductosFull={setProductosFull}
   recargarProductos={recargarProductos}
 />
@@ -227,16 +206,10 @@ export default function Productos() {
 }
 function FilaProducto({
   p,
-  variantesOrdenadas,
-  tallaDefault,
   setProductosFull,
   recargarProductos
 }) {
 
-  const [tallaSeleccionada, setTallaSeleccionada] = useState(tallaDefault);
-  const [precioTemporal, setPrecioTemporal] = useState(tallaDefault?.price || "");
-  const [estadoGuardado, setEstadoGuardado] =
-  useState("idle");
 
   return (
     <tr
@@ -610,257 +583,40 @@ onBlur={async (e) => {
         {p.category}
       </td>
 
-      {/* TALLA */}
-      <td style={{ padding: "10px 12px" }}>
-        <select
-          value={tallaSeleccionada?.id}
-          onChange={(e) => {
-            const v = variantesOrdenadas.find(
-              x => x.id === parseInt(e.target.value)
-            );
-            setTallaSeleccionada(v);
-            setPrecioTemporal(v?.price || "");
-          }}
-        >
-          {variantesOrdenadas.map(v => (
-            <option key={v.id} value={v.id}>
-              {v.size}
-            </option>
-          ))}
-        </select>
-      </td>
+{/* VARIANTES */}
+<td style={{ padding: "10px 12px" }}>
 
-      {/* PRECIO */}
-      <td style={{ padding: "10px 12px" }}>
-        <input
-  type="number"
-  value={precioTemporal}
-
-  onChange={(e) => {
-    setPrecioTemporal(e.target.value);
-  }}
-
-    onFocus={(e) => {
-    e.target.style.border =
-      "1px solid #ec4899";
-
-    e.target.style.boxShadow =
-      "0 0 0 4px rgba(236,72,153,0.12)";
-  }}
-
-  onBlurCapture={(e) => {
-    e.target.style.border =
-      "1px solid #f1f5f9";
-
-    e.target.style.boxShadow =
-      "0 2px 10px rgba(0,0,0,0.04)";
-  }}
-          
-  onBlur={async () => {
-
-    const nuevo = parseInt(precioTemporal);
-
-    if (isNaN(nuevo)) return;
-
-    setProductosFull(prev =>
-      prev.map(prod =>
-        prod.id === p.id
-          ? {
-              ...prod,
-              product_variants:
-                prod.product_variants.map(v =>
-                  v.id === tallaSeleccionada.id
-                    ? { ...v, price: nuevo }
-                    : v
-                )
-            }
-          : prod
-      )
-    );
-
-setEstadoGuardado("saving");
-
-await supabase
-  .from("product_variants")
-  .update({ price: nuevo })
-  .eq("id", tallaSeleccionada.id);
-
-setEstadoGuardado("saved");
-
-setTimeout(() => {
-  setEstadoGuardado("idle");
-}, 1800);
-
-  }}
-
-style={{
-  width: 100,
-
-  padding: "10px 12px",
-
-  borderRadius: 14,
-
-  border: "1px solid #f1f5f9",
-
-  background: "#fff",
-
-  fontWeight: "700",
-  fontSize: 15,
-
-  outline: "none",
-
-  transition: "all .25s ease",
-
-  boxShadow:
-    "0 2px 10px rgba(0,0,0,0.04)"
-}}
-/>
-
-<div
-  style={{
-    position: "relative",
-    height: 20,
-    marginTop: 6
-  }}
->
-
-  {/* ⏳ GUARDANDO */}
   <span
     style={{
-      position: "absolute",
-      left: 0,
-      top: 0,
-      opacity:
-        estadoGuardado === "saving"
-          ? 1
-          : 0,
-
-      transform:
-        estadoGuardado === "saving"
-          ? "translateY(0)"
-          : "translateY(4px)",
-
-      transition: "all .35s ease",
-
-      color: "#f59e0b",
-      fontSize: 12,
-      fontWeight: "600"
-    }}
-  >
-    ⏳ Guardando...
-  </span>
-
-  {/* ✅ GUARDADO */}
-  <span
-    style={{
-      position: "absolute",
-      left: 0,
-      top: 0,
-
-      opacity:
-        estadoGuardado === "saved"
-          ? 1
-          : 0,
-
-      transform:
-        estadoGuardado === "saved"
-          ? "translateY(0)"
-          : "translateY(4px)",
-
-      transition: "all .35s ease",
-
-      color: "#22c55e",
+      background: "#f3f4f6",
+      padding: "6px 10px",
+      borderRadius: 999,
       fontSize: 12,
       fontWeight: "700"
     }}
   >
-    ✓ Guardado
+    {p.product_variants?.length || 0} variantes
   </span>
 
-</div>
-        
-      </td>
+</td>
 
-      {/* ACCIONES */}
-      <td style={{ padding: "10px 12px" }}>
-        <div style={{ display: "flex", gap: 6 }}>
+{/* PRECIO DESDE */}
+<td style={{ padding: "10px 12px" }}>
 
-          <button
-            onClick={async () => {
-              if (!confirm("¿Eliminar talla?")) return;
+  <span
+    style={{
+      fontWeight: "700",
+      color: "#111827"
+    }}
+  >
+    Desde $
+    {Math.min(
+      ...(p.product_variants || [])
+        .map(v => v.price || 0)
+    ).toLocaleString("es-CL")}
+  </span>
 
-              await supabase
-                .from("product_variants")
-                .delete()
-                .eq("id", tallaSeleccionada.id);
-
-              setProductosFull(prev =>
-                prev.map(prod =>
-                  prod.id === p.id
-                    ? {
-                        ...prod,
-                        product_variants: prod.product_variants.filter(
-                          v => v.id !== tallaSeleccionada.id
-                        )
-                      }
-                    : prod
-                )
-              );
-            }}
-            style={{
-              background: "#ef4444",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 8px",
-              cursor: "pointer"
-            }}
-          >
-            ✕
-          </button>
-
-          <button
-            onClick={async () => {
-              const size = prompt("Nueva talla");
-              const price = prompt("Precio");
-
-              if (!size || !price) return;
-
-              const { data } = await supabase
-                .from("product_variants")
-                .insert([{
-                  product_id: p.id,
-                  size,
-                  price: parseInt(price)
-                }])
-                .select()
-                .single();
-
-              setProductosFull(prev =>
-                prev.map(prod =>
-                  prod.id === p.id
-                    ? {
-                        ...prod,
-                        product_variants: [...prod.product_variants, data]
-                      }
-                    : prod
-                )
-              );
-            }}
-            style={{
-              background: "#22c55e",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 8px",
-              cursor: "pointer"
-            }}
-          >
-            ➕
-          </button>
-
-        </div>
-      </td>
+</td>
 
     </tr>
   );
