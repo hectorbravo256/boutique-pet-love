@@ -536,52 +536,65 @@ const handleDragEnd = async (
 
   if (!over) return;
 
-  if (active.id !== over.id) {
+  if (active.id === over.id)
+    return;
 
-    const oldIndex =
-      producto.product_images.findIndex(
-        img => img.id === active.id
-      );
+  const oldIndex =
+    producto.product_images.findIndex(
+      img => img.id === active.id
+    );
 
-    const newIndex =
-      producto.product_images.findIndex(
-        img => img.id === over.id
-      );
+  const newIndex =
+    producto.product_images.findIndex(
+      img => img.id === over.id
+    );
 
-    const nuevas =
-      arrayMove(
-        producto.product_images,
-        oldIndex,
-        newIndex
-      );
+  // 🔥 nuevo orden
+  const nuevas =
+    arrayMove(
+      producto.product_images,
+      oldIndex,
+      newIndex
+    );
 
-    // 🔥 actualizar sort_order local
-    const actualizadas =
-      nuevas.map((img, index) => ({
-        ...img,
-        sort_order: index
-      }));
-
-    // 🔥 UI inmediata
-    setProducto(prev => ({
-      ...prev,
-      product_images: actualizadas
+  // 🔥 asignar sort_order correcto
+  const actualizadas =
+    nuevas.map((img, index) => ({
+      ...img,
+      sort_order: index
     }));
 
-    // 🔥 guardar DB
-    for (const img of actualizadas) {
+  // 🔥 actualizar UI inmediato
+  setProducto(prev => ({
+    ...prev,
+    product_images: actualizadas
+  }));
 
-      await supabase
-        .from("product_images")
-        .update({
-          sort_order: img.sort_order
-        })
-        .eq("id", img.id);
+  try {
 
-    }
+    // 🔥 guardar TODAS
+    const updates =
+      actualizadas.map(img =>
+        supabase
+          .from("product_images")
+          .update({
+            sort_order:
+              img.sort_order
+          })
+          .eq("id", img.id)
+      );
+
+    await Promise.all(updates);
 
     // 🔥 recargar desde DB
     await cargarProducto();
+
+  } catch (err) {
+
+    console.error(
+      "Error guardando orden",
+      err
+    );
 
   }
 
