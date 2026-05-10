@@ -1,6 +1,180 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import {
+  DndContext,
+  closestCenter
+} from "@dnd-kit/core";
+
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable
+} from "@dnd-kit/sortable";
+
+import {
+  CSS
+} from "@dnd-kit/utilities";
+
+
+function SortableImage({
+  img,
+  index,
+  eliminarImagen
+}) {
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({
+    id: img.id
+  });
+
+  const style = {
+    transform:
+      CSS.Transform.toString(transform),
+
+    transition
+  };
+
+  return (
+
+    <div
+      ref={setNodeRef}
+
+      style={{
+        ...style,
+
+        position: "relative",
+
+        borderRadius: 22,
+
+        overflow: "hidden",
+
+        background: "#f9fafb",
+
+        border:
+          "1px solid #f3f4f6",
+
+        boxShadow:
+          "0 6px 18px rgba(0,0,0,0.04)"
+      }}
+    >
+
+      {/* drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+
+        style={{
+          position: "absolute",
+
+          top: 12,
+          left: 12,
+
+          zIndex: 10,
+
+          background:
+            "rgba(255,255,255,0.92)",
+
+          width: 36,
+          height: 36,
+
+          borderRadius: 12,
+
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          cursor: "grab",
+
+          fontWeight: "700"
+        }}
+      >
+        ⋮⋮
+      </div>
+
+      {/* imagen */}
+      <img
+        src={img.url}
+
+        style={{
+          width: "100%",
+          height: 220,
+          objectFit: "cover"
+        }}
+      />
+
+      {/* portada */}
+      {index === 0 && (
+
+        <div
+          style={{
+            position: "absolute",
+
+            bottom: 12,
+            left: 12,
+
+            background:
+              "#111827",
+
+            color: "#fff",
+
+            padding: "6px 12px",
+
+            borderRadius: 999,
+
+            fontSize: 11,
+
+            fontWeight: "700"
+          }}
+        >
+          Portada
+        </div>
+
+      )}
+
+      {/* eliminar */}
+      <button
+        onClick={() =>
+          eliminarImagen(img.id)
+        }
+
+        style={{
+          position: "absolute",
+
+          top: 12,
+          right: 12,
+
+          width: 36,
+          height: 36,
+
+          borderRadius: 12,
+
+          border: "none",
+
+          background:
+            "rgba(255,255,255,0.92)",
+
+          color: "#ef4444",
+
+          fontWeight: "700",
+
+          cursor: "pointer"
+        }}
+      >
+        ✕
+      </button>
+
+    </div>
+
+  );
+
+}
 
 export default function ProductoDetalle() {
 
@@ -344,6 +518,62 @@ setProducto(data);
         img => img.id !== id
       )
   }));
+
+};
+
+  const handleDragEnd = async (
+  event
+) => {
+
+  const {
+    active,
+    over
+  } = event;
+
+  if (!over) return;
+
+  if (active.id !== over.id) {
+
+    const oldIndex =
+      producto.product_images.findIndex(
+        img => img.id === active.id
+      );
+
+    const newIndex =
+      producto.product_images.findIndex(
+        img => img.id === over.id
+      );
+
+    const nuevas =
+      arrayMove(
+        producto.product_images,
+        oldIndex,
+        newIndex
+      );
+
+    // actualizar UI
+    setProducto(prev => ({
+      ...prev,
+      product_images: nuevas
+    }));
+
+    // guardar orden db
+    for (
+      let i = 0;
+      i < nuevas.length;
+      i++
+    ) {
+
+      await supabase
+        .from("product_images")
+        .update({
+          sort_order: i
+        })
+        .eq("id", nuevas[i].id);
+
+    }
+
+  }
 
 };
 
@@ -721,117 +951,62 @@ setProducto(data);
   </div>
 
   {/* grid */}
-  <div
-    style={{
-      display: "grid",
+{/* grid drag */}
+<DndContext
+  collisionDetection={
+    closestCenter
+  }
 
-      gridTemplateColumns:
-        "repeat(auto-fill,minmax(180px,1fr))",
+  onDragEnd={handleDragEnd}
+>
 
-      gap: 18
-    }}
+  <SortableContext
+    items={
+      producto.product_images.map(
+        img => img.id
+      )
+    }
+
+    strategy={
+      rectSortingStrategy
+    }
   >
 
-    {producto.product_images.map(
-      (img, index) => (
+    <div
+      style={{
+        display: "grid",
 
-        <div
-          key={img.id}
+        gridTemplateColumns:
+          "repeat(auto-fill,minmax(180px,1fr))",
 
-          style={{
-            position: "relative",
+        gap: 18
+      }}
+    >
 
-            borderRadius: 22,
+      {producto.product_images.map(
+        (img, index) => (
 
-            overflow: "hidden",
+          <SortableImage
+            key={img.id}
 
-            background: "#f9fafb",
+            img={img}
 
-            border:
-              "1px solid #f3f4f6",
+            index={index}
 
-            boxShadow:
-              "0 6px 18px rgba(0,0,0,0.04)"
-          }}
-        >
-
-          {/* imagen */}
-          <img
-            src={img.url}
-
-            style={{
-              width: "100%",
-              height: 220,
-
-              objectFit: "cover"
-            }}
+            eliminarImagen={
+              eliminarImagen
+            }
           />
 
-          {/* portada */}
-          {index === 0 && (
+        )
+      )}
 
-            <div
-              style={{
-                position: "absolute",
+    </div>
 
-                top: 12,
-                left: 12,
+  </SortableContext>
 
-                background:
-                  "#111827",
+</DndContext>
 
-                color: "#fff",
-
-                padding: "6px 10px",
-
-                borderRadius: 999,
-
-                fontSize: 11,
-
-                fontWeight: "700"
-              }}
-            >
-              Portada
-            </div>
-
-          )}
-
-          {/* eliminar */}
-          <button
-            onClick={() =>
-              eliminarImagen(img.id)
-            }
-
-            style={{
-              position: "absolute",
-
-              top: 12,
-              right: 12,
-
-              width: 36,
-              height: 36,
-
-              borderRadius: 12,
-
-              border: "none",
-
-              background:
-                "rgba(255,255,255,0.92)",
-
-              color: "#ef4444",
-
-              fontWeight: "700",
-
-              cursor: "pointer"
-            }}
-          >
-            ✕
-          </button>
-
-        </div>
-
-      )
-    )}
 
   </div>
 
