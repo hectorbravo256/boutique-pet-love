@@ -229,38 +229,12 @@ function FilaProducto({
 
     alignItems: "center",
 
-    justifyContent: "center",
+    justifyContent: "center"
       
-    gap: 10
   }}
 >
 
-      {/* ✅ ACTIVO */}
-      <input
-        type="checkbox"
-        checked={Boolean(p.active)}
-        onChange={async (e) => {
-          const nuevo = e.target.checked;
 
-          setProductosFull(prev =>
-            prev.map(prod =>
-              prod.id === p.id ? { ...prod, active: nuevo } : prod
-            )
-          );
-
-          const { error } = await supabase
-  .from("products")
-  .update({ active: nuevo })
-  .eq("id", p.id);
-
-if (error) {
-  console.error(error);
-  alert("No se pudo guardar");
-}
-    await recargarProductos();
-        }}
-      />
-      
       
       {/* 🗑 ELIMINAR PRODUCTO PREMIUM */}
 <button
