@@ -119,16 +119,8 @@ export default function Productos() {
 }}>
   <thead style={{ background: "#f3f4f6" }}>
     <tr>
-      <th style={{ padding: 12 }}>
-  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-    <span style={{ fontSize: 12, fontWeight: "bold" }}>
-      Activar Descuento
-    </span>
-
-    <span style={{ fontSize: 12, fontWeight: "bold" }}>
-      Borrar
-    </span>
-  </div>
+<th style={{ padding: 12 }}>
+  ⚙️
 </th>
 
 <th
@@ -231,7 +223,17 @@ function FilaProducto({
   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
 
     {/* 🔹 FILA 1: CONTROLES PRINCIPALES */}
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <div
+  style={{
+    display: "flex",
+
+    alignItems: "center",
+
+    justifyContent: "center",
+      
+    gap: 10
+  }}
+>
 
       {/* ✅ ACTIVO */}
       <input
@@ -258,110 +260,7 @@ if (error) {
     await recargarProductos();
         }}
       />
-
-      {/* 🔥 ACTIVAR DESCUENTO */}
-      <label style={{
-  display: "flex",
-  alignItems: "center",
-  gap: 4,
-  fontSize: 12,
-  fontWeight: "bold"
-}}>
-      <input
-        type="checkbox"
-        checked={Boolean(p.discount_active)}
-        onChange={async (e) => {
-          const activo = e.target.checked;
-
-setProductosFull(prev =>
-  prev.map(prod =>
-    prod.id === p.id
-      ? {
-          ...prod,
-          discount_active: activo,
-          discount_percent: activo ? prod.discount_percent : 0,
-          discount_start: activo ? prod.discount_start : null,
-          discount_end: activo ? prod.discount_end : null
-        }
-      : prod
-  )
-);
-
-const { error } = await supabase
-  .from("products")
-  .update({
-    discount_active: activo,
-
-    discount_percent: activo
-      ? (p.discount_percent || 0)
-      : 0,
-
-    discount_start: activo
-      ? p.discount_start
-      : null,
-
-    discount_end: activo
-      ? p.discount_end
-      : null
-  })
-  .eq("id", p.id);
-
-if (error) {
-  console.error(error);
-  alert("No se pudo guardar descuento");
-}
-   await recargarProductos();
-        }}
-      />
-</label>
-
-      {/* 💰 % DESCUENTO */}
-{p.discount_active && (
-  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-
-    <input
-      type="number"
-      placeholder="%"
-      value={p.discount_percent ?? ""}
-      onChange={(e) => {
-  const val = parseInt(e.target.value) || 0;
-
-  setProductosFull(prev =>
-    prev.map(prod =>
-      prod.id === p.id
-        ? { ...prod, discount_percent: val }
-        : prod
-    )
-  );
-}}
-onBlur={async (e) => {
-  const val = parseInt(e.target.value) || 0;
-
-  await supabase
-    .from("products")
-    .update({ discount_percent: val })
-    .eq("id", p.id);
-}}
-      style={{
-        width: 60,
-        padding: 4,
-        borderRadius: 6,
-        border: "1px solid #ddd"
-      }}
-    />
-
-    {/* 🔥 PORCENTAJE VISUAL */}
-    <span style={{
-      fontSize: 12,
-      fontWeight: "bold",
-      color: "#ec4899"
-    }}>
-      {p.discount_percent ?? 0}%
-    </span>
-
-  </div>
-)}
-
+      
       
       {/* 🗑 ELIMINAR PRODUCTO PREMIUM */}
 <button
@@ -461,97 +360,7 @@ onBlur={async (e) => {
 </button>
 
     </div>
-
-    {/* 🔹 FILA 2: FECHAS (SOLO SI HAY DESCUENTO Y %) */}
-{p.discount_active && p.discount_percent > 0 && (
-  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-
-    <small style={{ fontSize: 10, color: "#666" }}>
-      Inicio / Fin
-    </small>
-
-    <div style={{ display: "flex", gap: 6 }}>
-
-      {/* ⏱ FECHA INICIO */}
-      <input
-        type="datetime-local"
-        value={p.discount_start ? p.discount_start.slice(0, 16) : ""}
-        onChange={async (e) => {
-          const val = e.target.value;
-
-          setProductosFull(prev =>
-            prev.map(prod =>
-              prod.id === p.id
-                ? { ...prod, discount_start: val }
-                : prod
-            )
-          );
-
-          await supabase
-            .from("products")
-            .update({ discount_start: val })
-            .eq("id", p.id);
-        }}
-        style={{
-          padding: 4,
-          borderRadius: 6,
-          border: "1px solid #ddd"
-        }}
-      />
-
-      {/* ⏱ FECHA FIN */}
-      <input
-        type="datetime-local"
-        value={p.discount_end ? p.discount_end.slice(0, 16) : ""}
-        onChange={async (e) => {
-          const val = e.target.value;
-
-          setProductosFull(prev =>
-            prev.map(prod =>
-              prod.id === p.id
-                ? { ...prod, discount_end: val }
-                : prod
-            )
-          );
-
-          await supabase
-            .from("products")
-            .update({ discount_end: val })
-            .eq("id", p.id);
-        }}
-        style={{
-          padding: 4,
-          borderRadius: 6,
-          border: "1px solid #ddd"
-        }}
-      />
-
-    </div>
-
-    {/* 🔥 ESTADO DESCUENTO */}
-    <small style={{
-      color: "#ec4899",
-      fontWeight: "bold"
-    }}>
-      {(() => {
-        const ahora = new Date();
-        const inicio = p.discount_start ? new Date(p.discount_start) : null;
-        const fin = p.discount_end ? new Date(p.discount_end) : null;
-
-        const activo =
-          (!inicio || ahora >= inicio) &&
-          (!fin || ahora <= fin);
-
-        return activo ? "🔥 Activo ahora" : "⏳ Programado";
-      })()}
-    </small>
-
-  </div>
-)}
-
-  </div>
 </td>
-
       {/* PRODUCTO */}
       <td style={{ padding: "10px 12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
