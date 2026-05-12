@@ -1,5 +1,4 @@
 
-
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
@@ -56,13 +55,23 @@ const decreaseQty = (index) => {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const heroProduct =
-  featuredProducts?.[currentHero];
-	const [
+  const [
   currentHero,
   setCurrentHero
 ] = useState(0);
-const sliderRef = useRef(null);
+const heroProduct =
+  featuredProducts?.[currentHero] || null;
+	
+const heroPrecios =
+  (heroProduct?.product_variants || [])
+    .map(v => Number(v.price || 0))
+    .filter(v => !isNaN(v));
+
+const heroPrecioBase =
+  heroPrecios.length > 0
+    ? Math.min(...heroPrecios)
+    : 0;
+
 	useEffect(() => {
 
   if (
@@ -171,9 +180,16 @@ const next =
       setProducts(data || []);
 
 		const destacados =
-  (data || []).filter(
-    p => p.featured
-  );
+  (data || [])
+
+    .filter(p => p.featured)
+
+    .sort(
+      (a, b) =>
+        (a.featured_order || 0)
+        -
+        (b.featured_order || 0)
+    );
 
 setFeaturedProducts(destacados);	
     };
@@ -453,8 +469,9 @@ localStorage.setItem(
       <h1
         className="
           mt-6
-          text-5xl
-          md:text-7xl
+          text-4xl
+		  sm:text-5xl
+		  md:text-7xl
           font-black
           leading-tight
           text-gray-900
@@ -492,12 +509,8 @@ localStorage.setItem(
               Desde $
 
               {
-                Math.min(
-                  ...heroProduct.product_variants.map(
-                    v => Number(v.price || 0)
-                  )
-                ).toLocaleString("es-CL")
-              }
+  heroPrecioBase.toLocaleString("es-CL")
+}
             </span>
 
             <span
@@ -511,21 +524,12 @@ localStorage.setItem(
 
               {
                 Math.round(
-
-                  Math.min(
-                    ...heroProduct.product_variants.map(
-                      v => Number(v.price || 0)
-                    )
-                  )
-
-                  *
-
-                  (
-                    1 -
-                    heroProduct.discount_percent / 100
-                  )
-
-                ).toLocaleString("es-CL")
+  heroPrecioBase *
+  (
+    1 -
+    heroProduct.discount_percent / 100
+  )
+).toLocaleString("es-CL")
               }
             </span>
 
@@ -543,12 +547,8 @@ localStorage.setItem(
             Desde $
 
             {
-              Math.min(
-                ...heroProduct.product_variants.map(
-                  v => Number(v.price || 0)
-                )
-              ).toLocaleString("es-CL")
-            }
+  heroPrecioBase.toLocaleString("es-CL")
+}
           </div>
 
         )}
@@ -674,7 +674,7 @@ localStorage.setItem(
 
       <img
         src={
-          heroProduct.product_images?.[0]?.url
+          heroProduct?.product_images?.[0]?.url
             ? `${heroProduct.product_images[0].url}?width=1200&quality=90`
             : "/placeholder.png"
         }
@@ -809,10 +809,13 @@ localStorage.setItem(
     ">
       Desde $
 
-      {Math.round(
-        precioBase *
-        (1 - product.discount_percent / 100)
-      ).toLocaleString("es-CL")}
+{Math.round(
+  precioBase *
+  (
+    1 -
+    product.discount_percent / 100
+  )
+).toLocaleString("es-CL")}
     </p>
 
   </div>
