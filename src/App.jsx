@@ -57,7 +57,38 @@ const decreaseQty = (index) => {
   const [products, setProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const heroProduct =
-  featuredProducts?.[0];
+  featuredProducts?.[currentHero];
+	const [
+  currentHero,
+  setCurrentHero
+] = useState(0);
+const sliderRef = useRef(null);
+	useEffect(() => {
+
+  if (
+    featuredProducts.length <= 1
+  ) return;
+
+  const interval =
+    setInterval(() => {
+
+      setCurrentHero(prev =>
+
+        prev ===
+        featuredProducts.length - 1
+
+          ? 0
+
+          : prev + 1
+
+      );
+
+    }, 5000);
+
+  return () =>
+    clearInterval(interval);
+
+}, [featuredProducts]);
   const [categories, setCategories] = useState([]);
   const [stockDB, setStockDB] = useState([]);
   const [formData, setFormData] = useState({
@@ -349,6 +380,8 @@ localStorage.setItem(
 {heroProduct && (
 
 <section
+  key={heroProduct.id}
+
   className="
     relative
     overflow-hidden
@@ -356,6 +389,7 @@ localStorage.setItem(
     md:px-12
     py-14
     md:py-20
+    animate-fade
   "
 >
 
@@ -521,6 +555,46 @@ localStorage.setItem(
 
       </div>
 
+		{/* INDICADORES */}
+<div
+  className="
+    flex
+    gap-3
+    mt-10
+  "
+>
+
+  {featuredProducts.map(
+    (_, index) => (
+
+      <button
+        key={index}
+
+        onClick={() =>
+          setCurrentHero(index)
+        }
+
+        className={`
+          h-3
+          rounded-full
+          transition-all
+          duration-500
+
+          ${
+            currentHero === index
+
+              ? "w-10 bg-pink-600"
+
+              : "w-3 bg-pink-200"
+          }
+        `}
+      />
+
+    )
+  )}
+
+</div>
+		
       {/* BOTONES */}
       <div
         className="
