@@ -360,6 +360,9 @@ if (error) {
 </button>
 
     </div>
+
+  </div>
+
 </td>
       {/* PRODUCTO */}
       <td style={{ padding: "10px 12px" }}>
