@@ -55,6 +55,9 @@ const decreaseQty = (index) => {
   const [selectedSizes, setSelectedSizes] = useState({});
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const heroProduct =
+  featuredProducts?.[0];
   const [categories, setCategories] = useState([]);
   const [stockDB, setStockDB] = useState([]);
   const [formData, setFormData] = useState({
@@ -123,7 +126,25 @@ const next =
         `)
         .eq("active", true);
 
+		(data || []).forEach(product => {
+
+  product.product_images?.sort(
+    (a, b) =>
+      (a.sort_order || 0)
+      -
+      (b.sort_order || 0)
+  );
+
+});
+
       setProducts(data || []);
+
+		const destacados =
+  (data || []).filter(
+    p => p.featured
+  );
+
+setFeaturedProducts(destacados);	
     };
 
     cargar();
@@ -324,46 +345,431 @@ localStorage.setItem(
       
 
 
-      {/* HERO */}
-      <section className="p-10 grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <span className="bg-pink-100 text-pink-600 px-4 py-1 rounded-full text-sm flex items-center gap-2 w-fit">
- 	   🐾 Boutique Pet Love
-	   </span>
+{/* 🔥 HERO PREMIUM */}
+{heroProduct && (
 
-          <h2 className="text-6xl md:text-7xl font-extrabold mt-4 leading-tight text-gray-900">
- 	 Viste a tu mascota con{" "}
-  	<span className="text-pink-600">amor</span> y estilo
-	</h2>
+<section
+  className="
+    relative
+    overflow-hidden
+    px-6
+    md:px-12
+    py-14
+    md:py-20
+  "
+>
 
-          <p className="mt-4 text-gray-500 text-lg">
-            Tienda online profesional para ropa y accesorios de mascotas.
-          </p>
+  {/* FONDO */}
+  <div
+    className="
+      absolute
+      inset-0
+      bg-gradient-to-br
+      from-pink-100
+      via-white
+      to-purple-100
+    "
+  />
 
-          <div className="flex gap-3 mt-6">
-            <a
-              href="#catalogo"
-              className="bg-pink-600 text-white px-6 py-3 rounded-xl"
+  {/* BLUR */}
+  <div
+    className="
+      absolute
+      top-0
+      right-0
+      w-[500px]
+      h-[500px]
+      bg-pink-300/30
+      blur-3xl
+      rounded-full
+    "
+  />
+
+  <div
+    className="
+      relative
+      z-10
+      grid
+      md:grid-cols-2
+      gap-10
+      items-center
+    "
+  >
+
+    {/* TEXTO */}
+    <div>
+
+      <span
+        className="
+          inline-flex
+          items-center
+          gap-2
+          bg-white
+          px-4
+          py-2
+          rounded-full
+          shadow-md
+          text-pink-600
+          font-semibold
+        "
+      >
+        ⭐ Producto Destacado
+      </span>
+
+      <h1
+        className="
+          mt-6
+          text-5xl
+          md:text-7xl
+          font-black
+          leading-tight
+          text-gray-900
+        "
+      >
+        {heroProduct.name}
+      </h1>
+
+      <p
+        className="
+          mt-6
+          text-lg
+          text-gray-600
+          max-w-xl
+        "
+      >
+        {heroProduct.description}
+      </p>
+
+      {/* PRECIOS */}
+      <div className="mt-8">
+
+        {heroProduct.discount_active ? (
+
+          <div className="flex items-center gap-4 flex-wrap">
+
+            <span
+              className="
+                text-2xl
+                text-gray-400
+                line-through
+                font-bold
+              "
             >
-              Comprar ahora
-            </a>
+              Desde $
 
-           <a
- 	 href="https://instagram.com/boutique_petlove"
- 	 target="_blank"
-  	 className="bg-white text-purple-600 border border-purple-200 px-6 py-3 rounded-xl font-semibold hover:shadow-md transition"
-	>
- 	 Ver Instagram
-	</a>
+              {
+                Math.min(
+                  ...heroProduct.product_variants.map(
+                    v => Number(v.price || 0)
+                  )
+                ).toLocaleString("es-CL")
+              }
+            </span>
+
+            <span
+              className="
+                text-5xl
+                font-black
+                text-pink-600
+              "
+            >
+              $
+
+              {
+                Math.round(
+
+                  Math.min(
+                    ...heroProduct.product_variants.map(
+                      v => Number(v.price || 0)
+                    )
+                  )
+
+                  *
+
+                  (
+                    1 -
+                    heroProduct.discount_percent / 100
+                  )
+
+                ).toLocaleString("es-CL")
+              }
+            </span>
+
           </div>
+
+        ) : (
+
+          <div
+            className="
+              text-5xl
+              font-black
+              text-pink-600
+            "
+          >
+            Desde $
+
+            {
+              Math.min(
+                ...heroProduct.product_variants.map(
+                  v => Number(v.price || 0)
+                )
+              ).toLocaleString("es-CL")
+            }
+          </div>
+
+        )}
+
+      </div>
+
+      {/* BOTONES */}
+      <div
+        className="
+          flex
+          gap-4
+          mt-10
+          flex-wrap
+        "
+      >
+
+        <button
+          onClick={() =>
+            navigate(
+              `/producto/${heroProduct.id}`
+            )
+          }
+
+          className="
+            bg-pink-600
+            hover:bg-pink-700
+            text-white
+            px-8
+            py-4
+            rounded-2xl
+            font-bold
+            text-lg
+            shadow-xl
+            transition-all
+            duration-300
+            hover:scale-105
+          "
+        >
+          Comprar ahora
+        </button>
+
+        <a
+          href="https://instagram.com/boutique_petlove"
+          target="_blank"
+
+          className="
+            bg-white
+            text-gray-800
+            px-8
+            py-4
+            rounded-2xl
+            font-bold
+            text-lg
+            shadow-md
+            border
+          "
+        >
+          Ver Instagram
+        </a>
+
+      </div>
+
+    </div>
+
+    {/* IMAGEN */}
+    <div
+      className="
+        relative
+        flex
+        justify-center
+      "
+    >
+
+      <div
+        className="
+          absolute
+          inset-0
+          bg-pink-300/20
+          blur-3xl
+          rounded-full
+        "
+      />
+
+      <img
+        src={
+          heroProduct.product_images?.[0]?.url
+            ? `${heroProduct.product_images[0].url}?width=1200&quality=90`
+            : "/placeholder.png"
+        }
+
+        className="
+          relative
+          z-10
+          w-full
+          max-w-xl
+          rounded-[40px]
+          shadow-2xl
+          object-cover
+        "
+      />
+
+    </div>
+
+  </div>
+
+</section>
+
+)}
+
+			 {/* 🔥 DESTACADOS */}
+{featuredProducts.length > 0 && (
+
+<section className="px-6 pt-4 pb-10">
+
+  <div className="flex items-center justify-between mb-6">
+
+    <div>
+
+      <h2 className="text-3xl font-black text-gray-900">
+        ⭐ Productos Destacados
+      </h2>
+
+      <p className="text-gray-500 mt-1">
+        Los favoritos de Boutique Pet Love
+      </p>
+
+    </div>
+
+  </div>
+
+  <div
+    className="
+      grid
+      grid-cols-2
+      md:grid-cols-3
+      xl:grid-cols-4
+      gap-5
+    "
+  >
+
+    {featuredProducts.map(product => {
+
+      const precios =
+        product.product_variants
+          ?.map(v => Number(v.price))
+          .filter(v => !isNaN(v))
+        || [];
+
+      const precioBase =
+        precios.length > 0
+          ? Math.min(...precios)
+          : 0;
+
+      return (
+
+        <div
+          key={product.id}
+
+          onClick={() =>
+            navigate(`/producto/${product.id}`)
+          }
+
+          className="
+            bg-white
+            rounded-3xl
+            overflow-hidden
+            shadow-sm
+            hover:shadow-2xl
+            transition-all
+            duration-500
+            hover:-translate-y-1
+            cursor-pointer
+          "
+        >
+
+          <img
+            src={
+              product.product_images?.[0]?.url
+                ? `${product.product_images[0].url}?width=800&quality=80`
+                : "/placeholder.png"
+            }
+
+            className="
+              w-full
+              aspect-square
+              object-cover
+            "
+          />
+
+          <div className="p-4">
+
+            <h3 className="
+              font-black
+              text-lg
+              text-gray-800
+              line-clamp-2
+            ">
+              {product.name}
+            </h3>
+
+           {product.discount_active ? (
+
+  <div className="mt-3">
+
+    <p className="
+      text-gray-400
+      line-through
+      text-sm
+    ">
+      Desde $
+      {precioBase.toLocaleString("es-CL")}
+    </p>
+
+    <p className="
+      text-pink-600
+      font-black
+      text-2xl
+    ">
+      Desde $
+
+      {Math.round(
+        precioBase *
+        (1 - product.discount_percent / 100)
+      ).toLocaleString("es-CL")}
+    </p>
+
+  </div>
+
+) : (
+
+  <p className="
+    mt-3
+    text-pink-600
+    font-black
+    text-2xl
+  ">
+    Desde $
+    {precioBase.toLocaleString("es-CL")}
+  </p>
+
+)}
+
+          </div>
+
         </div>
 
-        <img
-  src="/logo.png"
-  loading="eager"
-  className="w-96 mx-auto rounded-2xl shadow-xl"
-/>
-      </section>
+      );
+
+    })}
+
+  </div>
+
+</section>
+
+)}
 
       {/* CATÁLOGO */}
       <section id="catalogo" className="p-6">
