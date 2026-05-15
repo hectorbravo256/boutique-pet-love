@@ -933,6 +933,63 @@ const precioPromedio =
       }}
     />
 
+    {/* género */}
+<select
+  value={
+    producto.gender || "unisex"
+  }
+
+  onChange={async (e) => {
+
+    const value =
+      e.target.value;
+
+    setProducto(prev => ({
+      ...prev,
+      gender: value
+    }));
+
+    await supabase
+      .from("products")
+      .update({
+        gender: value
+      })
+      .eq("id", producto.id);
+
+  }}
+
+  style={{
+    padding:
+      "10px 16px",
+
+    borderRadius: 999,
+
+    border:
+      "1px solid #e5e7eb",
+
+    background:
+      "#f9fafb",
+
+    fontWeight: "700",
+
+    cursor: "pointer"
+  }}
+>
+
+  <option value="macho">
+    🐶 Macho
+  </option>
+
+  <option value="hembra">
+    🎀 Hembra
+  </option>
+
+  <option value="unisex">
+    ✨ Unisex
+  </option>
+
+</select>
+    
     {/* variantes */}
     <div
       style={{
