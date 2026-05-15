@@ -59,8 +59,17 @@ const decreaseQty = (index) => {
   currentHero,
   setCurrentHero
 ] = useState(0);
+	
 const heroProduct =
-  featuredProducts?.[currentHero] || null;
+  featuredProducts[
+    Math.min(
+      currentHero,
+      Math.max(
+        featuredProducts.length - 1,
+        0
+      )
+    )
+  ] || null;
 	
 const heroPrecios =
   (heroProduct?.product_variants || [])
@@ -73,16 +82,9 @@ const heroPrecioBase =
     : 0;
 
 	const nuevosProductos =
-  [...products]
-
-    .sort(
-      (a, b) =>
-        new Date(b.created_at || 0)
-        -
-        new Date(a.created_at || 0)
-    )
-
-    .slice(0, 10);
+  products.filter(
+    p => p.new_collection
+  );
 
 	useEffect(() => {
 
@@ -123,6 +125,19 @@ const heroPrecioBase =
   }
 
 }, [featuredProducts, currentHero]);
+
+	const bestSellers =
+  products.filter(
+    p => p.best_seller
+  );
+	const luxuryProducts =
+  products.filter(
+    p => p.luxury
+  );
+	const exclusiveProducts =
+  products.filter(
+    p => p.exclusive
+  );
 	
   const [categories, setCategories] = useState([]);
   const [stockDB, setStockDB] = useState([]);
@@ -184,13 +199,17 @@ const next =
   useEffect(() => {
     const cargar = async () => {
       const { data } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_variants (*),
-          product_images (*)
-        `)
-        .eq("active", true);
+  .from("products")
+  .select(`
+    *,
+    product_variants (*),
+    product_images (*)
+  `)
+  .eq("active", true)
+  .order("sort_order", {
+    foreignTable: "product_images",
+    ascending: true
+  });
 
 		(data || []).forEach(product => {
 
@@ -893,6 +912,7 @@ localStorage.setItem(
 )}
 
 			{/* 🔥 NUEVA COLECCIÓN */}
+	{nuevosProductos.length > 0 && (
 <section className="px-6 pb-14">
 
   <div className="
@@ -1208,7 +1228,961 @@ localStorage.setItem(
 </div>
 
 </section>
+)}
+			 
+{/* 🔥 BEST SELLERS */}
+{bestSellers.length > 0 && (
 
+<section className="px-6 pb-16">
+
+  {/* HEADER */}
+  <div className="
+    flex
+    items-end
+    justify-between
+    mb-8
+    gap-4
+    flex-wrap
+  ">
+
+    <div>
+
+      <p className="
+        text-orange-500
+        font-bold
+        uppercase
+        tracking-[0.25em]
+        text-sm
+      ">
+        TOP SALES
+      </p>
+
+      <h2 className="
+        text-4xl
+        font-black
+        text-gray-900
+        mt-2
+      ">
+        🔥 Best Sellers
+      </h2>
+
+      <p className="
+        text-gray-500
+        mt-2
+      ">
+        Los productos más vendidos y favoritos
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* SLIDER WRAPPER */}
+  <div className="relative">
+
+    {/* IZQUIERDA */}
+    <button
+      onClick={() => {
+
+        document
+          .getElementById("best-seller-slider")
+          ?.scrollBy({
+            left: -320,
+            behavior: "smooth"
+          });
+
+      }}
+
+      className="
+        hidden
+        md:flex
+        absolute
+        left-0
+        top-1/2
+        -translate-y-1/2
+        z-20
+        bg-white
+        shadow-xl
+        w-12
+        h-12
+        rounded-full
+        items-center
+        justify-center
+      "
+    >
+      ←
+    </button>
+
+    {/* DERECHA */}
+    <button
+      onClick={() => {
+
+        document
+          .getElementById("best-seller-slider")
+          ?.scrollBy({
+            left: 320,
+            behavior: "smooth"
+          });
+
+      }}
+
+      className="
+        hidden
+        md:flex
+        absolute
+        right-0
+        top-1/2
+        -translate-y-1/2
+        z-20
+        bg-white
+        shadow-xl
+        w-12
+        h-12
+        rounded-full
+        items-center
+        justify-center
+      "
+    >
+      →
+    </button>
+
+    {/* SLIDER */}
+    <div
+      id="best-seller-slider"
+
+      className="
+        flex
+        gap-6
+        overflow-x-auto
+        scroll-smooth
+        pb-4
+        snap-x
+        snap-mandatory
+        scrollbar-hide
+      "
+    >
+
+      {bestSellers.map(product => {
+
+        const precios =
+          product.product_variants
+            ?.map(v => Number(v.price))
+            .filter(v => !isNaN(v))
+          || [];
+
+        const precioBase =
+          precios.length > 0
+            ? Math.min(...precios)
+            : 0;
+
+        return (
+
+          <div
+            key={product.id}
+
+            onClick={() =>
+              navigate(`/producto/${product.id}`)
+            }
+
+            className="
+              min-w-[280px]
+              max-w-[280px]
+              snap-start
+              bg-white
+              rounded-[32px]
+              overflow-hidden
+              shadow-sm
+              hover:shadow-2xl
+              transition-all
+              duration-500
+              hover:-translate-y-1
+              cursor-pointer
+              group
+            "
+          >
+
+            {/* IMAGEN */}
+            <div className="
+              relative
+              overflow-hidden
+            ">
+
+              <img
+                src={
+                  product.product_images?.[0]?.url
+                    ? `${product.product_images[0].url}?width=800&quality=80`
+                    : "/placeholder.png"
+                }
+
+                loading="lazy"
+
+                onLoad={(e) =>
+                  e.target.classList.remove("opacity-0")
+                }
+
+                className="
+                  opacity-0
+                  transition-all
+                  duration-700
+                  w-full
+                  aspect-square
+                  object-cover
+                  group-hover:scale-105
+                "
+              />
+
+              {/* BADGE */}
+              <div className="
+                absolute
+                top-4
+                left-4
+                bg-orange-500
+                text-white
+                text-xs
+                font-black
+                px-3
+                py-2
+                rounded-full
+                shadow-xl
+              ">
+                🔥 BEST SELLER
+              </div>
+
+            </div>
+
+            {/* INFO */}
+            <div className="p-5">
+
+              <h3 className="
+                font-black
+                text-lg
+                text-gray-900
+                line-clamp-2
+              ">
+                {product.name}
+              </h3>
+
+              {/* PRECIOS */}
+              {product.discount_active ? (
+
+                <div className="mt-4">
+
+                  <p className="
+                    text-gray-400
+                    line-through
+                    text-sm
+                  ">
+                    Desde $
+                    {precioBase.toLocaleString("es-CL")}
+                  </p>
+
+                  <p className="
+                    text-pink-600
+                    font-black
+                    text-3xl
+                  ">
+                    $
+
+                    {Math.round(
+                      precioBase *
+                      (
+                        1 -
+                        product.discount_percent / 100
+                      )
+                    ).toLocaleString("es-CL")}
+                  </p>
+
+                </div>
+
+              ) : (
+
+                <p className="
+                  mt-4
+                  text-pink-600
+                  font-black
+                  text-3xl
+                ">
+                  Desde $
+                  {precioBase.toLocaleString("es-CL")}
+                </p>
+
+              )}
+
+              {/* CTA */}
+              <button
+                onClick={(e) => {
+
+                  e.stopPropagation();
+
+                  navigate(
+                    `/producto/${product.id}`
+                  );
+
+                }}
+
+                className="
+                  mt-5
+                  w-full
+                  bg-orange-500
+                  text-white
+                  py-3
+                  rounded-2xl
+                  font-bold
+                  transition-all
+                  duration-300
+                  hover:opacity-90
+                "
+              >
+                Ver producto
+              </button>
+
+            </div>
+
+          </div>
+
+        );
+
+      })}
+
+    </div>
+
+  </div>
+
+</section>
+
+)}
+
+	{/* 👑 LUXURY COLLECTION */}
+{luxuryProducts.length > 0 && (
+
+<section className="
+  px-6
+  py-20
+  bg-gradient-to-br
+  from-black
+  via-gray-900
+  to-black
+  relative
+  overflow-hidden
+">
+
+  {/* GLOW */}
+  <div className="
+    absolute
+    top-0
+    left-1/2
+    -translate-x-1/2
+    w-[700px]
+    h-[700px]
+    bg-yellow-500/10
+    blur-3xl
+    rounded-full
+    pointer-events-none
+  " />
+
+  {/* HEADER */}
+  <div className="
+    relative
+    z-10
+    flex
+    items-end
+    justify-between
+    mb-10
+    gap-4
+    flex-wrap
+  ">
+
+    <div>
+
+      <p className="
+        text-yellow-400
+        font-bold
+        uppercase
+        tracking-[0.3em]
+        text-sm
+      ">
+        PREMIUM COLLECTION
+      </p>
+
+      <h2 className="
+        text-5xl
+        font-black
+        text-white
+        mt-3
+      ">
+        👑 Luxury Collection
+      </h2>
+
+      <p className="
+        text-gray-400
+        mt-4
+        max-w-2xl
+      ">
+        Productos exclusivos cuidadosamente seleccionados
+        para una experiencia premium.
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* SLIDER WRAPPER */}
+  <div className="relative z-10">
+
+    {/* IZQUIERDA */}
+    <button
+      onClick={() => {
+
+        document
+          .getElementById("luxury-slider")
+          ?.scrollBy({
+            left: -320,
+            behavior: "smooth"
+          });
+
+      }}
+
+      className="
+        hidden
+        md:flex
+        absolute
+        left-0
+        top-1/2
+        -translate-y-1/2
+        z-20
+        bg-white/10
+        backdrop-blur-xl
+        border
+        border-white/20
+        text-white
+        w-12
+        h-12
+        rounded-full
+        items-center
+        justify-center
+      "
+    >
+      ←
+    </button>
+
+    {/* DERECHA */}
+    <button
+      onClick={() => {
+
+        document
+          .getElementById("luxury-slider")
+          ?.scrollBy({
+            left: 320,
+            behavior: "smooth"
+          });
+
+      }}
+
+      className="
+        hidden
+        md:flex
+        absolute
+        right-0
+        top-1/2
+        -translate-y-1/2
+        z-20
+        bg-white/10
+        backdrop-blur-xl
+        border
+        border-white/20
+        text-white
+        w-12
+        h-12
+        rounded-full
+        items-center
+        justify-center
+      "
+    >
+      →
+    </button>
+
+    {/* SLIDER */}
+    <div
+      id="luxury-slider"
+
+      className="
+        flex
+        gap-8
+        overflow-x-auto
+        scroll-smooth
+        pb-4
+        snap-x
+        snap-mandatory
+        scrollbar-hide
+      "
+    >
+
+      {luxuryProducts.map(product => {
+
+        const precios =
+          product.product_variants
+            ?.map(v => Number(v.price))
+            .filter(v => !isNaN(v))
+          || [];
+
+        const precioBase =
+          precios.length > 0
+            ? Math.min(...precios)
+            : 0;
+
+        return (
+
+          <div
+            key={product.id}
+
+            onClick={() =>
+              navigate(`/producto/${product.id}`)
+            }
+
+            className="
+              min-w-[320px]
+              max-w-[320px]
+              snap-start
+              bg-white/5
+              backdrop-blur-xl
+              border
+              border-white/10
+              rounded-[36px]
+              overflow-hidden
+              transition-all
+              duration-500
+              hover:-translate-y-2
+              hover:border-yellow-400/40
+              hover:shadow-[0_0_50px_rgba(250,204,21,0.15)]
+              cursor-pointer
+              group
+            "
+          >
+
+            {/* IMAGEN */}
+            <div className="
+              relative
+              overflow-hidden
+            ">
+
+              <img
+                src={
+                  product.product_images?.[0]?.url
+                    ? `${product.product_images[0].url}?width=1000&quality=90`
+                    : "/placeholder.png"
+                }
+
+                loading="lazy"
+
+                onLoad={(e) =>
+                  e.target.classList.remove("opacity-0")
+                }
+
+                className="
+                  opacity-0
+                  transition-all
+                  duration-700
+                  w-full
+                  aspect-square
+                  object-cover
+                  group-hover:scale-105
+                "
+              />
+
+              {/* BADGE */}
+              <div className="
+                absolute
+                top-5
+                left-5
+                bg-yellow-400
+                text-black
+                text-xs
+                font-black
+                px-4
+                py-2
+                rounded-full
+                shadow-xl
+              ">
+                👑 LUXURY
+              </div>
+
+            </div>
+
+            {/* INFO */}
+            <div className="p-6">
+
+              <h3 className="
+                font-black
+                text-2xl
+                text-white
+                line-clamp-2
+              ">
+                {product.name}
+              </h3>
+
+              {/* PRECIOS */}
+              {product.discount_active ? (
+
+                <div className="mt-5">
+
+                  <p className="
+                    text-gray-500
+                    line-through
+                    text-sm
+                  ">
+                    Desde $
+                    {precioBase.toLocaleString("es-CL")}
+                  </p>
+
+                  <p className="
+                    text-yellow-400
+                    font-black
+                    text-4xl
+                  ">
+                    $
+
+                    {Math.round(
+                      precioBase *
+                      (
+                        1 -
+                        product.discount_percent / 100
+                      )
+                    ).toLocaleString("es-CL")}
+                  </p>
+
+                </div>
+
+              ) : (
+
+                <p className="
+                  mt-5
+                  text-yellow-400
+                  font-black
+                  text-4xl
+                ">
+                  Desde $
+                  {precioBase.toLocaleString("es-CL")}
+                </p>
+
+              )}
+
+              {/* CTA */}
+              <button
+                onClick={(e) => {
+
+                  e.stopPropagation();
+
+                  navigate(
+                    `/producto/${product.id}`
+                  );
+
+                }}
+
+                className="
+                  mt-6
+                  w-full
+                  bg-yellow-400
+                  text-black
+                  py-4
+                  rounded-2xl
+                  font-black
+                  transition-all
+                  duration-300
+                  hover:scale-[1.02]
+                "
+              >
+                Ver producto
+              </button>
+
+            </div>
+
+          </div>
+
+        );
+
+      })}
+
+    </div>
+
+  </div>
+
+</section>
+
+)} 
+
+	{/* 💎 EXCLUSIVE COLLECTION */}
+{exclusiveProducts.length > 0 && (
+
+<section className="
+  px-6
+  py-24
+  relative
+  overflow-hidden
+  bg-gradient-to-br
+  from-fuchsia-950
+  via-black
+  to-purple-950
+">
+
+  {/* GLOW */}
+  <div className="
+    absolute
+    inset-0
+    bg-[radial-gradient(circle_at_top,rgba(236,72,153,0.25),transparent_50%)]
+    pointer-events-none
+  " />
+
+  {/* HEADER */}
+  <div className="
+    relative
+    z-10
+    mb-12
+    text-center
+  ">
+
+    <p className="
+      text-pink-400
+      uppercase
+      tracking-[0.35em]
+      text-sm
+      font-bold
+    ">
+      LIMITED EDITION
+    </p>
+
+    <h2 className="
+      mt-4
+      text-5xl
+      md:text-6xl
+      font-black
+      text-white
+    ">
+      💎 Exclusive Collection
+    </h2>
+
+    <p className="
+      mt-5
+      text-gray-300
+      max-w-2xl
+      mx-auto
+      text-lg
+    ">
+      Productos únicos y exclusivos disponibles
+      por tiempo limitado.
+    </p>
+
+  </div>
+
+  {/* SLIDER */}
+  <div
+    id="exclusive-slider"
+
+    className="
+      relative
+      z-10
+      flex
+      gap-8
+      overflow-x-auto
+      scroll-smooth
+      pb-6
+      snap-x
+      snap-mandatory
+      scrollbar-hide
+    "
+  >
+
+    {exclusiveProducts.map(product => {
+
+      const precios =
+        product.product_variants
+          ?.map(v => Number(v.price))
+          .filter(v => !isNaN(v))
+        || [];
+
+      const precioBase =
+        precios.length > 0
+          ? Math.min(...precios)
+          : 0;
+
+      return (
+
+        <div
+          key={product.id}
+
+          onClick={() =>
+            navigate(`/producto/${product.id}`)
+          }
+
+          className="
+            min-w-[340px]
+            max-w-[340px]
+            snap-start
+            rounded-[40px]
+            overflow-hidden
+            bg-white/5
+            backdrop-blur-2xl
+            border
+            border-white/10
+            transition-all
+            duration-500
+            hover:-translate-y-2
+            hover:border-pink-400/40
+            hover:shadow-[0_0_60px_rgba(236,72,153,0.25)]
+            group
+            cursor-pointer
+          "
+        >
+
+          {/* IMAGEN */}
+          <div className="
+            relative
+            overflow-hidden
+          ">
+
+            <img
+              src={
+                product.product_images?.[0]?.url
+                  ? `${product.product_images[0].url}?width=1200&quality=90`
+                  : "/placeholder.png"
+              }
+
+              loading="lazy"
+
+              onLoad={(e) =>
+                e.target.classList.remove("opacity-0")
+              }
+
+              className="
+                opacity-0
+                transition-all
+                duration-700
+                w-full
+                aspect-square
+                object-cover
+                group-hover:scale-105
+              "
+            />
+
+            {/* BADGE */}
+            <div className="
+              absolute
+              top-5
+              left-5
+              bg-pink-500
+              text-white
+              text-xs
+              font-black
+              px-4
+              py-2
+              rounded-full
+              shadow-2xl
+            ">
+              💎 EXCLUSIVO
+            </div>
+
+          </div>
+
+          {/* INFO */}
+          <div className="p-7">
+
+            <h3 className="
+              text-white
+              text-2xl
+              font-black
+              line-clamp-2
+            ">
+              {product.name}
+            </h3>
+
+            {/* PRECIOS */}
+            {product.discount_active ? (
+
+              <div className="mt-5">
+
+                <p className="
+                  text-gray-500
+                  line-through
+                  text-sm
+                ">
+                  Desde $
+                  {precioBase.toLocaleString("es-CL")}
+                </p>
+
+                <p className="
+                  text-pink-400
+                  text-4xl
+                  font-black
+                ">
+                  $
+
+                  {Math.round(
+                    precioBase *
+                    (
+                      1 -
+                      product.discount_percent / 100
+                    )
+                  ).toLocaleString("es-CL")}
+                </p>
+
+              </div>
+
+            ) : (
+
+              <p className="
+                mt-5
+                text-pink-400
+                text-4xl
+                font-black
+              ">
+                Desde $
+                {precioBase.toLocaleString("es-CL")}
+              </p>
+
+            )}
+
+            {/* CTA */}
+            <button
+              onClick={(e) => {
+
+                e.stopPropagation();
+
+                navigate(
+                  `/producto/${product.id}`
+                );
+
+              }}
+
+              className="
+                mt-7
+                w-full
+                py-4
+                rounded-2xl
+                bg-pink-500
+                hover:bg-pink-400
+                text-white
+                font-black
+                transition-all
+                duration-300
+                hover:scale-[1.02]
+              "
+            >
+              Ver producto
+            </button>
+
+          </div>
+
+        </div>
+
+      );
+
+    })}
+
+  </div>
+
+</section>
+
+)}
+			 
       {/* CATÁLOGO */}
       <section id="catalogo" className="p-6">
 
