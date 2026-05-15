@@ -72,6 +72,18 @@ const heroPrecioBase =
     ? Math.min(...heroPrecios)
     : 0;
 
+	const nuevosProductos =
+  [...products]
+
+    .sort(
+      (a, b) =>
+        new Date(b.created_at || 0)
+        -
+        new Date(a.created_at || 0)
+    )
+
+    .slice(0, 10);
+
 	useEffect(() => {
 
   if (
@@ -98,6 +110,20 @@ const heroPrecioBase =
     clearInterval(interval);
 
 }, [featuredProducts]);
+
+	useEffect(() => {
+
+  if (
+    currentHero >
+    featuredProducts.length - 1
+  ) {
+
+    setCurrentHero(0);
+
+  }
+
+}, [featuredProducts, currentHero]);
+	
   const [categories, setCategories] = useState([]);
   const [stockDB, setStockDB] = useState([]);
   const [formData, setFormData] = useState({
@@ -673,22 +699,31 @@ localStorage.setItem(
       />
 
       <img
-        src={
-          heroProduct?.product_images?.[0]?.url
-            ? `${heroProduct.product_images[0].url}?width=1200&quality=90`
-            : "/placeholder.png"
-        }
+  src={
+    heroProduct?.product_images?.[0]?.url
+      ? `${heroProduct.product_images[0].url}?width=1200&quality=90`
+      : "/placeholder.png"
+  }
 
-        className="
-          relative
-          z-10
-          w-full
-          max-w-xl
-          rounded-[40px]
-          shadow-2xl
-          object-cover
-        "
-      />
+  loading="lazy"
+
+  onLoad={(e) =>
+    e.target.classList.remove("opacity-0")
+  }
+
+  className="
+    opacity-0
+    transition-opacity
+    duration-700
+    relative
+    z-10
+    w-full
+    max-w-xl
+    rounded-[40px]
+    shadow-2xl
+    object-cover
+  "
+/>
 
     </div>
 
@@ -765,18 +800,27 @@ localStorage.setItem(
         >
 
           <img
-            src={
-              product.product_images?.[0]?.url
-                ? `${product.product_images[0].url}?width=800&quality=80`
-                : "/placeholder.png"
-            }
+  src={
+    product.product_images?.[0]?.url
+      ? `${product.product_images[0].url}?width=800&quality=80`
+      : "/placeholder.png"
+  }
 
-            className="
-              w-full
-              aspect-square
-              object-cover
-            "
-          />
+  loading="lazy"
+
+  onLoad={(e) =>
+    e.target.classList.remove("opacity-0")
+  }
+
+  className="
+    opacity-0
+    transition-opacity
+    duration-700
+    w-full
+    aspect-square
+    object-cover
+  "
+/>
 
           <div className="p-4">
 
@@ -847,6 +891,248 @@ localStorage.setItem(
 </section>
 
 )}
+
+			{/* 🔥 NUEVA COLECCIÓN */}
+<section className="px-6 pb-14">
+
+  <div className="
+    flex
+    items-end
+    justify-between
+    mb-8
+    gap-4
+    flex-wrap
+  ">
+
+    <div>
+
+      <p className="
+        text-pink-500
+        font-bold
+        uppercase
+        tracking-[0.25em]
+        text-sm
+      ">
+        NEW DROP
+      </p>
+
+      <h2 className="
+        text-4xl
+        font-black
+        text-gray-900
+        mt-2
+      ">
+        Nueva Colección
+      </h2>
+
+      <p className="
+        text-gray-500
+        mt-2
+      ">
+        Descubre los últimos productos premium
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* SLIDER */}
+  <div className="
+    flex
+    gap-6
+    overflow-x-auto
+	scroll-smooth
+    pb-4
+    snap-x
+    snap-mandatory
+    scrollbar-hide
+  ">
+
+    {nuevosProductos.map(product => {
+
+      const precios =
+        product.product_variants
+          ?.map(v => Number(v.price))
+          .filter(v => !isNaN(v))
+        || [];
+
+      const precioBase =
+        precios.length > 0
+          ? Math.min(...precios)
+          : 0;
+
+      return (
+
+        <div
+          key={product.id}
+
+          onClick={() =>
+            navigate(`/producto/${product.id}`)
+          }
+
+          className="
+            min-w-[280px]
+            max-w-[280px]
+            snap-start
+            bg-white
+            rounded-[32px]
+            overflow-hidden
+            shadow-sm
+            hover:shadow-2xl
+            transition-all
+            duration-500
+            hover:-translate-y-1
+            cursor-pointer
+            group
+          "
+        >
+
+          {/* IMAGEN */}
+          <div className="
+            relative
+            overflow-hidden
+          ">
+
+            <img
+  src={
+    product.product_images?.[0]?.url
+      ? `${product.product_images[0].url}?width=800&quality=80`
+      : "/placeholder.png"
+  }
+
+  loading="lazy"
+
+  onLoad={(e) =>
+    e.target.classList.remove("opacity-0")
+  }
+
+  className="
+    opacity-0
+    transition-all
+    duration-700
+    w-full
+    aspect-square
+    object-cover
+    group-hover:scale-105
+  "
+/>
+
+            {/* BADGE */}
+            {product.discount_active && (
+
+              <div className="
+                absolute
+                top-4
+                left-4
+                bg-pink-600
+                text-white
+                text-xs
+                font-black
+                px-3
+                py-2
+                rounded-full
+                shadow-xl
+              ">
+                -{product.discount_percent}%
+              </div>
+
+            )}
+
+          </div>
+
+          {/* INFO */}
+          <div className="p-5">
+
+            <h3 className="
+              font-black
+              text-lg
+              text-gray-900
+              line-clamp-2
+            ">
+              {product.name}
+            </h3>
+
+            {/* PRECIOS */}
+            {product.discount_active ? (
+
+              <div className="mt-4">
+
+                <p className="
+                  text-gray-400
+                  line-through
+                  text-sm
+                ">
+                  Desde $
+                  {precioBase.toLocaleString("es-CL")}
+                </p>
+
+                <p className="
+                  text-pink-600
+                  font-black
+                  text-3xl
+                ">
+                  $
+
+                  {Math.round(
+                    precioBase *
+                    (
+                      1 -
+                      product.discount_percent / 100
+                    )
+                  ).toLocaleString("es-CL")}
+                </p>
+
+              </div>
+
+            ) : (
+
+              <p className="
+                mt-4
+                text-pink-600
+                font-black
+                text-3xl
+              ">
+                Desde $
+                {precioBase.toLocaleString("es-CL")}
+              </p>
+
+            )}
+
+            {/* CTA */}
+            <button
+  onClick={(e) => {
+    e.stopPropagation();
+
+    navigate(`/producto/${product.id}`);
+  }}
+
+  className="
+    mt-5
+                w-full
+                bg-black
+                text-white
+                py-3
+                rounded-2xl
+                font-bold
+                transition-all
+                duration-300
+                hover:bg-pink-600
+              "
+            >
+              Ver producto
+            </button>
+
+          </div>
+
+        </div>
+
+      );
+
+    })}
+
+  </div>
+
+</section>
 
       {/* CATÁLOGO */}
       <section id="catalogo" className="p-6">
