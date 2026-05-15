@@ -75,6 +75,17 @@ export default function Collection() {
     const { data } =
       await query;
 
+    (data || []).forEach(product => {
+
+  product.product_images?.sort(
+    (a, b) =>
+      (a.sort_order || 0)
+      -
+      (b.sort_order || 0)
+  );
+
+});
+
     setProducts(data || []);
 
     setLoading(false);
