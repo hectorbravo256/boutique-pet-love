@@ -552,6 +552,68 @@ useEffect(() => {
   </div>
 </div>
 
+	  {/* RRSS */}
+<div className="hidden md:flex items-center gap-3 mr-5">
+
+  {/* INSTAGRAM */}
+  <a
+    href="https://instagram.com/boutique_petlove"
+
+    target="_blank"
+
+    rel="noreferrer"
+
+    className="
+      w-11
+      h-11
+      rounded-full
+      bg-gradient-to-br
+      from-pink-500
+      via-red-500
+      to-yellow-500
+      flex
+      items-center
+      justify-center
+      text-white
+      text-lg
+      shadow-lg
+      hover:scale-110
+      transition-all
+      duration-300
+    "
+  >
+    📷
+  </a>
+
+  {/* WHATSAPP */}
+  <a
+    href={WHATSAPP}
+
+    target="_blank"
+
+    rel="noreferrer"
+
+    className="
+      w-11
+      h-11
+      rounded-full
+      bg-green-500
+      flex
+      items-center
+      justify-center
+      text-white
+      text-lg
+      shadow-lg
+      hover:scale-110
+      transition-all
+      duration-300
+    "
+  >
+    💬
+  </a>
+
+</div>
+
     {/* 🟢 DERECHA → CARRITO */}
 <div className="flex justify-end">
   <div
@@ -574,14 +636,7 @@ useEffect(() => {
       {/* 🔽 CONTENIDO DINÁMICO */}
       <div>
         <Outlet />
-         <a
-  href={WHATSAPP}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="fixed bottom-5 left-5 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg z-50 transition transform hover:scale-110"
->
-  <MessageCircle size={24} />
-</a>
+         
 
         {/* CARRITO */}
       <div
