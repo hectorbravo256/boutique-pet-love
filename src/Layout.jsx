@@ -552,8 +552,15 @@ useEffect(() => {
   </div>
 </div>
 
-	  {/* RRSS */}
-<div className="hidden md:flex items-center gap-3 mr-5">
+
+
+    {/* 🟢 DERECHA → ACTIONS */}
+<div className="
+  flex
+  justify-end
+  items-center
+  gap-3
+">
 
   {/* INSTAGRAM */}
   <a
@@ -564,22 +571,22 @@ useEffect(() => {
     rel="noreferrer"
 
     className="
+      hidden
+      md:flex
+      items-center
+      justify-center
       w-11
       h-11
       rounded-full
-      bg-gradient-to-br
-      from-pink-500
-      via-red-500
-      to-yellow-500
-      flex
-      items-center
-      justify-center
-      text-white
-      text-lg
-      shadow-lg
-      hover:scale-110
+      border
+      border-pink-200
+      bg-white
+      text-pink-500
+      hover:bg-pink-50
+      hover:scale-105
       transition-all
       duration-300
+      shadow-sm
     "
   >
     📷
@@ -594,41 +601,75 @@ useEffect(() => {
     rel="noreferrer"
 
     className="
+      hidden
+      md:flex
+      items-center
+      justify-center
       w-11
       h-11
       rounded-full
-      bg-green-500
-      flex
-      items-center
-      justify-center
-      text-white
-      text-lg
-      shadow-lg
-      hover:scale-110
+      border
+      border-green-200
+      bg-white
+      text-green-500
+      hover:bg-green-50
+      hover:scale-105
       transition-all
       duration-300
+      shadow-sm
     "
   >
     💬
   </a>
 
-</div>
-
-    {/* 🟢 DERECHA → CARRITO */}
-<div className="flex justify-end">
+  {/* CARRITO */}
   <div
-  onClick={() => setCartOpen(true)}
-  className="relative bg-pink-600 hover:bg-pink-700 transition text-white px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer shadow-md"
->
+    onClick={() => setCartOpen(true)}
+
+    className="
+      relative
+      bg-gradient-to-r
+      from-pink-500
+      to-pink-600
+      hover:opacity-90
+      transition
+      text-white
+      px-4
+      py-2
+      rounded-full
+      flex
+      items-center
+      gap-2
+      cursor-pointer
+      shadow-md
+    "
+  >
+
     <ShoppingBag size={18} />
 
-    <span className="hidden md:inline">Carrito</span>
+    <span className="hidden md:inline">
+      Carrito
+    </span>
 
-    <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+    <span className="
+      absolute
+      -top-2
+      -right-2
+      bg-purple-500
+      text-white
+      text-xs
+      px-2
+      py-0.5
+      rounded-full
+      font-bold
+    ">
       {cartCount}
     </span>
+
   </div>
+
 </div>
+
 
   </div>
 </header>
