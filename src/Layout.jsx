@@ -16,6 +16,7 @@ export default function Layout() {
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [toastTimeout, setToastTimeout] = useState(null);
+  const [categories, setCategories] = useState([]);
 	
 const formatPrice = (price = 0) =>
   `$${Number(price).toLocaleString("es-CL")}`;
@@ -158,6 +159,36 @@ useEffect(() => {
   fetchStock();
 }, []);
 
+	useEffect(() => {
+
+  const fetchCategories = async () => {
+
+    const { data } = await supabase
+      .from("products")
+      .select("category");
+
+    if (!data) return;
+
+    const uniqueCategories = [
+
+      ...new Set(
+
+        data
+          .map(p => p.category)
+          .filter(Boolean)
+
+      )
+
+    ];
+
+    setCategories(uniqueCategories);
+
+  };
+
+  fetchCategories();
+
+}, []);
+
   return (
     <div className="bg-pink-50 min-h-screen">
 
@@ -175,57 +206,275 @@ useEffect(() => {
 
     {/* PANEL */}
     <div
-  className={`absolute left-0 top-0 h-full w-80 bg-white p-6 shadow-xl transform transition-transform duration-300 ${
+  className={`absolute left-0 top-0 h-full w-[92vw] max-w-[420px] bg-white/95 backdrop-blur-2xl p-6 shadow-2xl border-r border-pink-100 transform transition-transform duration-300 transform transition-transform duration-300 ${
     menuOpen ? "translate-x-0" : "-translate-x-full"
   }`}
 >
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8">
-        <button
-          onClick={() => setMenuOpen(false)}
-          className="text-2xl"
-        >
-          ✕
-        </button>
+<div className="
+  flex
+  justify-between
+  items-center
+  mb-10
+  pb-5
+  border-b
+  border-pink-100
+">
 
-        <h2 className="text-pink-600 text-lg font-bold">
-        Menú
-        </h2>
-      </div>
+  <div>
 
-      {/* OPCIONES */}
-<div className="flex flex-col gap-6 text-pink-500 text-lg font-semibold">
+    <p className="
+      text-xs
+      uppercase
+      tracking-[0.3em]
+      text-pink-400
+      font-bold
+    ">
+      Boutique Pet Love
+    </p>
 
-  <span
+    <h2 className="
+      text-2xl
+      font-black
+      text-pink-600
+      mt-2
+    ">
+      ☰ Menú
+    </h2>
+
+  </div>
+
+  <button
+    onClick={() => setMenuOpen(false)}
+
+    className="
+      w-11
+      h-11
+      rounded-full
+      bg-pink-100
+      hover:bg-pink-200
+      transition
+      text-xl
+      font-bold
+    "
+  >
+    ✕
+  </button>
+
+</div>
+
+{/* OPCIONES */}
+<div className="
+  flex
+  flex-col
+  gap-7
+  overflow-y-auto
+  pr-2
+  h-[calc(100vh-140px)]
+  scrollbar-hide
+">
+
+  {/* INICIO */}
+  <button
     onClick={() => {
       navigate("/");
       setMenuOpen(false);
     }}
-    className="cursor-pointer hover:text-pink-700 transition transform hover:translate-x-1"
+
+    className="
+      text-left
+      text-pink-600
+      font-bold
+      text-lg
+      hover:text-pink-700
+    "
   >
     🏠 Inicio
-  </span>
+  </button>
 
-  <span
+  {/* COLECCIONES */}
+	<div className="border-t border-pink-100 pt-6">
+  <div>
+
+    <h3 className="
+      text-xs
+      uppercase
+      tracking-[0.25em]
+      text-gray-400
+      mb-3
+    ">
+      Colecciones
+    </h3>
+
+    <div className="flex flex-col gap-3">
+
+      <button
+        onClick={() => {
+          navigate("/");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        🆕 Nueva colección
+      </button>
+
+      <button
+        onClick={() => {
+          navigate("/");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        🔥 Best Sellers
+      </button>
+
+      <button
+        onClick={() => {
+          navigate("/");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        👑 Luxury
+      </button>
+
+      <button
+        onClick={() => {
+          navigate("/");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        💎 Exclusivos
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+  {/* MASCOTAS */}
+	<div className="border-t border-pink-100 pt-6">
+  <div>
+
+    <h3 className="
+      text-xs
+      uppercase
+      tracking-[0.25em]
+      text-gray-400
+      mb-3
+    ">
+      Mascotas
+    </h3>
+
+    <div className="flex flex-col gap-3">
+
+      <button
+        onClick={() => {
+          navigate("/categoria/macho");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        🐶 Macho
+      </button>
+
+      <button
+        onClick={() => {
+          navigate("/categoria/hembra");
+          setMenuOpen(false);
+        }}
+
+        className="text-left text-pink-500 hover:text-pink-700"
+      >
+        🎀 Hembra
+      </button>
+
+    </div>
+
+  </div>
+</div>
+	
+  {/* CATEGORÍAS */}
+	<div className="border-t border-pink-100 pt-6">
+  <div>
+
+    <h3 className="
+      text-xs
+      uppercase
+      tracking-[0.25em]
+      text-gray-400
+      mb-3
+    ">
+      Categorías
+    </h3>
+
+    <div className="flex flex-col gap-3">
+
+  {categories.map(category => (
+
+    <button
+      key={category}
+
+      onClick={() => {
+
+        navigate(
+          `/categoria/${encodeURIComponent(category)}`
+        );
+
+        setMenuOpen(false);
+
+      }}
+
+      className="
+        text-left
+        text-pink-500
+        hover:text-pink-700
+        hover:translate-x-1
+        transition-all
+        duration-300
+        capitalize
+      "
+    >
+      ✨ {category}
+    </button>
+
+  ))}
+
+</div>
+
+  </div>
+</div>
+
+  {/* CONTACTO */}
+  <button
     onClick={() => {
-      navigate("/", { state: { scrollTo: "catalogo" } });
+      navigate("/", {
+        state: {
+          scrollTo: "contacto"
+        }
+      });
+
       setMenuOpen(false);
     }}
-    className="cursor-pointer hover:text-pink-700 transition transform hover:translate-x-1"
-  >
-    🛍 Tienda →
-  </span>
 
-  <span
-    onClick={() => {
-      navigate("/", { state: { scrollTo: "contacto" } });
-      setMenuOpen(false);
-    }}
-    className="cursor-pointer hover:text-pink-700 transition transform hover:translate-x-1"
+    className="
+      mt-4
+      text-left
+      text-pink-600
+      font-bold
+      text-lg
+      hover:text-pink-700
+    "
   >
-    📞 Contacto →
-  </span>
+    📞 Contacto
+  </button>
 
 </div>
 
