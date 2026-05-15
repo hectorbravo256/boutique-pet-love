@@ -8,6 +8,7 @@ import Login from "./Login";
 import { supabase } from "./supabaseClient";
 import Category from "./Category";
 import Gender from "./Gender";
+import Collection from "./Collection";
 import Product from "./Product";
 import Layout from "./Layout";
 import Success from "./Success";
@@ -2560,6 +2561,7 @@ export default function App() {
       <Route path="/checkout" element={<CheckoutWrapper />} />
       <Route path="/categoria/:slug" element={<Category />} />
 	  <Route path="/genero/:slug" element={<Gender />} />
+	  <Route path="/coleccion/:slug" element={<Collection />} />
       <Route path="/producto/:id" element={<Product />} />
       <Route path="/success" element={<Success />} />
     </Route>
