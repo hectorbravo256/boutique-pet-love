@@ -1048,9 +1048,230 @@ const precioPromedio =
 
       ⭐ Destacado
 
+       </label>
+
+  </div>
+
+      {/* 🔥 COLECCIONES PREMIUM */}
+<div
+  style={{
+    marginTop: 30
+  }}
+>
+
+  <h3
+    style={{
+      fontSize: 22,
+      fontWeight: "800",
+      marginBottom: 20
+    }}
+  >
+    🏷 Colecciones
+  </h3>
+
+  <div
+    style={{
+      display: "flex",
+      gap: 14,
+      flexWrap: "wrap"
+    }}
+  >
+
+    {/* NUEVA COLECCIÓN */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "14px 18px",
+        borderRadius: 20,
+        background:
+        producto.new_collection
+            ? "#ecfdf5"
+            : "#f3f4f6",
+        cursor: "pointer",
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(producto.new_collection)
+        }
+
+        onChange={async (e) => {
+
+          const checked =
+            e.target.checked;
+
+          setProducto(prev => ({
+            ...prev,
+            new_collection: checked
+          }));
+
+          await supabase
+            .from("products")
+            .update({
+              new_collection: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      🆕 Nueva colección
+
+    </label>
+
+    {/* BEST SELLER */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "14px 18px",
+        borderRadius: 20,
+        background:
+          producto.best_seller
+            ? "#eff6ff"
+            : "#f3f4f6",
+        cursor: "pointer",
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(producto.best_seller)
+        }
+
+        onChange={async (e) => {
+
+          const checked =
+            e.target.checked;
+
+          setProducto(prev => ({
+            ...prev,
+            best_seller: checked
+          }));
+
+          await supabase
+            .from("products")
+            .update({
+              best_seller: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      🔥 Best seller
+
+    </label>
+
+    {/* LUXURY */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "14px 18px",
+        borderRadius: 20,
+        background:
+          producto.luxury
+            ? "#fef3c7"
+            : "#f3f4f6",
+        cursor: "pointer",
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(producto.luxury)
+        }
+
+        onChange={async (e) => {
+
+          const checked =
+            e.target.checked;
+
+          setProducto(prev => ({
+            ...prev,
+            luxury: checked
+          }));
+
+          await supabase
+            .from("products")
+            .update({
+              luxury: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      👑 Luxury
+
+    </label>
+
+    {/* EXCLUSIVO */}
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "14px 18px",
+        borderRadius: 20,
+        background:
+          producto.exclusive
+            ? "#fce7f3"
+            : "#f3f4f6",
+        cursor: "pointer",
+        fontWeight: "700"
+      }}
+    >
+
+      <input
+        type="checkbox"
+
+        checked={
+          Boolean(producto.exclusive)
+        }
+
+        onChange={async (e) => {
+
+          const checked =
+            e.target.checked;
+
+          setProducto(prev => ({
+            ...prev,
+            exclusive: checked
+          }));
+
+          await supabase
+            .from("products")
+            .update({
+              exclusive: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      💎 Exclusivo
+
     </label>
 
   </div>
+
+</div>
 
   {/* DESCRIPCIÓN */}
   <textarea
