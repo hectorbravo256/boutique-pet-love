@@ -209,4 +209,17 @@ body {
   animation:
     fadeHero 0.8s ease;
 
+  will-change:
+    transform,
+    opacity;
+
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;  
 }
