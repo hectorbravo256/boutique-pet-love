@@ -7,6 +7,7 @@ import './index.css';
 import Login from "./Login";
 import { supabase } from "./supabaseClient";
 import Category from "./Category";
+import Gender from "./Gender";
 import Product from "./Product";
 import Layout from "./Layout";
 import Success from "./Success";
@@ -17,6 +18,7 @@ import CrearProducto from "./admin/CrearProducto";
 import Ventas from "./admin/Ventas";
 import ScrollToTop from "./ScrollToTop";
 import ProductoDetalle from "./admin/ProductoDetalle";
+
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -2557,6 +2559,7 @@ export default function App() {
       <Route path="/" element={<AppContent />} />
       <Route path="/checkout" element={<CheckoutWrapper />} />
       <Route path="/categoria/:slug" element={<Category />} />
+	  <Route path="/genero/:slug" element={<Gender />} />
       <Route path="/producto/:id" element={<Product />} />
       <Route path="/success" element={<Success />} />
     </Route>
