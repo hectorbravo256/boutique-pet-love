@@ -3,12 +3,13 @@ import { supabase } from "../supabaseClient";
 
 export default function CrearProducto() {
 
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    image: "",
-    variants: [{ size: "Talla 1", price: "" }]
-  });
+ const [newProduct, setNewProduct] = useState({
+  name: "",
+  category: "",
+  gender: "unisex",
+  image: "",
+  variants: [{ size: "Talla 1", price: "" }]
+});
 
   const [toast, setToast] = useState("");
 
@@ -29,10 +30,11 @@ export default function CrearProducto() {
     const { data: prod, error: errProd } = await supabase
       .from("products")
       .insert([{
-        name: newProduct.name,
-        category: newProduct.category,
-        active: true
-      }])
+  name: newProduct.name,
+  category: newProduct.category,
+  gender: newProduct.gender,
+  active: true
+}])
       .select()
       .single();
 
@@ -78,11 +80,12 @@ export default function CrearProducto() {
 
     // 🔄 reset completo
     setNewProduct({
-      name: "",
-      category: "",
-      image: "",
-      variants: [{ size: "Talla 1", price: "" }]
-    });
+  name: "",
+  category: "",
+  gender: "unisex",
+  image: "",
+  variants: [{ size: "Talla 1", price: "" }]
+});
 
     // 🎯 foco automático
     setTimeout(() => {
@@ -127,6 +130,39 @@ export default function CrearProducto() {
         }
         style={{ width: "100%", marginBottom: 10, padding: 8 }}
       />
+      
+      {/* 🐶 GÉNERO */}
+<select
+  value={newProduct.gender}
+
+  onChange={(e) =>
+    setNewProduct(prev => ({
+      ...prev,
+      gender: e.target.value
+    }))
+  }
+
+  style={{
+    width: "100%",
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 8
+  }}
+>
+
+  <option value="macho">
+    🐶 Macho
+  </option>
+
+  <option value="hembra">
+    🎀 Hembra
+  </option>
+
+  <option value="unisex">
+    ✨ Unisex
+  </option>
+
+</select>
 
       {/* 📏 VARIANTES */}
       {newProduct.variants.map((v, index) => (
