@@ -936,17 +936,90 @@ localStorage.setItem(
 
   </div>
 
+{/* SLIDER WRAPPER */}
+<div className="relative">
+
+  {/* BOTÓN IZQUIERDA */}
+  <button
+    onClick={() => {
+
+      document
+        .getElementById("new-collection-slider")
+        ?.scrollBy({
+          left: -320,
+          behavior: "smooth"
+        });
+
+    }}
+
+    className="
+      hidden
+      md:flex
+      absolute
+      left-0
+      top-1/2
+      -translate-y-1/2
+      z-20
+      bg-white
+      shadow-xl
+      w-12
+      h-12
+      rounded-full
+      items-center
+      justify-center
+    "
+  >
+    ←
+  </button>
+
+  {/* BOTÓN DERECHA */}
+  <button
+    onClick={() => {
+
+      document
+        .getElementById("new-collection-slider")
+        ?.scrollBy({
+          left: 320,
+          behavior: "smooth"
+        });
+
+    }}
+
+    className="
+      hidden
+      md:flex
+      absolute
+      right-0
+      top-1/2
+      -translate-y-1/2
+      z-20
+      bg-white
+      shadow-xl
+      w-12
+      h-12
+      rounded-full
+      items-center
+      justify-center
+    "
+  >
+    →
+  </button>
+
   {/* SLIDER */}
-  <div className="
-    flex
-    gap-6
-    overflow-x-auto
-	scroll-smooth
-    pb-4
-    snap-x
-    snap-mandatory
-    scrollbar-hide
-  ">
+  <div
+    id="new-collection-slider"
+
+    className="
+      flex
+      gap-6
+      overflow-x-auto
+      scroll-smooth
+      pb-4
+      snap-x
+      snap-mandatory
+      scrollbar-hide
+    "
+  >
 
     {nuevosProductos.map(product => {
 
@@ -1130,7 +1203,9 @@ localStorage.setItem(
 
     })}
 
-  </div>
+</div>
+
+</div>
 
 </section>
 
