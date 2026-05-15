@@ -315,7 +315,7 @@ useEffect(() => {
 
       <button
         onClick={() => {
-          navigate("/");
+          navigate("/coleccion/new");
           setMenuOpen(false);
         }}
 
@@ -326,7 +326,7 @@ useEffect(() => {
 
       <button
         onClick={() => {
-          navigate("/");
+          navigate("/coleccion/best-seller");
           setMenuOpen(false);
         }}
 
@@ -337,7 +337,7 @@ useEffect(() => {
 
       <button
         onClick={() => {
-          navigate("/");
+          navigate("/coleccion/luxury");
           setMenuOpen(false);
         }}
 
@@ -348,7 +348,7 @@ useEffect(() => {
 
       <button
         onClick={() => {
-          navigate("/");
+          navigate("/coleccion/exclusive");
           setMenuOpen(false);
         }}
 
