@@ -206,7 +206,8 @@ useEffect(() => {
 
     {/* PANEL */}
     <div
-  className={`absolute left-0 top-0 h-full w-[92vw] max-w-[420px] bg-white/95 backdrop-blur-2xl p-6 shadow-2xl border-r border-pink-100 transform transition-transform duration-300 transform transition-transform duration-300 ${
+  className={`absolute left-0 top-0 h-full w-[92vw] max-w-[420px] bg-white/95 backdrop-blur-2xl p-6 shadow-2xl border-r border-pink-100 transform transition-transform duration-300
+  ${
     menuOpen ? "translate-x-0" : "-translate-x-full"
   }`}
 >
@@ -283,12 +284,15 @@ useEffect(() => {
     }}
 
     className="
-      text-left
-      text-pink-600
-      font-bold
-      text-lg
-      hover:text-pink-700
-    "
+  text-left
+  text-pink-600
+  font-bold
+  text-lg
+  hover:text-pink-700
+  hover:translate-x-1
+  transition-all
+  duration-300
+"
   >
     🏠 Inicio
   </button>
@@ -315,7 +319,7 @@ useEffect(() => {
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🆕 Nueva colección
       </button>
@@ -326,7 +330,7 @@ useEffect(() => {
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🔥 Best Sellers
       </button>
@@ -337,7 +341,7 @@ useEffect(() => {
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         👑 Luxury
       </button>
@@ -348,7 +352,7 @@ useEffect(() => {
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         💎 Exclusivos
       </button>
@@ -376,25 +380,43 @@ useEffect(() => {
 
       <button
         onClick={() => {
-          navigate("/categoria/macho");
+          navigate("/genero/macho");
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🐶 Macho
       </button>
 
       <button
         onClick={() => {
-          navigate("/categoria/hembra");
+          navigate("/genero/hembra");
           setMenuOpen(false);
         }}
 
-        className="text-left text-pink-500 hover:text-pink-700"
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🎀 Hembra
       </button>
+
+		<button
+  onClick={() => {
+    navigate("/genero/unisex");
+    setMenuOpen(false);
+  }}
+
+  className="
+    text-left
+    text-pink-500
+    hover:text-pink-700
+    hover:translate-x-1
+    transition-all
+    duration-300
+  "
+>
+  ✨ Unisex
+</button>
 
     </div>
 
