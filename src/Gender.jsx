@@ -76,11 +76,12 @@ export default function Gender() {
 
   return (
 
-    <div
-      style={{
-        padding: 20
-      }}
-    >
+    <div className="
+  px-4
+  md:px-6
+  py-8
+  overflow-x-hidden
+">
 
       {/* HEADER */}
       <div
@@ -104,7 +105,10 @@ export default function Gender() {
         <h1
           style={{
             marginTop: 10,
-            fontSize: 46,
+            fontSize:
+  window.innerWidth < 768
+    ? 32
+    : 46,
             fontWeight: "900",
             color: "#111827",
             textTransform: "capitalize"
@@ -121,7 +125,7 @@ export default function Gender() {
   grid-cols-2
   md:grid-cols-3
   xl:grid-cols-4
-  gap-6
+  gap-3 md:gap-6
 ">
 
         {products.map(product => {
@@ -154,7 +158,7 @@ export default function Gender() {
               style={{
                 background: "#fff",
 
-                borderRadius: 30,
+                borderRadius: 22,
 
                 overflow: "hidden",
 
@@ -189,6 +193,8 @@ export default function Gender() {
                   || "/placeholder.png"
                 }
 
+                alt={product.name}
+
                 style={{
                   width: "100%",
                   aspectRatio: "1/1",
@@ -199,13 +205,13 @@ export default function Gender() {
               {/* info */}
               <div
                 style={{
-                  padding: 20
+                  padding: 14
                 }}
               >
 
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: "800",
                     color: "#111827"
                   }}
