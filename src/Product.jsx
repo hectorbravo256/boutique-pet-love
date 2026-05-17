@@ -823,23 +823,24 @@ onMouseOut={(e) => {
 
   </div>
 
-    {showModal && (
+{showModal && (
 <div
-  onClick={(e) => {
-  if (e.target.tagName === "IMG") {
-    nextImage();
-  }
-}}
+  onClick={() => {
+    setShowModal(false);
+  }}
+
   onTouchStart={handleTouchStart}
   onTouchMove={handleTouchMove}
   onTouchEnd={handleTouchEnd}
+
   style={{
     position: "fixed",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    background:   "linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.98))",
+    background:
+      "linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.98))",
     backdropFilter: "blur(8px)",
     display: "flex",
     alignItems: "center",
@@ -849,7 +850,6 @@ onMouseOut={(e) => {
     cursor: "pointer"
   }}
 >
-
   
 {/* BOTÓN CERRAR */}
 <div
@@ -970,6 +970,11 @@ onMouseOut={(e) => {
 </button>
     <img
   src={`${product.product_images?.[currentIndex]?.url}?width=1200&quality=80`}
+
+      onClick={(e) => {
+  e.stopPropagation();
+}}
+      
       className="
     animate-[fadeZoom_.3s_ease]
   "
