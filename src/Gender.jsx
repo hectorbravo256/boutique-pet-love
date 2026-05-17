@@ -103,12 +103,11 @@ export default function Gender() {
         </p>
 
         <h1
+          className="md:text-[46px]"
+          
           style={{
             marginTop: 10,
-            fontSize:
-  window.innerWidth < 768
-    ? 32
-    : 46,
+            fontSize: 32,
             fontWeight: "900",
             color: "#111827",
             textTransform: "capitalize"
@@ -223,7 +222,7 @@ export default function Gender() {
                   style={{
                     marginTop: 12,
 
-                    fontSize: 22,
+                    fontSize: 18,
 
                     fontWeight: "900",
 
