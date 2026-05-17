@@ -1146,17 +1146,13 @@ localStorage.setItem(
           </a>
         </div>
 
-<div style={{
-  display: "grid",
   <div className="
   grid
   grid-cols-2
   md:grid-cols-3
   xl:grid-cols-4
   gap-4
-">,
-  gap: 20
-}}>
+">
   {categories.map(cat => (
     <div
       key={cat.id}
