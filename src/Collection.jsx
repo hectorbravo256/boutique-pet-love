@@ -141,7 +141,7 @@ export default function Collection() {
         </p>
 
         <h1 className="
-          text-5xl
+          text-3xl md:text-5xl
           font-black
           text-gray-900
           mt-3
