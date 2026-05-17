@@ -34,7 +34,17 @@ export default function Category() {
   }, [slug]);
 
 return (
-  <div className="px-4 md:px-8 py-8 bg-gradient-to-b from-pink-50 via-white to-pink-100 min-h-screen">
+  <div className="
+  px-4
+  md:px-8
+  py-8
+  bg-gradient-to-b
+  from-pink-50
+  via-white
+  to-pink-100
+  min-h-screen
+  overflow-x-hidden
+">
 
   <h2 className="
   text-3xl
@@ -52,7 +62,7 @@ return (
   grid-cols-2
   md:grid-cols-3
   xl:grid-cols-4
-  gap-5
+  gap-3 md:gap-5
 ">
         {products.map(p => {
 
@@ -77,7 +87,7 @@ const precioBase =
     cursor-pointer
     bg-white/90
     backdrop-blur-sm
-    rounded-3xl
+    rounded-2xl md:rounded-3xl
     overflow-hidden
     border
     border-pink-100
@@ -151,12 +161,12 @@ const precioBase =
 <h3 className="
   font-black
   text-gray-800
-  text-lg
+  text-sm md:text-xl
   md:text-xl
   leading-tight
   tracking-tight
   line-clamp-2
-  min-h-[56px]
+  min-h-[42px] md:min-h-[56px]
   transition-all
   duration-300
   group-hover:text-pink-600
