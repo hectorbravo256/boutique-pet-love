@@ -25,6 +25,13 @@ export default function ProductCard({
     product.product_images?.[0]?.url
     || "/placeholder.png";
 
+  const totalStock =
+  product.product_variants?.reduce(
+    (acc, v) =>
+      acc + (v.stock || 0),
+    0
+  ) || 0;
+
   return (
 
     <div
@@ -41,11 +48,12 @@ export default function ProductCard({
         rounded-2xl
         md:rounded-3xl
         overflow-hidden
-        shadow-sm
-        hover:shadow-2xl
+        shadow-[0_4px_20px_rgba(0,0,0,0.06)]
+        hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]
         transition-all
         duration-500
-        hover:-translate-y-1
+        hover:-translate-y-0.5
+        hover:scale-[1.02]
       "
     >
 
@@ -68,10 +76,10 @@ export default function ProductCard({
             object-cover
             transition-all
             duration-700
-            group-hover:scale-105
+            group-hover:scale-[1.03]
           "
         />
-
+        
         {/* BADGES */}
         <div className="
           absolute
@@ -89,7 +97,7 @@ export default function ProductCard({
               from-pink-500
               to-purple-500
               text-white
-              text-[10px]
+              text-[9px] tracking-wide uppercase
               md:text-xs
               font-bold
               px-2
@@ -105,7 +113,7 @@ export default function ProductCard({
             <div className="
               bg-orange-500
               text-white
-              text-[10px]
+              text-[9px] tracking-wide uppercase
               md:text-xs
               font-bold
               px-2
@@ -120,7 +128,7 @@ export default function ProductCard({
             <div className="
               bg-sky-500
               text-white
-              text-[10px]
+              text-[9px] tracking-wide uppercase
               md:text-xs
               font-bold
               px-2
@@ -130,6 +138,24 @@ export default function ProductCard({
               ✨ NUEVO
             </div>
           )}
+
+          {totalStock <= 3 && totalStock > 0 && (
+
+  <div className="
+    bg-red-500
+    text-white
+    text-[9px]
+    tracking-wide
+    uppercase
+    font-bold
+    px-2
+    py-1
+    rounded-full
+  ">
+    Últimas unidades
+  </div>
+
+)}
 
         </div>
 
@@ -157,8 +183,8 @@ export default function ProductCard({
           mt-3
           text-pink-600
           font-black
-          text-lg
-          md:text-3xl
+          text-base
+          md:text-2xl
         ">
           Desde $
           {precioBase.toLocaleString("es-CL")}
@@ -212,10 +238,10 @@ export default function ProductCard({
             to-purple-500
             hover:opacity-90
             text-white
-            py-2.5
-            md:py-3
-            rounded-xl
-            md:rounded-2xl
+            py-2
+            md:py-2.5
+            rounded-lg
+            md:rounded-xl
             font-semibold
             shadow-lg
             transition-all
