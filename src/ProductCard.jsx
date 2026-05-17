@@ -190,33 +190,7 @@ export default function ProductCard({
           {precioBase.toLocaleString("es-CL")}
         </div>
 
-        {/* GÉNERO */}
-        {product.gender && (
-
-          <div className="
-            mt-3
-            inline-flex
-            items-center
-            gap-2
-            px-3
-            py-1
-            rounded-full
-            bg-pink-50
-            text-pink-600
-            text-xs
-            md:text-sm
-            font-semibold
-          ">
-
-            {product.gender === "hembra" && "🎀"}
-            {product.gender === "macho" && "🐶"}
-            {product.gender === "unisex" && "✨"}
-
-            {product.gender}
-
-          </div>
-
-        )}
+      
 
         {/* BOTÓN */}
         <button
@@ -231,15 +205,15 @@ export default function ProductCard({
           }}
 
           className="
-            mt-4
+            mt-3
             w-full
             bg-gradient-to-r
             from-pink-500
             to-purple-500
             hover:opacity-90
             text-white
-            py-2
-            md:py-2.5
+            py-1.5
+            md:py-2
             rounded-lg
             md:rounded-xl
             font-semibold
