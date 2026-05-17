@@ -120,7 +120,12 @@ export default function Collection() {
 
   return (
 
-    <div className="px-6 py-10">
+    <div className="
+  px-4
+  md:px-6
+  py-8
+  overflow-x-hidden
+">
 
       {/* HEADER */}
       <div className="mb-10">
@@ -147,13 +152,14 @@ export default function Collection() {
       </div>
 
       {/* GRID */}
-      <div className="
-        grid
-        grid-cols-2
-        md:grid-cols-3
-        xl:grid-cols-4
-        gap-6
-      ">
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-4
+  md:gap-6
+">
 
         {products.map(product => {
 
@@ -184,7 +190,7 @@ export default function Collection() {
 
               className="
                 bg-white
-                rounded-[30px]
+                rounded-[22px] md:rounded-[30px]
                 overflow-hidden
                 shadow-sm
                 hover:shadow-2xl
@@ -221,11 +227,11 @@ export default function Collection() {
               </div>
 
               {/* INFO */}
-              <div className="p-5">
+              <div className="p-3 md:p-5">
 
                 <h3 className="
                   font-black
-                  text-xl
+                  text-sm md:text-xl
                   text-gray-900
                   line-clamp-2
                 ">
@@ -236,7 +242,7 @@ export default function Collection() {
                   mt-4
                   text-pink-600
                   font-black
-                  text-3xl
+                  text-lg md:text-3xl
                 ">
                   Desde $
                   {precio.toLocaleString("es-CL")}
