@@ -452,7 +452,7 @@ localStorage.setItem(
     overflow-hidden
     px-6
     md:px-12
-    py-14
+    py-8
     md:py-20
     animate-fade
   "
@@ -518,9 +518,9 @@ localStorage.setItem(
       <h1
         className="
           mt-6
-          text-3xl
-		  sm:text-5xl
-		  md:text-7xl
+          text-2xl
+          sm:text-5xl
+          md:text-7xl
           font-black
           leading-tight
           text-gray-900
@@ -545,7 +545,7 @@ localStorage.setItem(
 
         {heroProduct.discount_active ? (
 
-          <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
 
             <span
               className="
@@ -648,7 +648,7 @@ localStorage.setItem(
       <div
         className="
           flex
-          gap-4
+          gap-3
           mt-10
           flex-wrap
         "
@@ -783,7 +783,7 @@ localStorage.setItem(
       grid-cols-2
       md:grid-cols-3
       xl:grid-cols-4
-      gap-5
+      gap-3 md:gap-6
     "
   >
 
@@ -811,7 +811,7 @@ localStorage.setItem(
     items-end
     justify-between
     mb-8
-    gap-4
+    gap-3
     flex-wrap
   ">
 
@@ -847,114 +847,23 @@ localStorage.setItem(
 
   </div>
 
-{/* SLIDER WRAPPER */}
-<div className="relative">
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-3
+  md:gap-6
+">
 
-  {/* BOTÓN IZQUIERDA */}
-  <button
-    onClick={() => {
-
-      document
-        .getElementById("new-collection-slider")
-        ?.scrollBy({
-          left: -320,
-          behavior: "smooth"
-        });
-
-    }}
-
-    className="
-      hidden
-      md:flex
-      absolute
-      left-0
-      top-1/2
-      -translate-y-1/2
-      z-20
-      bg-white
-      shadow-xl
-      w-12
-      h-12
-      rounded-full
-      items-center
-      justify-center
-    "
-  >
-    ←
-  </button>
-
-  {/* BOTÓN DERECHA */}
-  <button
-    onClick={() => {
-
-      document
-        .getElementById("new-collection-slider")
-        ?.scrollBy({
-          left: 320,
-          behavior: "smooth"
-        });
-
-    }}
-
-    className="
-      hidden
-      md:flex
-      absolute
-      right-0
-      top-1/2
-      -translate-y-1/2
-      z-20
-      bg-white
-      shadow-xl
-      w-12
-      h-12
-      rounded-full
-      items-center
-      justify-center
-    "
-  >
-    →
-  </button>
-
-  {/* SLIDER */}
-  <div
-    id="new-collection-slider"
-
-    className="
-      flex
-      gap-6
-      overflow-x-auto
-      scroll-smooth
-      pb-4
-      snap-x
-      snap-mandatory
-      scrollbar-hide
-    "
-  >
-
-{nuevosProductos.map(product => (
-
-  <div
-    key={product.id}
-    className="
-      min-w-[220px]
-      md:min-w-[280px]
-
-      max-w-[220px]
-      md:max-w-[280px]
-      snap-start
-    "
-  >
+  {nuevosProductos.map(product => (
 
     <ProductCard
+      key={product.id}
       product={product}
     />
 
-  </div>
-
-))}
-
-</div>
+  ))}
 
 </div>
 
@@ -972,7 +881,7 @@ localStorage.setItem(
     items-end
     justify-between
     mb-8
-    gap-4
+    gap-3
     flex-wrap
   ">
 
@@ -1008,116 +917,25 @@ localStorage.setItem(
 
   </div>
 
-  {/* SLIDER WRAPPER */}
-  <div className="relative">
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-3
+  md:gap-6
+">
 
-    {/* IZQUIERDA */}
-    <button
-      onClick={() => {
-
-        document
-          .getElementById("best-seller-slider")
-          ?.scrollBy({
-            left: -320,
-            behavior: "smooth"
-          });
-
-      }}
-
-      className="
-        hidden
-        md:flex
-        absolute
-        left-0
-        top-1/2
-        -translate-y-1/2
-        z-20
-        bg-white
-        shadow-xl
-        w-12
-        h-12
-        rounded-full
-        items-center
-        justify-center
-      "
-    >
-      ←
-    </button>
-
-    {/* DERECHA */}
-    <button
-      onClick={() => {
-
-        document
-          .getElementById("best-seller-slider")
-          ?.scrollBy({
-            left: 320,
-            behavior: "smooth"
-          });
-
-      }}
-
-      className="
-        hidden
-        md:flex
-        absolute
-        right-0
-        top-1/2
-        -translate-y-1/2
-        z-20
-        bg-white
-        shadow-xl
-        w-12
-        h-12
-        rounded-full
-        items-center
-        justify-center
-      "
-    >
-      →
-    </button>
-
-    {/* SLIDER */}
-    <div
-      id="best-seller-slider"
-
-      className="
-        flex
-        gap-6
-        overflow-x-auto
-        scroll-smooth
-        pb-4
-        snap-x
-        snap-mandatory
-        scrollbar-hide
-      "
-    >
-
-{bestSellers.map(product => (
-
-  <div
-    key={product.id}
-    className="
-      min-w-[220px]
-      md:min-w-[280px]
-
-      max-w-[220px]
-      md:max-w-[280px]
-      snap-start
-    "
-  >
+  {bestSellers.map(product => (
 
     <ProductCard
+      key={product.id}
       product={product}
     />
 
-  </div>
+  ))}
 
-))}
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
@@ -1159,7 +977,7 @@ localStorage.setItem(
     items-end
     justify-between
     mb-10
-    gap-4
+    gap-3
     flex-wrap
   ">
 
@@ -1197,122 +1015,25 @@ localStorage.setItem(
 
   </div>
 
-  {/* SLIDER WRAPPER */}
-  <div className="relative z-10">
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-3
+  md:gap-6
+">
 
-    {/* IZQUIERDA */}
-    <button
-      onClick={() => {
-
-        document
-          .getElementById("luxury-slider")
-          ?.scrollBy({
-            left: -320,
-            behavior: "smooth"
-          });
-
-      }}
-
-      className="
-        hidden
-        md:flex
-        absolute
-        left-0
-        top-1/2
-        -translate-y-1/2
-        z-20
-        bg-white/10
-        backdrop-blur-xl
-        border
-        border-white/20
-        text-white
-        w-12
-        h-12
-        rounded-full
-        items-center
-        justify-center
-      "
-    >
-      ←
-    </button>
-
-    {/* DERECHA */}
-    <button
-      onClick={() => {
-
-        document
-          .getElementById("luxury-slider")
-          ?.scrollBy({
-            left: 320,
-            behavior: "smooth"
-          });
-
-      }}
-
-      className="
-        hidden
-        md:flex
-        absolute
-        right-0
-        top-1/2
-        -translate-y-1/2
-        z-20
-        bg-white/10
-        backdrop-blur-xl
-        border
-        border-white/20
-        text-white
-        w-12
-        h-12
-        rounded-full
-        items-center
-        justify-center
-      "
-    >
-      →
-    </button>
-
-    {/* SLIDER */}
-    <div
-      id="luxury-slider"
-
-      className="
-        flex
-        gap-8
-        overflow-x-auto
-        scroll-smooth
-        pb-4
-        snap-x
-        snap-mandatory
-        scrollbar-hide
-      "
-    >
-
-{luxuryProducts.map(product => (
-
-  <div
-    key={product.id}
-    className="
-      min-w-[220px]
-      md:min-w-[280px]
-
-      max-w-[220px]
-      md:max-w-[280px]
-      snap-start
-    "
-  >
+  {luxuryProducts.map(product => (
 
     <ProductCard
+      key={product.id}
       product={product}
     />
 
-  </div>
+  ))}
 
-))}
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
@@ -1381,47 +1102,25 @@ localStorage.setItem(
 
   </div>
 
-  {/* SLIDER */}
-  <div
-    id="exclusive-slider"
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-3
+  md:gap-6
+">
 
-    className="
-      relative
-      z-10
-      flex
-      gap-8
-      overflow-x-auto
-      scroll-smooth
-      pb-6
-      snap-x
-      snap-mandatory
-      scrollbar-hide
-    "
-  >
-
-{exclusiveProducts.map(product => (
-
-  <div
-    key={product.id}
-    className="
-      min-w-[220px]
-      md:min-w-[280px]
-
-      max-w-[220px]
-      md:max-w-[280px]
-      snap-start
-    "
-  >
+  {exclusiveProducts.map(product => (
 
     <ProductCard
+      key={product.id}
       product={product}
     />
 
-  </div>
+  ))}
 
-))}
-
-  </div>
+</div>
 
 </section>
 
@@ -1449,7 +1148,13 @@ localStorage.setItem(
 
 <div style={{
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  <div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-4
+">,
   gap: 20
 }}>
   {categories.map(cat => (
@@ -1470,7 +1175,7 @@ localStorage.setItem(
   className="opacity-0 transition-opacity duration-500"
   style={{
     width: "100%",
-    height: 200,
+    aspectRatio: "1/1",
     objectFit: "cover"
   }}
 />
