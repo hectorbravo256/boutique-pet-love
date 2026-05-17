@@ -559,7 +559,7 @@ useEffect(() => {
   flex
   justify-end
   items-center
-  gap-3
+  gap-2 md:gap-3
 ">
 
   {/* INSTAGRAM */}
@@ -571,12 +571,13 @@ useEffect(() => {
     rel="noreferrer"
 
     className="
-      hidden
-      md:flex
+      flex
       items-center
       justify-center
-      w-11
-      h-11
+      w-9
+      h-9
+      md:w-11
+      md:h-11
       rounded-full
       border
       border-pink-200
@@ -601,8 +602,7 @@ useEffect(() => {
     rel="noreferrer"
 
     className="
-      hidden
-      md:flex
+      flex
       items-center
       justify-center
       w-11
