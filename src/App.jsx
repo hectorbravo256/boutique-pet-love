@@ -19,6 +19,7 @@ import CrearProducto from "./admin/CrearProducto";
 import Ventas from "./admin/Ventas";
 import ScrollToTop from "./ScrollToTop";
 import ProductoDetalle from "./admin/ProductoDetalle";
+import ProductCard from "./ProductCard";
 
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -517,7 +518,7 @@ localStorage.setItem(
       <h1
         className="
           mt-6
-          text-4xl
+          text-3xl
 		  sm:text-5xl
 		  md:text-7xl
           font-black
@@ -786,127 +787,14 @@ localStorage.setItem(
     "
   >
 
-    {featuredProducts.map(product => {
+{featuredProducts.map(product => (
 
-      const precios =
-        product.product_variants
-          ?.map(v => Number(v.price))
-          .filter(v => !isNaN(v))
-        || [];
+  <ProductCard
+    key={product.id}
+    product={product}
+  />
 
-      const precioBase =
-        precios.length > 0
-          ? Math.min(...precios)
-          : 0;
-
-      return (
-
-        <div
-          key={product.id}
-
-          onClick={() =>
-            navigate(`/producto/${product.id}`)
-          }
-
-          className="
-            bg-white
-            rounded-3xl
-            overflow-hidden
-            shadow-sm
-            hover:shadow-2xl
-            transition-all
-            duration-500
-            hover:-translate-y-1
-            cursor-pointer
-          "
-        >
-
-          <img
-  src={
-    product.product_images?.[0]?.url
-      ? `${product.product_images[0].url}?width=800&quality=80`
-      : "/placeholder.png"
-  }
-
-  loading="lazy"
-
-  onLoad={(e) =>
-    e.target.classList.remove("opacity-0")
-  }
-
-  className="
-    opacity-0
-    transition-opacity
-    duration-700
-    w-full
-    aspect-square
-    object-cover
-  "
-/>
-
-          <div className="p-4">
-
-            <h3 className="
-              font-black
-              text-lg
-              text-gray-800
-              line-clamp-2
-            ">
-              {product.name}
-            </h3>
-
-           {product.discount_active ? (
-
-  <div className="mt-3">
-
-    <p className="
-      text-gray-400
-      line-through
-      text-sm
-    ">
-      Desde $
-      {precioBase.toLocaleString("es-CL")}
-    </p>
-
-    <p className="
-      text-pink-600
-      font-black
-      text-2xl
-    ">
-      Desde $
-
-{Math.round(
-  precioBase *
-  (
-    1 -
-    product.discount_percent / 100
-  )
-).toLocaleString("es-CL")}
-    </p>
-
-  </div>
-
-) : (
-
-  <p className="
-    mt-3
-    text-pink-600
-    font-black
-    text-2xl
-  ">
-    Desde $
-    {precioBase.toLocaleString("es-CL")}
-  </p>
-
-)}
-
-          </div>
-
-        </div>
-
-      );
-
-    })}
+))}
 
   </div>
 
@@ -1044,187 +932,27 @@ localStorage.setItem(
     "
   >
 
-    {nuevosProductos.map(product => {
+{nuevosProductos.map(product => (
 
-      const precios =
-        product.product_variants
-          ?.map(v => Number(v.price))
-          .filter(v => !isNaN(v))
-        || [];
+  <div
+    key={product.id}
+    className="
+      min-w-[220px]
+      md:min-w-[280px]
 
-      const precioBase =
-        precios.length > 0
-          ? Math.min(...precios)
-          : 0;
+      max-w-[220px]
+      md:max-w-[280px]
+      snap-start
+    "
+  >
 
-      return (
+    <ProductCard
+      product={product}
+    />
 
-        <div
-          key={product.id}
+  </div>
 
-          onClick={() =>
-            navigate(`/producto/${product.id}`)
-          }
-
-          className="
-            min-w-[280px]
-            max-w-[280px]
-            snap-start
-            bg-white
-            rounded-[32px]
-            overflow-hidden
-            shadow-sm
-            hover:shadow-2xl
-            transition-all
-            duration-500
-            hover:-translate-y-1
-            cursor-pointer
-            group
-          "
-        >
-
-          {/* IMAGEN */}
-          <div className="
-            relative
-            overflow-hidden
-          ">
-
-            <img
-  src={
-    product.product_images?.[0]?.url
-      ? `${product.product_images[0].url}?width=800&quality=80`
-      : "/placeholder.png"
-  }
-
-  loading="lazy"
-
-  onLoad={(e) =>
-    e.target.classList.remove("opacity-0")
-  }
-
-  className="
-    opacity-0
-    transition-all
-    duration-700
-    w-full
-    aspect-square
-    object-cover
-    group-hover:scale-105
-  "
-/>
-
-            {/* BADGE */}
-            {product.discount_active && (
-
-              <div className="
-                absolute
-                top-4
-                left-4
-                bg-pink-600
-                text-white
-                text-xs
-                font-black
-                px-3
-                py-2
-                rounded-full
-                shadow-xl
-              ">
-                -{product.discount_percent}%
-              </div>
-
-            )}
-
-          </div>
-
-          {/* INFO */}
-          <div className="p-5">
-
-            <h3 className="
-              font-black
-              text-lg
-              text-gray-900
-              line-clamp-2
-            ">
-              {product.name}
-            </h3>
-
-            {/* PRECIOS */}
-            {product.discount_active ? (
-
-              <div className="mt-4">
-
-                <p className="
-                  text-gray-400
-                  line-through
-                  text-sm
-                ">
-                  Desde $
-                  {precioBase.toLocaleString("es-CL")}
-                </p>
-
-                <p className="
-                  text-pink-600
-                  font-black
-                  text-3xl
-                ">
-                  $
-
-                  {Math.round(
-                    precioBase *
-                    (
-                      1 -
-                      product.discount_percent / 100
-                    )
-                  ).toLocaleString("es-CL")}
-                </p>
-
-              </div>
-
-            ) : (
-
-              <p className="
-                mt-4
-                text-pink-600
-                font-black
-                text-3xl
-              ">
-                Desde $
-                {precioBase.toLocaleString("es-CL")}
-              </p>
-
-            )}
-
-            {/* CTA */}
-            <button
-  onClick={(e) => {
-    e.stopPropagation();
-
-    navigate(`/producto/${product.id}`);
-  }}
-
-  className="
-    mt-5
-                w-full
-                bg-black
-                text-white
-                py-3
-                rounded-2xl
-                font-bold
-                transition-all
-                duration-300
-                hover:bg-pink-600
-              "
-            >
-              Ver producto
-            </button>
-
-          </div>
-
-        </div>
-
-      );
-
-    })}
+))}
 
 </div>
 
@@ -1365,187 +1093,27 @@ localStorage.setItem(
       "
     >
 
-      {bestSellers.map(product => {
+{bestSellers.map(product => (
 
-        const precios =
-          product.product_variants
-            ?.map(v => Number(v.price))
-            .filter(v => !isNaN(v))
-          || [];
+  <div
+    key={product.id}
+    className="
+      min-w-[220px]
+      md:min-w-[280px]
 
-        const precioBase =
-          precios.length > 0
-            ? Math.min(...precios)
-            : 0;
+      max-w-[220px]
+      md:max-w-[280px]
+      snap-start
+    "
+  >
 
-        return (
+    <ProductCard
+      product={product}
+    />
 
-          <div
-            key={product.id}
+  </div>
 
-            onClick={() =>
-              navigate(`/producto/${product.id}`)
-            }
-
-            className="
-              min-w-[280px]
-              max-w-[280px]
-              snap-start
-              bg-white
-              rounded-[32px]
-              overflow-hidden
-              shadow-sm
-              hover:shadow-2xl
-              transition-all
-              duration-500
-              hover:-translate-y-1
-              cursor-pointer
-              group
-            "
-          >
-
-            {/* IMAGEN */}
-            <div className="
-              relative
-              overflow-hidden
-            ">
-
-              <img
-                src={
-                  product.product_images?.[0]?.url
-                    ? `${product.product_images[0].url}?width=800&quality=80`
-                    : "/placeholder.png"
-                }
-
-                loading="lazy"
-
-                onLoad={(e) =>
-                  e.target.classList.remove("opacity-0")
-                }
-
-                className="
-                  opacity-0
-                  transition-all
-                  duration-700
-                  w-full
-                  aspect-square
-                  object-cover
-                  group-hover:scale-105
-                "
-              />
-
-              {/* BADGE */}
-              <div className="
-                absolute
-                top-4
-                left-4
-                bg-orange-500
-                text-white
-                text-xs
-                font-black
-                px-3
-                py-2
-                rounded-full
-                shadow-xl
-              ">
-                🔥 BEST SELLER
-              </div>
-
-            </div>
-
-            {/* INFO */}
-            <div className="p-5">
-
-              <h3 className="
-                font-black
-                text-lg
-                text-gray-900
-                line-clamp-2
-              ">
-                {product.name}
-              </h3>
-
-              {/* PRECIOS */}
-              {product.discount_active ? (
-
-                <div className="mt-4">
-
-                  <p className="
-                    text-gray-400
-                    line-through
-                    text-sm
-                  ">
-                    Desde $
-                    {precioBase.toLocaleString("es-CL")}
-                  </p>
-
-                  <p className="
-                    text-pink-600
-                    font-black
-                    text-3xl
-                  ">
-                    $
-
-                    {Math.round(
-                      precioBase *
-                      (
-                        1 -
-                        product.discount_percent / 100
-                      )
-                    ).toLocaleString("es-CL")}
-                  </p>
-
-                </div>
-
-              ) : (
-
-                <p className="
-                  mt-4
-                  text-pink-600
-                  font-black
-                  text-3xl
-                ">
-                  Desde $
-                  {precioBase.toLocaleString("es-CL")}
-                </p>
-
-              )}
-
-              {/* CTA */}
-              <button
-                onClick={(e) => {
-
-                  e.stopPropagation();
-
-                  navigate(
-                    `/producto/${product.id}`
-                  );
-
-                }}
-
-                className="
-                  mt-5
-                  w-full
-                  bg-orange-500
-                  text-white
-                  py-3
-                  rounded-2xl
-                  font-bold
-                  transition-all
-                  duration-300
-                  hover:opacity-90
-                "
-              >
-                Ver producto
-              </button>
-
-            </div>
-
-          </div>
-
-        );
-
-      })}
+))}
 
     </div>
 
@@ -1720,190 +1288,27 @@ localStorage.setItem(
       "
     >
 
-      {luxuryProducts.map(product => {
+{luxuryProducts.map(product => (
 
-        const precios =
-          product.product_variants
-            ?.map(v => Number(v.price))
-            .filter(v => !isNaN(v))
-          || [];
+  <div
+    key={product.id}
+    className="
+      min-w-[220px]
+      md:min-w-[280px]
 
-        const precioBase =
-          precios.length > 0
-            ? Math.min(...precios)
-            : 0;
+      max-w-[220px]
+      md:max-w-[280px]
+      snap-start
+    "
+  >
 
-        return (
+    <ProductCard
+      product={product}
+    />
 
-          <div
-            key={product.id}
+  </div>
 
-            onClick={() =>
-              navigate(`/producto/${product.id}`)
-            }
-
-            className="
-              min-w-[320px]
-              max-w-[320px]
-              snap-start
-              bg-white/5
-              backdrop-blur-xl
-              border
-              border-white/10
-              rounded-[36px]
-              overflow-hidden
-              transition-all
-              duration-500
-              hover:-translate-y-2
-              hover:border-yellow-400/40
-              hover:shadow-[0_0_50px_rgba(250,204,21,0.15)]
-              cursor-pointer
-              group
-            "
-          >
-
-            {/* IMAGEN */}
-            <div className="
-              relative
-              overflow-hidden
-            ">
-
-              <img
-                src={
-                  product.product_images?.[0]?.url
-                    ? `${product.product_images[0].url}?width=1000&quality=90`
-                    : "/placeholder.png"
-                }
-
-                loading="lazy"
-
-                onLoad={(e) =>
-                  e.target.classList.remove("opacity-0")
-                }
-
-                className="
-                  opacity-0
-                  transition-all
-                  duration-700
-                  w-full
-                  aspect-square
-                  object-cover
-                  group-hover:scale-105
-                "
-              />
-
-              {/* BADGE */}
-              <div className="
-                absolute
-                top-5
-                left-5
-                bg-yellow-400
-                text-black
-                text-xs
-                font-black
-                px-4
-                py-2
-                rounded-full
-                shadow-xl
-              ">
-                👑 LUXURY
-              </div>
-
-            </div>
-
-            {/* INFO */}
-            <div className="p-6">
-
-              <h3 className="
-                font-black
-                text-2xl
-                text-white
-                line-clamp-2
-              ">
-                {product.name}
-              </h3>
-
-              {/* PRECIOS */}
-              {product.discount_active ? (
-
-                <div className="mt-5">
-
-                  <p className="
-                    text-gray-500
-                    line-through
-                    text-sm
-                  ">
-                    Desde $
-                    {precioBase.toLocaleString("es-CL")}
-                  </p>
-
-                  <p className="
-                    text-yellow-400
-                    font-black
-                    text-4xl
-                  ">
-                    $
-
-                    {Math.round(
-                      precioBase *
-                      (
-                        1 -
-                        product.discount_percent / 100
-                      )
-                    ).toLocaleString("es-CL")}
-                  </p>
-
-                </div>
-
-              ) : (
-
-                <p className="
-                  mt-5
-                  text-yellow-400
-                  font-black
-                  text-4xl
-                ">
-                  Desde $
-                  {precioBase.toLocaleString("es-CL")}
-                </p>
-
-              )}
-
-              {/* CTA */}
-              <button
-                onClick={(e) => {
-
-                  e.stopPropagation();
-
-                  navigate(
-                    `/producto/${product.id}`
-                  );
-
-                }}
-
-                className="
-                  mt-6
-                  w-full
-                  bg-yellow-400
-                  text-black
-                  py-4
-                  rounded-2xl
-                  font-black
-                  transition-all
-                  duration-300
-                  hover:scale-[1.02]
-                "
-              >
-                Ver producto
-              </button>
-
-            </div>
-
-          </div>
-
-        );
-
-      })}
+))}
 
     </div>
 
@@ -1994,191 +1399,27 @@ localStorage.setItem(
     "
   >
 
-    {exclusiveProducts.map(product => {
+{exclusiveProducts.map(product => (
 
-      const precios =
-        product.product_variants
-          ?.map(v => Number(v.price))
-          .filter(v => !isNaN(v))
-        || [];
+  <div
+    key={product.id}
+    className="
+      min-w-[220px]
+      md:min-w-[280px]
 
-      const precioBase =
-        precios.length > 0
-          ? Math.min(...precios)
-          : 0;
+      max-w-[220px]
+      md:max-w-[280px]
+      snap-start
+    "
+  >
 
-      return (
+    <ProductCard
+      product={product}
+    />
 
-        <div
-          key={product.id}
+  </div>
 
-          onClick={() =>
-            navigate(`/producto/${product.id}`)
-          }
-
-          className="
-            min-w-[340px]
-            max-w-[340px]
-            snap-start
-            rounded-[40px]
-            overflow-hidden
-            bg-white/5
-            backdrop-blur-2xl
-            border
-            border-white/10
-            transition-all
-            duration-500
-            hover:-translate-y-2
-            hover:border-pink-400/40
-            hover:shadow-[0_0_60px_rgba(236,72,153,0.25)]
-            group
-            cursor-pointer
-          "
-        >
-
-          {/* IMAGEN */}
-          <div className="
-            relative
-            overflow-hidden
-          ">
-
-            <img
-              src={
-                product.product_images?.[0]?.url
-                  ? `${product.product_images[0].url}?width=1200&quality=90`
-                  : "/placeholder.png"
-              }
-
-              loading="lazy"
-
-              onLoad={(e) =>
-                e.target.classList.remove("opacity-0")
-              }
-
-              className="
-                opacity-0
-                transition-all
-                duration-700
-                w-full
-                aspect-square
-                object-cover
-                group-hover:scale-105
-              "
-            />
-
-            {/* BADGE */}
-            <div className="
-              absolute
-              top-5
-              left-5
-              bg-pink-500
-              text-white
-              text-xs
-              font-black
-              px-4
-              py-2
-              rounded-full
-              shadow-2xl
-            ">
-              💎 EXCLUSIVO
-            </div>
-
-          </div>
-
-          {/* INFO */}
-          <div className="p-7">
-
-            <h3 className="
-              text-white
-              text-2xl
-              font-black
-              line-clamp-2
-            ">
-              {product.name}
-            </h3>
-
-            {/* PRECIOS */}
-            {product.discount_active ? (
-
-              <div className="mt-5">
-
-                <p className="
-                  text-gray-500
-                  line-through
-                  text-sm
-                ">
-                  Desde $
-                  {precioBase.toLocaleString("es-CL")}
-                </p>
-
-                <p className="
-                  text-pink-400
-                  text-4xl
-                  font-black
-                ">
-                  $
-
-                  {Math.round(
-                    precioBase *
-                    (
-                      1 -
-                      product.discount_percent / 100
-                    )
-                  ).toLocaleString("es-CL")}
-                </p>
-
-              </div>
-
-            ) : (
-
-              <p className="
-                mt-5
-                text-pink-400
-                text-4xl
-                font-black
-              ">
-                Desde $
-                {precioBase.toLocaleString("es-CL")}
-              </p>
-
-            )}
-
-            {/* CTA */}
-            <button
-              onClick={(e) => {
-
-                e.stopPropagation();
-
-                navigate(
-                  `/producto/${product.id}`
-                );
-
-              }}
-
-              className="
-                mt-7
-                w-full
-                py-4
-                rounded-2xl
-                bg-pink-500
-                hover:bg-pink-400
-                text-white
-                font-black
-                transition-all
-                duration-300
-                hover:scale-[1.02]
-              "
-            >
-              Ver producto
-            </button>
-
-          </div>
-
-        </div>
-
-      );
-
-    })}
+))}
 
   </div>
 
