@@ -47,7 +47,7 @@ return (
 ">
 
   <h2 className="
-  text-3xl
+  text-2xl
   md:text-4xl
   font-black
   text-pink-600
@@ -162,7 +162,6 @@ const precioBase =
   font-black
   text-gray-800
   text-sm md:text-xl
-  md:text-xl
   leading-tight
   tracking-tight
   line-clamp-2
