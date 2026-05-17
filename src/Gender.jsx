@@ -78,7 +78,7 @@ export default function Gender() {
 
     <div
       style={{
-        padding: 30
+        padding: 20
       }}
     >
 
@@ -116,16 +116,13 @@ export default function Gender() {
       </div>
 
       {/* GRID */}
-      <div
-        style={{
-          display: "grid",
-
-          gridTemplateColumns:
-            "repeat(auto-fill,minmax(260px,1fr))",
-
-          gap: 24
-        }}
-      >
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
+  gap-6
+">
 
         {products.map(product => {
 
@@ -208,7 +205,7 @@ export default function Gender() {
 
                 <div
                   style={{
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: "800",
                     color: "#111827"
                   }}
@@ -220,7 +217,7 @@ export default function Gender() {
                   style={{
                     marginTop: 12,
 
-                    fontSize: 28,
+                    fontSize: 22,
 
                     fontWeight: "900",
 
