@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
+import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 
@@ -533,11 +533,17 @@ useEffect(() => {
     {/* 🔥 LOGO IZQUIERDA */}
     <img
       src="/logo.png"
-      className="w-14 h-14 md:w-16 md:h-16 rounded-full shadow-md"
+      className="w-16 h-16 md:w-16 md:h-16 rounded-full shadow-md"
     />
 
     {/* 🔥 TEXTO DERECHA (2 FILAS) */}
-    <div className="flex flex-col justify-center leading-tight">
+<div className="
+  hidden
+  md:flex
+  flex-col
+  justify-center
+  leading-tight
+">
 
       <h1 className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
         BOUTIQUE PET LOVE
@@ -581,16 +587,18 @@ useEffect(() => {
       rounded-full
       border
       border-pink-200
-      bg-white
+      bg-white/90
+      backdrop-blur-md
       text-pink-500
       hover:bg-pink-50
       hover:scale-105
+	  hover:-translate-y-0.5
       transition-all
       duration-300
-      shadow-sm
+      shadow-[0_4px_20px_rgba(0,0,0,0.08)]
     "
   >
-    📷
+    <Instagram size={18} />
   </a>
 
   {/* WHATSAPP */}
@@ -610,16 +618,18 @@ useEffect(() => {
       rounded-full
       border
       border-green-200
-      bg-white
+      bg-white/90
+      backdrop-blur-md
       text-green-500
       hover:bg-green-50
       hover:scale-105
+	  hover:-translate-y-0.5
       transition-all
       duration-300
-      shadow-sm
+      shadow-[0_4px_20px_rgba(0,0,0,0.08)]
     "
   >
-    💬
+    <MessageCircle size={18} />
   </a>
 
   {/* CARRITO */}
