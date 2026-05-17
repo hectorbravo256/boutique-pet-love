@@ -994,9 +994,6 @@ onTouchEnd={(e) => e.stopPropagation()}
       onClick={(e) => {
   e.stopPropagation();
 }}
-
-      onTouchStart={(e) => e.stopPropagation()}
-onTouchEnd={(e) => e.stopPropagation()}
       
       className="
     animate-[fadeZoom_.3s_ease]
