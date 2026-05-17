@@ -141,20 +141,28 @@ const handleTouchMove = (e) => {
 };
 
 const handleTouchEnd = () => {
+
+  if (!showModal) return;
+
   if (!touchStartX || !touchEndX) return;
 
-const distance = touchStartX - touchEndX;
+  const distance =
+    touchStartX - touchEndX;
 
-  // 🔥 sensibilidad (puedes ajustar)
-  if (distance > 50) {
-    // swipe izquierda → siguiente
+  // swipe izquierda
+  if (distance > 70) {
     nextImage();
   }
 
-  if (distance < -50) {
-    // swipe derecha → anterior
+  // swipe derecha
+  if (distance < -70) {
     prevImage();
   }
+
+  // reset
+  setTouchStartX(0);
+  setTouchEndX(0);
+
 };
 
 const nextImage = () => {
@@ -857,6 +865,10 @@ onMouseOut={(e) => {
     e.stopPropagation();
     setShowModal(false);
   }}
+
+  onTouchStart={(e) => e.stopPropagation()}
+onTouchEnd={(e) => e.stopPropagation()}
+  
   className="
     absolute
     top-5
@@ -887,6 +899,10 @@ onMouseOut={(e) => {
     e.stopPropagation();
     prevImage();
   }}
+
+  onTouchStart={(e) => e.stopPropagation()}
+onTouchEnd={(e) => e.stopPropagation()}
+  
   className="
     hidden
     md:flex
@@ -931,6 +947,10 @@ onMouseOut={(e) => {
     e.stopPropagation();
     nextImage();
   }}
+
+onTouchStart={(e) => e.stopPropagation()}
+onTouchEnd={(e) => e.stopPropagation()}
+  
   className="
     hidden
     md:flex
@@ -974,6 +994,9 @@ onMouseOut={(e) => {
       onClick={(e) => {
   e.stopPropagation();
 }}
+
+      onTouchStart={(e) => e.stopPropagation()}
+onTouchEnd={(e) => e.stopPropagation()}
       
       className="
     animate-[fadeZoom_.3s_ease]
