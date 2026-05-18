@@ -4,10 +4,19 @@ import {
   useLocation
 } from "react-router-dom";
 
+import {
+  useState
+} from "react";
+
 export default function AdminLayout() {
 
   const location =
     useLocation();
+
+  const [
+    sidebarOpen,
+    setSidebarOpen
+  ] = useState(false);
 
   const isActive =
     (path) =>
@@ -45,30 +54,149 @@ export default function AdminLayout() {
 
     <div className="
       min-h-screen
-      bg-[#f5f7fb]
+      bg-gradient-to-b
+      from-[#fff7fb]
+      via-white
+      to-[#fdf2f8]
       flex
     ">
 
-      {/* SIDEBAR */}
-      <aside className="
-        hidden
-        md:flex
+      {/* MOBILE TOPBAR */}
+      <div className="
+        md:hidden
+
         fixed
         top-0
         left-0
-        h-screen
-        w-[260px]
+        right-0
 
+        h-[72px]
+
+        bg-white/80
+        backdrop-blur-xl
+
+        border-b
+        border-slate-200
+
+        px-4
+
+        flex
+        items-center
+        justify-between
+
+        z-[70]
+      ">
+
+        <div>
+
+          <p className="
+            uppercase
+            tracking-[0.3em]
+            text-[10px]
+            font-bold
+            text-pink-500
+          ">
+            Administración
+          </p>
+
+          <h1 className="
+            text-xl
+            font-black
+            text-slate-900
+          ">
+            ⚙️ Admin
+          </h1>
+
+        </div>
+
+        <button
+          onClick={() =>
+            setSidebarOpen(
+              !sidebarOpen
+            )
+          }
+
+          className="
+            w-12
+            h-12
+
+            rounded-2xl
+
+            bg-gradient-to-r
+            from-pink-500
+            to-purple-500
+
+            text-white
+            text-xl
+
+            shadow-lg
+
+            active:scale-95
+
+            transition-all
+          "
+        >
+          ☰
+        </button>
+
+      </div>
+
+      {/* BACKDROP */}
+      {
+        sidebarOpen && (
+
+          <div
+            onClick={() =>
+              setSidebarOpen(false)
+            }
+
+            className="
+              md:hidden
+
+              fixed
+              inset-0
+
+              bg-black/40
+              backdrop-blur-sm
+
+              z-[60]
+            "
+          />
+
+        )
+      }
+
+      {/* SIDEBAR */}
+      <aside className={`
+        fixed
+        top-0
+        left-0
+
+        h-screen
+        w-[280px]
+
+        flex
         flex-col
 
         bg-[#111827]
+
         border-r
         border-white/5
 
         p-6
 
-        z-50
-      ">
+        z-[80]
+
+        transition-all
+        duration-300
+
+        ${sidebarOpen
+          ? "translate-x-0"
+          : "-translate-x-full"
+        }
+
+        md:translate-x-0
+      `}>
 
         {/* HEADER */}
         <div className="mb-10">
@@ -107,6 +235,10 @@ export default function AdminLayout() {
               key={item.path}
 
               to={item.path}
+
+              onClick={() =>
+                setSidebarOpen(false)
+              }
 
               className={`
                 flex
@@ -157,12 +289,59 @@ export default function AdminLayout() {
 
         </nav>
 
+        {/* FOOTER */}
+        <div className="
+          mt-auto
+          pt-8
+        ">
+
+          <div className="
+            rounded-3xl
+
+            bg-white/5
+
+            border
+            border-white/10
+
+            p-5
+          ">
+
+            <p className="
+              text-xs
+              uppercase
+              tracking-[0.25em]
+
+              text-slate-400
+              font-bold
+            ">
+              Boutique Pet Love
+            </p>
+
+            <p className="
+              mt-3
+              text-sm
+              text-slate-300
+              leading-relaxed
+            ">
+              Panel administrativo premium
+              para ecommerce.
+            </p>
+
+          </div>
+
+        </div>
+
       </aside>
 
       {/* CONTENT */}
       <main className="
         flex-1
-        md:ml-[260px]
+
+        md:ml-[280px]
+
+        pt-[92px]
+        md:pt-8
+
         p-4
         md:p-8
       ">
