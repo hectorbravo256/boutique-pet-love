@@ -848,9 +848,11 @@ export default function Ventas() {
 
               </div>
 
-            </AdminCard>
+            </div>
 
-          ))}
+          </AdminCard>
+
+        ))}
 
       </div>
 
