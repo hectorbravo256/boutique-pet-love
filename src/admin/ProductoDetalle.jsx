@@ -3233,6 +3233,8 @@ const precioPromedio =
   
     </div>
 
+  </div>
+
   );
 
 }
