@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import AdminCard from "./components/AdminCard";
+import AdminButton from "./components/AdminButton";
 import {
   DndContext,
   closestCenter
@@ -784,14 +786,16 @@ const precioPromedio =
 
   return (
 
-    <div
-      style={{
-        padding: 30,
-        background:
-          "linear-gradient(to bottom,#fff,#fff7fb)",
-        minHeight: "100vh"
-      }}
-    >
+<div className="
+  p-4
+  md:p-8
+
+  min-h-screen
+
+  bg-gradient-to-b
+  from-white
+  to-pink-50
+">
 
      {/* HEADER PREMIUM */}
 <div
@@ -814,23 +818,7 @@ const precioPromedio =
   </Link>
 
   {/* card principal */}
-  <div
-    style={{
-      marginTop: 18,
-
-      background: "#fff",
-
-      borderRadius: 28,
-
-      padding: 24,
-
-      boxShadow:
-        "0 10px 35px rgba(0,0,0,0.06)",
-
-      border:
-        "1px solid rgba(236,72,153,0.08)"
-    }}
-  >
+<AdminCard className="mt-5">
 
     <div
       style={{
@@ -1548,20 +1536,7 @@ const precioPromedio =
 </div>
 
       {/* SEO PREMIUM */}
-<div
-  style={{
-    background: "#fff",
-
-    borderRadius: 28,
-
-    padding: 24,
-
-    marginBottom: 26,
-
-    boxShadow:
-      "0 10px 35px rgba(0,0,0,0.05)"
-  }}
->
+<AdminCard className="mb-6">
 
   {/* título */}
   <div
@@ -1909,32 +1884,17 @@ const precioPromedio =
 </div>
 
       {/* ANALYTICS PREMIUM */}
-<div
-  style={{
-    display: "grid",
-
-    gridTemplateColumns:
-      "repeat(auto-fit,minmax(220px,1fr))",
-
-    gap: 20,
-
-    marginBottom: 26
-  }}
->
+<div className="
+  grid
+  grid-cols-1
+  md:grid-cols-2
+  xl:grid-cols-4
+  gap-5
+  mb-6
+">
 
   {/* STOCK */}
-  <div
-    style={{
-      background: "#fff",
-
-      borderRadius: 26,
-
-      padding: 24,
-
-      boxShadow:
-        "0 10px 35px rgba(0,0,0,0.05)"
-    }}
-  >
+<AdminCard>
 
     <div
       style={{
@@ -1960,21 +1920,10 @@ const precioPromedio =
       {stockTotal}
     </div>
 
-  </div>
+  </AdminCard>
 
   {/* INVENTARIO */}
-  <div
-    style={{
-      background: "#fff",
-
-      borderRadius: 26,
-
-      padding: 24,
-
-      boxShadow:
-        "0 10px 35px rgba(0,0,0,0.05)"
-    }}
-  >
+<AdminCard>
 
     <div
       style={{
@@ -2003,21 +1952,10 @@ const precioPromedio =
       )}
     </div>
 
-  </div>
+  </AdminCard>
 
   {/* PROMEDIO */}
-  <div
-    style={{
-      background: "#fff",
-
-      borderRadius: 26,
-
-      padding: 24,
-
-      boxShadow:
-        "0 10px 35px rgba(0,0,0,0.05)"
-    }}
-  >
+<AdminCard>
 
     <div
       style={{
@@ -2046,21 +1984,10 @@ const precioPromedio =
       )}
     </div>
 
-  </div>
+  </AdminCard>
 
   {/* ALERTAS */}
-  <div
-    style={{
-      background: "#fff",
-
-      borderRadius: 26,
-
-      padding: 24,
-
-      boxShadow:
-        "0 10px 35px rgba(0,0,0,0.05)"
-    }}
-  >
+<AdminCard>
 
     <div
       style={{
@@ -2137,25 +2064,12 @@ const precioPromedio =
 
     </div>
 
-  </div>
+  </AdminCard>
 
 </div>
 
       {/* DESCUENTOS PREMIUM */}
-<div
-  style={{
-    background: "#fff",
-
-    borderRadius: 28,
-
-    padding: 24,
-
-    marginBottom: 26,
-
-    boxShadow:
-      "0 10px 35px rgba(0,0,0,0.05)"
-  }}
->
+<AdminCard>
 
   {/* título */}
   <div
@@ -2438,20 +2352,7 @@ const precioPromedio =
 </div>
 
       {/* IMÁGENES PREMIUM */}
-<div
-  style={{
-    background: "#fff",
-
-    borderRadius: 28,
-
-    padding: 24,
-
-    marginBottom: 26,
-
-    boxShadow:
-      "0 10px 35px rgba(0,0,0,0.05)"
-  }}
->
+<AdminCard>
 
   {/* título */}
   <div
@@ -2589,18 +2490,7 @@ const precioPromedio =
 </div>
       
 {/* TABLA PREMIUM */}
-<div
-  style={{
-    background: "#fff",
-
-    borderRadius: 28,
-
-    padding: 20,
-
-    boxShadow:
-      "0 10px 35px rgba(0,0,0,0.05)"
-  }}
->
+<AdminCard>
 
   {/* encabezado */}
   <div
@@ -3052,37 +2942,15 @@ const precioPromedio =
 </div>
 
 {/* BOTÓN ABRIR MODAL */}
-<button
+<AdminButton
   onClick={() =>
     setMostrarModal(true)
   }
 
-  style={{
-    marginTop: 24,
-
-    background:
-      "linear-gradient(135deg,#22c55e,#16a34a)",
-
-    color: "#fff",
-
-    border: "none",
-
-    borderRadius: 18,
-
-    padding: "16px 22px",
-
-    fontWeight: "700",
-
-    fontSize: 15,
-
-    cursor: "pointer",
-
-    boxShadow:
-      "0 10px 25px rgba(34,197,94,0.25)"
-  }}
+  className="mt-6"
 >
   ➕ Agregar talla
-</button>
+</AdminButton>
 
       {/* MODAL PREMIUM */}
 {mostrarModal && (
@@ -3093,7 +2961,7 @@ const precioPromedio =
       inset: 0,
 
       background:
-        "rgba(0,0,0,0.45)",
+  "rgba(15,23,42,0.55)",
 
       display: "flex",
       alignItems: "center",
@@ -3105,20 +2973,7 @@ const precioPromedio =
     }}
   >
 
-    <div
-      style={{
-        width: 420,
-
-        background: "#fff",
-
-        borderRadius: 30,
-
-        padding: 28,
-
-        boxShadow:
-          "0 20px 60px rgba(0,0,0,0.18)"
-      }}
-    >
+<AdminCard>
 
       {/* título */}
       <h2
@@ -3372,7 +3227,7 @@ const precioPromedio =
 
       </div>
 
-    </div>
+    </AdminCard>
 
   </div>
 
