@@ -300,35 +300,85 @@ export default function Ventas() {
 
   return (
 
-    <div className="
-      p-4
-      md:p-8
+<div className="
+  min-h-screen
+
+  p-4
+  md:p-8
+
+  bg-gradient-to-b
+  from-[#fff7fb]
+  via-white
+  to-[#fdf2f8]
+">
+
+{/* HEADER PREMIUM */}
+<div className="
+  relative
+  overflow-hidden
+
+  rounded-[32px]
+
+  p-6
+  md:p-8
+
+  mb-8
+
+  bg-gradient-to-br
+  from-pink-500
+  via-fuchsia-500
+  to-purple-600
+
+  text-white
+
+  shadow-[0_20px_60px_rgba(168,85,247,0.35)]
+">
+
+  <div className="
+    absolute
+    inset-0
+
+    opacity-10
+
+    bg-[radial-gradient(circle_at_top_right,white,transparent_40%)]
+  " />
+
+  <div className="relative z-10">
+
+    <p className="
+      uppercase
+      tracking-[0.35em]
+      text-xs
+      font-bold
+      text-pink-100
     ">
+      Panel administrativo
+    </p>
 
-      {/* HEADER */}
-      <div className="mb-8">
+    <h1 className="
+      text-4xl
+      md:text-5xl
+      font-black
+      mt-3
+    ">
+      📦 Ventas y pedidos
+    </h1>
 
-        <p className="
-          text-pink-500
-          uppercase
-          tracking-[0.3em]
-          text-xs
-          font-bold
-        ">
-          Administración
-        </p>
+    <p className="
+      mt-4
+      text-pink-100
+      max-w-2xl
+      text-sm
+      md:text-base
+    ">
+      Gestiona pedidos, clientes,
+      estados de envío y métricas
+      de ventas en tiempo real.
+    </p>
 
-        <h1 className="
-          text-4xl
-          md:text-5xl
-          font-black
-          text-slate-900
-          mt-3
-        ">
-          📦 Ventas y pedidos
-        </h1>
+  </div>
 
-      </div>
+</div>
 
       {/* MÉTRICAS */}
       <div className="
@@ -470,8 +520,16 @@ export default function Ventas() {
           .map(o => (
 
             <AdminCard
-              key={o.id}
-            >
+  key={o.id}
+
+  className="
+    hover:-translate-y-1
+    hover:shadow-[0_20px_60px_rgba(15,23,42,0.10)]
+
+    transition-all
+    duration-300
+  "
+>
 
               <div className="
                 flex
@@ -510,6 +568,9 @@ export default function Ventas() {
                       py-1
 
                       rounded-full
+                      shadow-sm
+                      uppercase
+                      tracking-wide
 
                       text-sm
                       font-bold
@@ -639,7 +700,12 @@ export default function Ventas() {
                                 key={idx}
 
                                 className="
-                                  bg-slate-100
+                                  bg-gradient-to-r
+                                  from-pink-50
+                                  to-purple-50
+
+                                  border
+                                  border-pink-100
 
                                   px-4
                                   py-2
@@ -673,91 +739,112 @@ export default function Ventas() {
                   xl:w-[240px]
                 ">
 
-                  <div className="
-                    bg-slate-50
+<div className="
+  relative
+  overflow-hidden
 
-                    border
-                    border-slate-100
+  rounded-[28px]
 
-                    rounded-[28px]
+  p-6
 
-                    p-5
-                  ">
+  bg-gradient-to-br
+  from-slate-900
+  to-slate-800
 
-                    <div className="
-                      text-sm
-                      font-bold
-                      text-slate-500
-                    ">
-                      Total
-                    </div>
+  text-white
 
-                    <div className="
-                      mt-3
+  shadow-[0_15px_50px_rgba(15,23,42,0.25)]
+">
 
-                      text-3xl
-                      font-black
+  <div className="
+    absolute
+    -top-16
+    -right-16
 
-                      text-slate-900
-                    ">
-                      $
-                      {
-                        Number(
-                          o.total
-                        ).toLocaleString(
-                          "es-CL"
-                        )
-                      }
-                    </div>
+    w-40
+    h-40
 
-                    {/* BOTÓN */}
-                    {
-                      (
-                        o.estado ||
-                        "pendiente"
-                      ) === "pendiente"
+    rounded-full
+    shadow-sm
+    uppercase
+    tracking-wide
 
-                      && (
+    bg-pink-500/20
+  " />
 
-                        <button
-                          onClick={() =>
-                            cambiarEstado(
-                              o.id
-                            )
-                          }
+  <div className="relative z-10">
 
-                          className="
-                            mt-5
+    <div className="
+      text-sm
+      font-bold
+      text-slate-300
+    ">
+      Total
+    </div>
 
-                            w-full
+    <div className="
+      mt-4
 
-                            bg-gradient-to-r
-                            from-emerald-500
-                            to-green-500
+      text-4xl
+      font-black
+    ">
+      $
+      {
+        Number(
+          o.total
+        ).toLocaleString(
+          "es-CL"
+        )
+      }
+    </div>
 
-                            hover:opacity-90
-                            hover:-translate-y-0.5
+    {
+      (
+        o.estado ||
+        "pendiente"
+      ) === "pendiente"
 
-                            transition-all
-                            duration-300
+      && (
 
-                            text-white
-                            font-bold
+        <button
+          onClick={() =>
+            cambiarEstado(
+              o.id
+            )
+          }
 
-                            py-3
+          className="
+            mt-6
 
-                            rounded-2xl
-                          "
-                        >
-                          📦 Marcar enviado
-                        </button>
+            w-full
 
-                      )
-                    }
+            rounded-2xl
 
-                  </div>
+            bg-gradient-to-r
+            from-emerald-500
+            to-green-500
 
-                </div>
+            py-3
+
+            font-bold
+            text-white
+
+            hover:scale-[1.02]
+            hover:opacity-90
+
+            transition-all
+            duration-300
+          "
+        >
+          📦 Marcar enviado
+        </button>
+
+      )
+    }
+
+  </div>
+
+</div>
 
               </div>
 
@@ -781,28 +868,75 @@ function StatCard({
 
   return (
 
-    <AdminCard>
+    <div className="
+      relative
+      overflow-hidden
+
+      rounded-[28px]
+
+      p-6
+
+      bg-white/80
+      backdrop-blur-xl
+
+      border
+      border-white/60
+
+      shadow-[0_10px_40px_rgba(15,23,42,0.08)]
+
+      hover:-translate-y-1
+      hover:shadow-[0_20px_60px_rgba(236,72,153,0.15)]
+
+      transition-all
+      duration-300
+    ">
 
       <div className="
-        text-sm
-        font-bold
-        text-slate-500
-      ">
-        {title}
+        absolute
+        -top-10
+        -right-10
+
+        w-32
+        h-32
+
+        rounded-full
+        shadow-sm
+        uppercase
+        tracking-wide
+
+        bg-gradient-to-br
+        from-pink-100
+        to-purple-100
+
+        opacity-60
+      " />
+
+      <div className="relative z-10">
+
+        <div className="
+          text-sm
+          font-bold
+          text-slate-500
+        ">
+          {title}
+        </div>
+
+        <div className="
+          mt-4
+
+          text-3xl
+          md:text-4xl
+
+          font-black
+
+          text-slate-900
+        ">
+          {value}
+        </div>
+
       </div>
 
-      <div className="
-        mt-4
-
-        text-3xl
-        font-black
-
-        text-slate-900
-      ">
-        {value}
-      </div>
-
-    </AdminCard>
+    </div>
 
   );
 
@@ -856,6 +990,9 @@ function FiltroBtn({
         py-2.5
 
         rounded-full
+        shadow-sm
+        uppercase
+        tracking-wide
 
         font-bold
 
@@ -874,7 +1011,12 @@ function FiltroBtn({
             `
 
             : `
-              bg-slate-100
+              bg-gradient-to-r
+              from-pink-50
+              to-purple-50
+
+              border
+              border-pink-100
               text-slate-700
 
               hover:bg-slate-200
