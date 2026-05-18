@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 
 export default function CrearProducto() {
@@ -10,6 +10,30 @@ export default function CrearProducto() {
   image: "",
   variants: [{ size: "Talla 1", price: "" }]
 });
+
+ const [categories, setCategories] =
+  useState([]);
+
+ useEffect(() => {
+
+  cargarCategorias();
+
+}, []);
+
+const cargarCategorias = async () => {
+
+  const { data } =
+    await supabase
+      .from("categories")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", {
+        ascending: true
+      });
+
+  setCategories(data || []);
+
+};
 
   const [toast, setToast] = useState("");
 
@@ -148,17 +172,16 @@ export default function CrearProducto() {
     Selecciona categoría
   </option>
 
-  <option value="otono-invierno">
-    Otoño - Invierno
+{categories.map(cat => (
+
+  <option
+    key={cat.id}
+    value={cat.slug}
+  >
+    {cat.name}
   </option>
 
-  <option value="accesorios">
-    Accesorios
-  </option>
-
-  <option value="trajes-gala">
-    Trajes Gala
-  </option>
+))}
 
 </select>
       
