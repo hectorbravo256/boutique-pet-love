@@ -452,7 +452,7 @@ localStorage.setItem(
     overflow-hidden
     px-6
     md:px-12
-    py-8
+    py-4
     md:py-20
     animate-fade
   "
@@ -490,7 +490,8 @@ localStorage.setItem(
       z-10
       grid
       md:grid-cols-2
-      gap-10
+      gap-4
+      md:gap-10
       items-center
     "
   >
@@ -504,12 +505,16 @@ localStorage.setItem(
           items-center
           gap-2
           bg-white
-          px-4
-          py-2
+          px-3
+          py-1.5
+          md:px-4
+          md:py-2
           rounded-full
           shadow-md
           text-pink-600
           font-semibold
+		  text-sm
+          md:text-base
         "
       >
         ⭐ Producto Destacado
@@ -518,7 +523,8 @@ localStorage.setItem(
       <h1
         className="
           mt-6
-          text-2xl
+          text-[42px]
+          leading-[0.95]
           sm:text-5xl
           md:text-7xl
           font-black
@@ -532,7 +538,8 @@ localStorage.setItem(
       <p
         className="
           mt-6
-          text-lg
+          text-base
+          md:text-lg
           text-gray-600
           max-w-xl
         "
@@ -564,7 +571,8 @@ localStorage.setItem(
 
             <span
               className="
-                text-5xl
+                text-4xl
+                md:text-5xl
                 font-black
                 text-pink-600
               "
@@ -665,11 +673,14 @@ localStorage.setItem(
             bg-pink-600
             hover:bg-pink-700
             text-white
-            px-8
-            py-4
+            px-6
+            py-3
+            md:px-8
+            md:py-4
             rounded-2xl
             font-bold
-            text-lg
+            text-base
+            md:text-lg
             shadow-xl
             transition-all
             duration-300
@@ -684,6 +695,8 @@ localStorage.setItem(
           target="_blank"
 
           className="
+			hidden
+			md:flex
             bg-white
             text-gray-800
             px-8
