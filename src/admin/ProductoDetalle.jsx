@@ -1531,8 +1531,6 @@ const precioPromedio =
 
     </div>
 
-  </div>
-
 </AdminCard>
 
       {/* SEO PREMIUM */}
