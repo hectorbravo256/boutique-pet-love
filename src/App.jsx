@@ -20,6 +20,7 @@ import Ventas from "./admin/Ventas";
 import ScrollToTop from "./ScrollToTop";
 import ProductoDetalle from "./admin/ProductoDetalle";
 import ProductCard from "./ProductCard";
+import AdminCategorias from "./admin/AdminCategorias";
 
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -1561,6 +1562,10 @@ export default function App() {
 	  <Route
   path="/admin/producto/:id"
   element={<ProductoDetalle />}
+/>
+		<Route
+  path="admincategorias"
+  element={<AdminCategorias />}
 />
     </Route>
 
