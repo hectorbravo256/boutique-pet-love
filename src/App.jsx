@@ -523,7 +523,7 @@ localStorage.setItem(
       <h1
         className="
           mt-6
-          text-[42px]
+          text-[34px]
           leading-[0.95]
           sm:text-5xl
           md:text-7xl
@@ -535,11 +535,12 @@ localStorage.setItem(
         {heroProduct.name}
       </h1>
 
-      <p
-        className="
-          mt-6
-          text-base
-          md:text-lg
+	<p
+  	  className="
+    	  hidden
+    	  md:block
+    	  mt-6
+    	  text-lg
           text-gray-600
           max-w-xl
         "
@@ -547,6 +548,8 @@ localStorage.setItem(
         {heroProduct.description}
       </p>
 
+<div className="hidden md:block">		
+		
       {/* PRECIOS */}
       <div className="mt-8">
 
@@ -611,13 +614,16 @@ localStorage.setItem(
         )}
 
       </div>
+	</div>
 
 		{/* INDICADORES */}
 <div
   className="
-    flex
+    hidden
+    md:flex
     gap-3
-    mt-10
+    mt-6
+    md:mt-10
   "
 >
 
