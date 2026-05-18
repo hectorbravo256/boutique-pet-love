@@ -1151,18 +1151,7 @@ localStorage.setItem(
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-3xl font-bold">Tienda online</h2>
-            <p className="text-gray-500 text-sm">
-              Versión estable para Netlify.
-            </p>
           </div>
-
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            className="bg-purple-600 text-white px-5 py-2 rounded-xl"
-          >
-            Pedir catálogo completo
-          </a>
         </div>
 
   <div className="
@@ -1172,22 +1161,41 @@ localStorage.setItem(
   xl:grid-cols-4
   gap-4
 ">
-  {categories.map(cat => (
+  {categories
+  .filter(cat =>
+    products.some(product =>
+      product.category === cat.slug
+      &&
+      product.active
+    )
+  )
+  .map(cat => (
     <div
       key={cat.id}
       onClick={() => navigate(`/categoria/${cat.slug}`)}
-      style={{
-        cursor: "pointer",
-        borderRadius: 12,
-        overflow: "hidden",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-      }}
+      className="
+  group
+  cursor-pointer
+  rounded-3xl
+  overflow-hidden
+  bg-white
+  shadow-sm
+  hover:shadow-xl
+  transition-all
+  duration-500
+  hover:-translate-y-1
+"
     >
       <img
   src={`${cat.image}?width=600&quality=70`}
   loading="lazy"
   onLoad={(e) => e.target.classList.remove("opacity-0")}
-  className="opacity-0 transition-opacity duration-500"
+  className="
+  opacity-0
+  transition-all
+  duration-700
+  group-hover:scale-105
+"
   style={{
     width: "100%",
     aspectRatio: "1/1",
