@@ -182,6 +182,9 @@ export default function ProductoDetalle() {
 
   const [producto, setProducto] = useState(null);
 
+  const [categories, setCategories] =
+  useState([]);
+
   const [guardandoInfo, setGuardandoInfo] =
   useState(false);
 
@@ -204,11 +207,13 @@ const [nuevoStock, setNuevoStock] =
   useState(false);
 
   // 🔄 cargar producto
-  useEffect(() => {
+useEffect(() => {
 
-    cargarProducto();
+  cargarProducto();
 
-  }, [id]);
+  cargarCategorias();
+
+}, [id]);
 
   const cargarProducto = async () => {
 
@@ -300,6 +305,21 @@ if (!data.meta_description) {
 setProducto(data);
 
   };
+
+  const cargarCategorias = async () => {
+
+  const { data } =
+    await supabase
+      .from("categories")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", {
+        ascending: true
+      });
+
+  setCategories(data || []);
+
+};
 
   // 🔥 actualizar precio
   const actualizarPrecio = async (
@@ -895,43 +915,63 @@ const precioPromedio =
   >
 
     {/* categoría */}
-    <input
-      value={
-        producto.category || ""
-      }
+    <select
+  value={
+    producto.category || ""
+  }
 
-      onChange={(e) =>
-        setProducto(prev => ({
-          ...prev,
-          category:
-            e.target.value
-        }))
-      }
+  onChange={async (e) => {
 
-      onBlur={(e) =>
-        actualizarProducto(
-          "category",
-          e.target.value
-        )
-      }
+    const value =
+      e.target.value;
 
-      placeholder="Categoría"
+    setProducto(prev => ({
+      ...prev,
+      category: value
+    }));
 
-      style={{
-        padding:
-          "10px 16px",
+    await supabase
+      .from("products")
+      .update({
+        category: value
+      })
+      .eq("id", producto.id);
 
-        borderRadius: 999,
+  }}
 
-        border:
-          "1px solid #e5e7eb",
+  style={{
+    padding: "10px 16px",
 
-        background:
-          "#f9fafb",
+    borderRadius: 999,
 
-        fontWeight: "700"
-      }}
-    />
+    border:
+      "1px solid #e5e7eb",
+
+    background:
+      "#f9fafb",
+
+    fontWeight: "700",
+
+    cursor: "pointer"
+  }}
+>
+
+  <option value="">
+    Categoría
+  </option>
+
+  {categories.map(cat => (
+
+    <option
+      key={cat.id}
+      value={cat.slug}
+    >
+      {cat.name}
+    </option>
+
+  ))}
+
+</select>
 
     {/* género */}
 <select
