@@ -5,7 +5,7 @@ import App from "./App";
 
 import {
   ToastProvider
-} from "./components/ToastProvider";
+} from "./admin/components/ToastProvider";
 
 ReactDOM.createRoot(
   document.getElementById("root")
