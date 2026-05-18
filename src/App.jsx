@@ -1564,7 +1564,7 @@ export default function App() {
   element={<ProductoDetalle />}
 />
 		<Route
-  path="admincategorias"
+  path="/admin/categorias"
   element={<AdminCategorias />}
 />
     </Route>
