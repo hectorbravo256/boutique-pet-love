@@ -1,730 +1,675 @@
-import { useState, useEffect } from "react";
-import { supabase } from "../supabaseClient";
+import {
+  useState,
+  useEffect
+} from "react";
+
+import { supabase }
+from "../supabaseClient";
+
+import AdminCard
+from "./components/AdminCard";
+
+import AdminInput
+from "./components/AdminInput";
+
+import AdminButton
+from "./components/AdminButton";
 
 export default function CrearProducto() {
 
- const [newProduct, setNewProduct] = useState({
-  name: "",
-  category: "",
-  gender: "unisex",
-  image: "",
-  variants: [{ size: "Talla 1", price: "" }]
-});
+  const [categories, setCategories] =
+    useState([]);
 
- const [categories, setCategories] =
-  useState([]);
+  const [toast, setToast] =
+    useState("");
 
- useEffect(() => {
+  const [newProduct, setNewProduct] =
+    useState({
+      name: "",
+      category: "",
+      gender: "unisex",
+      image: "",
+      variants: [
+        {
+          size: "",
+          price: "",
+          stock: ""
+        }
+      ]
+    });
 
-  cargarCategorias();
+  // 🔥 cargar categorías
+  useEffect(() => {
 
-}, []);
+    cargarCategorias();
 
-const cargarCategorias = async () => {
+  }, []);
 
-  const { data } =
-    await supabase
-      .from("categories")
-      .select("*")
-      .eq("active", true)
-      .order("sort_order", {
-        ascending: true
-      });
+  const cargarCategorias = async () => {
 
-  setCategories(data || []);
+    const { data } =
+      await supabase
+        .from("categories")
+        .select("*")
+        .eq("active", true)
+        .order("sort_order", {
+          ascending: true
+        });
 
-};
+    setCategories(data || []);
 
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2500);
   };
 
-  // 🔥 crear producto completo
+  // 🔥 crear producto
   const crearProducto = async () => {
 
-    if (!newProduct.name || newProduct.variants.length === 0) {
-      showToast("⚠️ Completa el nombre y al menos una talla");
+    if (
+      !newProduct.name ||
+      !newProduct.category
+    ) {
+
+      mostrarToast(
+        "Completa nombre y categoría"
+      );
+
       return;
+
     }
 
-    // 1. producto
-    const { data: prod, error: errProd } = await supabase
-      .from("products")
-      .insert([{
-  name: newProduct.name,
-  category: newProduct.category,
-  gender: newProduct.gender,
-  active: true
-}])
-      .select()
-      .single();
+    // 🔥 insertar producto
+    const { data, error } =
+      await supabase
+        .from("products")
+        .insert([{
+          name: newProduct.name,
+          category:
+            newProduct.category,
+          gender:
+            newProduct.gender,
+          active: true
+        }])
+        .select()
+        .single();
 
-    if (errProd) {
+    if (error) {
 
-  console.error(errProd);
+      mostrarToast(
+        "Error creando producto"
+      );
 
-  showToast(
-    errProd.message ||
-    "❌ Error creando producto"
-  );
-
-  return;
-}
-
-    // 2. variantes
-    const variantsToInsert = newProduct.variants
-      .filter(v => v.size && v.price)
-      .map(v => ({
-        product_id: prod.id,
-        size: v.size,
-        price: parseInt(v.price)
-      }));
-
-    if (variantsToInsert.length === 0) {
-      showToast("⚠️ Debes ingresar al menos una talla con precio");
       return;
+
     }
 
-    const { error: errVar } = await supabase
-      .from("product_variants")
-      .insert(variantsToInsert);
+    const productId = data.id;
 
-    if (errVar) {
-
-  console.error(errVar);
-
-  showToast(
-    errVar.message ||
-    "❌ Error creando tallas"
-  );
-
-  return;
-}
-
-    // 3. imagen
+    // 🔥 insertar imagen
     if (newProduct.image) {
+
       await supabase
         .from("product_images")
         .insert([{
-          product_id: prod.id,
-          url: newProduct.image
+          product_id: productId,
+          url: newProduct.image,
+          sort_order: 0
         }]);
+
     }
 
-    showToast("✅ Producto creado");
+    // 🔥 insertar variantes
+    const variantes =
+      newProduct.variants
+        .filter(v =>
+          v.size && v.price
+        )
+        .map(v => ({
+          product_id: productId,
+          size: v.size,
+          price: Number(v.price),
+          stock:
+            Number(v.stock || 0)
+        }));
 
-    // 🔄 reset completo
+    if (variantes.length > 0) {
+
+      await supabase
+        .from("product_variants")
+        .insert(variantes);
+
+    }
+
+    mostrarToast(
+      "Producto creado"
+    );
+
+    // 🔥 reset
     setNewProduct({
-  name: "",
-  category: "",
-  gender: "unisex",
-  image: "",
-  variants: [{ size: "Talla 1", price: "" }]
-});
+      name: "",
+      category: "",
+      gender: "unisex",
+      image: "",
+      variants: [
+        {
+          size: "",
+          price: "",
+          stock: ""
+        }
+      ]
+    });
 
-    // 🎯 foco automático
+  };
+
+  // 🔥 toast
+  const mostrarToast = (msg) => {
+
+    setToast(msg);
+
     setTimeout(() => {
-      document.querySelector('input[placeholder="Nombre"]')?.focus();
-    }, 0);
+
+      setToast("");
+
+    }, 2500);
+
   };
 
   return (
 
-  <div className="
-    max-w-[900px]
-    mx-auto
-    p-4
-    md:p-8
-  ">
-
     <div className="
-      bg-white/80
-      backdrop-blur-xl
-
-      border
-      border-white/60
-
-      rounded-[32px]
-
-      p-6
+      max-w-[1000px]
+      mx-auto
+      p-4
       md:p-8
-
-      shadow-[0_10px_40px_rgba(0,0,0,0.05)]
     ">
 
-      {/* HEADER */}
-      <div className="mb-8">
+      <AdminCard>
 
-        <p className="
-          text-pink-500
-          uppercase
-          tracking-[0.3em]
-          text-xs
-          font-bold
+        {/* HEADER */}
+        <div className="mb-8">
+
+          <p className="
+            text-pink-500
+            uppercase
+            tracking-[0.3em]
+            text-xs
+            font-bold
+          ">
+            Administración
+          </p>
+
+          <h1 className="
+            text-4xl
+            md:text-5xl
+            font-black
+            text-slate-900
+            mt-3
+          ">
+            ➕ Crear producto
+          </h1>
+
+        </div>
+
+        {/* FORM */}
+        <div className="
+          grid
+          gap-5
         ">
-          Administración
-        </p>
 
-        <h1 className="
-          text-4xl
-          md:text-5xl
-          font-black
-          text-slate-900
-          mt-3
-        ">
-          ➕ Crear producto
-        </h1>
+          {/* NOMBRE */}
+          <AdminInput
+            placeholder="Nombre"
 
-      </div>
+            value={newProduct.name}
 
-      {/* FORM */}
-      <div className="
-        grid
-        gap-5
-      ">
+            onChange={(e) =>
+              setNewProduct(prev => ({
+                ...prev,
+                name: e.target.value
+              }))
+            }
+          />
 
-        {/* NOMBRE */}
-        <input
-          placeholder="Nombre"
+          {/* CATEGORÍA */}
+          <select
+            value={newProduct.category}
 
-          value={newProduct.name}
+            onChange={(e) =>
+              setNewProduct(prev => ({
+                ...prev,
+                category:
+                  e.target.value
+              }))
+            }
 
-          onChange={(e) =>
-            setNewProduct(prev => ({
-              ...prev,
-              name: e.target.value
-            }))
-          }
+            className="
+              w-full
 
-          className="
-            w-full
+              rounded-2xl
 
-            rounded-2xl
+              border
+              border-slate-200
 
-            border
-            border-slate-200
+              bg-white
 
-            bg-white
+              px-4
+              py-3
 
-            px-4
-            py-3
+              text-sm
+              font-medium
 
-            text-sm
-            font-medium
+              outline-none
 
-            outline-none
+              transition-all
+              duration-300
 
-            transition-all
-            duration-300
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+            "
+          >
 
-            focus:border-pink-400
-            focus:ring-4
-            focus:ring-pink-100
-          "
-        />
-
-        {/* CATEGORÍA */}
-        <select
-          value={newProduct.category}
-
-          onChange={(e) =>
-            setNewProduct(prev => ({
-              ...prev,
-              category: e.target.value
-            }))
-          }
-
-          className="
-            w-full
-
-            rounded-2xl
-
-            border
-            border-slate-200
-
-            bg-white
-
-            px-4
-            py-3
-
-            text-sm
-            font-medium
-
-            outline-none
-
-            transition-all
-            duration-300
-
-            focus:border-pink-400
-            focus:ring-4
-            focus:ring-pink-100
-          "
-        >
-
-          <option value="">
-            Selecciona categoría
-          </option>
-
-          {categories.map(cat => (
-
-            <option
-              key={cat.id}
-              value={cat.slug}
-            >
-              {cat.name}
+            <option value="">
+              Selecciona categoría
             </option>
 
-          ))}
+            {categories.map(cat => (
 
-        </select>
+              <option
+                key={cat.id}
+                value={cat.slug}
+              >
+                {cat.name}
+              </option>
 
-        {/* GÉNERO */}
-        <select
-          value={newProduct.gender}
+            ))}
 
-          onChange={(e) =>
-            setNewProduct(prev => ({
-              ...prev,
-              gender: e.target.value
-            }))
-          }
+          </select>
 
-          className="
-            w-full
+          {/* GÉNERO */}
+          <select
+            value={newProduct.gender}
 
-            rounded-2xl
+            onChange={(e) =>
+              setNewProduct(prev => ({
+                ...prev,
+                gender:
+                  e.target.value
+              }))
+            }
+
+            className="
+              w-full
+
+              rounded-2xl
+
+              border
+              border-slate-200
+
+              bg-white
+
+              px-4
+              py-3
+
+              text-sm
+              font-medium
+
+              outline-none
+
+              transition-all
+              duration-300
+
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+            "
+          >
+
+            <option value="macho">
+              🐶 Macho
+            </option>
+
+            <option value="hembra">
+              🎀 Hembra
+            </option>
+
+            <option value="unisex">
+              ✨ Unisex
+            </option>
+
+          </select>
+
+          {/* VARIANTES */}
+          <div className="
+            bg-slate-50
 
             border
-            border-slate-200
+            border-slate-100
 
-            bg-white
+            rounded-[28px]
 
-            px-4
-            py-3
-
-            text-sm
-            font-medium
-
-            outline-none
-
-            transition-all
-            duration-300
-
-            focus:border-pink-400
-            focus:ring-4
-            focus:ring-pink-100
-          "
-        >
-
-          <option value="macho">
-            🐶 Macho
-          </option>
-
-          <option value="hembra">
-            🎀 Hembra
-          </option>
-
-          <option value="unisex">
-            ✨ Unisex
-          </option>
-
-        </select>
-
-        {/* VARIANTES */}
-        <div className="
-          bg-slate-50
-          border
-          border-slate-100
-          rounded-[28px]
-          p-5
-        ">
-
-          <div className="
-            flex
-            items-center
-            justify-between
-            mb-5
+            p-5
           ">
 
-            <h2 className="
-              text-2xl
-              font-black
-              text-slate-900
+            <div className="
+              flex
+              items-center
+              justify-between
+              mb-5
             ">
-              📏 Tallas
-            </h2>
 
+              <h2 className="
+                text-2xl
+                font-black
+                text-slate-900
+              ">
+                📏 Variantes
+              </h2>
+
+              <button
+                onClick={() => {
+
+                  const tallas = [];
+
+                  for (
+                    let i = 0;
+                    i <= 12;
+                    i++
+                  ) {
+
+                    tallas.push({
+                      size: `Talla ${i}`,
+                      price: "",
+                      stock: ""
+                    });
+
+                  }
+
+                  setNewProduct(prev => ({
+                    ...prev,
+                    variants: tallas
+                  }));
+
+                }}
+
+                className="
+                  bg-emerald-500
+                  hover:bg-emerald-600
+
+                  transition-all
+                  duration-300
+
+                  text-white
+                  text-sm
+                  font-bold
+
+                  px-4
+                  py-2
+
+                  rounded-xl
+                "
+              >
+                ⚡ Generar 0–12
+              </button>
+
+            </div>
+
+            <div className="
+              grid
+              gap-3
+            ">
+
+              {newProduct.variants.map(
+                (v, index) => (
+
+                <div
+                  key={index}
+
+                  className="
+                    grid
+                    grid-cols-1
+                    md:grid-cols-[1fr_140px_120px_60px]
+                    gap-3
+                  "
+                >
+
+                  {/* TALLA */}
+                  <AdminInput
+                    placeholder="Talla"
+
+                    value={v.size}
+
+                    onChange={(e) => {
+
+                      const updated =
+                        [...newProduct.variants];
+
+                      updated[index].size =
+                        e.target.value;
+
+                      setNewProduct(prev => ({
+                        ...prev,
+                        variants: updated
+                      }));
+
+                    }}
+                  />
+
+                  {/* PRECIO */}
+                  <AdminInput
+                    type="number"
+
+                    placeholder="Precio"
+
+                    value={v.price}
+
+                    onChange={(e) => {
+
+                      const updated =
+                        [...newProduct.variants];
+
+                      updated[index].price =
+                        e.target.value;
+
+                      setNewProduct(prev => ({
+                        ...prev,
+                        variants: updated
+                      }));
+
+                    }}
+                  />
+
+                  {/* STOCK */}
+                  <AdminInput
+                    type="number"
+
+                    placeholder="Stock"
+
+                    value={v.stock}
+
+                    onChange={(e) => {
+
+                      const updated =
+                        [...newProduct.variants];
+
+                      updated[index].stock =
+                        e.target.value;
+
+                      setNewProduct(prev => ({
+                        ...prev,
+                        variants: updated
+                      }));
+
+                    }}
+                  />
+
+                  {/* ELIMINAR */}
+                  <button
+                    onClick={() => {
+
+                      setNewProduct(prev => ({
+                        ...prev,
+
+                        variants:
+                          prev.variants.filter(
+                            (_, i) =>
+                              i !== index
+                          )
+                      }));
+
+                    }}
+
+                    className="
+                      bg-red-500
+                      hover:bg-red-600
+
+                      transition-all
+                      duration-300
+
+                      rounded-2xl
+
+                      text-white
+                      font-bold
+                    "
+                  >
+                    ✕
+                  </button>
+
+                </div>
+
+              ))}
+
+            </div>
+
+            {/* AGREGAR */}
             <button
               onClick={() => {
 
-                const tallas = [];
-
-                for (let i = 0; i <= 12; i++) {
-
-                  tallas.push({
-                    size: `Talla ${i}`,
-                    price: ""
-                  });
-
-                }
-
                 setNewProduct(prev => ({
                   ...prev,
-                  variants: tallas
+
+                  variants: [
+                    ...prev.variants,
+                    {
+                      size: "",
+                      price: "",
+                      stock: ""
+                    }
+                  ]
                 }));
 
               }}
 
               className="
-                bg-emerald-500
-                hover:bg-emerald-600
+                mt-5
+
+                bg-blue-500
+                hover:bg-blue-600
 
                 transition-all
                 duration-300
 
                 text-white
-                text-sm
                 font-bold
 
                 px-4
-                py-2
+                py-3
 
-                rounded-xl
+                rounded-2xl
               "
             >
-              ⚡ Generar 0–12
+              ➕ Agregar talla
             </button>
 
           </div>
 
-          <div className="
-            grid
-            gap-3
-          ">
+          {/* IMAGEN */}
+          <AdminInput
+            placeholder="URL Imagen"
 
-            {newProduct.variants.map((v, index) => (
+            value={newProduct.image}
 
-              <div
-                key={index}
-
-                className="
-                  grid
-                  grid-cols-[1fr_120px_50px]
-                  gap-3
-                "
-              >
-
-                {/* TALLA */}
-                <input
-                  placeholder="Talla"
-
-                  value={v.size}
-
-                  onChange={(e) => {
-
-                    const updated =
-                      [...newProduct.variants];
-
-                    updated[index].size =
-                      e.target.value;
-
-                    setNewProduct(prev => ({
-                      ...prev,
-                      variants: updated
-                    }));
-
-                  }}
-
-                  className="
-                    rounded-2xl
-
-                    border
-                    border-slate-200
-
-                    bg-white
-
-                    px-4
-                    py-3
-
-                    text-sm
-                    font-medium
-
-                    outline-none
-
-                    transition-all
-                    duration-300
-
-                    focus:border-pink-400
-                    focus:ring-4
-                    focus:ring-pink-100
-                  "
-                />
-
-                {/* PRECIO */}
-                <input
-                  type="number"
-
-                  placeholder="Precio"
-
-                  value={v.price}
-
-                  onChange={(e) => {
-
-                    const updated =
-                      [...newProduct.variants];
-
-                    updated[index].price =
-                      e.target.value;
-
-                    setNewProduct(prev => ({
-                      ...prev,
-                      variants: updated
-                    }));
-
-                  }}
-
-                  className="
-                    rounded-2xl
-
-                    border
-                    border-slate-200
-
-                    bg-white
-
-                    px-4
-                    py-3
-
-                    text-sm
-                    font-medium
-
-                    outline-none
-
-                    transition-all
-                    duration-300
-
-                    focus:border-pink-400
-                    focus:ring-4
-                    focus:ring-pink-100
-                  "
-                />
-
-                {/* ELIMINAR */}
-                <button
-                  onClick={() => {
-
-                    setNewProduct(prev => ({
-                      ...prev,
-
-                      variants:
-                        prev.variants.filter(
-                          (_, i) =>
-                            i !== index
-                        )
-                    }));
-
-                  }}
-
-                  className="
-                    bg-red-500
-                    hover:bg-red-600
-
-                    transition-all
-                    duration-300
-
-                    rounded-2xl
-
-                    text-white
-                    font-bold
-                  "
-                >
-                  ✕
-                </button>
-
-              </div>
-
-            ))}
-
-          </div>
-
-          {/* AGREGAR */}
-          <button
-            onClick={() => {
-
+            onChange={(e) =>
               setNewProduct(prev => ({
                 ...prev,
+                image: e.target.value
+              }))
+            }
+          />
 
-                variants: [
-                  ...prev.variants,
-                  {
-                    size: "",
-                    price: ""
-                  }
-                ]
-              }));
+          {/* PREVIEW */}
+          {newProduct.image && (
 
-            }}
+            <div className="
+              flex
+              justify-center
+            ">
 
-            className="
-              mt-5
+              <img
+                src={newProduct.image}
 
-              bg-blue-500
-              hover:bg-blue-600
+                className="
+                  w-full
+                  max-w-[260px]
 
-              transition-all
-              duration-300
+                  aspect-[4/5]
+                  object-cover
 
-              text-white
-              font-bold
+                  rounded-[28px]
 
-              px-4
-              py-3
+                  shadow-[0_15px_35px_rgba(0,0,0,0.12)]
 
-              rounded-2xl
-            "
+                  transition-all
+                  duration-500
+
+                  hover:scale-[1.02]
+                "
+              />
+
+            </div>
+
+          )}
+
+          {/* CREAR */}
+          <AdminButton
+            onClick={crearProducto}
           >
-            ➕ Agregar talla
-          </button>
+            🚀 Crear producto
+          </AdminButton>
 
         </div>
 
-        {/* IMAGEN */}
-        <input
-          placeholder="URL Imagen (opcional)"
+      </AdminCard>
 
-          value={newProduct.image}
+      {/* TOAST */}
+      {toast && (
 
-          onChange={(e) =>
-            setNewProduct(prev => ({
-              ...prev,
-              image: e.target.value
-            }))
-          }
+        <div className="
+          fixed
+          bottom-5
+          right-5
 
-          className="
-            w-full
+          bg-[#111827]
 
-            rounded-2xl
+          text-white
+          font-semibold
 
-            border
-            border-slate-200
+          px-5
+          py-3
 
-            bg-white
+          rounded-2xl
 
-            px-4
-            py-3
+          shadow-2xl
 
-            text-sm
-            font-medium
+          z-[999]
+        ">
 
-            outline-none
+          {toast}
 
-            transition-all
-            duration-300
+        </div>
 
-            focus:border-pink-400
-            focus:ring-4
-            focus:ring-pink-100
-          "
-        />
-
-        {/* PREVIEW */}
-        {newProduct.image && (
-
-          <div className="
-            flex
-            justify-center
-          ">
-
-            <img
-              src={newProduct.image}
-
-              className="
-                w-full
-                max-w-[260px]
-
-                aspect-[4/5]
-                object-cover
-
-                rounded-[28px]
-
-                shadow-[0_15px_35px_rgba(0,0,0,0.12)]
-
-                transition-all
-                duration-500
-
-                hover:scale-[1.02]
-              "
-            />
-
-          </div>
-
-        )}
-
-        {/* CREAR */}
-        <button
-          onClick={crearProducto}
-
-          className="
-            bg-gradient-to-r
-            from-pink-500
-            to-purple-500
-
-            hover:opacity-90
-            hover:-translate-y-0.5
-
-            transition-all
-            duration-300
-
-            text-white
-            font-black
-            text-lg
-
-            py-4
-
-            rounded-[24px]
-
-            shadow-[0_10px_30px_rgba(236,72,153,0.35)]
-          "
-        >
-          🚀 Crear producto
-        </button>
-
-      </div>
+      )}
 
     </div>
 
-    {/* TOAST */}
-    {toast && (
+  );
 
-      <div className="
-        fixed
-        bottom-5
-        right-5
-
-        bg-[#111827]
-
-        text-white
-        font-semibold
-
-        px-5
-        py-3
-
-        rounded-2xl
-
-        shadow-2xl
-
-        z-[999]
-      ">
-
-        {toast}
-
-      </div>
-
-    )}
-
-  </div>
-
-);
+}
