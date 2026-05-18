@@ -1533,7 +1533,7 @@ const precioPromedio =
 
   </div>
 
-</div>
+</AdminCard>
 
       {/* SEO PREMIUM */}
 <AdminCard className="mb-6">
@@ -1881,7 +1881,7 @@ const precioPromedio =
 
   </div>
 
-</div>
+</AdminCard>
 
       {/* ANALYTICS PREMIUM */}
 <div className="
@@ -2349,7 +2349,7 @@ const precioPromedio =
 
   </div>
 
-</div>
+</AdminCard>
 
       {/* IMÁGENES PREMIUM */}
 <AdminCard>
@@ -2487,7 +2487,7 @@ const precioPromedio =
 
 </DndContext>
 
-</div>
+</AdminCard>
       
 {/* TABLA PREMIUM */}
 <AdminCard>
@@ -2939,7 +2939,7 @@ const precioPromedio =
 
   </div>
 
-</div>
+</AdminCard>
 
 {/* BOTÓN ABRIR MODAL */}
 <AdminButton
