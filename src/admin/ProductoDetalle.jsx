@@ -3230,7 +3230,7 @@ const precioPromedio =
   </div>
 
 )}
-
+  
     </div>
 
   );
