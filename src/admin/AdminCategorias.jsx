@@ -135,18 +135,27 @@ export default function AdminCategorias() {
           marginBottom: 30
         }}
       >
-        ⚙️ Administrar categorías
+        🗂 Gestión de categorías
       </h1>
 
       {/* 🔥 CREAR */}
       <div
         style={{
-          background: "#fff",
+          background: "#f5f7fb",
           padding: 20,
           borderRadius: 20,
           marginBottom: 30,
           boxShadow:
-            "0 10px 30px rgba(0,0,0,0.06)"
+  "0 10px 40px rgba(0,0,0,0.05)",
+
+border:
+  "1px solid rgba(255,255,255,0.6)",
+
+backdropFilter:
+  "blur(14px)",
+
+background:
+  "rgba(255,255,255,0.85)"
         }}
       >
 
@@ -161,7 +170,11 @@ export default function AdminCategorias() {
         <div
           style={{
             display: "grid",
-            gap: 12
+
+gridTemplateColumns:
+  "repeat(auto-fit,minmax(260px,1fr))",
+
+gap: 16
           }}
         >
 
@@ -178,8 +191,22 @@ export default function AdminCategorias() {
             }
 
             style={{
-              padding: 12
-            }}
+  padding: 14,
+
+  borderRadius: 16,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 15,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
           />
 
           <input
@@ -195,8 +222,22 @@ export default function AdminCategorias() {
             }
 
             style={{
-              padding: 12
-            }}
+  padding: 14,
+
+  borderRadius: 16,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 15,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
           />
 
           <input
@@ -212,8 +253,22 @@ export default function AdminCategorias() {
             }
 
             style={{
-              padding: 12
-            }}
+  padding: 14,
+
+  borderRadius: 16,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 15,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
           />
 
           <input
@@ -234,8 +289,22 @@ export default function AdminCategorias() {
             }
 
             style={{
-              padding: 12
-            }}
+  padding: 14,
+
+  borderRadius: 16,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 15,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
           />
 
           <button
@@ -245,7 +314,9 @@ export default function AdminCategorias() {
 
             style={{
               background:
-                "#ec4899",
+  "linear-gradient(135deg,#ec4899,#8b5cf6)",
+              boxShadow:
+  "0 10px 30px rgba(236,72,153,0.35)",
 
               color: "#fff",
 
@@ -281,7 +352,7 @@ export default function AdminCategorias() {
             key={cat.id}
 
             style={{
-              background: "#fff",
+              background: "#f5f7fb",
 
               padding: 20,
 
@@ -295,7 +366,11 @@ export default function AdminCategorias() {
             <div
               style={{
                 display: "grid",
-                gap: 12
+
+gridTemplateColumns:
+  "repeat(auto-fit,minmax(260px,1fr))",
+
+gap: 16
               }}
             >
 
@@ -348,6 +423,25 @@ export default function AdminCategorias() {
                   padding: 10
                 }}
               />
+
+              {cat.image && (
+
+  <img
+    src={cat.image}
+
+    style={{
+      width: "100%",
+      maxWidth: 220,
+
+      borderRadius: 18,
+
+      marginTop: 10,
+
+      objectFit: "cover"
+    }}
+  />
+
+)}
 
               <input
                 type="number"
