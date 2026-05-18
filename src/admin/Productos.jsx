@@ -1,413 +1,656 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
-import { Link } from "react-router-dom";
+import {
+  useEffect,
+  useState
+} from "react";
+
+import { supabase }
+from "../supabaseClient";
+
+import { Link }
+from "react-router-dom";
+
+import AdminCard
+from "./components/AdminCard";
+
+import AdminInput
+from "./components/AdminInput";
 
 export default function Productos() {
 
-  const [productosFull, setProductosFull] = useState([]);
-  const [searchProduct, setSearchProduct] = useState("");
-  const [toast, setToast] = useState("");
-  const [orden, setOrden] = useState({ campo: "name", direccion: "asc" });
-  const [filtroCategoria, setFiltroCategoria] = useState("");
+  const [productosFull, setProductosFull] =
+    useState([]);
+
+  const [searchProduct, setSearchProduct] =
+    useState("");
+
+  const [toast, setToast] =
+    useState("");
+
+  const [orden, setOrden] =
+    useState({
+      campo: "name",
+      direccion: "asc"
+    });
+
+  const [filtroCategoria, setFiltroCategoria] =
+    useState("");
 
   const showToast = (msg) => {
+
     setToast(msg);
-    setTimeout(() => setToast(""), 2500);
+
+    setTimeout(() => {
+
+      setToast("");
+
+    }, 2500);
+
   };
 
-  const recargarProductos = async () => {
-    const { data } = await supabase
-      .from("products")
-      .select(`
-        *,
-        product_variants (*),
-        product_images (*)
-      `)
-      .order("sort_order", {
-  foreignTable: "product_images",
-  ascending: true
-})
-.order("name", { ascending: true });
+  const recargarProductos =
+    async () => {
 
-    setProductosFull(
-  Array.isArray(data) ? data : []
-);
-  };
+      const { data } =
+        await supabase
+          .from("products")
+          .select(`
+            *,
+            product_variants (*),
+            product_images (*)
+          `)
 
-  const ordenarProductos = (lista) => {
-    if (!Array.isArray(lista)) return [];
-  return [...lista].sort((a, b) => {
-    let valA, valB;
+          .order("sort_order", {
+            foreignTable:
+              "product_images",
+            ascending: true
+          })
 
-    if (orden.campo === "name") {
-      valA = a.name.toLowerCase();
-      valB = b.name.toLowerCase();
-    }
+          .order("name", {
+            ascending: true
+          });
 
-    if (orden.campo === "category") {
-      valA = (a.category || "").toLowerCase();
-      valB = (b.category || "").toLowerCase();
-    }
+      setProductosFull(
+        Array.isArray(data)
+          ? data
+          : []
+      );
 
-    if (orden.campo === "price") {
-      valA = a.product_variants?.[0]?.price || 0;
-      valB = b.product_variants?.[0]?.price || 0;
-    }
+    };
 
-    if (valA < valB) return orden.direccion === "asc" ? -1 : 1;
-    if (valA > valB) return orden.direccion === "asc" ? 1 : -1;
-    return 0;
-  });
-};
+  const ordenarProductos =
+    (lista) => {
+
+      if (!Array.isArray(lista))
+        return [];
+
+      return [...lista].sort(
+        (a, b) => {
+
+          let valA, valB;
+
+          if (orden.campo === "name") {
+
+            valA =
+              a.name.toLowerCase();
+
+            valB =
+              b.name.toLowerCase();
+
+          }
+
+          if (
+            orden.campo === "category"
+          ) {
+
+            valA =
+              (
+                a.category || ""
+              ).toLowerCase();
+
+            valB =
+              (
+                b.category || ""
+              ).toLowerCase();
+
+          }
+
+          if (orden.campo === "price") {
+
+            valA =
+              a.product_variants?.[0]
+                ?.price || 0;
+
+            valB =
+              b.product_variants?.[0]
+                ?.price || 0;
+
+          }
+
+          if (valA < valB)
+            return orden.direccion === "asc"
+              ? -1
+              : 1;
+
+          if (valA > valB)
+            return orden.direccion === "asc"
+              ? 1
+              : -1;
+
+          return 0;
+
+        }
+      );
+
+    };
 
   useEffect(() => {
+
     recargarProductos();
+
   }, []);
 
   return (
-    <div style={{ padding: 20 }}>
 
-      <h1>🛒 Editor de Productos</h1>
+    <div className="
+      p-4
+      md:p-8
+    ">
 
-      {/* 🔍 BUSCADOR */}
-      <input
-        placeholder="🔍 Buscar producto..."
-        value={searchProduct}
-        onChange={(e) => setSearchProduct(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 10,
-          marginBottom: 20,
-          borderRadius: 8,
-          border: "1px solid #ddd"
-        }}
-      />
+      {/* HEADER */}
+      <div className="mb-8">
 
-      <select
-  value={filtroCategoria}
-  onChange={(e) => setFiltroCategoria(e.target.value)}
-  style={{
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 8,
-    border: "1px solid #ddd"
-  }}
->
-  <option value="">Todas las categorías</option>
+        <p className="
+          text-pink-500
+          uppercase
+          tracking-[0.3em]
+          text-xs
+          font-bold
+        ">
+          Administración
+        </p>
 
-  {[
-  ...new Set(
-    (Array.isArray(productosFull)
-      ? productosFull
-      : []
-    ).map(p => p.category)
-  )
-].map(cat => (
-    <option key={cat} value={cat}>
-      {cat}
-    </option>
-  ))}
-</select>
+        <h1 className="
+          text-4xl
+          md:text-5xl
+          font-black
+          text-slate-900
+          mt-3
+        ">
+          🛒 Productos
+        </h1>
 
-{/* 📦 LISTADO TABLA PRO */}
-<table style={{
-  width: "100%",
-  borderCollapse: "collapse",
-  background: "#fff",
-  borderRadius: 10,
-  overflow: "hidden"
-}}>
-  <thead style={{ background: "#f3f4f6" }}>
-    <tr>
-<th style={{ padding: 12 }}>
-  ⚙️
-</th>
+      </div>
 
-<th
-  style={{ padding: 12, cursor: "pointer" }}
-  onClick={() =>
-    setOrden(prev => ({
-      campo: "name",
-      direccion: prev.direccion === "asc" ? "desc" : "asc"
-    }))
-  }
->
-  Producto ⬍
-</th>
+      {/* FILTROS */}
+      <AdminCard className="mb-6">
 
-<th
-  style={{ padding: 12, cursor: "pointer" }}
-  onClick={() =>
-    setOrden(prev => ({
-      campo: "category",
-      direccion: prev.direccion === "asc" ? "desc" : "asc"
-    }))
-  }
->
-  Categoría ⬍
-</th>
-      <th style={{ padding: 12 }}>
-  Variantes
-</th>
+        <div className="
+          grid
+          md:grid-cols-2
+          gap-4
+        ">
 
-<th style={{ padding: 12 }}>
-  Precio desde
-</th>
+          <AdminInput
+            placeholder="🔍 Buscar producto..."
 
-    </tr>
-  </thead>
+            value={searchProduct}
 
-  <tbody>
-    {ordenarProductos(
-  productosFull
-    ?.filter(p =>
-      p.name.toLowerCase().includes(searchProduct.toLowerCase())
-    )
-    .filter(p =>
-      filtroCategoria ? p.category === filtroCategoria : true
-    )
-).map((p) => {
+            onChange={(e) =>
+              setSearchProduct(
+                e.target.value
+              )
+            }
+          />
 
+          <select
+            value={filtroCategoria}
 
+            onChange={(e) =>
+              setFiltroCategoria(
+                e.target.value
+              )
+            }
 
-        return (
- <FilaProducto
-  key={p.id}
-  p={p}
-  setProductosFull={setProductosFull}
-  recargarProductos={recargarProductos}
-/>
-);
-      })}
-  </tbody>
-</table>
+            className="
+              w-full
 
-      {/* 🔔 TOAST */}
-      {toast && (
-        <div style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          background: "#111",
-          color: "#fff",
-          padding: "10px 16px",
-          borderRadius: 10
-        }}>
-          {toast}
+              rounded-2xl
+
+              border
+              border-slate-200
+
+              bg-white
+
+              px-4
+              py-3
+
+              text-sm
+              font-medium
+
+              outline-none
+
+              transition-all
+              duration-300
+
+              focus:border-pink-400
+              focus:ring-4
+              focus:ring-pink-100
+            "
+          >
+
+            <option value="">
+              Todas las categorías
+            </option>
+
+            {[
+              ...new Set(
+                productosFull.map(
+                  p => p.category
+                )
+              )
+            ].map(cat => (
+
+              <option
+                key={cat}
+                value={cat}
+              >
+                {cat}
+              </option>
+
+            ))}
+
+          </select>
+
         </div>
+
+      </AdminCard>
+
+      {/* TABLA */}
+      <AdminCard className="overflow-x-auto">
+
+        <table className="
+          w-full
+          min-w-[850px]
+        ">
+
+          <thead>
+
+            <tr className="
+              border-b
+              border-slate-100
+            ">
+
+              <th className="
+                text-left
+                p-4
+              ">
+                ⚙️
+              </th>
+
+              <th
+                className="
+                  text-left
+                  p-4
+                  cursor-pointer
+                "
+
+                onClick={() =>
+                  setOrden(prev => ({
+                    campo: "name",
+
+                    direccion:
+                      prev.direccion === "asc"
+                        ? "desc"
+                        : "asc"
+                  }))
+                }
+              >
+                Producto ⬍
+              </th>
+
+              <th
+                className="
+                  text-left
+                  p-4
+                  cursor-pointer
+                "
+
+                onClick={() =>
+                  setOrden(prev => ({
+                    campo: "category",
+
+                    direccion:
+                      prev.direccion === "asc"
+                        ? "desc"
+                        : "asc"
+                  }))
+                }
+              >
+                Categoría ⬍
+              </th>
+
+              <th className="
+                text-left
+                p-4
+              ">
+                Variantes
+              </th>
+
+              <th className="
+                text-left
+                p-4
+              ">
+                Precio desde
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {ordenarProductos(
+
+              productosFull
+
+                .filter(p =>
+                  p.name
+                    .toLowerCase()
+                    .includes(
+                      searchProduct
+                        .toLowerCase()
+                    )
+                )
+
+                .filter(p =>
+                  filtroCategoria
+                    ? p.category ===
+                      filtroCategoria
+                    : true
+                )
+
+            ).map(p => (
+
+              <FilaProducto
+                key={p.id}
+
+                p={p}
+
+                setProductosFull={
+                  setProductosFull
+                }
+
+                recargarProductos={
+                  recargarProductos
+                }
+
+                showToast={showToast}
+              />
+
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </AdminCard>
+
+      {/* TOAST */}
+      {toast && (
+
+        <div className="
+          fixed
+          bottom-5
+          right-5
+
+          bg-[#111827]
+
+          text-white
+          font-semibold
+
+          px-5
+          py-3
+
+          rounded-2xl
+
+          shadow-2xl
+
+          z-[999]
+        ">
+
+          {toast}
+
+        </div>
+
       )}
 
     </div>
+
   );
+
 }
+
 function FilaProducto({
   p,
   setProductosFull,
-  recargarProductos
+  showToast
 }) {
 
-
   return (
-    <tr
-      style={{
-        borderBottom: "1px solid #eee",
-        height: 60,
-        transition: "0.2s"
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.background = "#f9fafb"}
-      onMouseLeave={(e) => e.currentTarget.style.background = "white"}
-    >
 
-      {/* ACTIVO + ELIMINAR */}
-<td style={{ padding: "10px 12px", verticalAlign: "middle" }}>
-  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <tr className="
+      border-b
+      border-slate-100
 
-    {/* 🔹 FILA 1: CONTROLES PRINCIPALES */}
-    <div
-  style={{
-    display: "flex",
+      hover:bg-slate-50
 
-    alignItems: "center",
+      transition-all
+      duration-200
+    ">
 
-    justifyContent: "center"
-      
-  }}
->
+      {/* ACCIONES */}
+      <td className="p-4">
 
+        <button
+          onClick={async () => {
 
-      
-      {/* 🗑 ELIMINAR PRODUCTO PREMIUM */}
-<button
-  onClick={async () => {
-    if (!confirm("¿Eliminar producto completo?")) return;
+            if (
+              !confirm(
+                "¿Eliminar producto completo?"
+              )
+            ) return;
 
-    await supabase
-      .from("product_variants")
-      .delete()
-      .eq("product_id", p.id);
+            await supabase
+              .from("product_variants")
+              .delete()
+              .eq(
+                "product_id",
+                p.id
+              );
 
-    await supabase
-      .from("product_images")
-      .delete()
-      .eq("product_id", p.id);
+            await supabase
+              .from("product_images")
+              .delete()
+              .eq(
+                "product_id",
+                p.id
+              );
 
-    await supabase
-      .from("products")
-      .delete()
-      .eq("id", p.id);
+            await supabase
+              .from("products")
+              .delete()
+              .eq("id", p.id);
 
-    setProductosFull(prev =>
-      prev.filter(prod => prod.id !== p.id)
-    );
-  }}
+            setProductosFull(prev =>
+              prev.filter(
+                prod =>
+                  prod.id !== p.id
+              )
+            );
 
-  style={{
-    width: 38,
-    height: 38,
+            showToast(
+              "Producto eliminado"
+            );
 
-    borderRadius: 14,
+          }}
 
-    border: "1px solid rgba(239,68,68,0.15)",
+          className="
+            w-10
+            h-10
 
-    background:
-      "linear-gradient(135deg, #fff5f5, #ffe4e6)",
+            rounded-2xl
 
-    color: "#ef4444",
+            border
+            border-red-100
 
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+            bg-gradient-to-br
+            from-red-50
+            to-pink-50
 
-    cursor: "pointer",
+            text-red-500
 
-    transition: "all .25s ease",
+            flex
+            items-center
+            justify-center
 
-    boxShadow:
-      "0 4px 15px rgba(239,68,68,0.08)"
-  }}
+            transition-all
+            duration-300
 
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform =
-      "translateY(-2px) scale(1.05)";
+            hover:-translate-y-0.5
+            hover:scale-105
 
-    e.currentTarget.style.boxShadow =
-      "0 10px 25px rgba(239,68,68,0.20)";
+            hover:shadow-lg
 
-    e.currentTarget.style.background =
-      "linear-gradient(135deg, #ef4444, #ec4899)";
+            hover:from-red-500
+            hover:to-pink-500
 
-    e.currentTarget.style.color = "#fff";
-  }}
+            hover:text-white
+          "
+        >
+          ✕
+        </button>
 
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform =
-      "translateY(0px) scale(1)";
+      </td>
 
-    e.currentTarget.style.boxShadow =
-      "0 4px 15px rgba(239,68,68,0.08)";
-
-    e.currentTarget.style.background =
-      "linear-gradient(135deg, #fff5f5, #ffe4e6)";
-
-    e.currentTarget.style.color = "#ef4444";
-  }}
->
-
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2.3}
-    stroke="currentColor"
-    style={{
-      width: 17,
-      height: 17
-    }}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-
-</button>
-
-    </div>
-
-  </div>
-
-</td>
       {/* PRODUCTO */}
-      <td style={{ padding: "10px 12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <td className="p-4">
+
+        <div className="
+          flex
+          items-center
+          gap-4
+        ">
+
           <img
-            src={p.product_images?.[0]?.url || "/placeholder.png"}
-            style={{ width: 40, height: 40, borderRadius: 6 }}
+            src={
+              p.product_images?.[0]
+                ?.url
+              ||
+              "/placeholder.png"
+            }
+
+            className="
+              w-14
+              h-14
+
+              rounded-2xl
+
+              object-cover
+
+              border
+              border-slate-100
+            "
           />
+
           <Link
-  to={`/admin/producto/${p.id}`}
-  style={{
-    fontWeight: "700",
-    color: "#111827",
-    textDecoration: "none",
-    cursor: "pointer",
-    transition: "all .2s ease"
-  }}
+            to={`/admin/producto/${p.id}`}
 
-  onMouseEnter={(e) => {
-    e.target.style.color = "#ec4899";
-  }}
+            className="
+              font-bold
+              text-slate-900
 
-  onMouseLeave={(e) => {
-    e.target.style.color = "#111827";
-  }}
->
-  {p.name}
-</Link>
+              hover:text-pink-500
+
+              transition-all
+              duration-300
+            "
+          >
+            {p.name}
+          </Link>
+
         </div>
+
       </td>
 
       {/* CATEGORÍA */}
-      <td style={{ padding: "10px 12px" }}>
-        {p.category}
+      <td className="p-4">
+
+        <span className="
+          bg-slate-100
+
+          px-3
+          py-1.5
+
+          rounded-full
+
+          text-sm
+          font-semibold
+
+          text-slate-700
+        ">
+          {p.category}
+        </span>
+
       </td>
 
-{/* VARIANTES */}
-<td style={{ padding: "10px 12px" }}>
+      {/* VARIANTES */}
+      <td className="p-4">
 
-  <span
-    style={{
-      background: "#f3f4f6",
-      padding: "6px 10px",
-      borderRadius: 999,
-      fontSize: 12,
-      fontWeight: "700"
-    }}
-  >
-    {p.product_variants?.length || 0} variantes
-  </span>
+        <span className="
+          bg-pink-50
+          text-pink-600
 
-</td>
+          px-3
+          py-1.5
 
-{/* PRECIO DESDE */}
-<td style={{ padding: "10px 12px" }}>
+          rounded-full
 
-  <span
-    style={{
-      fontWeight: "700",
-      color: "#111827"
-    }}
-  >
-    Desde $
-    {Math.min(
-      ...(p.product_variants || [])
-        .map(v => v.price || 0)
-    ).toLocaleString("es-CL")}
-  </span>
+          text-sm
+          font-bold
+        ">
+          {
+            p.product_variants
+              ?.length || 0
+          } variantes
+        </span>
 
-</td>
+      </td>
+
+      {/* PRECIO */}
+      <td className="p-4">
+
+        <span className="
+          font-black
+          text-slate-900
+        ">
+          Desde $
+
+          {Math.min(
+
+            ...(p.product_variants || [])
+              .map(v =>
+                v.price || 0
+              )
+
+          ).toLocaleString(
+            "es-CL"
+          )}
+        </span>
+
+      </td>
 
     </tr>
+
   );
+
 }
