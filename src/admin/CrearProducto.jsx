@@ -91,15 +91,17 @@ export default function CrearProducto() {
         .select()
         .single();
 
-    if (error) {
+if (error) {
 
-      mostrarToast(
-        "Error creando producto"
-      );
+  console.log(error);
 
-      return;
+  mostrarToast(
+    error.message
+  );
 
-    }
+  return;
+
+}
 
     const productId = data.id;
 
