@@ -159,29 +159,19 @@ useEffect(() => {
   fetchStock();
 }, []);
 
-	useEffect(() => {
+useEffect(() => {
 
   const fetchCategories = async () => {
 
     const { data } = await supabase
-      .from("products")
-      .select("category");
+      .from("categories")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", {
+        ascending: true
+      });
 
-    if (!data) return;
-
-    const uniqueCategories = [
-
-      ...new Set(
-
-        data
-          .map(p => p.category)
-          .filter(Boolean)
-
-      )
-
-    ];
-
-    setCategories(uniqueCategories);
+    setCategories(data || []);
 
   };
 
@@ -439,35 +429,34 @@ useEffect(() => {
 
     <div className="flex flex-col gap-3">
 
-  {categories.map(category => (
+{categories.map(category => (
 
-    <button
-      key={category}
+  <button
+    key={category.id}
 
-      onClick={() => {
+    onClick={() => {
 
-        navigate(
-          `/categoria/${encodeURIComponent(category)}`
-        );
+      navigate(
+        `/categoria/${category.slug}`
+      );
 
-        setMenuOpen(false);
+      setMenuOpen(false);
 
-      }}
+    }}
 
-      className="
-        text-left
-        text-pink-500
-        hover:text-pink-700
-        hover:translate-x-1
-        transition-all
-        duration-300
-        capitalize
-      "
-    >
-      ✨ {category}
-    </button>
+    className="
+      text-left
+      text-pink-500
+      hover:text-pink-700
+      hover:translate-x-1
+      transition-all
+      duration-300
+    "
+  >
+    ✨ {category.name}
+  </button>
 
-  ))}
+))}
 
 </div>
 
