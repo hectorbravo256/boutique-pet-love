@@ -118,25 +118,78 @@ export default function AdminCategorias() {
 
     };
 
+  const guardarCategoria =
+  async (cat) => {
+
+    const { error } =
+      await supabase
+        .from("categories")
+        .update({
+          name: cat.name,
+          slug: cat.slug,
+          image: cat.image,
+          sort_order:
+            cat.sort_order,
+          active: cat.active
+        })
+        .eq("id", cat.id);
+
+    if (error) {
+
+      alert(error.message);
+
+      return;
+
+    }
+
+    alert(
+      "Categoría actualizada"
+    );
+
+    await cargarCategorias();
+
+};
+
   return (
 
     <div
       style={{
         padding: 30,
-        maxWidth: 900,
+        maxWidth: 1400,
         margin: "auto"
       }}
     >
 
-      <h1
-        style={{
-          fontSize: 34,
-          fontWeight: "900",
-          marginBottom: 30
-        }}
-      >
-        🗂 Gestión de categorías
-      </h1>
+<div
+  style={{
+    marginBottom: 40
+  }}
+>
+
+  <p
+    style={{
+      color: "#ec4899",
+      fontWeight: "700",
+      letterSpacing: 2,
+      textTransform: "uppercase",
+      fontSize: 13
+    }}
+  >
+    Administración
+  </p>
+
+  <h1
+    style={{
+      fontSize: 46,
+      fontWeight: "900",
+      color: "#111827",
+      marginTop: 10
+    }}
+  >
+    🗂 Gestión de categorías
+  </h1>
+
+</div>
 
       {/* 🔥 CREAR */}
       <div
@@ -183,12 +236,27 @@ gap: 16
 
             value={newCategory.name}
 
-            onChange={(e) =>
-              setNewCategory(prev => ({
-                ...prev,
-                name: e.target.value
-              }))
-            }
+            onChange={(e) => {
+
+  const value =
+    e.target.value;
+
+  setNewCategory(prev => ({
+
+    ...prev,
+
+    name: value,
+
+    slug:
+      value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "-")
+
+  }));
+
+}}
 
             style={{
   padding: 14,
@@ -346,13 +414,20 @@ gap: 16
         }}
       >
 
-        {categories.map(cat => (
+        {categories.map((cat, index) => (
 
           <div
             key={cat.id}
 
             style={{
-              background: "#f5f7fb",
+              background:
+  "rgba(255,255,255,0.9)",
+
+backdropFilter:
+  "blur(12px)",
+
+border:
+  "1px solid #f1f5f9",
 
               padding: 20,
 
@@ -377,69 +452,133 @@ gap: 16
               <input
                 value={cat.name}
 
-                onChange={(e) =>
-                  actualizarCategoria(
-                    cat.id,
-                    "name",
-                    e.target.value
-                  )
-                }
+                onChange={(e) => {
+
+  const updated =
+    [...categories];
+
+  updated[index].name =
+    e.target.value;
+
+  setCategories(updated);
+
+}}
 
                 style={{
-                  padding: 10
-                }}
+  padding: 14,
+
+  borderRadius: 14,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 14,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
               />
 
               <input
                 value={cat.slug}
 
-                onChange={(e) =>
-                  actualizarCategoria(
-                    cat.id,
-                    "slug",
-                    e.target.value
-                  )
-                }
+onChange={(e) => {
+
+  const updated =
+    [...categories];
+
+  updated[index].slug =
+    e.target.value;
+
+  setCategories(updated);
+
+}}
 
                 style={{
-                  padding: 10
-                }}
+  padding: 14,
+
+  borderRadius: 14,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 14,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
               />
 
               <input
                 value={
                   cat.image || ""
                 }
+onChange={(e) => {
 
-                onChange={(e) =>
-                  actualizarCategoria(
-                    cat.id,
-                    "image",
-                    e.target.value
-                  )
-                }
+  const updated =
+    [...categories];
+
+  updated[index].image =
+    e.target.value;
+
+  setCategories(updated);
+
+}}
+
 
                 style={{
-                  padding: 10
-                }}
+  padding: 14,
+
+  borderRadius: 14,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 14,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
               />
 
-              {cat.image && (
+{cat.image && (
 
-  <img
-    src={cat.image}
-
+  <div
     style={{
-      width: "100%",
-      maxWidth: 220,
-
-      borderRadius: 18,
-
-      marginTop: 10,
-
-      objectFit: "cover"
+      display: "flex",
+      justifyContent: "center"
     }}
-  />
+  >
+
+    <img
+      src={cat.image}
+
+      style={{
+        width: "100%",
+        maxWidth: 260,
+        aspectRatio: "4/5",
+        objectFit: "cover",
+
+        borderRadius: 20,
+
+        boxShadow:
+          "0 10px 30px rgba(0,0,0,0.08)"
+      }}
+    />
+
+  </div>
 
 )}
 
@@ -450,17 +589,35 @@ gap: 16
                   cat.sort_order || 0
                 }
 
-                onChange={(e) =>
-                  actualizarCategoria(
-                    cat.id,
-                    "sort_order",
-                    e.target.value
-                  )
-                }
+                onChange={(e) => {
+
+  const updated =
+    [...categories];
+
+  updated[index].sort_order =
+    e.target.value;
+
+  setCategories(updated);
+
+}}
 
                 style={{
-                  padding: 10
-                }}
+  padding: 14,
+
+  borderRadius: 14,
+
+  border:
+    "1px solid #e5e7eb",
+
+  background:
+    "#fff",
+
+  fontSize: 14,
+
+  fontWeight: "500",
+
+  outline: "none"
+}}
               />
 
               <label
@@ -476,18 +633,71 @@ gap: 16
 
                   checked={cat.active}
 
-                  onChange={(e) =>
-                    actualizarCategoria(
-                      cat.id,
-                      "active",
-                      e.target.checked
-                    )
-                  }
+                  onChange={(e) => {
+
+  const updated =
+    [...categories];
+
+  updated[index].active =
+    e.target.checked;
+
+  setCategories(updated);
+
+}}
+
                 />
 
                 Activa
 
               </label>
+
+              <button
+  onClick={() =>
+    guardarCategoria(cat)
+  }
+
+  onMouseEnter={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(0px)";
+
+  }}
+
+  style={{
+    background:
+      "linear-gradient(135deg,#ec4899,#8b5cf6)",
+
+    color: "#fff",
+
+    border: "none",
+
+    padding: "12px 18px",
+
+    borderRadius: 14,
+
+    cursor: "pointer",
+
+    fontWeight: "700",
+
+    boxShadow:
+      "0 10px 30px rgba(236,72,153,0.25)",
+
+    transition:
+      "all .3s ease",
+
+    transform:
+      "translateY(0px)"
+  }}
+>
+  💾 Guardar cambios
+</button>
 
               <button
                 onClick={() =>
@@ -498,7 +708,10 @@ gap: 16
 
                 style={{
                   background:
-                    "#ef4444",
+  "linear-gradient(135deg,#111827,#374151)",
+
+boxShadow:
+  "0 10px 20px rgba(0,0,0,0.15)",
 
                   color: "#fff",
 
