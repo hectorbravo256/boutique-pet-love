@@ -4,7 +4,7 @@ import {
 } from "react";
 
 import { supabase }
-from "./supabaseClient";
+from "../supabaseClient";
 
 export default function AdminCategorias() {
 
