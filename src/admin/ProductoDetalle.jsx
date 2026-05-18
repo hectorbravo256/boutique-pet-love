@@ -1530,8 +1530,6 @@ const precioPromedio =
       </div>
 
     </div>
-  
-  </div>
 
 </AdminCard>
 
