@@ -39,9 +39,16 @@ export default function CrearProducto() {
       .single();
 
     if (errProd) {
-      showToast("❌ Error creando producto");
-      return;
-    }
+
+  console.error(errProd);
+
+  showToast(
+    errProd.message ||
+    "❌ Error creando producto"
+  );
+
+  return;
+}
 
     // 2. variantes
     const variantsToInsert = newProduct.variants
@@ -62,9 +69,16 @@ export default function CrearProducto() {
       .insert(variantsToInsert);
 
     if (errVar) {
-      showToast("❌ Error creando tallas");
-      return;
-    }
+
+  console.error(errVar);
+
+  showToast(
+    errVar.message ||
+    "❌ Error creando tallas"
+  );
+
+  return;
+}
 
     // 3. imagen
     if (newProduct.image) {
@@ -119,17 +133,34 @@ export default function CrearProducto() {
       />
 
       {/* 🏷 CATEGORÍA */}
-      <input
-        placeholder="Categoría"
-        value={newProduct.category}
-        onChange={(e) =>
-          setNewProduct(prev => ({
-            ...prev,
-            category: e.target.value
-          }))
-        }
-        style={{ width: "100%", marginBottom: 10, padding: 8 }}
-      />
+      <select
+  value={newProduct.category}
+
+  onChange={(e) =>
+    setNewProduct(prev => ({
+      ...prev,
+      category: e.target.value
+    }))
+  }
+>
+
+  <option value="">
+    Selecciona categoría
+  </option>
+
+  <option value="otono-invierno">
+    Otoño - Invierno
+  </option>
+
+  <option value="accesorios">
+    Accesorios
+  </option>
+
+  <option value="trajes-gala">
+    Trajes Gala
+  </option>
+
+</select>
       
       {/* 🐶 GÉNERO */}
 <select
