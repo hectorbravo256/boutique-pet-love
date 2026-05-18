@@ -82,21 +82,7 @@ export default function AdminCategorias() {
   };
 
   // 🔥 actualizar
-  const actualizarCategoria =
-    async (
-      id,
-      field,
-      value
-    ) => {
 
-      await supabase
-        .from("categories")
-        .update({
-          [field]: value
-        })
-        .eq("id", id);
-
-    };
 
   // 🔥 eliminar
   const eliminarCategoria =
@@ -221,15 +207,11 @@ background:
         </h2>
 
         <div
-          style={{
-            display: "grid",
-
-gridTemplateColumns:
-  "repeat(auto-fit,minmax(260px,1fr))",
-
-gap: 16
-          }}
-        >
+  style={{
+    display: "grid",
+    gap: 14
+  }}
+>
 
           <input
             placeholder="Nombre"
@@ -276,6 +258,7 @@ gap: 16
   outline: "none"
 }}
           />
+            
 
           <input
             placeholder="Slug"
@@ -339,6 +322,37 @@ gap: 16
 }}
           />
 
+          {newCategory.image && (
+
+  <div
+  style={{
+    display: "flex",
+    justifyContent: "center"
+  }}
+>
+  <img
+    src={newCategory.image}
+
+    style={{
+      width: "100%",
+      maxWidth: 240,
+
+      aspectRatio: "4/5",
+
+      objectFit: "cover",
+
+      borderRadius: 20,
+
+      marginTop: 10,
+
+      boxShadow:
+        "0 15px 35px rgba(0,0,0,0.12)"
+    }}
+  />
+    </div>
+
+)}
+
           <input
             type="number"
 
@@ -380,6 +394,20 @@ gap: 16
               crearCategoria
             }
 
+            onMouseEnter={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(-2px)";
+
+}}
+
+onMouseLeave={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(0px)";
+
+}}
+
             style={{
               background:
   "linear-gradient(135deg,#ec4899,#8b5cf6)",
@@ -388,7 +416,7 @@ gap: 16
 
               color: "#fff",
 
-              padding: 14,
+              padding: "12px 18px",
 
               border: "none",
 
@@ -396,7 +424,9 @@ gap: 16
 
               fontWeight: "700",
 
-              cursor: "pointer"
+              cursor: "pointer",
+              transition: "all .3s ease",
+              transform: "translateY(0px)"
             }}
           >
             ➕ Crear categoría
@@ -416,38 +446,66 @@ gap: 16
 
         {categories.map((cat, index) => (
 
-          <div
-            key={cat.id}
+<div
+  key={cat.id}
 
-            style={{
-              background:
-  "rgba(255,255,255,0.9)",
+  onMouseEnter={(e) => {
 
-backdropFilter:
-  "blur(12px)",
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
 
-border:
-  "1px solid #f1f5f9",
+  }}
 
-              padding: 20,
+  onMouseLeave={(e) => {
 
-              borderRadius: 20,
+    e.currentTarget.style.transform =
+      "translateY(0px)";
 
-              boxShadow:
-                "0 10px 30px rgba(0,0,0,0.05)"
-            }}
-          >
+  }}
+
+  style={{
+    background:
+      "rgba(255,255,255,0.9)",
+
+    backdropFilter:
+      "blur(12px)",
+
+    border:
+      "1px solid #f1f5f9",
+
+    padding: 20,
+
+    borderRadius: 20,
+
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.05)",
+
+    transition:
+      "all .3s ease",
+
+    transform:
+      "translateY(0px)"
+  }}
+>
 
             <div
-              style={{
-                display: "grid",
+  style={{
+    display: "grid",
 
 gridTemplateColumns:
-  "repeat(auto-fit,minmax(260px,1fr))",
+  "repeat(auto-fit,minmax(280px,1fr))",
 
-gap: 16
-              }}
-            >
+    gap: 24,
+
+    alignItems: "start"
+  }}
+>
+              <div
+  style={{
+    display: "grid",
+    gap: 14
+  }}
+>
 
               <input
                 value={cat.name}
@@ -553,34 +611,7 @@ onChange={(e) => {
 }}
               />
 
-{cat.image && (
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center"
-    }}
-  >
-
-    <img
-      src={cat.image}
-
-      style={{
-        width: "100%",
-        maxWidth: 260,
-        aspectRatio: "4/5",
-        objectFit: "cover",
-
-        borderRadius: 20,
-
-        boxShadow:
-          "0 10px 30px rgba(0,0,0,0.08)"
-      }}
-    />
-
-  </div>
-
-)}
 
               <input
                 type="number"
@@ -675,23 +706,15 @@ onChange={(e) => {
       "linear-gradient(135deg,#ec4899,#8b5cf6)",
 
     color: "#fff",
-
     border: "none",
-
     padding: "12px 18px",
-
     borderRadius: 14,
-
     cursor: "pointer",
-
     fontWeight: "700",
-
     boxShadow:
       "0 10px 30px rgba(236,72,153,0.25)",
-
     transition:
       "all .3s ease",
-
     transform:
       "translateY(0px)"
   }}
@@ -706,6 +729,20 @@ onChange={(e) => {
                   )
                 }
 
+                onMouseEnter={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(-2px)";
+
+}}
+
+onMouseLeave={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(0px)";
+
+}}
+
                 style={{
                   background:
   "linear-gradient(135deg,#111827,#374151)",
@@ -714,20 +751,61 @@ boxShadow:
   "0 10px 20px rgba(0,0,0,0.15)",
 
                   color: "#fff",
-
                   border: "none",
-
                   padding: 12,
-
                   borderRadius: 12,
-
                   cursor: "pointer",
-
-                  fontWeight: "700"
+                  fontWeight: "700",
+                  transition: "all .3s ease",
+                  transform: "translateY(0px)"
                 }}
               >
                 🗑 Eliminar
               </button>
+
+                </div>
+
+<div>
+
+  {cat.image && (
+
+    <img
+      src={cat.image}
+
+      onMouseEnter={(e) => {
+
+  e.currentTarget.style.transform =
+    "scale(1.02)";
+
+}}
+
+onMouseLeave={(e) => {
+
+  e.currentTarget.style.transform =
+    "scale(1)";
+
+}}
+
+      style={{
+        width: "100%",
+        maxHeight: 360,
+        aspectRatio: "4/5",
+        objectFit: "cover",
+
+        borderRadius: 22,
+
+        boxShadow:
+          "0 15px 35px rgba(0,0,0,0.12)",
+        transition: "all .4s ease",
+        transform: "scale(1)"
+      }}
+    />
+
+  )}
+
+</div>
+
+              </div>
 
             </div>
 
@@ -737,7 +815,6 @@ boxShadow:
 
       </div>
 
-    </div>
 
   );
 
