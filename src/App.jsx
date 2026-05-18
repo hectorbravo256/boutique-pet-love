@@ -247,9 +247,14 @@ setFeaturedProducts(destacados);
   }, []);
 
 	useEffect(() => {
-  supabase
-    .from("categories")
-    .select("*")
+    supabase
+  	.from("categories")
+  	.select("*")
+	.eq("active", true)
+	.order("sort_order", {
+  	ascending: true
+	})
+  	.eq("active", true)
     .then(({ data }) => setCategories(data || []));
 }, []);
 
@@ -1187,7 +1192,9 @@ localStorage.setItem(
 "
     >
       <img
-  src={`${cat.image}?width=600&quality=70`}
+  src={`${
+  cat.featured_image || cat.image
+}?width=600&quality=70`}
   loading="lazy"
   onLoad={(e) => e.target.classList.remove("opacity-0")}
   className="
@@ -1197,17 +1204,20 @@ localStorage.setItem(
   group-hover:scale-105
 "
   style={{
-    width: "100%",
-    aspectRatio: "1/1",
-    objectFit: "cover"
-  }}
+  width: "100%",
+  aspectRatio: "4/5",
+  objectFit: "cover"
+}}
 />
 
-      <div style={{
-        padding: 10,
-        textAlign: "center",
-        fontWeight: "bold"
-      }}>
+      <div className="
+  p-4
+  text-center
+  font-black
+  text-gray-800
+  text-lg
+  bg-white
+">
         {cat.name}
       </div>
     </div>
