@@ -138,480 +138,414 @@ export default function AdminCategorias() {
 
   return (
 
-    <div
-      style={{
-        padding: 30,
-        maxWidth: 1400,
-        margin: "auto"
-      }}
-    >
+  <div className="
+    max-w-[1400px]
+    mx-auto
+    p-4
+    md:p-8
+  ">
 
-<div
-  style={{
-    marginBottom: 40
-  }}
->
+    {/* HEADER */}
+    <div className="mb-10">
 
-  <p
-    style={{
-      color: "#ec4899",
-      fontWeight: "700",
-      letterSpacing: 2,
-      textTransform: "uppercase",
-      fontSize: 13
-    }}
-  >
-    Administración
-  </p>
+      <p className="
+        text-pink-500
+        uppercase
+        tracking-[0.3em]
+        text-xs
+        font-bold
+      ">
+        Administración
+      </p>
 
-  <h1
-    style={{
-      fontSize: 46,
-      fontWeight: "900",
-      color: "#111827",
-      marginTop: 10
-    }}
-  >
-    🗂 Gestión de categorías
-  </h1>
+      <h1 className="
+        text-4xl
+        md:text-5xl
+        font-black
+        text-slate-900
+        mt-3
+      ">
+        🗂 Gestión de categorías
+      </h1>
 
-</div>
-
-      {/* 🔥 CREAR */}
-      <div
-        style={{
-          background: "#f5f7fb",
-          padding: 20,
-          borderRadius: 20,
-          marginBottom: 30,
-          boxShadow:
-  "0 10px 40px rgba(0,0,0,0.05)",
-
-border:
-  "1px solid rgba(255,255,255,0.6)",
-
-backdropFilter:
-  "blur(14px)",
-
-background:
-  "rgba(255,255,255,0.85)"
-        }}
-      >
-
-        <h2
-          style={{
-            marginBottom: 20
-          }}
-        >
-          Nueva categoría
-        </h2>
-
-        <div
-  style={{
-    display: "grid",
-    gap: 14
-  }}
->
-
-          <input
-            placeholder="Nombre"
-
-            value={newCategory.name}
-
-            onChange={(e) => {
-
-  const value =
-    e.target.value;
-
-  setNewCategory(prev => ({
-
-    ...prev,
-
-    name: value,
-
-    slug:
-      value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, "-")
-
-  }));
-
-}}
-
-            style={{
-  padding: 14,
-
-  borderRadius: 16,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 15,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
-          />
-            
-
-          <input
-            placeholder="Slug"
-
-            value={newCategory.slug}
-
-            onChange={(e) =>
-              setNewCategory(prev => ({
-                ...prev,
-                slug: e.target.value
-              }))
-            }
-
-            style={{
-  padding: 14,
-
-  borderRadius: 16,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 15,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
-          />
-
-          <input
-            placeholder="URL Imagen"
-
-            value={newCategory.image}
-
-            onChange={(e) =>
-              setNewCategory(prev => ({
-                ...prev,
-                image: e.target.value
-              }))
-            }
-
-            style={{
-  padding: 14,
-
-  borderRadius: 16,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 15,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
-          />
-
-          {newCategory.image && (
-
-  <div
-  style={{
-    display: "flex",
-    justifyContent: "center"
-  }}
->
-  <img
-    src={newCategory.image}
-
-    style={{
-      width: "100%",
-      maxWidth: 240,
-
-      aspectRatio: "4/5",
-
-      objectFit: "cover",
-
-      borderRadius: 20,
-
-      marginTop: 10,
-
-      boxShadow:
-        "0 15px 35px rgba(0,0,0,0.12)"
-    }}
-  />
     </div>
 
-)}
+    {/* CREAR */}
+    <div className="
+      bg-white/80
+      backdrop-blur-xl
+      border
+      border-white/60
+      rounded-[30px]
+      p-6
+      shadow-[0_10px_40px_rgba(0,0,0,0.05)]
+      mb-8
+    ">
 
-          <input
-            type="number"
+      <h2 className="
+        text-2xl
+        font-black
+        text-slate-900
+        mb-6
+      ">
+        Nueva categoría
+      </h2>
 
-            placeholder="Orden"
+      <div className="
+        grid
+        gap-4
+      ">
 
-            value={
-              newCategory.sort_order
-            }
+        <input
+          placeholder="Nombre"
 
-            onChange={(e) =>
-              setNewCategory(prev => ({
-                ...prev,
-                sort_order:
-                  e.target.value
-              }))
-            }
+          value={newCategory.name}
 
-            style={{
-  padding: 14,
+          onChange={(e) => {
 
-  borderRadius: 16,
+            const value =
+              e.target.value;
 
-  border:
-    "1px solid #e5e7eb",
+            setNewCategory(prev => ({
 
-  background:
-    "#fff",
+              ...prev,
 
-  fontSize: 15,
+              name: value,
 
-  fontWeight: "500",
+              slug:
+                value
+                  .toLowerCase()
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .replace(/\s+/g, "-")
 
-  outline: "none"
-}}
-          />
+            }));
 
-          <button
-            onClick={
-              crearCategoria
-            }
+          }}
 
-            onMouseEnter={(e) => {
+          className="
+            w-full
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-4
+            py-3
+            text-sm
+            font-medium
+            outline-none
+            transition-all
+            duration-300
+            focus:border-pink-400
+            focus:ring-4
+            focus:ring-pink-100
+          "
+        />
 
-  e.currentTarget.style.transform =
-    "translateY(-2px)";
+        <input
+          placeholder="Slug"
 
-}}
+          value={newCategory.slug}
 
-onMouseLeave={(e) => {
+          onChange={(e) =>
+            setNewCategory(prev => ({
+              ...prev,
+              slug: e.target.value
+            }))
+          }
 
-  e.currentTarget.style.transform =
-    "translateY(0px)";
+          className="
+            w-full
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-4
+            py-3
+            text-sm
+            font-medium
+            outline-none
+            transition-all
+            duration-300
+            focus:border-pink-400
+            focus:ring-4
+            focus:ring-pink-100
+          "
+        />
 
-}}
+        <input
+          placeholder="URL Imagen"
 
-            style={{
-              background:
-  "linear-gradient(135deg,#ec4899,#8b5cf6)",
-              boxShadow:
-  "0 10px 30px rgba(236,72,153,0.35)",
+          value={newCategory.image}
 
-              color: "#fff",
+          onChange={(e) =>
+            setNewCategory(prev => ({
+              ...prev,
+              image: e.target.value
+            }))
+          }
 
-              padding: "12px 18px",
+          className="
+            w-full
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-4
+            py-3
+            text-sm
+            font-medium
+            outline-none
+            transition-all
+            duration-300
+            focus:border-pink-400
+            focus:ring-4
+            focus:ring-pink-100
+          "
+        />
 
-              border: "none",
+        {newCategory.image && (
 
-              borderRadius: 14,
+          <div className="
+            flex
+            justify-center
+          ">
 
-              fontWeight: "700",
+            <img
+              src={newCategory.image}
 
-              cursor: "pointer",
-              transition: "all .3s ease",
-              transform: "translateY(0px)"
-            }}
-          >
-            ➕ Crear categoría
-          </button>
+              className="
+                w-full
+                max-w-[240px]
+                aspect-[4/5]
+                object-cover
+                rounded-[24px]
+                shadow-[0_15px_35px_rgba(0,0,0,0.12)]
+                transition-all
+                duration-500
+                hover:scale-[1.02]
+              "
+            />
 
-        </div>
+          </div>
+
+        )}
+
+        <input
+          type="number"
+
+          placeholder="Orden"
+
+          value={
+            newCategory.sort_order
+          }
+
+          onChange={(e) =>
+            setNewCategory(prev => ({
+              ...prev,
+              sort_order:
+                e.target.value
+            }))
+          }
+
+          className="
+            w-full
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-4
+            py-3
+            text-sm
+            font-medium
+            outline-none
+            transition-all
+            duration-300
+            focus:border-pink-400
+            focus:ring-4
+            focus:ring-pink-100
+          "
+        />
+
+        <button
+          onClick={
+            crearCategoria
+          }
+
+          className="
+            bg-gradient-to-r
+            from-pink-500
+            to-purple-500
+
+            hover:opacity-90
+            hover:-translate-y-0.5
+
+            transition-all
+            duration-300
+
+            text-white
+            font-bold
+
+            py-3
+            rounded-2xl
+
+            shadow-[0_10px_30px_rgba(236,72,153,0.35)]
+          "
+        >
+          ➕ Crear categoría
+        </button>
 
       </div>
 
-      {/* 🔥 LISTA */}
-      <div
-        style={{
-          display: "grid",
-          gap: 18
-        }}
-      >
+    </div>
 
-        {categories.map((cat, index) => (
+    {/* LISTA */}
+    <div className="
+      grid
+      gap-6
+    ">
 
-<div
-  key={cat.id}
+      {categories.map((cat, index) => (
 
-  onMouseEnter={(e) => {
+        <div
+          key={cat.id}
 
-    e.currentTarget.style.transform =
-      "translateY(-2px)";
+          className="
+            bg-white/90
+            backdrop-blur-xl
 
-  }}
+            border
+            border-slate-100
 
-  onMouseLeave={(e) => {
+            rounded-[30px]
 
-    e.currentTarget.style.transform =
-      "translateY(0px)";
+            p-5
 
-  }}
+            shadow-[0_10px_30px_rgba(0,0,0,0.05)]
 
-  style={{
-    background:
-      "rgba(255,255,255,0.9)",
+            transition-all
+            duration-300
 
-    backdropFilter:
-      "blur(12px)",
+            hover:-translate-y-1
+          "
+        >
 
-    border:
-      "1px solid #f1f5f9",
+          <div className="
+            grid
+            lg:grid-cols-[1fr_280px]
+            gap-6
+            items-start
+          ">
 
-    padding: 20,
-
-    borderRadius: 20,
-
-    boxShadow:
-      "0 10px 30px rgba(0,0,0,0.05)",
-
-    transition:
-      "all .3s ease",
-
-    transform:
-      "translateY(0px)"
-  }}
->
-
-            <div
-  style={{
-    display: "grid",
-
-gridTemplateColumns:
-  "repeat(auto-fit,minmax(280px,1fr))",
-
-    gap: 24,
-
-    alignItems: "start"
-  }}
->
-              <div
-  style={{
-    display: "grid",
-    gap: 14
-  }}
->
+            {/* FORM */}
+            <div className="
+              grid
+              gap-4
+            ">
 
               <input
                 value={cat.name}
 
                 onChange={(e) => {
 
-  const updated =
-    [...categories];
+                  const updated =
+                    [...categories];
 
-  updated[index].name =
-    e.target.value;
+                  updated[index].name =
+                    e.target.value;
 
-  setCategories(updated);
+                  setCategories(updated);
 
-}}
+                }}
 
-                style={{
-  padding: 14,
-
-  borderRadius: 14,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 14,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
+                className="
+                  w-full
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  bg-white
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  outline-none
+                  transition-all
+                  duration-300
+                  focus:border-pink-400
+                  focus:ring-4
+                  focus:ring-pink-100
+                "
               />
 
               <input
                 value={cat.slug}
 
-onChange={(e) => {
+                onChange={(e) => {
 
-  const updated =
-    [...categories];
+                  const updated =
+                    [...categories];
 
-  updated[index].slug =
-    e.target.value;
+                  updated[index].slug =
+                    e.target.value;
 
-  setCategories(updated);
+                  setCategories(updated);
 
-}}
+                }}
 
-                style={{
-  padding: 14,
-
-  borderRadius: 14,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 14,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
+                className="
+                  w-full
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  bg-white
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  outline-none
+                  transition-all
+                  duration-300
+                  focus:border-pink-400
+                  focus:ring-4
+                  focus:ring-pink-100
+                "
               />
 
               <input
                 value={
                   cat.image || ""
                 }
-onChange={(e) => {
 
-  const updated =
-    [...categories];
+                onChange={(e) => {
 
-  updated[index].image =
-    e.target.value;
+                  const updated =
+                    [...categories];
 
-  setCategories(updated);
+                  updated[index].image =
+                    e.target.value;
 
-}}
+                  setCategories(updated);
 
+                }}
 
-                style={{
-  padding: 14,
-
-  borderRadius: 14,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 14,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
+                className="
+                  w-full
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  bg-white
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  outline-none
+                  transition-all
+                  duration-300
+                  focus:border-pink-400
+                  focus:ring-4
+                  focus:ring-pink-100
+                "
               />
-
-
 
               <input
                 type="number"
@@ -622,42 +556,43 @@ onChange={(e) => {
 
                 onChange={(e) => {
 
-  const updated =
-    [...categories];
+                  const updated =
+                    [...categories];
 
-  updated[index].sort_order =
-    e.target.value;
+                  updated[index].sort_order =
+                    e.target.value;
 
-  setCategories(updated);
+                  setCategories(updated);
 
-}}
+                }}
 
-                style={{
-  padding: 14,
-
-  borderRadius: 14,
-
-  border:
-    "1px solid #e5e7eb",
-
-  background:
-    "#fff",
-
-  fontSize: 14,
-
-  fontWeight: "500",
-
-  outline: "none"
-}}
+                className="
+                  w-full
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  bg-white
+                  px-4
+                  py-3
+                  text-sm
+                  font-medium
+                  outline-none
+                  transition-all
+                  duration-300
+                  focus:border-pink-400
+                  focus:ring-4
+                  focus:ring-pink-100
+                "
               />
 
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10
-                }}
-              >
+              <label className="
+                flex
+                items-center
+                gap-3
+                text-sm
+                font-semibold
+                text-slate-700
+              ">
 
                 <input
                   type="checkbox"
@@ -666,16 +601,15 @@ onChange={(e) => {
 
                   onChange={(e) => {
 
-  const updated =
-    [...categories];
+                    const updated =
+                      [...categories];
 
-  updated[index].active =
-    e.target.checked;
+                    updated[index].active =
+                      e.target.checked;
 
-  setCategories(updated);
+                    setCategories(updated);
 
-}}
-
+                  }}
                 />
 
                 Activa
@@ -683,44 +617,32 @@ onChange={(e) => {
               </label>
 
               <button
-  onClick={() =>
-    guardarCategoria(cat)
-  }
+                onClick={() =>
+                  guardarCategoria(cat)
+                }
 
-  onMouseEnter={(e) => {
+                className="
+                  bg-gradient-to-r
+                  from-pink-500
+                  to-purple-500
 
-    e.currentTarget.style.transform =
-      "translateY(-2px)";
+                  hover:opacity-90
+                  hover:-translate-y-0.5
 
-  }}
+                  transition-all
+                  duration-300
 
-  onMouseLeave={(e) => {
+                  text-white
+                  font-bold
 
-    e.currentTarget.style.transform =
-      "translateY(0px)";
+                  py-3
+                  rounded-2xl
 
-  }}
-
-  style={{
-    background:
-      "linear-gradient(135deg,#ec4899,#8b5cf6)",
-
-    color: "#fff",
-    border: "none",
-    padding: "12px 18px",
-    borderRadius: 14,
-    cursor: "pointer",
-    fontWeight: "700",
-    boxShadow:
-      "0 10px 30px rgba(236,72,153,0.25)",
-    transition:
-      "all .3s ease",
-    transform:
-      "translateY(0px)"
-  }}
->
-  💾 Guardar cambios
-</button>
+                  shadow-[0_10px_30px_rgba(236,72,153,0.25)]
+                "
+              >
+                💾 Guardar cambios
+              </button>
 
               <button
                 onClick={() =>
@@ -729,93 +651,68 @@ onChange={(e) => {
                   )
                 }
 
-                onMouseEnter={(e) => {
+                className="
+                  bg-gradient-to-r
+                  from-slate-800
+                  to-slate-700
 
-  e.currentTarget.style.transform =
-    "translateY(-2px)";
+                  hover:opacity-90
+                  hover:-translate-y-0.5
 
-}}
+                  transition-all
+                  duration-300
 
-onMouseLeave={(e) => {
+                  text-white
+                  font-bold
 
-  e.currentTarget.style.transform =
-    "translateY(0px)";
+                  py-3
+                  rounded-2xl
 
-}}
-
-                style={{
-                  background:
-  "linear-gradient(135deg,#111827,#374151)",
-
-boxShadow:
-  "0 10px 20px rgba(0,0,0,0.15)",
-
-                  color: "#fff",
-                  border: "none",
-                  padding: 12,
-                  borderRadius: 12,
-                  cursor: "pointer",
-                  fontWeight: "700",
-                  transition: "all .3s ease",
-                  transform: "translateY(0px)"
-                }}
+                  shadow-[0_10px_20px_rgba(0,0,0,0.15)]
+                "
               >
                 🗑 Eliminar
               </button>
 
-                </div>
+            </div>
 
-<div>
+            {/* IMAGE */}
+            <div>
 
-  {cat.image && (
+              {cat.image && (
 
-    <img
-      src={cat.image}
+                <img
+                  src={cat.image}
 
-      onMouseEnter={(e) => {
+                  className="
+                    w-full
+                    max-h-[360px]
+                    aspect-[4/5]
+                    object-cover
 
-  e.currentTarget.style.transform =
-    "scale(1.02)";
+                    rounded-[24px]
 
-}}
+                    shadow-[0_15px_35px_rgba(0,0,0,0.12)]
 
-onMouseLeave={(e) => {
+                    transition-all
+                    duration-500
 
-  e.currentTarget.style.transform =
-    "scale(1)";
+                    hover:scale-[1.02]
+                  "
+                />
 
-}}
-
-      style={{
-        width: "100%",
-        maxHeight: 360,
-        aspectRatio: "4/5",
-        objectFit: "cover",
-
-        borderRadius: 22,
-
-        boxShadow:
-          "0 15px 35px rgba(0,0,0,0.12)",
-        transition: "all .4s ease",
-        transform: "scale(1)"
-      }}
-    />
-
-  )}
-
-</div>
-
-              </div>
+              )}
 
             </div>
 
           </div>
 
-        ))}
+        </div>
 
-      </div>
+      ))}
 
+    </div>
 
-  );
+  </div>
 
-}
+);
