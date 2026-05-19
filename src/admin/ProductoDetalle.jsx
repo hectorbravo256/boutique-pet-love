@@ -1835,11 +1835,7 @@ className="
 
 </div>
 
-  </div>
-
 </AdminCard>
-
-  </div>
   
       {/* SEO PREMIUM */}
 <AdminCard className="
@@ -3898,6 +3894,8 @@ className="
 </AdminModal>
   
     </div>
+
+  </div>
 
 </>
         
