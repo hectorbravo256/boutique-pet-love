@@ -16,8 +16,13 @@ import {
 
 import AdminCard
 from "./components/AdminCard";
+import DashboardSkeleton
+from "./components/DashboardSkeleton";
 
 export default function Dashboard() {
+
+  const [loading, setLoading] =
+  useState(true);
 
   const [orders, setOrders] =
     useState([]);
@@ -28,7 +33,12 @@ export default function Dashboard() {
       "/.netlify/functions/get-orders"
     )
       .then(res => res.json())
-      .then(setOrders);
+      .then(data => {
+
+  setOrders(data);
+  setLoading(false);
+
+});
 
   }, []);
 
@@ -182,45 +192,143 @@ export default function Dashboard() {
 
     }, [orders]);
 
+    if (loading) {
+  return <DashboardSkeleton />;
+}
+  
   return (
 
+<div className="
+  min-h-screen
+
+  p-4
+  md:p-8
+
+  bg-gradient-to-b
+  from-[#fff7fb]
+  via-white
+  to-[#fdf2f8]
+">
+
+{/* HERO PREMIUM */}
+<div className="
+  relative
+  overflow-hidden
+
+  rounded-[36px]
+
+  p-6
+  md:p-10
+
+  bg-gradient-to-br
+  from-pink-500
+  via-fuchsia-500
+  to-purple-600
+
+  text-white
+
+  shadow-[0_25px_80px_rgba(168,85,247,0.35)]
+
+  mb-10
+  animate-[fadeIn_.4s_ease]
+">
+
+  {/* GLOW */}
+  <div className="
+    absolute
+    -top-32
+    -right-32
+
+    w-[420px]
+    h-[420px]
+
+    rounded-full
+
+    bg-white/10
+
+    blur-3xl
+  " />
+
+  <div className="
+    relative
+    z-10
+  ">
+
+    <p className="
+      uppercase
+      tracking-[0.35em]
+      text-xs
+      font-bold
+      text-pink-100
+    ">
+      Ecommerce Analytics
+    </p>
+
+    <h1 className="
+      text-4xl
+      md:text-6xl
+
+      font-black
+
+      mt-4
+      leading-tight
+    ">
+      🚀 Dashboard Enterprise
+    </h1>
+
+    <p className="
+      mt-5
+
+      text-pink-100
+
+      max-w-2xl
+
+      text-sm
+      md:text-lg
+
+      leading-relaxed
+    ">
+      Controla ventas, pedidos,
+      métricas y rendimiento
+      completo de tu ecommerce.
+    </p>
+
+    {/* QUICK STATS */}
     <div className="
-      p-4
-      md:p-8
+      grid
+      grid-cols-2
+      md:grid-cols-4
+
+      gap-4
+
+      mt-8
     ">
 
-      {/* HEADER */}
-      <div className="mb-10">
+      <MiniStat
+        label="Ventas"
+        value={`$${totalVentas.toLocaleString("es-CL")}`}
+      />
 
-        <p className="
-          text-pink-500
-          uppercase
-          tracking-[0.3em]
-          text-xs
-          font-bold
-        ">
-          Analytics
-        </p>
+      <MiniStat
+        label="Pedidos"
+        value={totalPedidos}
+      />
 
-        <h1 className="
-          text-4xl
-          md:text-5xl
-          font-black
-          text-slate-900
-          mt-3
-        ">
-          🚀 Dashboard Enterprise
-        </h1>
+      <MiniStat
+        label="Pendientes"
+        value={pendientes}
+      />
 
-        <p className="
-          mt-4
-          text-slate-500
-          text-base
-        ">
-          Panel premium ecommerce analytics
-        </p>
+      <MiniStat
+        label="Enviados"
+        value={enviados}
+      />
 
-      </div>
+    </div>
+
+  </div>
+
+</div>
 
       {/* STATS */}
       <div className="
@@ -284,7 +392,12 @@ export default function Dashboard() {
       ">
 
         {/* TOP */}
-        <AdminCard>
+        <AdminCard className="
+  hover:-translate-y-1
+  transition-all
+  duration-300
+">
+          
 
           <h2 className="
             text-2xl
@@ -326,7 +439,12 @@ export default function Dashboard() {
                 </div>
 
                 <div className="
-                  bg-pink-50
+                  bg-gradient-to-r
+                  from-pink-50
+                  to-purple-50
+
+                  border
+                  border-pink-100
                   text-pink-600
 
                   px-4
@@ -349,7 +467,11 @@ export default function Dashboard() {
         </AdminCard>
 
         {/* PEDIDOS */}
-        <AdminCard>
+        <AdminCard className="
+  hover:-translate-y-1
+  transition-all
+  duration-300
+">
 
           <h2 className="
             text-2xl
@@ -460,6 +582,7 @@ export default function Dashboard() {
           items-center
           justify-between
           mb-6
+          animate-[fadeIn_.4s_ease]
         ">
 
           <div>
@@ -492,7 +615,13 @@ export default function Dashboard() {
           height={320}
         >
 
-          <LineChart data={dataGrafico}>
+          <LineChart data={dataGrafico} 
+            margin={{
+            top: 20,
+            right: 20,
+            left: -10,
+            bottom: 0
+            }}>
 
             <CartesianGrid
               strokeDasharray="3 3"
@@ -545,31 +674,126 @@ function StatCard({
 
   return (
 
-    <AdminCard>
+    <div className="
+      relative
+      overflow-hidden
 
-      <div className={`
-        text-sm
+      rounded-[32px]
+
+      bg-white/80
+      backdrop-blur-xl
+
+      border
+      border-white/60
+
+      p-6
+
+      shadow-[0_10px_40px_rgba(15,23,42,0.06)]
+
+      hover:-translate-y-1
+      hover:shadow-[0_25px_70px_rgba(236,72,153,0.12)]
+
+      transition-all
+      duration-300
+    ">
+
+      <div className="
+        absolute
+        -top-10
+        -right-10
+
+        w-32
+        h-32
+
+        rounded-full
+
+        bg-gradient-to-br
+        from-pink-100
+        to-purple-100
+
+        opacity-60
+      " />
+
+      <div className="
+        relative
+        z-10
+      ">
+
+        <div className={`
+          text-sm
+          font-black
+
+          uppercase
+          tracking-[0.15em]
+
+          ${color}
+        `}>
+          {title}
+        </div>
+
+        <div className="
+          mt-5
+
+          text-3xl
+          md:text-5xl
+
+          font-black
+
+          text-slate-900
+        ">
+          {value}
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+}
+
+function MiniStat({
+  label,
+  value
+}) {
+
+  return (
+
+    <div className="
+      rounded-3xl
+
+      bg-white/10
+      backdrop-blur-xl
+
+      border
+      border-white/10
+
+      p-4
+    ">
+
+      <div className="
+        text-xs
+        uppercase
+        tracking-[0.2em]
+
+        text-pink-100
         font-bold
-
-        ${color}
-      `}>
-        {title}
+      ">
+        {label}
       </div>
 
       <div className="
-        mt-4
+        mt-3
 
-        text-2xl
-        md:text-4xl
+        text-xl
+        md:text-2xl
 
         font-black
-
-        text-slate-900
       ">
         {value}
       </div>
 
-    </AdminCard>
+    </div>
 
   );
 
