@@ -1835,9 +1835,6 @@ className="
 
 </div>
 
-</div>
-
-
 
 </AdminCard>
 
@@ -3898,8 +3895,6 @@ className="
 </AdminModal>
   
     </div>
-
-  </div>
 
 </>
         
