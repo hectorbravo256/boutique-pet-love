@@ -15,16 +15,35 @@ from "./components/AdminCard";
 import AdminInput
 from "./components/AdminInput";
 
+import AdminModal
+from "./components/AdminModal";
+
+import ProductsSkeleton
+from "./components/ProductsSkeleton";
+
 export default function Productos() {
 
   const [productosFull, setProductosFull] =
     useState([]);
+
+  const [loading, setLoading] =
+  useState(true);
 
   const [searchProduct, setSearchProduct] =
     useState("");
 
   const [toast, setToast] =
     useState("");
+
+  const [
+  deleteModal,
+  setDeleteModal
+] = useState(false);
+
+const [
+  productoEliminar,
+  setProductoEliminar
+] = useState(null);
 
   const [orden, setOrden] =
     useState({
@@ -74,6 +93,8 @@ export default function Productos() {
           ? data
           : []
       );
+
+      setLoading(false);
 
     };
 
@@ -149,40 +170,178 @@ export default function Productos() {
 
   }, []);
 
+  if (loading) {
+
+  return (
+    <ProductsSkeleton />
+  );
+
+}
+
   return (
 
+<div className="
+  min-h-screen
+
+  p-4
+  md:p-8
+
+  bg-gradient-to-b
+  from-[#fff7fb]
+  via-white
+  to-[#fdf2f8]
+">
+
+{/* HERO PREMIUM */}
+<div className="
+  relative
+  overflow-hidden
+
+  rounded-[36px]
+
+  p-6
+  md:p-10
+
+  bg-gradient-to-br
+  from-pink-500
+  via-fuchsia-500
+  to-purple-600
+
+  text-white
+
+  shadow-[0_25px_80px_rgba(168,85,247,0.35)]
+
+  mb-8
+">
+
+  {/* GLOW */}
+  <div className="
+    absolute
+    -top-32
+    -right-32
+
+    w-[420px]
+    h-[420px]
+
+    rounded-full
+
+    bg-white/10
+
+    blur-3xl
+  " />
+
+  <div className="
+    relative
+    z-10
+  ">
+
+    <p className="
+      uppercase
+      tracking-[0.35em]
+      text-xs
+      font-bold
+      text-pink-100
+    ">
+      Inventory Management
+    </p>
+
+    <h1 className="
+      text-4xl
+      md:text-6xl
+
+      font-black
+
+      mt-4
+      leading-tight
+    ">
+      🛒 Productos Enterprise
+    </h1>
+
+    <p className="
+      mt-5
+
+      text-pink-100
+
+      max-w-2xl
+
+      text-sm
+      md:text-lg
+
+      leading-relaxed
+    ">
+      Gestiona inventario,
+      categorías, variantes
+      y productos premium
+      desde un solo lugar.
+    </p>
+
+    {/* STATS */}
     <div className="
-      p-4
-      md:p-8
+      grid
+      grid-cols-2
+      md:grid-cols-4
+
+      gap-4
+
+      mt-8
     ">
 
-      {/* HEADER */}
-      <div className="mb-8">
+      <MiniStat
+        label="Productos"
+        value={productosFull.length}
+      />
 
-        <p className="
-          text-pink-500
-          uppercase
-          tracking-[0.3em]
-          text-xs
-          font-bold
-        ">
-          Administración
-        </p>
+      <MiniStat
+        label="Categorías"
+        value={
+          [
+            ...new Set(
+              productosFull.map(
+                p => p.category
+              )
+            )
+          ].length
+        }
+      />
 
-        <h1 className="
-          text-4xl
-          md:text-5xl
-          font-black
-          text-slate-900
-          mt-3
-        ">
-          🛒 Productos
-        </h1>
+      <MiniStat
+        label="Variantes"
+        value={
+          productosFull.reduce(
+            (acc, p) =>
+              acc +
+              (
+                p.product_variants
+                  ?.length || 0
+              ),
+            0
+          )
+        }
+      />
 
-      </div>
+      <MiniStat
+        label="Resultados"
+        value={
+          ordenarProductos(
+            productosFull
+          ).length
+        }
+      />
+
+    </div>
+
+  </div>
+
+</div>
 
       {/* FILTROS */}
-      <AdminCard className="mb-6">
+      <AdminCard className="
+  mb-6
+
+  hover:-translate-y-1
+  transition-all
+  duration-300
+">
 
         <div className="
           grid
@@ -266,18 +425,29 @@ export default function Productos() {
       </AdminCard>
 
       {/* TABLA */}
-      <AdminCard className="overflow-x-auto">
+      <AdminCard className="
+  overflow-x-auto
+
+  hover:-translate-y-1
+  transition-all
+  duration-300
+">
 
         <table className="
           w-full
           min-w-[850px]
         ">
 
-          <thead>
+          <thead className="
+            sticky
+            top-0
+            z-10
+            ">
 
             <tr className="
-              border-b
-              border-slate-100
+                border-b
+                border-slate-100
+                bg-slate-50/80
             ">
 
               <th className="
@@ -385,6 +555,14 @@ export default function Productos() {
                 }
 
                 showToast={showToast}
+
+                setDeleteModal={
+                  setDeleteModal
+                }
+
+                setProductoEliminar={
+                  setProductoEliminar
+                }
               />
 
             ))}
@@ -394,6 +572,138 @@ export default function Productos() {
         </table>
 
       </AdminCard>
+
+  {/* DELETE MODAL */}
+<AdminModal
+  open={deleteModal}
+
+  onClose={() => {
+
+    setDeleteModal(false);
+
+    setProductoEliminar(null);
+
+  }}
+
+  title="Eliminar producto"
+>
+
+  <p className="
+    text-slate-600
+    leading-relaxed
+  ">
+    ¿Seguro que deseas
+    eliminar este producto?
+  </p>
+
+  <div className="
+    flex
+    justify-end
+    gap-3
+
+    mt-8
+  ">
+
+    <button
+      onClick={() => {
+
+        setDeleteModal(false);
+
+        setProductoEliminar(null);
+
+      }}
+
+      className="
+        px-5
+        py-3
+
+        rounded-2xl
+
+        bg-slate-100
+        hover:bg-slate-200
+
+        font-semibold
+
+        transition-all
+      "
+    >
+      Cancelar
+    </button>
+
+    <button
+      onClick={async () => {
+
+        if (!productoEliminar)
+          return;
+
+        await supabase
+          .from("product_variants")
+          .delete()
+          .eq(
+            "product_id",
+            productoEliminar.id
+          );
+
+        await supabase
+          .from("product_images")
+          .delete()
+          .eq(
+            "product_id",
+            productoEliminar.id
+          );
+
+        await supabase
+          .from("products")
+          .delete()
+          .eq(
+            "id",
+            productoEliminar.id
+          );
+
+        setProductosFull(prev =>
+          prev.filter(
+            prod =>
+              prod.id !==
+              productoEliminar.id
+          )
+        );
+
+        showToast(
+          "Producto eliminado"
+        );
+
+        setDeleteModal(false);
+
+        setProductoEliminar(null);
+
+      }}
+
+      className="
+        px-5
+        py-3
+
+        rounded-2xl
+
+        bg-gradient-to-r
+        from-red-500
+        to-pink-500
+
+        text-white
+        font-bold
+
+        shadow-lg
+
+        hover:scale-[1.02]
+
+        transition-all
+      "
+    >
+      Eliminar
+    </button>
+
+  </div>
+
+</AdminModal>
 
       {/* TOAST */}
       {toast && (
@@ -430,10 +740,59 @@ export default function Productos() {
 
 }
 
+function MiniStat({
+  label,
+  value
+}) {
+
+  return (
+
+    <div className="
+      rounded-3xl
+
+      bg-white/10
+      backdrop-blur-xl
+
+      border
+      border-white/10
+
+      p-4
+    ">
+
+      <div className="
+        text-xs
+        uppercase
+        tracking-[0.2em]
+
+        text-pink-100
+        font-bold
+      ">
+        {label}
+      </div>
+
+      <div className="
+        mt-3
+
+        text-xl
+        md:text-2xl
+
+        font-black
+      ">
+        {value}
+      </div>
+
+    </div>
+
+  );
+
+}
+
 function FilaProducto({
   p,
   setProductosFull,
-  showToast
+  showToast,
+  setDeleteModal,
+  setProductoEliminar
 }) {
 
   return (
@@ -443,7 +802,7 @@ function FilaProducto({
       border-slate-100
 
       hover:bg-slate-50
-
+      hover:shadow-sm
       transition-all
       duration-200
     ">
@@ -454,43 +813,9 @@ function FilaProducto({
         <button
           onClick={async () => {
 
-            if (
-              !confirm(
-                "¿Eliminar producto completo?"
-              )
-            ) return;
+            setProductoEliminar(p);
 
-            await supabase
-              .from("product_variants")
-              .delete()
-              .eq(
-                "product_id",
-                p.id
-              );
-
-            await supabase
-              .from("product_images")
-              .delete()
-              .eq(
-                "product_id",
-                p.id
-              );
-
-            await supabase
-              .from("products")
-              .delete()
-              .eq("id", p.id);
-
-            setProductosFull(prev =>
-              prev.filter(
-                prod =>
-                  prod.id !== p.id
-              )
-            );
-
-            showToast(
-              "Producto eliminado"
-            );
+            setDeleteModal(true);
 
           }}
 
@@ -550,9 +875,9 @@ function FilaProducto({
             }
 
             className="
-              w-14
-              h-14
-
+              w-16
+              h-16
+              shadow-md
               rounded-2xl
 
               object-cover
@@ -567,6 +892,7 @@ function FilaProducto({
 
             className="
               font-bold
+              text-lg
               text-slate-900
 
               hover:text-pink-500
@@ -586,7 +912,12 @@ function FilaProducto({
       <td className="p-4">
 
         <span className="
-          bg-slate-100
+          bg-gradient-to-r
+          from-slate-100
+          to-slate-50
+
+          border
+          border-slate-200
 
           px-3
           py-1.5
@@ -607,7 +938,12 @@ function FilaProducto({
       <td className="p-4">
 
         <span className="
-          bg-pink-50
+          bg-gradient-to-r
+          from-pink-50
+          to-purple-50
+
+          border
+          border-pink-100
           text-pink-600
 
           px-3
