@@ -1835,9 +1835,9 @@ className="
 
 </div>
 
-</AdminCard>
+</div>
 
-  </div>
+</AdminCard>
   
       {/* SEO PREMIUM */}
 <AdminCard className="
