@@ -19,6 +19,8 @@ import {
   CSS
 } from "@dnd-kit/utilities";
 
+import AdminModal
+from "./components/AdminModal";
 
 function SortableImage({
   img,
@@ -43,98 +45,122 @@ function SortableImage({
     transition
   };
 
+
   return (
 
-    <div
-      ref={setNodeRef}
+<div
+  ref={setNodeRef}
 
-      style={{
-        ...style,
+  style={style}
 
-        position: "relative",
+  className="
+    group
+    relative
 
-        borderRadius: 22,
+    overflow-hidden
 
-        overflow: "hidden",
+    rounded-[30px]
 
-        background: "#f9fafb",
+    border
+    border-slate-100
 
-        border:
-          "1px solid #f3f4f6",
+    bg-white
 
-        boxShadow:
-          "0 6px 18px rgba(0,0,0,0.04)"
-      }}
-    >
+    shadow-[0_10px_30px_rgba(15,23,42,0.05)]
+
+    hover:-translate-y-1
+    hover:shadow-[0_25px_60px_rgba(236,72,153,0.10)]
+
+    transition-all
+    duration-300
+  "
+>
 
       {/* drag handle */}
-      <div
-        {...attributes}
-        {...listeners}
+<div
+  {...attributes}
+  {...listeners}
 
-        style={{
-          position: "absolute",
+  className="
+    absolute
 
-          top: 12,
-          left: 12,
+    top-3
+    left-3
 
-          zIndex: 10,
+    z-20
 
-          background:
-            "rgba(255,255,255,0.92)",
+    flex
+    items-center
+    justify-center
 
-          width: 36,
-          height: 36,
+    w-11
+    h-11
 
-          borderRadius: 12,
+    rounded-2xl
 
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+    bg-white/90
+    backdrop-blur-md
 
-          cursor: "grab",
+    border
+    border-white
 
-          fontWeight: "700"
-        }}
-      >
+    shadow-lg
+
+    cursor-grab
+
+    text-slate-700
+    font-black
+
+    opacity-0
+    group-hover:opacity-100
+
+    transition-all
+  "
+>
         ⋮⋮
       </div>
 
       {/* imagen */}
-      <img
-        src={img.url}
+<img
+  src={img.url}
 
-        style={{
-          width: "100%",
-          height: 220,
-          objectFit: "cover"
-        }}
-      />
+  className="
+    w-full
+    h-[240px]
+
+    object-cover
+
+    transition-all
+    duration-500
+
+    group-hover:scale-105
+  "
+/>
 
       {/* portada */}
       {index === 0 && (
 
-        <div
-          style={{
-            position: "absolute",
+<div className="
+  absolute
 
-            bottom: 12,
-            left: 12,
+  bottom-3
+  left-3
 
-            background:
-              "#111827",
+  rounded-full
 
-            color: "#fff",
+  bg-black/80
+  backdrop-blur-md
 
-            padding: "6px 12px",
+  px-4
+  py-2
 
-            borderRadius: 999,
+  text-xs
+  font-black
 
-            fontSize: 11,
+  text-white
 
-            fontWeight: "700"
-          }}
-        >
+  shadow-lg
+">
           Portada
         </div>
 
@@ -146,28 +172,42 @@ function SortableImage({
           eliminarImagen(img.id)
         }
 
-        style={{
-          position: "absolute",
+className="
+  absolute
 
-          top: 12,
-          right: 12,
+  top-3
+  right-3
 
-          width: 36,
-          height: 36,
+  z-20
 
-          borderRadius: 12,
+  flex
+  items-center
+  justify-center
 
-          border: "none",
+  w-11
+  h-11
 
-          background:
-            "rgba(255,255,255,0.92)",
+  rounded-2xl
 
-          color: "#ef4444",
+  bg-white/90
+  backdrop-blur-md
 
-          fontWeight: "700",
+  border
+  border-white
 
-          cursor: "pointer"
-        }}
+  shadow-lg
+
+  text-red-500
+  font-black
+
+  opacity-0
+  group-hover:opacity-100
+
+  hover:bg-red-500
+  hover:text-white
+
+  transition-all
+"
       >
         ✕
       </button>
@@ -786,6 +826,135 @@ const precioPromedio =
 
   return (
 
+<>
+    
+<div className="
+  sticky
+  top-0
+
+  z-50
+
+  mb-6
+
+  border
+  border-white/50
+
+  bg-white/80
+  backdrop-blur-xl
+
+  px-6
+  py-4
+
+  rounded-[24px]
+
+  shadow-[0_10px_40px_rgba(15,23,42,0.08)]
+">
+
+<div className="
+  flex
+  flex-wrap
+  items-center
+  justify-between
+
+  gap-4
+">
+
+  {/* izquierda */}
+  <div>
+
+    <div className="
+      text-xs
+
+      uppercase
+      tracking-[0.2em]
+
+      font-black
+
+      text-slate-400
+    ">
+      PRODUCTO
+    </div>
+
+    <div className="
+      text-2xl
+      font-black
+
+      text-slate-900
+    ">
+      {producto.name}
+    </div>
+
+  </div>
+
+  {/* derecha */}
+  <div className="
+    flex
+    items-center
+    gap-3
+  ">
+
+    <div className={`
+      px-4
+      py-2
+
+      rounded-full
+
+      text-sm
+      font-black
+
+      ${
+        producto.active
+          ? `
+            bg-emerald-50
+            text-emerald-600
+          `
+          : `
+            bg-red-50
+            text-red-600
+          `
+      }
+    `}>
+
+      {producto.active
+        ? "● Activo"
+        : "● Inactivo"}
+
+    </div>
+
+    <a
+      href={`/producto/${producto.slug}`}
+      target="_blank"
+      rel="noreferrer"
+
+      className="
+        px-5
+        py-3
+
+        rounded-2xl
+
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-500
+
+        text-white
+        font-bold
+
+        shadow-lg
+
+        hover:scale-[1.02]
+
+        transition-all
+      "
+    >
+      👁 Ver producto
+    </a>
+
+  </div>
+
+</div>
+
+</div>
+
 <div className="
   p-4
   md:p-8
@@ -797,62 +966,79 @@ const precioPromedio =
   to-pink-50
 ">
 
-     {/* HEADER PREMIUM */}
-<div
-  style={{
-    marginBottom: 30
-  }}
->
+{/* HEADER PREMIUM */}
+<div className="mb-8">
 
   {/* volver */}
-  <Link
-    to="/admin/productos"
-    style={{
-      textDecoration: "none",
-      color: "#ec4899",
-      fontWeight: "700",
-      fontSize: 15
-    }}
-  >
-    ← Volver a productos
-  </Link>
+<Link
+  to="/admin/productos"
+
+  className="
+    inline-flex
+    items-center
+    gap-2
+
+    text-pink-500
+    hover:text-pink-600
+
+    font-bold
+
+    transition-all
+    duration-200
+  "
+>
+  ← Volver a productos
+</Link>
 
   {/* card principal */}
-<AdminCard className="mt-5">
+<AdminCard className="
+  mt-5
 
-    <div
-      style={{
-        display: "flex",
-        gap: 24,
-        alignItems: "center",
-        flexWrap: "wrap"
-      }}
-    >
+  overflow-hidden
+
+  border
+  border-white/60
+
+  bg-white/80
+  backdrop-blur-xl
+
+  shadow-[0_20px_60px_rgba(15,23,42,0.08)]
+">
+
+<div className="
+  flex
+  flex-wrap
+  items-start
+  gap-6
+">
 
       {/* imagen */}
-      <img
-        src={
-          producto.product_images?.[0]?.url
-          || "/placeholder.png"
-        }
-        style={{
-          width: 120,
-          height: 120,
-          borderRadius: 24,
-          objectFit: "cover",
+<img
+  src={
+    producto.product_images?.[0]?.url
+    || "/placeholder.png"
+  }
 
-          boxShadow:
-            "0 10px 25px rgba(0,0,0,0.10)"
-        }}
-      />
+  className="
+    w-32
+    h-32
+
+    rounded-[28px]
+
+    object-cover
+
+    shadow-[0_15px_40px_rgba(15,23,42,0.15)]
+
+    border
+    border-white
+  "
+/>
 
 {/* INFO PREMIUM */}
-<div
-  style={{
-    flex: 1,
-    minWidth: 320
-  }}
->
+<div className="
+  flex-1
+  min-w-[320px]
+">
 
   {/* NOMBRE */}
   <input
@@ -872,35 +1058,32 @@ const precioPromedio =
       )
     }
 
-    style={{
-      width: "100%",
+className="
+  w-full
 
-      border: "none",
+  bg-transparent
 
-      fontSize: 38,
+  text-4xl
+  md:text-5xl
 
-      fontWeight: "900",
+  font-black
 
-      color: "#111827",
+  text-slate-900
 
-      outline: "none",
+  outline-none
 
-      marginBottom: 18,
-
-      background: "transparent"
-    }}
+  mb-5
+"
   />
 
   {/* BADGES */}
-  <div
-    style={{
-      display: "flex",
-      gap: 12,
-      flexWrap: "wrap",
+<div className="
+  flex
+  flex-wrap
+  gap-3
 
-      marginBottom: 18
-    }}
-  >
+  mb-5
+">
 
     {/* categoría */}
     <select
@@ -927,21 +1110,28 @@ const precioPromedio =
 
   }}
 
-  style={{
-    padding: "10px 16px",
+  className="
+  px-4
+  py-3
 
-    borderRadius: 999,
+  rounded-full
 
-    border:
-      "1px solid #e5e7eb",
+  border
+  border-slate-200
 
-    background:
-      "#f9fafb",
+  bg-slate-50
 
-    fontWeight: "700",
+  font-bold
 
-    cursor: "pointer"
-  }}
+  text-sm
+
+  cursor-pointer
+
+  transition-all
+
+  hover:border-pink-300
+  hover:bg-pink-50
+"
 >
 
   <option value="">
@@ -986,22 +1176,28 @@ const precioPromedio =
 
   }}
 
-  style={{
-    padding:
-      "10px 16px",
+className="
+  px-4
+  py-3
 
-    borderRadius: 999,
+  rounded-full
 
-    border:
-      "1px solid #e5e7eb",
+  border
+  border-slate-200
 
-    background:
-      "#f9fafb",
+  bg-slate-50
 
-    fontWeight: "700",
+  font-bold
 
-    cursor: "pointer"
-  }}
+  text-sm
+
+  cursor-pointer
+
+  transition-all
+
+  hover:border-pink-300
+  hover:bg-pink-50
+"
 >
 
   <option value="macho">
@@ -1137,50 +1333,90 @@ const precioPromedio =
 
   </div>
 
-      {/* 🔥 COLECCIONES PREMIUM */}
-<div
-  style={{
-    marginTop: 30
-  }}
->
+{/* 🔥 COLECCIONES PREMIUM */}
+<div className="mt-8">
 
-  <h3
-    style={{
-      fontSize: 22,
-      fontWeight: "800",
-      marginBottom: 20
-    }}
-  >
+<h3 className="
+  text-2xl
+  font-black
+
+  text-slate-900
+
+  mb-5
+">
     🏷 Colecciones
   </h3>
 
-  <div
-    style={{
-      display: "flex",
-      gap: 14,
-      flexWrap: "wrap"
-    }}
-  >
+<div className="
+  flex
+  flex-wrap
+
+  gap-4
+">
 
     {/* NUEVA COLECCIÓN */}
-    <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "14px 18px",
-        borderRadius: 20,
-        background:
-        producto.new_collection
-            ? "#ecfdf5"
-            : "#f3f4f6",
-        cursor: "pointer",
-        fontWeight: "700"
-      }}
-    >
+<label className={`
+  group
+
+  inline-flex
+  items-center
+  gap-3
+
+  rounded-[22px]
+
+  px-5
+  py-4
+
+  cursor-pointer
+
+  font-black
+
+  border
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-1
+
+  ${
+    producto.new_collection
+
+      ? `
+        border-emerald-200
+
+        bg-gradient-to-r
+        from-emerald-500
+        to-teal-500
+
+        text-white
+
+        shadow-[0_10px_30px_rgba(16,185,129,0.25)]
+      `
+
+      : `
+        border-slate-200
+
+        bg-white
+
+        text-slate-700
+
+        hover:border-emerald-200
+        hover:bg-emerald-50
+      `
+  }
+`}>
 
       <input
         type="checkbox"
+
+        className="
+          w-5
+          h-5
+
+          accent-white
+
+          cursor-pointer
+        "
 
         checked={
           Boolean(producto.new_collection)
@@ -1211,24 +1447,67 @@ const precioPromedio =
     </label>
 
     {/* BEST SELLER */}
-    <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "14px 18px",
-        borderRadius: 20,
-        background:
-          producto.best_seller
-            ? "#eff6ff"
-            : "#f3f4f6",
-        cursor: "pointer",
-        fontWeight: "700"
-      }}
-    >
+<label className={`
+  group
+
+  inline-flex
+  items-center
+  gap-3
+
+  rounded-[22px]
+
+  px-5
+  py-4
+
+  cursor-pointer
+
+  font-black
+
+  border
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-1
+
+  ${
+    producto.best_seller
+
+      ? `
+        border-blue-200
+
+        bg-gradient-to-r
+        from-blue-500
+        to-cyan-500
+
+        text-white
+
+        shadow-[0_10px_30px_rgba(59,130,246,0.25)]
+      `
+
+      : `
+        border-slate-200
+
+        bg-white
+
+        text-slate-700
+
+        hover:border-blue-200
+        hover:bg-blue-50
+      `
+  }
+`}>
 
       <input
         type="checkbox"
+        className="
+  w-5
+  h-5
+
+  accent-white
+
+  cursor-pointer
+"
 
         checked={
           Boolean(producto.best_seller)
@@ -1259,24 +1538,67 @@ const precioPromedio =
     </label>
 
     {/* LUXURY */}
-    <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "14px 18px",
-        borderRadius: 20,
-        background:
-          producto.luxury
-            ? "#fef3c7"
-            : "#f3f4f6",
-        cursor: "pointer",
-        fontWeight: "700"
-      }}
-    >
+<label className={`
+  group
+
+  inline-flex
+  items-center
+  gap-3
+
+  rounded-[22px]
+
+  px-5
+  py-4
+
+  cursor-pointer
+
+  font-black
+
+  border
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-1
+
+  ${
+    producto.luxury
+
+      ? `
+        border-amber-200
+
+        bg-gradient-to-r
+        from-amber-400
+        to-yellow-500
+
+        text-white
+
+        shadow-[0_10px_30px_rgba(245,158,11,0.25)]
+      `
+
+      : `
+        border-slate-200
+
+        bg-white
+
+        text-slate-700
+
+        hover:border-amber-200
+        hover:bg-amber-50
+      `
+  }
+`}>
 
       <input
         type="checkbox"
+        className="
+  w-5
+  h-5
+
+  accent-white
+
+  cursor-pointer
+"
 
         checked={
           Boolean(producto.luxury)
@@ -1307,25 +1629,67 @@ const precioPromedio =
     </label>
 
     {/* EXCLUSIVO */}
-    <label
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "14px 18px",
-        borderRadius: 20,
-        background:
-          producto.exclusive
-            ? "#fce7f3"
-            : "#f3f4f6",
-        cursor: "pointer",
-        fontWeight: "700"
-      }}
-    >
+<label className={`
+  group
+
+  inline-flex
+  items-center
+  gap-3
+
+  rounded-[22px]
+
+  px-5
+  py-4
+
+  cursor-pointer
+
+  font-black
+
+  border
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-1
+
+  ${
+    producto.exclusive
+
+      ? `
+        border-pink-200
+
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-500
+
+        text-white
+
+        shadow-[0_10px_30px_rgba(236,72,153,0.25)]
+      `
+
+      : `
+        border-slate-200
+
+        bg-white
+
+        text-slate-700
+
+        hover:border-pink-200
+        hover:bg-pink-50
+      `
+  }
+`}>
 
       <input
         type="checkbox"
+        className="
+  w-5
+  h-5
 
+  accent-white
+
+  cursor-pointer
+"
         checked={
           Boolean(producto.exclusive)
         }
@@ -1385,209 +1749,156 @@ const precioPromedio =
 
     rows={4}
 
-    style={{
-      width: "100%",
+className="
+  w-full
 
-      padding: 18,
+  rounded-[24px]
 
-      borderRadius: 20,
+  border
+  border-slate-200
 
-      border:
-        "1px solid #e5e7eb",
+  bg-slate-50
 
-      background:
-        "#f9fafb",
+  p-5
 
-      resize: "vertical",
+  text-[15px]
 
-      fontSize: 15,
+  resize-y
 
-      outline: "none"
-    }}
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+"
   />
 
   {/* GUARDANDO */}
+<div className="
+  fixed
+  bottom-6
+  right-6
+
+  z-[9999]
+
+  transition-all
+  duration-300
+
+  pointer-events-none
+">
+
   {guardandoInfo && (
 
-    <div
-      style={{
-        marginTop: 12,
+    <div className="
+      flex
+      items-center
+      gap-3
 
-        color: "#ec4899",
+      rounded-2xl
 
-        fontWeight: "700"
-      }}
-    >
-      Guardando...
+      bg-slate-900/95
+      backdrop-blur-xl
+
+      px-5
+      py-4
+
+      text-white
+
+      shadow-[0_20px_60px_rgba(15,23,42,0.35)]
+
+      border
+      border-white/10
+    ">
+
+      <div className="
+        w-3
+        h-3
+
+        rounded-full
+
+        bg-emerald-400
+
+        animate-pulse
+      " />
+
+      <span className="
+        text-sm
+        font-bold
+      ">
+        Guardando cambios...
+      </span>
+
     </div>
 
   )}
 
 </div>
 
-      {/* KPIs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          flexWrap: "wrap"
-        }}
-      >
+</div>
 
-        {/* stock total */}
-        <div
-          style={{
-            minWidth: 130,
 
-            background:
-              "linear-gradient(135deg,#fff7ed,#ffedd5)",
-
-            borderRadius: 22,
-
-            padding: 18
-          }}
-        >
-
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: "700",
-              color: "#9a3412"
-            }}
-          >
-            STOCK TOTAL
-          </div>
-
-          <div
-            style={{
-              marginTop: 8,
-
-              fontSize: 30,
-              fontWeight: "800",
-
-              color: "#111827"
-            }}
-          >
-            {
-              producto.product_variants.reduce(
-                (acc, v) =>
-                  acc + (v.stock || 0),
-                0
-              )
-            }
-          </div>
-
-        </div>
-
-        {/* precio desde */}
-        <div
-          style={{
-            minWidth: 160,
-
-            background:
-              "linear-gradient(135deg,#eff6ff,#dbeafe)",
-
-            borderRadius: 22,
-
-            padding: 18
-          }}
-        >
-
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: "700",
-              color: "#1d4ed8"
-            }}
-          >
-            PRECIO DESDE
-          </div>
-
-          <div
-            style={{
-              marginTop: 8,
-
-              fontSize: 28,
-              fontWeight: "800",
-
-              color: "#111827"
-            }}
-          >
-            {
-  producto.product_variants.length > 0
-    ? `$${Math.min(
-        ...producto.product_variants.map(
-          v => v.price || 0
-        )
-      ).toLocaleString("es-CL")}`
-
-    : "$0"
-}
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
 
 </AdminCard>
 
       {/* SEO PREMIUM */}
-<AdminCard className="mb-6">
+<AdminCard className="
+  mb-6
+
+  border
+  border-slate-100
+
+  bg-white/90
+  backdrop-blur-xl
+
+  shadow-[0_10px_40px_rgba(15,23,42,0.06)]
+">
 
   {/* título */}
-  <div
-    style={{
-      marginBottom: 22
-    }}
-  >
+<div className="mb-6">
 
-    <h2
-      style={{
-        margin: 0,
-        fontSize: 24,
-        fontWeight: "800"
-      }}
-    >
+    <h2 className="
+  text-2xl
+  font-black
+  text-slate-900
+">
       🔎 SEO Producto
     </h2>
 
-    <p
-      style={{
-        marginTop: 8,
-        color: "#6b7280"
-      }}
-    >
+    <p className="
+  mt-2
+
+  text-slate-500
+
+  leading-relaxed
+">
       Optimiza este producto para Google
     </p>
 
   </div>
 
   {/* grid */}
-  <div
-    style={{
-      display: "grid",
+  <div className="
+  grid
+  grid-cols-1
+  md:grid-cols-2
 
-      gridTemplateColumns:
-        "repeat(auto-fit,minmax(280px,1fr))",
-
-      gap: 20
-    }}
-  >
+  gap-5
+">
 
     {/* slug */}
     <div>
 
-      <label
-        style={{
-          display: "block",
+      <label className="
+  block
 
-          marginBottom: 8,
+  mb-2
 
-          fontWeight: "700"
-        }}
-      >
+  text-sm
+  font-black
+
+  text-slate-700
+">
         URL / Slug
       </label>
 
@@ -1617,18 +1928,28 @@ const precioPromedio =
 
         placeholder="producto-premium"
 
-        style={{
-          width: "100%",
+        className="
+  w-full
 
-          padding: "14px 16px",
+  rounded-2xl
 
-          borderRadius: 16,
+  border
+  border-slate-200
 
-          border:
-            "1px solid #e5e7eb",
+  bg-slate-50
 
-          fontWeight: "600"
-        }}
+  px-4
+  py-3
+
+  font-semibold
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+"
       />
 
     </div>
@@ -1636,15 +1957,16 @@ const precioPromedio =
     {/* meta title */}
     <div>
 
-      <label
-        style={{
-          display: "block",
+      <label className="
+  block
 
-          marginBottom: 8,
+  mb-2
 
-          fontWeight: "700"
-        }}
-      >
+  text-sm
+  font-black
+
+  text-slate-700
+">
         Meta title
       </label>
 
@@ -1672,18 +1994,28 @@ const precioPromedio =
           Título SEO Google
         "
 
-        style={{
-          width: "100%",
+className="
+  w-full
 
-          padding: "14px 16px",
+  rounded-2xl
 
-          borderRadius: 16,
+  border
+  border-slate-200
 
-          border:
-            "1px solid #e5e7eb",
+  bg-slate-50
 
-          fontWeight: "600"
-        }}
+  px-4
+  py-3
+
+  font-semibold
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+"
       />
 
     </div>
@@ -1697,15 +2029,16 @@ const precioPromedio =
     }}
   >
 
-    <label
-      style={{
-        display: "block",
+<label className="
+  block
 
-        marginBottom: 8,
+  mb-2
 
-        fontWeight: "700"
-      }}
-    >
+  text-sm
+  font-black
+
+  text-slate-700
+">
       Meta description
     </label>
 
@@ -1736,20 +2069,29 @@ const precioPromedio =
         Descripción SEO Google
       "
 
-      style={{
-        width: "100%",
+className="
+  w-full
 
-        padding: 18,
+  rounded-[24px]
 
-        borderRadius: 20,
+  border
+  border-slate-200
 
-        border:
-          "1px solid #e5e7eb",
+  bg-slate-50
 
-        resize: "vertical",
+  p-5
 
-        fontSize: 15
-      }}
+  resize-y
+
+  text-[15px]
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+"
     />
 
   </div>
@@ -1761,15 +2103,16 @@ const precioPromedio =
     }}
   >
 
-    <label
-      style={{
-        display: "block",
+<label className="
+  block
 
-        marginBottom: 8,
+  mb-2
 
-        fontWeight: "700"
-      }}
-    >
+  text-sm
+  font-black
+
+  text-slate-700
+">
       Keywords SEO
     </label>
 
@@ -1797,62 +2140,70 @@ const precioPromedio =
         ropa mascotas, luxury pet...
       "
 
-      style={{
-        width: "100%",
+className="
+  w-full
 
-        padding: "14px 16px",
+  rounded-2xl
 
-        borderRadius: 16,
+  border
+  border-slate-200
 
-        border:
-          "1px solid #e5e7eb",
+  bg-slate-50
 
-        fontWeight: "600"
-      }}
+  px-4
+  py-3
+
+  font-semibold
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+"
     />
 
   </div>
 
   {/* preview google */}
-  <div
-    style={{
-      marginTop: 28,
+<div className="
+  mt-8
 
-      background: "#f9fafb",
+  rounded-[28px]
 
-      borderRadius: 22,
+  border
+  border-slate-100
 
-      padding: 22,
+  bg-gradient-to-br
+  from-slate-50
+  to-white
 
-      border:
-        "1px solid #f3f4f6"
-    }}
-  >
+  p-6
 
-    <div
-      style={{
-        color: "#1a0dab",
+  shadow-inner
+">
 
-        fontSize: 22,
+<div className="
+  text-[22px]
 
-        fontWeight: "500"
-      }}
-    >
+  font-semibold
+
+  text-blue-700
+">
       {
         producto.meta_title
         || producto.name
       }
     </div>
 
-    <div
-      style={{
-        marginTop: 6,
+<div className="
+  mt-2
 
-        color: "#15803d",
+  text-sm
 
-        fontSize: 14
-      }}
-    >
+  text-green-700
+">
       boutiquepetlove.cl/producto/
       {
         producto.slug
@@ -1862,15 +2213,13 @@ const precioPromedio =
       }
     </div>
 
-    <div
-      style={{
-        marginTop: 10,
+<div className="
+  mt-3
 
-        color: "#4b5563",
+  text-slate-600
 
-        lineHeight: 1.6
-      }}
-    >
+  leading-relaxed
+">
       {
         producto.meta_description
         || producto.description
@@ -1881,142 +2230,360 @@ const precioPromedio =
 
 </AdminCard>
 
-      {/* ANALYTICS PREMIUM */}
+{/* ANALYTICS PREMIUM */}
 <div className="
   grid
+
   grid-cols-1
   md:grid-cols-2
   xl:grid-cols-4
-  gap-5
-  mb-6
+
+  gap-6
+
+  mb-8
 ">
 
   {/* STOCK */}
-<AdminCard>
+<AdminCard className="
+  group
+  relative
+  overflow-hidden
 
-    <div
-      style={{
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#6b7280"
-      }}
-    >
-      STOCK TOTAL
-    </div>
+  border
+  border-white/60
 
-    <div
-      style={{
-        marginTop: 12,
+  bg-gradient-to-br
+  from-orange-50
+  to-white
 
-        fontSize: 36,
+  shadow-[0_10px_30px_rgba(15,23,42,0.05)]
 
-        fontWeight: "900",
+  hover:-translate-y-1
+  hover:shadow-[0_25px_60px_rgba(251,146,60,0.12)]
 
-        color: "#111827"
-      }}
-    >
-      {stockTotal}
-    </div>
+  transition-all
+  duration-300
+">
 
-  </AdminCard>
+<div className="
+  absolute
+  -top-10
+  -right-10
+
+  w-32
+  h-32
+
+  rounded-full
+
+  bg-orange-200/40
+
+  blur-3xl
+" />
+
+<div className="
+  relative
+  z-10
+
+  text-4xl
+
+  mb-5
+">
+  📦
+</div>
+
+<div className="
+  relative
+  z-10
+
+  text-xs
+
+  uppercase
+  tracking-[0.2em]
+
+  font-black
+
+  text-orange-700
+">
+  STOCK TOTAL
+</div>
+
+<div className="
+  relative
+  z-10
+
+  mt-4
+
+  text-5xl
+
+  font-black
+
+  text-slate-900
+">
+  {stockTotal}
+</div>
+
+</AdminCard>
 
   {/* INVENTARIO */}
-<AdminCard>
+<AdminCard className="
+  group
+  relative
+  overflow-hidden
 
-    <div
-      style={{
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#6b7280"
-      }}
-    >
-      VALOR INVENTARIO
-    </div>
+  border
+  border-white/60
 
-    <div
-      style={{
-        marginTop: 12,
+  bg-gradient-to-br
+  from-emerald-50
+  to-white
 
-        fontSize: 28,
+  shadow-[0_10px_30px_rgba(15,23,42,0.05)]
 
-        fontWeight: "900",
+  hover:-translate-y-1
+  hover:shadow-[0_25px_60px_rgba(16,185,129,0.12)]
 
-        color: "#059669"
-      }}
-    >
-      $
-      {valorInventario.toLocaleString(
-        "es-CL"
-      )}
-    </div>
+  transition-all
+  duration-300
+">
 
-  </AdminCard>
+<div className="
+  absolute
+  -top-10
+  -right-10
+
+  w-32
+  h-32
+
+  rounded-full
+
+  bg-emerald-200/40
+
+  blur-3xl
+" />
+
+<div className="
+  relative
+  z-10
+
+  text-4xl
+
+  mb-5
+">
+  💵
+</div>
+
+<div className="
+  relative
+  z-10
+
+  text-xs
+
+  uppercase
+  tracking-[0.2em]
+
+  font-black
+
+  text-emerald-700
+">
+  VALOR INVENTARIO
+</div>
+
+<div className="
+  relative
+  z-10
+
+  mt-4
+
+  text-3xl
+
+  font-black
+
+  text-emerald-600
+">
+  $
+  {valorInventario.toLocaleString("es-CL")}
+</div>
+
+</AdminCard>
+
 
   {/* PROMEDIO */}
-<AdminCard>
+<AdminCard className="
+  group
+  relative
+  overflow-hidden
 
-    <div
-      style={{
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#6b7280"
-      }}
-    >
-      PRECIO PROMEDIO
-    </div>
+  border
+  border-white/60
 
-    <div
-      style={{
-        marginTop: 12,
+  bg-gradient-to-br
+  from-blue-50
+  to-white
 
-        fontSize: 28,
+  shadow-[0_10px_30px_rgba(15,23,42,0.05)]
 
-        fontWeight: "900",
+  hover:-translate-y-1
+  hover:shadow-[0_25px_60px_rgba(16,185,129,0.12)]
 
-        color: "#2563eb"
-      }}
-    >
-      $
-      {precioPromedio.toLocaleString(
-        "es-CL"
-      )}
-    </div>
+  transition-all
+  duration-300
+">
 
-  </AdminCard>
+<div className="
+  absolute
+  -top-10
+  -right-10
+
+  w-32
+  h-32
+
+  rounded-full
+
+  bg-blue-200/40
+
+  blur-3xl
+" />
+
+<div className="
+  relative
+  z-10
+
+  text-4xl
+
+  mb-5
+">
+  💎
+</div>
+
+<div className="
+  relative
+  z-10
+
+  text-xs
+
+  uppercase
+  tracking-[0.2em]
+
+  font-black
+
+  text-blue-700
+">
+  PRECIO PROMEDIO
+</div>
+
+<div className="
+  relative
+  z-10
+
+  mt-4
+
+  text-3xl
+
+  font-black
+
+  text-blue-600
+">
+  $
+{precioPromedio.toLocaleString("es-CL")}
+</div>
+
+</AdminCard>
+  
 
   {/* ALERTAS */}
-<AdminCard>
+<AdminCard className="
+  group
+  relative
+  overflow-hidden
 
-    <div
-      style={{
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#6b7280"
-      }}
-    >
-      ALERTAS
-    </div>
+  border
+  border-white/60
 
-    <div
-      style={{
-        marginTop: 14,
+  bg-gradient-to-br
+  from-rose-50
+  to-white
 
-        display: "flex",
+  shadow-[0_10px_30px_rgba(15,23,42,0.05)]
 
-        flexDirection: "column",
+  hover:-translate-y-1
+  hover:shadow-[0_25px_60px_rgba(244,63,94,0.12)]
 
-        gap: 10
-      }}
-    >
+  transition-all
+  duration-300
+">
+
+<div className="
+  absolute
+  -top-10
+  -right-10
+
+  w-32
+  h-32
+
+  rounded-full
+
+  bg-rose-200/40
+
+  blur-3xl
+" />
+
+<div className="
+  relative
+  z-10
+
+  text-4xl
+
+  mb-5
+">
+  🚨
+</div>
+
+<div className="
+  relative
+  z-10
+
+  text-xs
+
+  uppercase
+  tracking-[0.2em]
+
+  font-black
+
+  text-rose-700
+">
+  ALERTAS
+</div>
+
+<div className="
+  relative
+  z-10
+
+  mt-5
+
+  flex
+  flex-col
+
+  gap-3
+">
 
       {variantesAgotadas > 0 && (
 
-        <div
-          style={{
-            color: "#dc2626",
-            fontWeight: "700"
-          }}
-        >
+<div className="
+  rounded-2xl
+
+  border
+  border-red-100
+
+  bg-red-50
+
+  px-4
+  py-3
+
+  text-sm
+  font-black
+
+  text-red-600
+">
           🔴 {variantesAgotadas}
           {" "}agotadas
         </div>
@@ -2025,12 +2592,22 @@ const precioPromedio =
 
       {variantesBajoStock > 0 && (
 
-        <div
-          style={{
-            color: "#ea580c",
-            fontWeight: "700"
-          }}
-        >
+<div className="
+  rounded-2xl
+
+  border
+  border-orange-100
+
+  bg-orange-50
+
+  px-4
+  py-3
+
+  text-sm
+  font-black
+
+  text-orange-600
+">
           🟠 {variantesBajoStock}
           {" "}bajo stock
         </div>
@@ -2038,24 +2615,44 @@ const precioPromedio =
       )}
 
       {!producto.meta_title && (
-        <div
-          style={{
-            color: "#9333ea",
-            fontWeight: "700"
-          }}
-        >
+<div className="
+  rounded-2xl
+
+  border
+  border-purple-100
+
+  bg-purple-50
+
+  px-4
+  py-3
+
+  text-sm
+  font-black
+
+  text-purple-600
+">
           🟣 SEO incompleto
         </div>
       )}
 
       {producto.product_images
         .length === 0 && (
-        <div
-          style={{
-            color: "#2563eb",
-            fontWeight: "700"
-          }}
-        >
+<div className="
+  rounded-2xl
+
+  border
+  border-blue-100
+
+  bg-blue-50
+
+  px-4
+  py-3
+
+  text-sm
+  font-black
+
+  text-blue-600
+">
           🔵 Sin imágenes
         </div>
       )}
@@ -2066,81 +2663,97 @@ const precioPromedio =
 
 </div>
 
-      {/* DESCUENTOS PREMIUM */}
-<AdminCard>
+{/* DESCUENTOS PREMIUM */}
+<AdminCard className="
+  mb-6
+
+  border
+  border-slate-100
+
+  bg-white/90
+  backdrop-blur-xl
+
+  shadow-[0_10px_40px_rgba(15,23,42,0.06)]
+">
 
   {/* título */}
-  <div
-    style={{
-      marginBottom: 24
-    }}
-  >
+<div className="mb-6">
 
-    <h2
-      style={{
-        margin: 0,
-
-        fontSize: 24,
-
-        fontWeight: "800"
-      }}
-    >
+<h2 className="
+  text-2xl
+  font-black
+  text-slate-900
+">
       🔥 Descuentos
     </h2>
 
-    <p
-      style={{
-        marginTop: 8,
+<p className="
+  mt-2
 
-        color: "#6b7280"
-      }}
-    >
+  text-slate-500
+
+  leading-relaxed
+">
       Configura promociones del producto
     </p>
 
   </div>
 
   {/* activar */}
-  <div
-    style={{
-      display: "flex",
+<div className="
+  flex
+  items-center
+  gap-3
 
-      alignItems: "center",
+  mb-6
+">
 
-      gap: 12,
+<label className={`
+  inline-flex
+  items-center
+  gap-3
 
-      marginBottom: 24
-    }}
-  >
+  rounded-[22px]
 
-    <label
-      style={{
-        display: "flex",
+  px-5
+  py-4
 
-        alignItems: "center",
+  font-black
 
-        gap: 10,
+  transition-all
 
-        background:
-          producto.discount_active
-            ? "#fef2f2"
-            : "#f9fafb",
+  ${
+    producto.discount_active
 
-        color:
-          producto.discount_active
-            ? "#dc2626"
-            : "#374151",
+      ? `
+        bg-red-50
+        text-red-600
 
-        padding: "14px 18px",
+        border
+        border-red-100
+      `
 
-        borderRadius: 18,
+      : `
+        bg-slate-50
+        text-slate-700
 
-        fontWeight: "700"
-      }}
-    >
+        border
+        border-slate-200
+      `
+  }
+`}>
 
       <input
         type="checkbox"
+
+        className="
+  w-5
+  h-5
+
+  accent-pink-500
+
+  cursor-pointer
+"
 
         checked={
           Boolean(
@@ -2163,21 +2776,20 @@ const precioPromedio =
   </div>
 
   {/* porcentaje */}
-  <div
-    style={{
-      maxWidth: 280
-    }}
-  >
+<div className="
+  max-w-[280px]
+">
 
-    <label
-      style={{
-        display: "block",
+<label className="
+  block
 
-        marginBottom: 8,
+  mb-2
 
-        fontWeight: "700"
-      }}
-    >
+  text-sm
+  font-black
+
+  text-slate-700
+">
       % descuento
     </label>
 
@@ -2208,76 +2820,98 @@ const precioPromedio =
       min={0}
       max={90}
 
-      style={{
-        width: "100%",
+className="
+  w-full
 
-        padding: "16px 18px",
+  rounded-[22px]
 
-        borderRadius: 18,
+  border
+  border-slate-200
 
-        border:
-          "1px solid #e5e7eb",
+  bg-slate-50
 
-        fontSize: 18,
+  px-5
+  py-4
 
-        fontWeight: "800"
-      }}
+  text-xl
+  font-black
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:bg-white
+
+  focus:ring-4
+  focus:ring-pink-100
+"
     />
 
   </div>
 
   {/* preview */}
-  <div
-    style={{
-      marginTop: 28,
+<div className="
+  relative
+  overflow-hidden
 
-      background:
-        "linear-gradient(135deg,#fff1f2,#ffe4e6)",
+  mt-8
 
-      borderRadius: 24,
+  rounded-[32px]
 
-      padding: 24
-    }}
-  >
+  border
+  border-pink-100
 
-    <div
-      style={{
-        fontSize: 14,
+  bg-gradient-to-br
+  from-pink-50
+  via-white
+  to-purple-50
 
-        fontWeight: "700",
+  p-8
 
-        color: "#9f1239",
+  shadow-[0_20px_60px_rgba(236,72,153,0.08)]
+">
 
-        marginBottom: 14
-      }}
-    >
+<div className="
+  relative
+  z-10
+
+  text-sm
+
+  font-black
+
+  tracking-[0.2em]
+
+  text-pink-700
+
+  uppercase
+
+  mb-4
+">
       PREVIEW DESCUENTO
     </div>
 
-    <div
-      style={{
-        display: "flex",
+<div className="
+  relative
+  z-10
 
-        alignItems: "center",
+  flex
+  flex-wrap
+  items-center
 
-        gap: 14,
-
-        flexWrap: "wrap"
-      }}
-    >
+  gap-4
+">
 
       {/* precio original */}
-      <div
-        style={{
-          fontSize: 24,
+<div className="
+  text-2xl
 
-          textDecoration: "line-through",
+  font-bold
 
-          color: "#9ca3af",
+  text-slate-400
 
-          fontWeight: "700"
-        }}
-      >
+  line-through
+">
         $
         {
           precioPromedio.toLocaleString(
@@ -2287,15 +2921,14 @@ const precioPromedio =
       </div>
 
       {/* precio descuento */}
-      <div
-        style={{
-          fontSize: 36,
+<div className="
+  text-5xl
+  md:text-6xl
 
-          fontWeight: "900",
+  font-black
 
-          color: "#e11d48"
-        }}
-      >
+  text-pink-600
+">
         $
         {
           Math.round(
@@ -2319,22 +2952,26 @@ const precioPromedio =
       {/* badge */}
       {producto.discount_active && (
 
-        <div
-          style={{
-            background:
-              "#e11d48",
+<div className="
+  inline-flex
+  items-center
 
-            color: "#fff",
+  rounded-full
 
-            padding: "10px 14px",
+  bg-gradient-to-r
+  from-pink-500
+  to-purple-500
 
-            borderRadius: 999,
+  px-5
+  py-3
 
-            fontWeight: "800",
+  text-sm
+  font-black
 
-            fontSize: 14
-          }}
-        >
+  text-white
+
+  shadow-lg
+">
           🔥 -
           {
             producto.discount_percent
@@ -2349,63 +2986,86 @@ const precioPromedio =
 
 </AdminCard>
 
-      {/* IMÁGENES PREMIUM */}
-<AdminCard>
+{/* IMÁGENES PREMIUM */}
+<AdminCard className="
+  mb-6
+
+  border
+  border-slate-100
+
+  bg-white/90
+  backdrop-blur-xl
+
+  shadow-[0_10px_40px_rgba(15,23,42,0.06)]
+">
 
   {/* título */}
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
+<div className="
+  flex
+  flex-col
+  md:flex-row
 
-      marginBottom: 22
-    }}
-  >
+  md:items-center
+  md:justify-between
+
+  gap-5
+
+  mb-6
+">
 
     <div>
 
-      <h2
-        style={{
-          margin: 0,
-          fontSize: 22,
-          fontWeight: "800"
-        }}
-      >
+<h2 className="
+  text-2xl
+  font-black
+  text-slate-900
+">
         📸 Imágenes
       </h2>
 
-      <p
-        style={{
-          marginTop: 6,
-          color: "#6b7280"
-        }}
-      >
+<p className="
+  mt-2
+
+  text-slate-500
+
+  leading-relaxed
+">
         Gestiona imágenes del producto
       </p>
 
     </div>
 
     {/* subir */}
-    <label
-      style={{
-        background:
-          "linear-gradient(135deg,#ec4899,#db2777)",
+<label className="
+  group
 
-        color: "#fff",
+  inline-flex
+  items-center
+  gap-3
 
-        padding: "14px 18px",
+  rounded-[22px]
 
-        borderRadius: 16,
+  bg-gradient-to-r
+  from-pink-500
+  to-purple-500
 
-        fontWeight: "700",
+  px-6
+  py-4
 
-        cursor: "pointer",
+  text-sm
+  font-black
 
-        boxShadow:
-          "0 10px 25px rgba(236,72,153,0.25)"
-      }}
-    >
+  text-white
+
+  cursor-pointer
+
+  shadow-[0_12px_30px_rgba(236,72,153,0.28)]
+
+  hover:scale-[1.02]
+
+  transition-all
+  duration-300
+">
 
       {subiendoImagen
         ? "Subiendo..."
@@ -2450,16 +3110,15 @@ const precioPromedio =
     }
   >
 
-    <div
-      style={{
-        display: "grid",
+<div className="
+  grid
 
-        gridTemplateColumns:
-          "repeat(auto-fill,minmax(180px,1fr))",
+  grid-cols-2
+  md:grid-cols-3
+  xl:grid-cols-4
 
-        gap: 18
-      }}
-    >
+  gap-5
+">
 
       {producto.product_images.map(
         (img, index) => (
@@ -2479,6 +3138,52 @@ const precioPromedio =
         )
       )}
 
+  {producto.product_images.length === 0 && (
+
+  <div className="
+    col-span-full
+
+    rounded-[32px]
+
+    border-2
+    border-dashed
+    border-slate-200
+
+    bg-slate-50/70
+
+    p-16
+
+    text-center
+  ">
+
+    <div className="
+      text-6xl
+      mb-5
+    ">
+      📸
+    </div>
+
+    <div className="
+      text-xl
+      font-black
+
+      text-slate-800
+    ">
+      Aún no hay imágenes
+    </div>
+
+    <p className="
+      mt-3
+
+      text-slate-500
+    ">
+      Sube imágenes premium para mejorar conversión
+    </p>
+
+  </div>
+
+)}
+
     </div>
 
   </SortableContext>
@@ -2488,123 +3193,117 @@ const precioPromedio =
 </AdminCard>
       
 {/* TABLA PREMIUM */}
-<AdminCard>
+<AdminCard className="
+  overflow-x-auto
+  
+  border
+  border-slate-100
+
+  bg-white/90
+  backdrop-blur-xl
+
+  shadow-[0_10px_40px_rgba(15,23,42,0.06)]
+">
 
   {/* encabezado */}
-  <div
-    style={{
-      display: "grid",
+<div className="
+  grid
 
-      gridTemplateColumns:
-        "1fr 1fr 1fr 1fr 120px",
+  grid-cols-[1fr_1fr_1fr_1fr_120px]
 
-      padding: "0 16px 18px 16px",
+  px-4
+  pb-5
 
-      borderBottom:
-        "1px solid #f3f4f6",
+  border-b
+  border-slate-100
 
-      fontSize: 13,
+  text-xs
 
-      fontWeight: "700",
+  uppercase
+  tracking-[0.18em]
 
-      color: "#6b7280"
-    }}
-  >
+  font-black
 
-    <div>Talla</div>
+  text-slate-500
+">
 
-    <div>Precio</div>
+  <div>Talla</div>
 
-    <div>Stock</div>
+  <div>Precio</div>
 
-    <div>Estado</div>
+  <div>Stock</div>
 
-    <div>Acciones</div>
+  <div>Estado</div>
 
-  </div>
+  <div>Acciones</div>
+
+</div>
 
   {/* filas */}
-  <div
-    style={{
-      marginTop: 8,
+<div className="
+  mt-3
 
-      display: "flex",
-      flexDirection: "column",
-      gap: 12
-    }}
-  >
+  flex
+  flex-col
+
+  gap-3
+">
 
     {producto.product_variants.map(v => (
 
-      <div
-        key={v.id}
+<div
+  key={v.id}
 
-        style={{
-          display: "grid",
+  className="
+    grid
 
-          gridTemplateColumns:
-            "1fr 1fr 1fr 1fr 120px",
+    grid-cols-[1fr_1fr_1fr_1fr_120px]
 
-          alignItems: "center",
+    items-center
 
-          padding: 16,
+    rounded-[28px]
 
-          borderRadius: 22,
+    border
+    border-slate-100
 
-          background:
-            "linear-gradient(to right,#fff,#fcfcfc)",
+    bg-gradient-to-r
+    from-white
+    to-slate-50/50
 
-          border:
-            "1px solid #f3f4f6",
+    p-4
 
-          transition:
-            "all .25s ease",
+    shadow-[0_4px_14px_rgba(15,23,42,0.04)]
 
-          boxShadow:
-            "0 4px 12px rgba(0,0,0,0.03)"
-        }}
+    hover:-translate-y-1
+    hover:shadow-[0_18px_40px_rgba(236,72,153,0.08)]
 
-        onMouseEnter={(e) => {
-
-          e.currentTarget.style.transform =
-            "translateY(-2px)";
-
-          e.currentTarget.style.boxShadow =
-            "0 12px 24px rgba(0,0,0,0.06)";
-
-        }}
-
-        onMouseLeave={(e) => {
-
-          e.currentTarget.style.transform =
-            "translateY(0px)";
-
-          e.currentTarget.style.boxShadow =
-            "0 4px 12px rgba(0,0,0,0.03)";
-
-        }}
-      >
+    transition-all
+    duration-300
+  "
+>
 
         {/* TALLA */}
         <div>
 
-          <span
-            style={{
-              background:
-                "#f9fafb",
+<span className="
+  inline-flex
+  items-center
 
-              border:
-                "1px solid #e5e7eb",
+  rounded-full
 
-              padding: "10px 16px",
+  border
+  border-slate-200
 
-              borderRadius: 999,
+  bg-white
 
-              fontWeight: "700",
+  px-4
+  py-2
 
-              fontSize: 14
-            }}
-          >
+  text-sm
+  font-black
+
+  shadow-sm
+">
             {v.size}
           </span>
 
@@ -2649,25 +3348,31 @@ const precioPromedio =
 
             }}
 
-            style={{
-              width: 140,
+className="
+  w-[150px]
 
-              padding: "12px 16px",
+  rounded-2xl
 
-              borderRadius: 16,
+  border
+  border-slate-200
 
-              border:
-                "1px solid #e5e7eb",
+  bg-white
 
-              fontWeight: "700",
+  px-4
+  py-3
 
-              fontSize: 15,
+  font-black
 
-              background: "#fff",
+  text-slate-900
 
-              transition:
-                "all .2s ease"
-            }}
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:ring-4
+  focus:ring-pink-100
+"
           />
 
         </div>
@@ -2675,13 +3380,11 @@ const precioPromedio =
         {/* STOCK */}
         <div>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10
-            }}
-          >
+<div className="
+  flex
+  items-center
+  gap-3
+">
 
             {/* - */}
             <button
@@ -2695,24 +3398,27 @@ const precioPromedio =
                 )
               }
 
-              style={{
-                width: 38,
-                height: 38,
+className="
+  w-10
+  h-10
 
-                borderRadius: 12,
+  rounded-2xl
 
-                border: "none",
+  border
+  border-red-100
 
-                background:
-                  "#fef2f2",
+  bg-red-50
 
-                color: "#ef4444",
+  text-red-500
 
-                fontSize: 18,
-                fontWeight: "700",
+  text-xl
+  font-black
 
-                cursor: "pointer"
-              }}
+  hover:bg-red-500
+  hover:text-white
+
+  transition-all
+"
             >
               −
             </button>
@@ -2754,22 +3460,31 @@ const precioPromedio =
 
               }}
 
-              style={{
-                width: 80,
+className="
+  w-20
 
-                padding: "12px 14px",
+  rounded-2xl
 
-                borderRadius: 16,
+  border
+  border-slate-200
 
-                border:
-                  "1px solid #e5e7eb",
+  bg-white
 
-                textAlign: "center",
+  px-3
+  py-3
 
-                fontWeight: "700",
+  text-center
 
-                fontSize: 15
-              }}
+  font-black
+
+  outline-none
+
+  transition-all
+
+  focus:border-pink-400
+  focus:ring-4
+  focus:ring-pink-100
+"
             />
 
             {/* + */}
@@ -2781,24 +3496,27 @@ const precioPromedio =
                 )
               }
 
-              style={{
-                width: 38,
-                height: 38,
+className="
+  w-10
+  h-10
 
-                borderRadius: 12,
+  rounded-2xl
 
-                border: "none",
+  border
+  border-emerald-100
 
-                background:
-                  "#ecfdf5",
+  bg-emerald-50
 
-                color: "#22c55e",
+  text-emerald-500
 
-                fontSize: 18,
-                fontWeight: "700",
+  text-xl
+  font-black
 
-                cursor: "pointer"
-              }}
+  hover:bg-emerald-500
+  hover:text-white
+
+  transition-all
+"
             >
               +
             </button>
@@ -2812,42 +3530,50 @@ const precioPromedio =
 
           {(v.stock || 0) <= 0 ? (
 
-            <span
-              style={{
-                background:
-                  "#fef2f2",
+<span className="
+  inline-flex
+  items-center
 
-                color: "#dc2626",
+  rounded-full
 
-                padding: "8px 14px",
+  bg-red-50
 
-                borderRadius: 999,
+  px-4
+  py-2
 
-                fontWeight: "700",
+  text-xs
+  font-black
 
-                fontSize: 12
-              }}
-            >
+  text-red-600
+
+  border
+  border-red-100
+">
               ● Agotado
             </span>
 
           ) : (v.stock || 0) <= 3 ? (
 
             <span
-              style={{
-                background:
-                  "#fff7ed",
+className="
+  inline-flex
+  items-center
 
-                color: "#ea580c",
+  rounded-full
 
-                padding: "8px 14px",
+  bg-orange-50
 
-                borderRadius: 999,
+  px-4
+  py-2
 
-                fontWeight: "700",
+  text-xs
+  font-black
 
-                fontSize: 12
-              }}
+  text-orange-600
+
+  border
+  border-orange-100
+"
             >
               ● Bajo stock
             </span>
@@ -2855,20 +3581,25 @@ const precioPromedio =
           ) : (
 
             <span
-              style={{
-                background:
-                  "#ecfdf5",
+className="
+  inline-flex
+  items-center
 
-                color: "#059669",
+  rounded-full
 
-                padding: "8px 14px",
+  bg-emerald-50
 
-                borderRadius: 999,
+  px-4
+  py-2
 
-                fontWeight: "700",
+  text-xs
+  font-black
 
-                fontSize: 12
-              }}
+  text-emerald-600
+
+  border
+  border-emerald-100
+"
             >
               ● En stock
             </span>
@@ -2885,46 +3616,27 @@ const precioPromedio =
               eliminarVariante(v.id)
             }
 
-            style={{
-              width: 42,
-              height: 42,
+className="
+  w-11
+  h-11
 
-              borderRadius: 14,
+  rounded-2xl
 
-              border: "none",
+  border
+  border-red-100
 
-              background:
-                "#fef2f2",
+  bg-red-50
 
-              color: "#ef4444",
+  text-red-500
 
-              fontWeight: "700",
+  text-lg
+  font-black
 
-              cursor: "pointer",
+  hover:bg-red-500
+  hover:text-white
 
-              transition:
-                "all .2s ease"
-            }}
-
-            onMouseEnter={(e) => {
-
-              e.currentTarget.style.background =
-                "#ef4444";
-
-              e.currentTarget.style.color =
-                "#fff";
-
-            }}
-
-            onMouseLeave={(e) => {
-
-              e.currentTarget.style.background =
-                "#fef2f2";
-
-              e.currentTarget.style.color =
-                "#ef4444";
-
-            }}
+  transition-all
+"
           >
             ✕
           </button>
@@ -2951,290 +3663,246 @@ const precioPromedio =
 </AdminButton>
 
       {/* MODAL PREMIUM */}
-{mostrarModal && (
+<AdminModal
+  open={mostrarModal}
 
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-
-      background:
-  "rgba(15,23,42,0.55)",
-
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-
-      zIndex: 9999,
-
-      backdropFilter: "blur(6px)"
-    }}
-  >
+  onClose={() =>
+    setMostrarModal(false)
+  }
 
-<AdminCard>
+  title="Nueva Variante"
 
-      {/* título */}
-      <h2
-        style={{
-          marginTop: 0,
-          marginBottom: 24,
+  width="max-w-4xl"
+>
 
-          fontSize: 26,
+  <div className="
+    grid
+    grid-cols-1
+    md:grid-cols-2
 
-          fontWeight: "800",
+    gap-6
+  ">
 
-          color: "#111827"
-        }}
-      >
-        Nueva variante
-      </h2>
+    {/* TALLA */}
+    <div>
 
-      {/* talla */}
-      <div style={{ marginBottom: 18 }}>
+      <label className="
+        block
 
-        <label
-          style={{
-            display: "block",
+        text-sm
+        font-black
 
-            marginBottom: 8,
+        text-slate-700
 
-            fontWeight: "700",
+        mb-3
+      ">
+        Talla
+      </label>
 
-            fontSize: 14
-          }}
-        >
-          Talla
-        </label>
+      <input
+        value={nuevaTalla}
 
-        <select
-          value={nuevaTalla}
+        onChange={(e) =>
+  setNuevaTalla(
+    e.target.value
+  )
+}
 
-          onChange={(e) =>
-            setNuevaTalla(e.target.value)
-          }
+        className="
+          w-full
 
-          style={{
-            width: "100%",
+          rounded-2xl
 
-            padding: "14px 16px",
+          border
+          border-slate-200
 
-            borderRadius: 16,
+          bg-slate-50
 
-            border:
-              "1px solid #e5e7eb",
+          px-4
+          py-3
 
-            fontWeight: "600",
+          outline-none
 
-            fontSize: 15
-          }}
-        >
+          transition-all
 
-          <option value="">
-            Seleccionar talla
-          </option>
+          focus:border-pink-400
+          focus:bg-white
+        "
+      />
 
-          {[
-            "XXS",
-            "XS",
-            "S",
-            "M",
-            "L",
-            "XL",
-            "XXL",
-            "XXXL",
+    </div>
 
-            "Talla 0",
-            "Talla 1",
-            "Talla 2",
-            "Talla 3",
-            "Talla 4",
-            "Talla 5",
-            "Talla 6",
-            "Talla 7",
-            "Talla 8",
-            "Talla 9",
-            "Talla 10",
-            "Talla 11",
-            "Talla 12"
-          ].map(t => (
+    {/* STOCK */}
+    <div>
 
-            <option
-              key={t}
-              value={t}
-            >
-              {t}
-            </option>
+      <label className="
+        block
 
-          ))}
+        text-sm
+        font-black
 
-        </select>
+        text-slate-700
 
-      </div>
+        mb-3
+      ">
+        Stock
+      </label>
 
-      {/* precio */}
-      <div style={{ marginBottom: 18 }}>
+      <input
+        type="number"
 
-        <label
-          style={{
-            display: "block",
+        value={nuevoStock}
 
-            marginBottom: 8,
+        onChange={(e) =>
+          setNuevoStock(
+            e.target.value
+          )
+        }
 
-            fontWeight: "700",
+        className="
+          w-full
 
-            fontSize: 14
-          }}
-        >
-          Precio
-        </label>
+          rounded-2xl
 
-        <input
-          type="number"
+          border
+          border-slate-200
 
-          value={nuevoPrecio}
+          bg-slate-50
 
-          onChange={(e) =>
-            setNuevoPrecio(e.target.value)
-          }
+          px-4
+          py-3
 
-          placeholder="24990"
+          outline-none
 
-          style={{
-            width: "100%",
+          transition-all
 
-            padding: "14px 16px",
+          focus:border-pink-400
+          focus:bg-white
+        "
+      />
 
-            borderRadius: 16,
-
-            border:
-              "1px solid #e5e7eb",
-
-            fontWeight: "600",
-
-            fontSize: 15
-          }}
-        />
-
-      </div>
-
-      {/* stock */}
-      <div style={{ marginBottom: 26 }}>
-
-        <label
-          style={{
-            display: "block",
-
-            marginBottom: 8,
-
-            fontWeight: "700",
-
-            fontSize: 14
-          }}
-        >
-          Stock inicial
-        </label>
-
-        <input
-          type="number"
-
-          value={nuevoStock}
-
-          onChange={(e) =>
-            setNuevoStock(e.target.value)
-          }
-
-          placeholder="0"
-
-          style={{
-            width: "100%",
-
-            padding: "14px 16px",
-
-            borderRadius: 16,
-
-            border:
-              "1px solid #e5e7eb",
-
-            fontWeight: "600",
-
-            fontSize: 15
-          }}
-        />
-
-      </div>
-
-      {/* acciones */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 12
-        }}
-      >
-
-        {/* cancelar */}
-        <button
-          onClick={() =>
-            setMostrarModal(false)
-          }
-
-          style={{
-            padding: "14px 18px",
-
-            borderRadius: 16,
-
-            border:
-              "1px solid #e5e7eb",
-
-            background: "#fff",
-
-            fontWeight: "700",
-
-            cursor: "pointer"
-          }}
-        >
-          Cancelar
-        </button>
-
-        {/* guardar */}
-        <button
-          onClick={agregarVariante}
-
-          style={{
-            padding: "14px 20px",
-
-            borderRadius: 16,
-
-            border: "none",
-
-            background:
-              "linear-gradient(135deg,#ec4899,#db2777)",
-
-            color: "#fff",
-
-            fontWeight: "700",
-
-            cursor: "pointer",
-
-            boxShadow:
-              "0 10px 25px rgba(236,72,153,0.25)"
-          }}
-        >
-          Guardar variante
-        </button>
-
-      </div>
-
-    </AdminCard>
+    </div>
 
   </div>
 
-)}
+  {/* PRECIO */}
+<div>
+
+  <label className="
+    block
+
+    text-sm
+    font-black
+
+    text-slate-700
+
+    mb-3
+  ">
+    Precio
+  </label>
+
+  <input
+    type="number"
+
+    value={nuevoPrecio}
+
+    onChange={(e) =>
+      setNuevoPrecio(
+        e.target.value
+      )
+    }
+
+    className="
+      w-full
+
+      rounded-2xl
+
+      border
+      border-slate-200
+
+      bg-slate-50
+
+      px-4
+      py-3
+
+      outline-none
+
+      transition-all
+
+      focus:border-pink-400
+      focus:bg-white
+    "
+  />
+
+</div>
+
+  {/* BOTONES */}
+  <div className="
+    flex
+    justify-end
+    gap-3
+
+    mt-8
+  ">
+
+    <button
+      onClick={() =>
+        setMostrarModal(false)
+      }
+
+      className="
+        px-5
+        py-3
+
+        rounded-2xl
+
+        bg-slate-100
+        hover:bg-slate-200
+
+        font-semibold
+
+        transition-all
+      "
+    >
+      Cancelar
+    </button>
+
+    <button
+      onClick={agregarVariante}
+
+      className="
+        px-6
+        py-3
+
+        rounded-2xl
+
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-500
+
+        text-white
+        font-bold
+
+        shadow-lg
+
+        hover:scale-[1.02]
+
+        transition-all
+      "
+    >
+      Guardar variante
+    </button>
+
+  </div>
+
+</AdminModal>
   
     </div>
 
   </div>
 
+</>
+        
   );
 
 }
