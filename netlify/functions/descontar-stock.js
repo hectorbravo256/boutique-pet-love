@@ -8,7 +8,7 @@ const supabase = createClient(
 exports.handler = async (event) => {
   const { product_id, size, qty } = JSON.parse(event.body);
   
-  if (!product_id || !size) {
+  if (!product_id || !size || !qty) {
   return {
     statusCode: 400,
     body: "Datos incompletos",
