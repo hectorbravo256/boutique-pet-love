@@ -103,6 +103,7 @@ const formData = form_data;
             observacion: formData.observacion,
             items,
             total,
+            status: "Pendiente",
           },
         ]);
 
@@ -110,6 +111,38 @@ const formData = form_data;
         console.log("SUPABASE ERROR:", error);
       } else {
         console.log("PEDIDO GUARDADO");
+
+        try {
+
+  for (const item of items) {
+
+    await fetch(
+      "https://boutiquepetlove.cl/.netlify/functions/descontar-stock",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          product_id: item.id,
+          size: item.size,
+          qty: item.qty || 1,
+        }),
+      }
+    );
+  }
+
+  console.log("STOCK DESCONTADO");
+
+} catch (stockError) {
+
+  console.log(
+    "ERROR STOCK:",
+    stockError
+  );
+}
       }
 
       const transporter =
