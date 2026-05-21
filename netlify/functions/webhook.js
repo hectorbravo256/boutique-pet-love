@@ -128,7 +128,7 @@ if (existing.data) {
             observacion: formData.observacion,
             items,
             total,
-            estado: "Pendiente",
+            estado: "pendiente",
             payment_id: payment.id,
           },
         ]);
