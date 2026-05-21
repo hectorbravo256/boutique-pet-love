@@ -19,7 +19,7 @@ export const handler = async (event) => {
     const items = body.items.map((item) => ({
   title: item.name,
   unit_price: Number(item.price),
-  quantity: 1,
+  quantity: item.qty || 1,
   currency_id: "CLP",
 }));
 
@@ -58,7 +58,7 @@ const response = await preference.create({
     },
 
     notification_url:
-      "https://fluffy-daifuku-56b90b.netlify.app/.netlify/functions/webhook",
+      "https://boutiquepetlove.cl/.netlify/functions/webhook",
 
     back_urls: {
       success: "https://boutiquepetlove.cl/success",
