@@ -35,10 +35,18 @@ exports.handler = async (event) => {
       };
     }
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_KEY
-    );
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY,
+  {
+    auth: {
+      persistSession: false,
+    },
+    realtime: {
+      disabled: true,
+    },
+  }
+);
 
     const response = await fetch(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
