@@ -8,6 +8,12 @@ const supabase = createClient(
 exports.handler = async (event) => {
   try {
     const { id, estado } = JSON.parse(event.body);
+    if (!id || !estado) {
+  return {
+    statusCode: 400,
+    body: "Datos incompletos",
+  };
+}
 
     const { error } = await supabase
       .from("orders")
