@@ -1,3 +1,5 @@
+global.WebSocket = require("ws");
+
 const nodemailer = require("nodemailer");
 const { createClient } = require("@supabase/supabase-js");
 
