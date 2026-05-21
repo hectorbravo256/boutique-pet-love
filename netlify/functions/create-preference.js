@@ -66,8 +66,8 @@ metadata: {
   total: total,
 },
 
-    notification_url:
-      "https://boutiquepetlove.cl/.netlify/functions/webhook",
+notification_url:
+`${process.env.SITE_URL}/.netlify/functions/webhook`,
 
     back_urls: {
       success: "https://boutiquepetlove.cl/success",
