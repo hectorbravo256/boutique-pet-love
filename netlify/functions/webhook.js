@@ -93,11 +93,15 @@ const supabase = createClient(
       payment.status === "authorized"
     ) {
 
+const orderData = JSON.parse(
+  payment.metadata.order_data
+);
+
 const {
   items,
   form_data,
   total,
-} = payment.metadata;
+} = orderData;
 
 const formData = form_data;
 
