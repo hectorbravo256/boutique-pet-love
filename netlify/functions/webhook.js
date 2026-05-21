@@ -89,6 +89,19 @@ const {
 
 const formData = form_data;
 
+      const existing = await supabase
+  .from("orders")
+  .select("id")
+  .eq("payment_id", payment.id)
+  .maybeSingle();
+
+if (existing.data) {
+  return {
+    statusCode: 200,
+    body: "already processed",
+  };
+}
+
       const { error } = await supabase
         .from("orders")
         .insert([
@@ -104,6 +117,7 @@ const formData = form_data;
             items,
             total,
             estado: "Pendiente",
+            payment_id: payment.id,
           },
         ]);
 
