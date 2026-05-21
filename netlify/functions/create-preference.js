@@ -17,6 +17,7 @@ export const handler = async (event) => {
 
   
     const items = body.items.map((item) => ({
+      id: item.id,
   title: item.name,
   unit_price: Number(item.price),
   quantity: item.qty || 1,
@@ -51,11 +52,19 @@ const response = await preference.create({
   body: {
     items: items,
 
-    metadata: {
-      items: body.items,
-      formData: body.formData,
-      total: total,
-    },
+metadata: {
+  items: body.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    size: item.size,
+    qty: item.qty || 1,
+    price: item.price,
+  })),
+
+  form_data: body.formData,
+
+  total: total,
+},
 
     notification_url:
       "https://boutiquepetlove.cl/.netlify/functions/webhook",
