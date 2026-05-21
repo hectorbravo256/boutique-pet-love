@@ -50,10 +50,22 @@ if (!payment.metadata || !payment.metadata.items) {
     // ✅ SOLO SI ESTÁ APROBADO
     if (payment.status === "approved" || payment.status === "authorized") {
 
-const { items, form_data, total } = payment.metadata;
+const { items, formData, total } = payment.metadata;
 
-const formData = form_data;
+const existing = await supabase
+  .from("orders")
+  .select("id")
+  .eq("payment_id", paymentId)
+  .maybeSingle();
 
+if (existing.data) {
+  console.log("⚠️ Pedido ya procesado");
+
+  return {
+    statusCode: 200,
+    body: "already processed",
+  };
+}
 
 const { error } = await supabase.from("orders").insert([
   {
@@ -67,6 +79,7 @@ const { error } = await supabase.from("orders").insert([
     observacion: formData.observacion,
     items,
     total,
+	payment_id: paymentId,
   },
 ]);
 
