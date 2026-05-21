@@ -52,20 +52,7 @@ if (!payment.metadata || !payment.metadata.items) {
 
 const { items, formData, total } = payment.metadata;
 
-const existing = await supabase
-  .from("orders")
-  .select("id")
-  .eq("payment_id", paymentId)
-  .maybeSingle();
 
-if (existing.data) {
-  console.log("⚠️ Pedido ya procesado");
-
-  return {
-    statusCode: 200,
-    body: "already processed",
-  };
-}
 
 const { error } = await supabase.from("orders").insert([
   {
@@ -79,7 +66,6 @@ const { error } = await supabase.from("orders").insert([
     observacion: formData.observacion,
     items,
     total,
-	payment_id: paymentId,
   },
 ]);
 
@@ -147,9 +133,16 @@ try {
     };
 
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: error.toString(),
+	  
+console.log("WEBHOOK ERROR:", error);
+
+return {
+  statusCode: 500,
+  body: JSON.stringify({
+    error: error.message,
+    stack: error.stack,
+  }),
+};
     };
   }
 };
