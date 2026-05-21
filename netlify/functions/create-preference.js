@@ -52,17 +52,19 @@ const response = await preference.create({
     items: items,
 
 metadata: {
-  items: body.items.map((item) => ({
-    id: item.id,
-    name: item.name,
-    size: item.size,
-    qty: item.qty || 1,
-    price: item.price,
-  })),
+  order_data: JSON.stringify({
+    items: body.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      size: item.size,
+      qty: item.qty || 1,
+      price: item.price,
+    })),
 
-  form_data: body.formData,
+    form_data: body.formData,
 
-  total: total,
+    total,
+  }),
 },
 
 notification_url:
