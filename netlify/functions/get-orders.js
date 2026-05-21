@@ -54,15 +54,34 @@ exports.handler = async () => {
       };
     }
 
-    // ✅ éxito
-    return {
-      statusCode: 200,
-      body: JSON.stringify(
-        Array.isArray(data)
-          ? data
-          : []
-      ),
-    };
+// 🔥 sanitizar pedidos
+const safeData = (
+  Array.isArray(data)
+    ? data
+    : []
+).map((o) => ({
+  ...o,
+
+  items: Array.isArray(o.items)
+    ? o.items
+    : [],
+
+  total:
+    Number.isFinite(
+      Number(o.total)
+    )
+      ? Number(o.total)
+      : 0,
+
+  estado:
+    o.estado || "pendiente",
+}));
+
+// ✅ éxito
+return {
+  statusCode: 200,
+  body: JSON.stringify(safeData),
+};
 
   } catch (err) {
 
