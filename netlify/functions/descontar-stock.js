@@ -1,3 +1,5 @@
+global.WebSocket = require("ws");
+
 const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
