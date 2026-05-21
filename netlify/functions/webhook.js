@@ -131,17 +131,26 @@ const formData = form_data;
         )
         .join("");
 
-      const html = `
-        <h2>🐾 Nueva compra confirmada</h2>
+const html = `
+  <h2>🐾 Nueva compra confirmada</h2>
 
-        <p><strong>Nombre:</strong> ${formData.nombre}</p>
-        <p><strong>Correo:</strong> ${formData.correo}</p>
-        <p><strong>Total:</strong> $${total}</p>
+  <h3>Información del cliente</h3>
 
-        <h3>Productos</h3>
+  <p><strong>Nombre:</strong> ${formData.nombre}</p>
+  <p><strong>RUT:</strong> ${formData.rut}</p>
+  <p><strong>Correo:</strong> ${formData.correo}</p>
+  <p><strong>Teléfono:</strong> ${formData.telefono}</p>
+  <p><strong>Dirección:</strong> ${formData.direccion}</p>
+  <p><strong>Comuna:</strong> ${formData.comuna}</p>
+  <p><strong>Región:</strong> ${formData.region}</p>
+  <p><strong>Observación:</strong> ${formData.observacion || "Sin observaciones"}</p>
 
-        <ul>${productosHTML}</ul>
-      `;
+  <h3>Productos</h3>
+
+  <ul>${productosHTML}</ul>
+
+  <h2>Total: $${total}</h2>
+`;
 
       try {
 
