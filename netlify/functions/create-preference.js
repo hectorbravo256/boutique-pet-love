@@ -68,12 +68,12 @@ metadata: {
 },
 
 notification_url:
-`${process.env.SITE_URL}/.netlify/functions/webhook`,
+"https://boutiquepetlove.cl/.netlify/functions/webhook",
 
 back_urls: {
-  success: `${process.env.SITE_URL}/success`,
-  failure: `${process.env.SITE_URL}/failure`,
-  pending: `${process.env.SITE_URL}/pending`,
+  success: "https://boutiquepetlove.cl/success",
+  failure: "https://boutiquepetlove.cl/failure",
+  pending: "https://boutiquepetlove.cl/pending",
 },
 
     auto_return: "approved",
