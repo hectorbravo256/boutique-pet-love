@@ -103,7 +103,7 @@ const formData = form_data;
             observacion: formData.observacion,
             items,
             total,
-            status: "Pendiente",
+            estado: "Pendiente",
           },
         ]);
 
