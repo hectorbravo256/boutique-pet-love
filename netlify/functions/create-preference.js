@@ -16,8 +16,7 @@ export const handler = async (event) => {
     }
 
   
-    const items = body.items.map((item) => ({
-      id: item.id,
+const items = body.items.map((item) => ({
   title: item.name,
   unit_price: Number(item.price),
   quantity: item.qty || 1,
