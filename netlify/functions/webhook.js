@@ -1,9 +1,7 @@
-```javascript
 const nodemailer = require("nodemailer");
 const { createClient } = require("@supabase/supabase-js");
 
 exports.handler = async (event) => {
-
   try {
 
     const body = event.body
@@ -37,14 +35,12 @@ exports.handler = async (event) => {
       };
     }
 
-    // 🔥 SUPABASE
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_KEY
     );
 
-    // 🔥 CONSULTAR PAGO MERCADO PAGO
-    const res = await fetch(
+    const response = await fetch(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
@@ -53,11 +49,10 @@ exports.handler = async (event) => {
       }
     );
 
-    const payment = await res.json();
+    const payment = await response.json();
 
     console.log("PAYMENT:", payment);
 
-    // 🔥 VALIDAR METADATA
     if (
       !payment.metadata ||
       !payment.metadata.items
@@ -70,7 +65,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // 🔥 SOLO PAGOS APROBADOS
     if (
       payment.status === "approved" ||
       payment.status === "authorized"
@@ -82,7 +76,6 @@ exports.handler = async (event) => {
         total,
       } = payment.metadata;
 
-      // 🔥 GUARDAR PEDIDO
       const { error } = await supabase
         .from("orders")
         .insert([
@@ -101,17 +94,11 @@ exports.handler = async (event) => {
         ]);
 
       if (error) {
-        console.log(
-          "ERROR SUPABASE:",
-          error
-        );
+        console.log("SUPABASE ERROR:", error);
       } else {
-        console.log(
-          "PEDIDO GUARDADO"
-        );
+        console.log("PEDIDO GUARDADO");
       }
 
-      // 🔥 EMAIL
       const transporter =
         nodemailer.createTransport({
           host: "smtp.gmail.com",
@@ -124,32 +111,23 @@ exports.handler = async (event) => {
           },
         });
 
-      const productosHTML =
-        items
-          .map(
-            (i) =>
-              `<li>${i.name} (${i.size}) x${i.qty || 1} - $${i.price}</li>`
-          )
-          .join("");
+      const productosHTML = items
+        .map(
+          (i) =>
+            `<li>${i.name} (${i.size}) x${i.qty || 1} - $${i.price}</li>`
+        )
+        .join("");
 
       const html = `
         <h2>🐾 Nueva compra confirmada</h2>
 
-        <h3>Cliente</h3>
-
         <p><strong>Nombre:</strong> ${formData.nombre}</p>
-        <p><strong>RUT:</strong> ${formData.rut}</p>
         <p><strong>Correo:</strong> ${formData.correo}</p>
-        <p><strong>Teléfono:</strong> ${formData.telefono}</p>
-        <p><strong>Dirección:</strong> ${formData.direccion}</p>
-        <p><strong>Comuna:</strong> ${formData.comuna}</p>
-        <p><strong>Región:</strong> ${formData.region}</p>
+        <p><strong>Total:</strong> $${total}</p>
 
         <h3>Productos</h3>
 
         <ul>${productosHTML}</ul>
-
-        <h3>Total: $${total}</h3>
       `;
 
       try {
@@ -166,9 +144,7 @@ exports.handler = async (event) => {
           html,
         });
 
-        console.log(
-          "EMAIL ENVIADO"
-        );
+        console.log("EMAIL ENVIADO");
 
       } catch (emailError) {
 
@@ -199,4 +175,3 @@ exports.handler = async (event) => {
     };
   }
 };
-```
