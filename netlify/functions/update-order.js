@@ -11,7 +11,10 @@ exports.handler = async (event) => {
 
     const { error } = await supabase
       .from("orders")
-      .update({ estado })
+      .update({
+  estado,
+  updated_at: new Date(),
+})
       .eq("id", id);
 
     if (error) throw error;
