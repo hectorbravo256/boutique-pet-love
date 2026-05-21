@@ -1,131 +1,183 @@
-const fetch = require("node-fetch");
+```javascript
 const nodemailer = require("nodemailer");
-
-exports.handler = async (event) => {
-  try {
-    const body = event.body ? JSON.parse(event.body) : {};
-
 const { createClient } = require("@supabase/supabase-js");
 
+exports.handler = async (event) => {
+
+  try {
+
+    const body = event.body
+      ? JSON.parse(event.body)
+      : {};
+
+    console.log("WEBHOOK BODY:", body);
+
+    if (
+      body.type !== "payment" &&
+      body.topic !== "merchant_order"
+    ) {
+      return {
+        statusCode: 200,
+        body: "ok",
+      };
+    }
+
+    const paymentId =
+      body.data?.id ||
+      (body.resource
+        ? body.resource.split("/").pop()
+        : null);
+
+    if (!paymentId) {
+      console.log("No paymentId");
+
+      return {
+        statusCode: 200,
+        body: "ok",
+      };
+    }
+
+    // 🔥 SUPABASE
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_KEY
     );
 
-    console.log("WEBHOOK BODY:", body);
-
-  if (body.type !== "payment" && body.topic !== "merchant_order") {
-  return { statusCode: 200, body: "ok" };
-}
-
-    const paymentId =
-  body.data?.id ||
-  (body.resource ? body.resource.split("/").pop() : null);
-
-if (!paymentId) {
-  console.log("No paymentId");
-  return { statusCode: 200 };
-}
-
-    // 🔐 CONSULTAR PAGO REAL
-    const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
-      },
-    });
+    // 🔥 CONSULTAR PAGO MERCADO PAGO
+    const res = await fetch(
+      `https://api.mercadopago.com/v1/payments/${paymentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        },
+      }
+    );
 
     const payment = await res.json();
 
-console.log("STATUS DEL PAGO:", payment.status);
+    console.log("PAYMENT:", payment);
 
-console.log("METADATA COMPLETA:", payment.metadata);
+    // 🔥 VALIDAR METADATA
+    if (
+      !payment.metadata ||
+      !payment.metadata.items
+    ) {
+      console.log("No metadata");
 
+      return {
+        statusCode: 200,
+        body: "ok",
+      };
+    }
 
-// ✅ VALIDACIÓN PRO (AQUÍ VA)
-if (!payment.metadata || !payment.metadata.items) {
-  console.log("No hay metadata");
-  return { statusCode: 200, body: "ok" };
-}
+    // 🔥 SOLO PAGOS APROBADOS
+    if (
+      payment.status === "approved" ||
+      payment.status === "authorized"
+    ) {
 
-    // ✅ SOLO SI ESTÁ APROBADO
-    if (payment.status === "approved" || payment.status === "authorized") {
+      const {
+        items,
+        formData,
+        total,
+      } = payment.metadata;
 
-const { items, formData, total } = payment.metadata;
+      // 🔥 GUARDAR PEDIDO
+      const { error } = await supabase
+        .from("orders")
+        .insert([
+          {
+            nombre: formData.nombre,
+            rut: formData.rut,
+            correo: formData.correo,
+            telefono: formData.telefono,
+            direccion: formData.direccion,
+            comuna: formData.comuna,
+            region: formData.region,
+            observacion: formData.observacion,
+            items,
+            total,
+          },
+        ]);
 
+      if (error) {
+        console.log(
+          "ERROR SUPABASE:",
+          error
+        );
+      } else {
+        console.log(
+          "PEDIDO GUARDADO"
+        );
+      }
 
+      // 🔥 EMAIL
+      const transporter =
+        nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 465,
+          secure: true,
 
-const { error } = await supabase.from("orders").insert([
-  {
-    nombre: formData.nombre,
-    rut: formData.rut,
-    correo: formData.correo,
-    telefono: formData.telefono,
-    direccion: formData.direccion,
-    comuna: formData.comuna,
-    region: formData.region,
-    observacion: formData.observacion,
-    items,
-    total,
-  },
-]);
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
 
-if (error) {
-  console.log("❌ ERROR SUPABASE:", error);
-} else {
-  console.log("✅ PEDIDO GUARDADO EN SUPABASE");
-}
-
-
-      // 📧 CONFIG EMAIL
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-      const productosHTML = items
-        .map(
-          (i) =>
-            `<li>${i.name} (${i.size}) x${i.qty || 1} - $${i.price}</li>`
-        )
-        .join("");
+      const productosHTML =
+        items
+          .map(
+            (i) =>
+              `<li>${i.name} (${i.size}) x${i.qty || 1} - $${i.price}</li>`
+          )
+          .join("");
 
       const html = `
         <h2>🐾 Nueva compra confirmada</h2>
 
         <h3>Cliente</h3>
+
         <p><strong>Nombre:</strong> ${formData.nombre}</p>
-	<p><strong>RUT:</strong> ${formData.rut}</p>
+        <p><strong>RUT:</strong> ${formData.rut}</p>
         <p><strong>Correo:</strong> ${formData.correo}</p>
         <p><strong>Teléfono:</strong> ${formData.telefono}</p>
         <p><strong>Dirección:</strong> ${formData.direccion}</p>
         <p><strong>Comuna:</strong> ${formData.comuna}</p>
         <p><strong>Región:</strong> ${formData.region}</p>
-	<p><strong>Observación:</strong> ${formData.observacion || "Sin observaciones"}</p>
 
         <h3>Productos</h3>
+
         <ul>${productosHTML}</ul>
 
         <h3>Total: $${total}</h3>
       `;
 
-try {
-  await transporter.sendMail({
-    from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
-    to: `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
-    subject: "Compra confirmada 🐾",
-    html,
-  });
+      try {
 
-  console.log("EMAIL ENVIADO OK");
-} catch (error) {
-  console.log("ERROR AL ENVIAR EMAIL:", error);
-}
-	}
+        await transporter.sendMail({
+          from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
+
+          to:
+            `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
+
+          subject:
+            "Compra confirmada 🐾",
+
+          html,
+        });
+
+        console.log(
+          "EMAIL ENVIADO"
+        );
+
+      } catch (emailError) {
+
+        console.log(
+          "ERROR EMAIL:",
+          emailError
+        );
+      }
+    }
 
     return {
       statusCode: 200,
@@ -133,16 +185,18 @@ try {
     };
 
   } catch (error) {
-	  
-console.log("WEBHOOK ERROR:", error);
 
-return {
-  statusCode: 500,
-  body: JSON.stringify({
-    error: error.message,
-    stack: error.stack,
-  }),
-};
+    console.log(
+      "WEBHOOK ERROR:",
+      error
+    );
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error.message,
+      }),
     };
   }
 };
+```
