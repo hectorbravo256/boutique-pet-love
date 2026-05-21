@@ -81,11 +81,13 @@ const supabase = createClient(
       payment.status === "authorized"
     ) {
 
-      const {
-        items,
-        formData,
-        total,
-      } = payment.metadata;
+const {
+  items,
+  form_data,
+  total,
+} = payment.metadata;
+
+const formData = form_data;
 
       const { error } = await supabase
         .from("orders")
