@@ -41,9 +41,10 @@ const supabase = createClient(
   {
     auth: {
       persistSession: false,
+      autoRefreshToken: false,
     },
     realtime: {
-      disabled: true,
+      enabled: false,
     },
   }
 );
