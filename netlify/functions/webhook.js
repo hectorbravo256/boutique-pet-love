@@ -61,6 +61,18 @@ const supabase = createClient(
     );
 
     const payment = await response.json();
+    if (!response.ok) {
+
+  console.log(
+    "ERROR MP:",
+    payment
+  );
+
+  return {
+    statusCode: 500,
+    body: "Error Mercado Pago",
+  };
+}
 
     console.log("PAYMENT:", payment);
 
