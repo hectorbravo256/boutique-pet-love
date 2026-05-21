@@ -135,29 +135,7 @@ export default function Ventas() {
 
       }
 
-      // 🔥 descontar stock
-      for (const item of (
-        Array.isArray(pedido.items)
-          ? pedido.items
-          : []
-      )) {
 
-        await supabase.rpc(
-          "descontar_stock",
-          {
-            p_id:
-              item.product_id
-              || item.id,
-
-            p_size:
-              item.size,
-
-            cantidad:
-              item.qty || 1,
-          }
-        );
-
-      }
 
       // 📦 actualizar estado
       await fetch(
