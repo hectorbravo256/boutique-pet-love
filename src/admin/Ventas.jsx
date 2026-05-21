@@ -188,7 +188,9 @@ export default function Ventas() {
     ).reduce(
       (acc, o) =>
         acc +
-        Number(o.total || 0),
+(Number.isFinite(Number(o.total))
+  ? Number(o.total)
+  : 0),
       0
     );
 
@@ -537,7 +539,9 @@ export default function Ventas() {
                       text-slate-900
                     ">
                       {
-                        o.items?.[0]?.name
+                        Array.isArray(o.items)
+  ? o.items?.[0]?.name
+  : "Pedido"
                       }
                     </div>
 
@@ -768,12 +772,12 @@ export default function Ventas() {
     ">
       $
       {
-        Number(
-          o.total
-        ).toLocaleString(
-          "es-CL"
-        )
-      }
+  Number(
+    o.total || 0
+  ).toLocaleString(
+    "es-CL"
+  )
+}
     </div>
 
     {
