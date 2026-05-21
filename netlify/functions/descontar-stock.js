@@ -7,6 +7,13 @@ const supabase = createClient(
 
 exports.handler = async (event) => {
   const { product_id, size, qty } = JSON.parse(event.body);
+  
+  if (!product_id || !size) {
+  return {
+    statusCode: 400,
+    body: "Datos incompletos",
+  };
+}
 
   const { error } = await supabase.rpc("descontar_stock", {
     p_id: product_id,
