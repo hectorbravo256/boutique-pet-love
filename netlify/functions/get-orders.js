@@ -1,6 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
 
-
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY,
@@ -19,78 +18,90 @@ exports.handler = async () => {
 
   try {
 
-    // 🔥 validar variables
-    if (
-      !process.env.SUPABASE_URL ||
-      !process.env.SUPABASE_KEY
-    ) {
+    const { data, error } =
+      await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
 
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "Faltan variables de entorno Supabase"
-        }),
-      };
-    }
-
-    // 🔥 obtener pedidos
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
-
-    // 🔥 error Supabase
     if (error) {
 
-      console.error("Supabase error:", error);
+      console.log(
+        "SUPABASE ERROR:",
+        error
+      );
 
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: error.message
+          error: error.message,
         }),
       };
     }
 
-// 🔥 sanitizar pedidos
-const safeData = (
-  Array.isArray(data)
-    ? data
-    : []
-).map((o) => ({
-  ...o,
+    // 🔥 sanitizar pedidos
+    const safeData =
+      (Array.isArray(data)
+        ? data
+        : []
+      ).map((o) => ({
 
-  items: Array.isArray(o.items)
-    ? o.items
-    : [],
+        ...o,
 
-  total:
-    Number.isFinite(
-      Number(o.total)
-    )
-      ? Number(o.total)
-      : 0,
+        items:
+          Array.isArray(o.items)
+            ? o.items
+            : [],
 
-  estado:
-    o.estado || "pendiente",
-}));
+        total:
+          Number.isFinite(
+            Number(o.total)
+          )
+            ? Number(o.total)
+            : 0,
 
-// ✅ éxito
-return {
-  statusCode: 200,
-  body: JSON.stringify(safeData),
-};
+        estado:
+          typeof o.estado ===
+          "string"
+
+            ? o.estado.toLowerCase()
+
+            : "pendiente",
+
+        nombre:
+          o.nombre || "",
+
+        correo:
+          o.correo || "",
+
+        created_at:
+          o.created_at || null,
+
+      }));
+
+    return {
+      statusCode: 200,
+
+      body: JSON.stringify(
+        safeData
+      ),
+    };
 
   } catch (err) {
 
-    console.error("Function crash:", err);
+    console.log(
+      "FUNCTION ERROR:",
+      err
+    );
 
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: err.message || "Error interno servidor"
+        error:
+          err.message ||
+          "Error interno",
       }),
     };
   }
