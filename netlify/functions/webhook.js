@@ -70,18 +70,19 @@ const supabase = createClient(
 }
 
     console.log("PAYMENT:", payment);
+    
+if (
+  !payment.metadata ||
+  !payment.metadata.order_data
+) {
 
-    if (
-      !payment.metadata ||
-      !payment.metadata.items
-    ) {
-      console.log("No metadata");
+  console.log("No metadata");
 
-      return {
-        statusCode: 200,
-        body: "ok",
-      };
-    }
+  return {
+    statusCode: 200,
+    body: "ok",
+  };
+}
 
     if (
       payment.status === "approved" ||
