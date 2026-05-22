@@ -12,21 +12,16 @@ exports.handler = async (event) => {
 
     console.log("WEBHOOK BODY:", body);
 
-    if (
-      body.type !== "payment" &&
-      body.topic !== "merchant_order"
-    ) {
-      return {
-        statusCode: 200,
-        body: "ok",
-      };
-    }
+if (body.type !== "payment") {
+  return {
+    statusCode: 200,
+    body: "ok",
+  };
+}
 
-    const paymentId =
-      body.data?.id ||
-      (body.resource
-        ? body.resource.split("/").pop()
-        : null);
+const paymentId =
+  body.data?.id ||
+  body.resource;
 
     if (!paymentId) {
       console.log("No paymentId");
