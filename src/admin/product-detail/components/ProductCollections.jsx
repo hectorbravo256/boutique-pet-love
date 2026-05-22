@@ -6,7 +6,7 @@ export default function ProductCollections({
 
   return (
 
-<div className="mt-8">
+    <div className="mt-8">
 
 <h3 className="
   text-2xl
@@ -17,7 +17,7 @@ export default function ProductCollections({
   mb-5
 ">
     🏷 Colecciones
-</h3>
+  </h3>
 
 <div className="
   flex
@@ -26,7 +26,7 @@ export default function ProductCollections({
   gap-4
 ">
 
-{/* NUEVA */}
+    {/* NUEVA COLECCIÓN */}
 <label className={`
   group
 
@@ -78,45 +78,47 @@ export default function ProductCollections({
   }
 `}>
 
-<input
-  type="checkbox"
+      <input
+        type="checkbox"
 
-  className="
-    w-5
-    h-5
+        className="
+          w-5
+          h-5
 
-    accent-white
+          accent-white
 
-    cursor-pointer
-  "
+          cursor-pointer
+        "
 
-  checked={
-    Boolean(producto.new_collection)
-  }
+        checked={
+          Boolean(producto.new_collection)
+        }
 
-  onChange={(e) => {
+        onChange={async (e) => {
 
-    const checked =
-      e.target.checked;
+          const checked =
+            e.target.checked;
 
-    setProducto(prev => ({
-      ...prev,
-      new_collection: checked
-    }));
+          setProducto(prev => ({
+            ...prev,
+            new_collection: checked
+          }));
 
-    actualizarProducto(
-      "new_collection",
-      checked
-    );
+          await supabase
+            .from("products")
+            .update({
+              new_collection: checked
+            })
+            .eq("id", producto.id);
 
-  }}
-/>
+        }}
+      />
 
-🆕 Nueva colección
+      🆕 Nueva colección
 
-</label>
+    </label>
 
-{/* BEST SELLER */}
+    {/* BEST SELLER */}
 <label className={`
   group
 
@@ -168,45 +170,46 @@ export default function ProductCollections({
   }
 `}>
 
-<input
-  type="checkbox"
+      <input
+        type="checkbox"
+        className="
+  w-5
+  h-5
 
-  className="
-    w-5
-    h-5
+  accent-white
 
-    accent-white
+  cursor-pointer
+"
 
-    cursor-pointer
-  "
+        checked={
+          Boolean(producto.best_seller)
+        }
 
-  checked={
-    Boolean(producto.best_seller)
-  }
+        onChange={async (e) => {
 
-  onChange={(e) => {
+          const checked =
+            e.target.checked;
 
-    const checked =
-      e.target.checked;
+          setProducto(prev => ({
+            ...prev,
+            best_seller: checked
+          }));
 
-    setProducto(prev => ({
-      ...prev,
-      best_seller: checked
-    }));
+          await supabase
+            .from("products")
+            .update({
+              best_seller: checked
+            })
+            .eq("id", producto.id);
 
-    actualizarProducto(
-      "best_seller",
-      checked
-    );
+        }}
+      />
 
-  }}
-/>
+      🔥 Best seller
 
-🔥 Best seller
+    </label>
 
-</label>
-
-{/* LUXURY */}
+    {/* LUXURY */}
 <label className={`
   group
 
@@ -258,43 +261,134 @@ export default function ProductCollections({
   }
 `}>
 
-<input
-  type="checkbox"
+      <input
+        type="checkbox"
+        className="
+  w-5
+  h-5
 
-  className="
-    w-5
-    h-5
+  accent-white
 
-    accent-white
+  cursor-pointer
+"
 
-    cursor-pointer
-  "
+        checked={
+          Boolean(producto.luxury)
+        }
 
-  checked={
-    Boolean(producto.luxury)
+        onChange={async (e) => {
+
+          const checked =
+            e.target.checked;
+
+          setProducto(prev => ({
+            ...prev,
+            luxury: checked
+          }));
+
+          await supabase
+            .from("products")
+            .update({
+              luxury: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      👑 Luxury
+
+    </label>
+
+    {/* EXCLUSIVO */}
+<label className={`
+  group
+
+  inline-flex
+  items-center
+  gap-3
+
+  rounded-[22px]
+
+  px-5
+  py-4
+
+  cursor-pointer
+
+  font-black
+
+  border
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-1
+
+  ${
+    producto.exclusive
+
+      ? `
+        border-pink-200
+
+        bg-gradient-to-r
+        from-pink-500
+        to-purple-500
+
+        text-white
+
+        shadow-[0_10px_30px_rgba(236,72,153,0.25)]
+      `
+
+      : `
+        border-slate-200
+
+        bg-white
+
+        text-slate-700
+
+        hover:border-pink-200
+        hover:bg-pink-50
+      `
   }
+`}>
 
-  onChange={(e) => {
+      <input
+        type="checkbox"
+        className="
+  w-5
+  h-5
 
-    const checked =
-      e.target.checked;
+  accent-white
 
-    setProducto(prev => ({
-      ...prev,
-      luxury: checked
-    }));
+  cursor-pointer
+"
+        checked={
+          Boolean(producto.exclusive)
+        }
 
-    actualizarProducto(
-      "luxury",
-      checked
-    );
+        onChange={async (e) => {
 
-  }}
-/>
+          const checked =
+            e.target.checked;
 
-👑 Luxury
+          setProducto(prev => ({
+            ...prev,
+            exclusive: checked
+          }));
 
-</label>
+          await supabase
+            .from("products")
+            .update({
+              exclusive: checked
+            })
+            .eq("id", producto.id);
+
+        }}
+      />
+
+      💎 Exclusivo
+
+    </label>
 
 </div>
 
