@@ -140,27 +140,47 @@ if (existing.data) {
 
         try {
 
-  for (const item of items) {
+for (const item of items) {
 
-    await fetch(
-      "https://boutiquepetlove.cl/.netlify/functions/descontar-stock",
-      {
-        method: "POST",
+  console.log(
+    "DESCONTANDO ITEM:",
+    item
+  );
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+  const stockResponse = await fetch(
+    "https://boutiquepetlove.cl/.netlify/functions/descontar-stock",
+    {
+      method: "POST",
 
-        body: JSON.stringify({
-          product_id: item.id,
-          size: item.size,
-          qty: item.qty || 1,
-        }),
-      }
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        product_id: Number(item.id),
+        size: item.size,
+        qty: Number(item.qty || 1),
+      }),
+    }
+  );
+
+  const stockResult =
+    await stockResponse.text();
+
+  console.log(
+    "RESPUESTA STOCK:",
+    stockResult
+  );
+
+  if (!stockResponse.ok) {
+
+    console.log(
+      "ERROR DESCONTANDO STOCK"
     );
   }
+}
 
-  console.log("STOCK DESCONTADO");
+console.log("STOCK DESCONTADO");
 
 } catch (stockError) {
 
