@@ -104,12 +104,10 @@ export default function ProductCollections({
             new_collection: checked
           }));
 
-          await supabase
-            .from("products")
-            .update({
-              new_collection: checked
-            })
-            .eq("id", producto.id);
+    actualizarProducto(
+      "new_collection",
+      checked
+    );
 
         }}
       />
@@ -195,12 +193,10 @@ export default function ProductCollections({
             best_seller: checked
           }));
 
-          await supabase
-            .from("products")
-            .update({
-              best_seller: checked
-            })
-            .eq("id", producto.id);
+    actualizarProducto(
+      "best_seller",
+      checked
+    );
 
         }}
       />
@@ -286,12 +282,10 @@ export default function ProductCollections({
             luxury: checked
           }));
 
-          await supabase
-            .from("products")
-            .update({
-              luxury: checked
-            })
-            .eq("id", producto.id);
+    actualizarProducto(
+      "luxury",
+      checked
+    );
 
         }}
       />
@@ -376,12 +370,10 @@ export default function ProductCollections({
             exclusive: checked
           }));
 
-          await supabase
-            .from("products")
-            .update({
-              exclusive: checked
-            })
-            .eq("id", producto.id);
+    actualizarProducto(
+      "exclusive",
+      checked
+    );
 
         }}
       />
