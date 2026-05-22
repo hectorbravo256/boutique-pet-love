@@ -237,7 +237,7 @@ const html = `
           from: `"Boutique Pet Love" <${process.env.EMAIL_USER}>`,
 
           to:
-            `${formData.correo}, contabilidadagenciarebolledo@gmail.com`,
+            `${formData.correo}, ventas@boutiquepetlove.cl`,
 
           subject:
             "Compra confirmada 🐾",
