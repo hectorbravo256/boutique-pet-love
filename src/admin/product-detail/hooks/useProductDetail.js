@@ -6,6 +6,17 @@ from "../../../supabaseClient";
 import { arrayMove }
 from "@dnd-kit/sortable";
 
+import {
+
+  getProductById,
+
+  getCategories,
+
+  updateProductField
+
+}
+from "../../services/productsService";
+
 export default function useProductDetail(id) {
 
     const [producto, setProducto] = useState(null);
@@ -47,19 +58,9 @@ useEffect(() => {
   
     const cargarProducto = async () => {
 
-    const { data } = await supabase
-      .from("products")
-      .select(`
-        *,
-        product_variants (*),
-        product_images (*)
-      `)
-      .eq("id", id)
-      .order("sort_order", {
-  foreignTable: "product_images",
-  ascending: true
-})
-      .single();
+    const { data } =
+  await getProductById(id);
+
 
     if (!data) return;
 
@@ -139,13 +140,8 @@ setProducto(data);
     const cargarCategorias = async () => {
 
   const { data } =
-    await supabase
-      .from("categories")
-      .select("*")
-      .eq("active", true)
-      .order("sort_order", {
-        ascending: true
-      });
+    await getCategories();
+
 
   setCategories(data || []);
 
@@ -168,12 +164,11 @@ setProducto(data);
 
     // 🔥 guardar db
     const { error } =
-      await supabase
-        .from("products")
-        .update({
-          [campo]: valor
-        })
-        .eq("id", producto.id);
+      await updateProductField(
+  producto.id,
+  campo,
+  valor
+);
 
     if (error) {
       console.error(error);
