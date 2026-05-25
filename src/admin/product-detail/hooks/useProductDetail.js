@@ -378,6 +378,179 @@ setProducto(data);
 
 };
 
+      const subirImagen = async (file) => {
+
+  if (!file) return;
+
+  try {
+
+    setSubiendoImagen(true);
+
+    const nombre =
+      `${Date.now()}-${file.name}`;
+
+    // 🔥 subir storage
+    const { error: uploadError } =
+      await supabase.storage
+        .from("products")
+        .upload(nombre, file);
+
+   if (uploadError) {
+
+  console.error(
+    "SUPABASE STORAGE ERROR:",
+    uploadError
+  );
+
+  alert(
+    uploadError.message ||
+    JSON.stringify(uploadError)
+  );
+
+  return;
+}
+
+    // 🔥 obtener url
+    const { data } =
+      supabase.storage
+        .from("products")
+        .getPublicUrl(nombre);
+
+    const url =
+      data.publicUrl;
+
+    // 🔥 guardar db
+    const { data: nueva } =
+      await supabase
+        .from("product_images")
+        .insert([{
+  product_id: producto.id,
+
+  url,
+
+  sort_order:
+    producto.product_images.length
+}])
+        .select()
+        .single();
+
+    // 🔥 actualizar UI
+    setProducto(prev => ({
+      ...prev,
+      product_images: [
+        ...prev.product_images,
+        nueva
+      ]
+    }));
+
+  } catch (err) {
+
+    console.error(err);
+
+  } finally {
+
+    setSubiendoImagen(false);
+
+  }
+
+};
+
+  const eliminarImagen = async (id) => {
+
+  if (!confirm("¿Eliminar imagen?"))
+    return;
+
+  await supabase
+    .from("product_images")
+    .delete()
+    .eq("id", id);
+
+  setProducto(prev => ({
+    ...prev,
+    product_images:
+      prev.product_images.filter(
+        img => img.id !== id
+      )
+  }));
+
+};
+
+
+const handleDragEnd = async (
+  event
+) => {
+
+  const {
+    active,
+    over
+  } = event;
+
+  if (!over) return;
+
+  if (active.id === over.id)
+    return;
+
+  const oldIndex =
+    producto.product_images.findIndex(
+      img => img.id === active.id
+    );
+
+  const newIndex =
+    producto.product_images.findIndex(
+      img => img.id === over.id
+    );
+
+  // 🔥 nuevo orden
+  const nuevas =
+    arrayMove(
+      producto.product_images,
+      oldIndex,
+      newIndex
+    );
+
+  // 🔥 asignar sort_order correcto
+  const actualizadas =
+    nuevas.map((img, index) => ({
+      ...img,
+      sort_order: index
+    }));
+
+  // 🔥 actualizar UI inmediato
+  setProducto(prev => ({
+    ...prev,
+    product_images: actualizadas
+  }));
+
+  try {
+
+    // 🔥 guardar TODAS
+    const updates =
+      actualizadas.map(img =>
+        supabase
+          .from("product_images")
+          .update({
+            sort_order:
+              img.sort_order
+          })
+          .eq("id", img.id)
+      );
+
+    await Promise.all(updates);
+
+    // 🔥 recargar desde DB
+    await cargarProducto();
+
+  } catch (err) {
+
+    console.error(
+      "Error guardando orden",
+      err
+    );
+
+  }
+
+};
+
 return {
 
   producto,
@@ -415,7 +588,12 @@ return {
   actualizarStock,
 
   eliminarVariante,
-  agregarVariante
+  agregarVariante,
+
+  subirImagen,
+  eliminarImagen,
+
+  handleDragEnd
 
 };
 
