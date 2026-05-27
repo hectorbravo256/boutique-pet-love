@@ -1,47 +1,29 @@
 import { useEffect, useState } from "react";
 
-import { supabase }
-from "../../../supabaseClient";
-
 import { arrayMove }
 from "@dnd-kit/sortable";
 
 import {
-
   getProductById,
-
   getCategories,
-
   updateProductField
-
 }
 from "../../services/productsService";
 
 import {
-
   updateVariantPrice,
-
   updateVariantStock,
-
   deleteVariant,
-
   createVariant
-
 }
 from "../../services/variantsService";
 
 import {
-
   uploadImage,
-
   createProductImage,
-
   deleteProductImage,
-
   updateImageSort,
-
   getImageUrl
-
 }
 from "../../services/imageService";
 
