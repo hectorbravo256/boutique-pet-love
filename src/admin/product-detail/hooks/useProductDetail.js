@@ -30,6 +30,21 @@ import {
 }
 from "../../services/variantsService";
 
+import {
+
+  uploadImage,
+
+  createProductImage,
+
+  deleteProductImage,
+
+  updateImageSort,
+
+  getImageUrl
+
+}
+from "../../services/imageService";
+
 export default function useProductDetail(id) {
 
     const [producto, setProducto] = useState(null);
@@ -393,10 +408,11 @@ const { data } =
       `${Date.now()}-${file.name}`;
 
     // 🔥 subir storage
-    const { error: uploadError } =
-      await supabase.storage
-        .from("products")
-        .upload(nombre, file);
+const { error: uploadError } =
+  await uploadImage(
+    nombre,
+    file
+  );
 
    if (uploadError) {
 
@@ -414,28 +430,22 @@ const { data } =
 }
 
     // 🔥 obtener url
-    const { data } =
-      supabase.storage
-        .from("products")
-        .getPublicUrl(nombre);
+const { data } =
+  getImageUrl(nombre);
 
-    const url =
-      data.publicUrl;
+const url =
+  data.publicUrl;
 
     // 🔥 guardar db
-    const { data: nueva } =
-      await supabase
-        .from("product_images")
-        .insert([{
-  product_id: producto.id,
+const { data: nueva } =
+  await createProductImage({
+    product_id: producto.id,
 
-  url,
+    url,
 
-  sort_order:
-    producto.product_images.length
-}])
-        .select()
-        .single();
+    sort_order:
+      producto.product_images.length
+  });
 
     // 🔥 actualizar UI
     setProducto(prev => ({
@@ -463,10 +473,7 @@ const { data } =
   if (!confirm("¿Eliminar imagen?"))
     return;
 
-  await supabase
-    .from("product_images")
-    .delete()
-    .eq("id", id);
+await deleteProductImage(id);
 
   setProducto(prev => ({
     ...prev,
@@ -527,16 +534,15 @@ const handleDragEnd = async (
   try {
 
     // 🔥 guardar TODAS
-    const updates =
-      actualizadas.map(img =>
-        supabase
-          .from("product_images")
-          .update({
-            sort_order:
-              img.sort_order
-          })
-          .eq("id", img.id)
-      );
+const updates =
+  actualizadas.map(img =>
+
+    updateImageSort(
+      img.id,
+      img.sort_order
+    )
+
+  );
 
     await Promise.all(updates);
 
