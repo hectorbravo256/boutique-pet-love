@@ -17,6 +17,19 @@ import {
 }
 from "../../services/productsService";
 
+import {
+
+  updateVariantPrice,
+
+  updateVariantStock,
+
+  deleteVariant,
+
+  createVariant
+
+}
+from "../../services/variantsService";
+
 export default function useProductDetail(id) {
 
     const [producto, setProducto] = useState(null);
@@ -230,11 +243,10 @@ setProducto(data);
       [variantId]: "saving"
     }));
 
-    await supabase
-      .from("product_variants")
-      .update({ price: nuevoPrecio })
-      .eq("id", variantId);
-
+await updateVariantPrice(
+  variantId,
+  nuevoPrecio
+);
     setEstadoGuardado(prev => ({
       ...prev,
       [variantId]: "saved"
@@ -272,10 +284,10 @@ setProducto(data);
       [`stock-${variantId}`]: "saving"
     }));
 
-    await supabase
-      .from("product_variants")
-      .update({ stock: nuevoStock })
-      .eq("id", variantId);
+await updateVariantStock(
+  variantId,
+  nuevoStock
+);
 
     setEstadoGuardado(prev => ({
       ...prev,
@@ -298,10 +310,9 @@ setProducto(data);
 
     if (!confirm("¿Eliminar talla?")) return;
 
-    await supabase
-      .from("product_variants")
-      .delete()
-      .eq("id", variantId);
+await deleteVariant(
+  variantId
+);
 
     setProducto(prev => ({
       ...prev,
@@ -336,23 +347,20 @@ setProducto(data);
     return;
   }
 
-  const { data } = await supabase
-    .from("product_variants")
-    .insert([{
-      product_id: producto.id,
+const { data } =
+  await createVariant({
+    product_id: producto.id,
 
-      size: nuevaTalla,
+    size: nuevaTalla,
 
-      price:
-        parseInt(nuevoPrecio)
-        || 0,
+    price:
+      parseInt(nuevoPrecio)
+      || 0,
 
-      stock:
-        parseInt(nuevoStock)
-        || 0
-    }])
-    .select()
-    .single();
+    stock:
+      parseInt(nuevoStock)
+      || 0
+  });
 
   setProducto(prev => ({
     ...prev,
