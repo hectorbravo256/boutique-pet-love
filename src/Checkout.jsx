@@ -204,44 +204,94 @@ window.innerWidth >= 768
   	className="checkout-img"
 	/>
 
-    {/* 📦 INFO */}
-    <div className="checkout-info">
-      <p className="checkout-name">{item.name}</p>
-      <p className="checkout-size">{item.size}</p>
- 	  <p className="text-xs text-gray-500">
-  {(stockMap[`${item.id}-${item.size}`] || 0) === 0
-  ? "❌ Sin stock"
-  : `Stock disponible: ${stockMap[`${item.id}-${item.size}`]}`}
-</p>
+{/* 📦 INFO */}
+<div className="checkout-info">
 
-      {/* 🔢 CANTIDAD */}
-      <div className="checkout-qty">
-        <button onClick={() => decreaseQty(i)}>−</button>
-        <span>{item.qty || 1}</span>
-        <button
-  onClick={() => {
-    const stock = stockMap[`${item.id}-${item.size}`] || 0;
+  <p className="checkout-name">
+    {item.name}
+  </p>
 
-    if ((item.qty || 1) >= stock) {
-      window.dispatchEvent(
-        new CustomEvent("toast", {
-          detail: "⚠️ No puedes agregar más del stock disponible"
-        })
-      );
-      return;
-    }
+  <p className="checkout-size">
+    {item.size}
+  </p>
 
-    increaseQty(i);
-  }}
-  disabled={
-    (stockMap[`${item.id}-${item.size}`] || 0) === 0 ||
-    (item.qty || 1) >= (stockMap[`${item.id}-${item.size}`] || 0)
-  }
->
-  +
-</button>
-      </div>
-    </div>
+  <p className="text-xs text-gray-500">
+
+    {(stockMap[
+      `${item.product_id}-${item.size}`
+    ] || 0) === 0
+
+      ? "❌ Sin stock"
+
+      : `Stock disponible: ${
+          stockMap[
+            `${item.product_id}-${item.size}`
+          ]
+        }`}
+
+  </p>
+
+  {/* 🔢 CANTIDAD */}
+  <div className="checkout-qty">
+
+    <button
+      onClick={() => decreaseQty(i)}
+    >
+      −
+    </button>
+
+    <span>
+      {item.qty || 1}
+    </span>
+
+    <button
+
+      onClick={() => {
+
+        const stock =
+          stockMap[
+            `${item.product_id}-${item.size}`
+          ] || 0;
+
+        if ((item.qty || 1) >= stock) {
+
+          window.dispatchEvent(
+            new CustomEvent("toast", {
+              detail:
+                "⚠️ No puedes agregar más del stock disponible"
+            })
+          );
+
+          return;
+
+        }
+
+        increaseQty(i);
+
+      }}
+
+      disabled={
+
+        (stockMap[
+          `${item.product_id}-${item.size}`
+        ] || 0) === 0
+
+        ||
+
+        (item.qty || 1) >=
+        (stockMap[
+          `${item.product_id}-${item.size}`
+        ] || 0)
+
+      }
+
+    >
+      +
+    </button>
+
+  </div>
+
+</div>
 
     {/* 💰 PRECIO + ELIMINAR */}
     <div className="checkout-actions">
