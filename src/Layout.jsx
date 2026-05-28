@@ -42,7 +42,9 @@ const increaseQty = (i) => {
   const newCart = [...(cart || [])];
 	if (!newCart[i]) return;
   const stock =
-  stockMap[`${newCart[i].id}-${newCart[i].size}`];
+  stockMap[
+  `${newCart[i].product_id}-${newCart[i].size}`
+];
 
 const currentQty = newCart[i].qty || 1;
 
@@ -722,7 +724,10 @@ useEffect(() => {
 
         <button
   onClick={() => {
-    const stock = stockMap[`${item.id}-${item.size}`];
+    const stock =
+  stockMap[
+    `${newCart[i].product_id}-${newCart[i].size}`
+  ];;
 
 if (stock === undefined) {
   increaseQty(i); // deja pasar si no hay info aún
@@ -741,12 +746,12 @@ if (stock === undefined) {
     increaseQty(i);
   }}
 			disabled={
-  stockMap[`${item.id}-${item.size}`] !== undefined &&
-  (item.qty || 1) >= stockMap[`${item.id}-${item.size}`]
+  stockMap[`${item.product_id}-${item.size}`] !== undefined &&
+  (item.qty || 1) >= stockMap[`${item.product_id}-${item.size}`]
 }
           className={`w-8 h-8 md:w-7 md:h-7 flex items-center justify-center rounded-full transition font-bold ${
-  stockMap[`${item.id}-${item.size}`] !== undefined &&
-  (item.qty || 1) >= stockMap[`${item.id}-${item.size}`]
+  stockMap[`${item.product_id}-${item.size}`] !== undefined &&
+  (item.qty || 1) >= stockMap[`${item.product_id}-${item.size}`]
     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
     : "bg-pink-100 hover:bg-pink-200"
 }`}
