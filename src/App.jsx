@@ -261,15 +261,26 @@ setFeaturedProducts(destacados);
 
 // 🧩 CARGAR STOCK
 useEffect(() => {
+
   const cargarStock = async () => {
-    const { data } = await supabase
-      .from("product_stock")
-      .select("*");
+
+    const { data } =
+      await supabase
+
+        .from("product_variants")
+
+        .select(`
+          product_id,
+          size,
+          stock
+        `);
 
     setStockDB(data || []);
+
   };
 
   cargarStock();
+
 }, []);
 
   useEffect(() => {
