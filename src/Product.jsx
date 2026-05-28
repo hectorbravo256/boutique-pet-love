@@ -108,22 +108,42 @@ const precioFinal = tieneDescuento
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const existingIndex = cart.findIndex(
-      i => i.id === product.id && i.size === size
-    );
+const existingIndex = cart.findIndex(
+
+  i =>
+    i.product_id === product.id &&
+    i.size === size
+
+);
 
     if (existingIndex !== -1) {
       cart[existingIndex].qty += qty;
     } else {
-      cart.push({
-  id: product.id,
+cart.push({
+
+  id: variant.id,
+
+  product_id: product.id,
+
   name: product.name,
+
   size,
-  price: precioFinal, // 🔥 precio con descuento
-  originalPrice: variant.price, // 💰 precio original
-  discount: tieneDescuento ? product.discount_percent : 0,
+
+  price: precioFinal,
+
+  originalPrice: variant.price,
+
+  discount:
+    tieneDescuento
+      ? product.discount_percent
+      : 0,
+
   qty,
-  image: product.product_images?.[0]?.url + "?width=400&quality=70"
+
+  image:
+    product.product_images?.[0]?.url +
+    "?width=400&quality=70"
+
 });
     }
 
