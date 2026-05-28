@@ -152,10 +152,10 @@ useEffect(() => {
 	useEffect(() => {
   const fetchStock = async () => {
     const { data } = await supabase
-      .from("product_stock")
+      .from("product_variants")
       .select("*");
 
-    setStockDB(data || []);
+    setStockDB(stockDB || []);
   };
 
   fetchStock();
