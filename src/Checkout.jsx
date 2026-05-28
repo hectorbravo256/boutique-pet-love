@@ -161,7 +161,7 @@ const { data: stockDB } =
       stock
     `);
 
-    setStockDB(data || []);
+    setStockDB(stockDB || []);
   };
 
   cargarStock();
