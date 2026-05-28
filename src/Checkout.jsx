@@ -152,9 +152,14 @@ const applyCoupon = async () => {
 
 	useEffect(() => {
   const cargarStock = async () => {
-    const { data } = await supabase
-      .from("product_stock")
-      .select("*");
+const { data: stockDB } =
+  await supabase
+    .from("product_variants")
+    .select(`
+      product_id,
+      size,
+      stock
+    `);
 
     setStockDB(data || []);
   };
@@ -164,8 +169,10 @@ const applyCoupon = async () => {
 
 	useEffect(() => {
   const updatedCart = safeCart.map(item => {
-    const stock =
-      stockMap[`${item.id}-${item.size}`] || 0;
+const stock =
+  stockMap[
+    `${item.product_id}-${item.size}`
+  ] || 0;
 
     if (item.qty > stock) {
       return { ...item, qty: stock };
@@ -607,8 +614,10 @@ window.innerWidth >= 768
   // 🔥 VALIDAR STOCK REAL
   for (const item of cart) {
 
-    const stock =
-  stockMap[`${item.id}-${item.size}`];
+const stock =
+  stockMap[
+    `${item.product_id}-${item.size}`
+  ];
 
 if (stock === undefined) {
   continue;
