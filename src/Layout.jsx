@@ -724,10 +724,10 @@ useEffect(() => {
 
         <button
   onClick={() => {
-    const stock =
+const stock =
   stockMap[
-    `${newCart[i].product_id}-${newCart[i].size}`
-  ];;
+    `${item.product_id}-${item.size}`
+  ];
 
 if (stock === undefined) {
   increaseQty(i); // deja pasar si no hay info aún
