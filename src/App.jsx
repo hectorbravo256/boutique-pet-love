@@ -357,8 +357,9 @@ if (stock === 0) {
   return;
 }
 
-    const item = {
-      id: product.id,
+const item = {
+  id: variant.id,
+  product_id: product.id,
       name: product.name,
       size,
       price: variant?.price || 0,
@@ -371,7 +372,7 @@ if (stock === 0) {
 
     setCart((prev) => {
   const existingIndex = prev.findIndex(
-    (i) => i.id === item.id && i.size === item.size
+    (i) => i.product_id === item.product_id && i.size === item.size
   );
 
   if (existingIndex !== -1) {
