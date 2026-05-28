@@ -275,7 +275,7 @@ useEffect(() => {
           stock
         `);
 
-    setStockDB(data || []);
+    setStockDB(stockDB || []);
 
   };
 
