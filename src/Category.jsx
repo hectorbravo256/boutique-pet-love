@@ -113,7 +113,7 @@ const precioBase =
     <img
       src={
         p.product_images?.[0]?.url
-          ? `${p.product_images[0].url}?width=400&quality=70`
+          ? `${p.product_images[0].url}?width=350&quality=65`
           : "/placeholder.png"
       }
       loading="lazy"
