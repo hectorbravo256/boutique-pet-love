@@ -64,7 +64,7 @@ export default function ProductCard({
       ">
 
         <img
-          src={`${portada}?width=350&quality=65`}
+          src={`${portada}?width=300&quality=60`}
 
           alt={product.name}
 
