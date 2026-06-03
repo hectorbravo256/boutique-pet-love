@@ -1,6 +1,6 @@
 
 import { ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
 import Checkout from "./Checkout";
 import './index.css';
@@ -12,15 +12,16 @@ import Collection from "./Collection";
 import Product from "./Product";
 import Layout from "./Layout";
 import Success from "./Success";
-import AdminLayout from "./admin/AdminLayout";
-import Dashboard from "./admin/Dashboard";
-import Productos from "./admin/Productos";
-import CrearProducto from "./admin/CrearProducto";
-import Ventas from "./admin/Ventas";
 import ScrollToTop from "./ScrollToTop";
-import ProductoDetalle from "./admin/ProductoDetalle";
 import ProductCard from "./ProductCard";
-import AdminCategorias from "./admin/AdminCategorias";
+
+const AdminLayout = lazy(() => import("./admin/AdminLayout"));
+const Dashboard = lazy(() => import("./admin/Dashboard"));
+const Productos = lazy(() => import("./admin/Productos"));
+const CrearProducto = lazy(() => import("./admin/CrearProducto"));
+const Ventas = lazy(() => import("./admin/Ventas"));
+const ProductoDetalle = lazy(() => import("./admin/ProductoDetalle"));
+const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
 
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -759,7 +760,7 @@ localStorage.setItem(
       <img
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=700&quality=70`
+      ? `${heroProduct.product_images[0].url}?width=600&quality=60`
       : "/placeholder.png"
   }
 
@@ -1209,7 +1210,7 @@ localStorage.setItem(
 <img
   src={
     cat.featured_image || cat.image
-      ? `${cat.featured_image || cat.image}?width=400&quality=65`
+      ? `${cat.featured_image || cat.image}?width=320&quality=60`
       : "/placeholder.png"
   }
 
@@ -1566,14 +1567,16 @@ export default function App() {
     </Route>
 
     {/* 🔴 ADMIN (SIN HEADER) */}
-    <Route
-      path="/admin"
-      element={
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      }
-    >
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <Suspense fallback={<div>Cargando...</div>}>
+        <AdminLayout />
+      </Suspense>
+    </ProtectedRoute>
+  }
+>
       <Route index element={<Dashboard />} />
       <Route path="productos" element={<Productos />} />
       <Route path="crear" element={<CrearProducto />} />
