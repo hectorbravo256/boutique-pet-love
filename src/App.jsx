@@ -761,7 +761,7 @@ localStorage.setItem(
       <img
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=1200&quality=90`
+      ? `${heroProduct.product_images[0].url}?width=900&quality=80`
       : "/placeholder.png"
   }
 
