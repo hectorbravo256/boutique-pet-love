@@ -924,8 +924,8 @@ md:h-14
 
         </div>
 
-        <div className="text-center text-sm text-gray-400 mt-6">
-          © 2026 BOUTIQUE PET LOVE • Sitio listo para publicar en Netlify.
+        <div className="text-center text-sm text-gray-600 mt-6">
+          © 2026 BOUTIQUE PET LOVE
         </div>
       </footer>
         
