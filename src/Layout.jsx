@@ -678,7 +678,9 @@ useEffect(() => {
 
       {/* 🔽 CONTENIDO DINÁMICO */}
       <div>
-        <Outlet />
+        <main id="main-content">
+ 	 		<Outlet />
+		</main>
          
 
         {/* CARRITO */}
