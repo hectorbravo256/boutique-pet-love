@@ -765,7 +765,11 @@ localStorage.setItem(
       : "/placeholder.png"
   }
 
-  loading="lazy"
+  fetchPriority="high"
+
+  alt={heroProduct.name}
+  width="1280"
+  height="1280"
 
   onLoad={(e) =>
     e.target.classList.remove("opacity-0")
