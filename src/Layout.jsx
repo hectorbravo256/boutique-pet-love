@@ -523,7 +523,7 @@ useEffect(() => {
     
     {/* 🔥 LOGO IZQUIERDA */}
     <img
-      src="/logo.png"
+      src="/logo.webp"
       className="w-16 h-16 md:w-16 md:h-16 rounded-full shadow-md"
     />
 
@@ -886,7 +886,7 @@ md:h-14
         <div className="grid md:grid-cols-3 gap-6">
 
           <div>
-            <img src="/logo.png" className="w-16 rounded-full mb-2" />
+            <img src="/logo.webp" className="w-16 rounded-full mb-2" />
             <h3 className="text-pink-600 font-bold">
               BOUTIQUE PET LOVE
             </h3>
