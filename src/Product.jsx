@@ -373,6 +373,7 @@ return (
 <img
   key={currentIndex}
   src={`${product.product_images[currentIndex]?.url}?width=1200&quality=80`}
+  alt={product.name}
   loading="eager"
 
   onClick={() => {
@@ -1012,7 +1013,6 @@ onTouchEnd={(e) => e.stopPropagation()}
     <img
   src={`${product.product_images?.[currentIndex]?.url}?width=1200&quality=80`}
       alt={product.name}
-
       onClick={(e) => {
   e.stopPropagation();
 }}
