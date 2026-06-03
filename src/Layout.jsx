@@ -522,10 +522,13 @@ useEffect(() => {
   >
     
     {/* 🔥 LOGO IZQUIERDA */}
-    <img
-      src="/logo.webp"
-      className="w-16 h-16 md:w-16 md:h-16 rounded-full shadow-md"
-    />
+<img
+  src="/logo.webp"
+  alt="Boutique Pet Love"
+  width="64"
+  height="64"
+  className="w-16 h-16 md:w-16 md:h-16 rounded-full shadow-md"
+/>
 
     {/* 🔥 TEXTO DERECHA (2 FILAS) */}
 <div className="
@@ -561,11 +564,10 @@ useEffect(() => {
 
   {/* INSTAGRAM */}
   <a
-    href="https://instagram.com/boutique_petlove"
-
-    target="_blank"
-
-    rel="noreferrer"
+  href="https://instagram.com/boutique_petlove"
+  target="_blank"
+  rel="noreferrer"
+  aria-label="Instagram Boutique Pet Love"
 
     className="
       flex
@@ -594,11 +596,10 @@ useEffect(() => {
 
   {/* WHATSAPP */}
   <a
-    href={WHATSAPP}
-
-    target="_blank"
-
-    rel="noreferrer"
+ href={WHATSAPP}
+  target="_blank"
+  rel="noreferrer"
+  aria-label="WhatsApp Boutique Pet Love"
 
     className="
       flex
@@ -704,6 +705,9 @@ useEffect(() => {
   <div key={i} className="flex justify-between items-center text-sm mt-4 gap-3 pb-3 border-b border-pink-100">
 
     <img src={item.image}
+  alt={item.name}
+  width="48"
+  height="48"
       className="w-12 h-12 object-cover rounded-lg"
     />
 
@@ -837,6 +841,7 @@ if (stock === undefined) {
   )}`}
   target="_blank"
   rel="noopener noreferrer"
+  aria-label="Contactar por WhatsApp"
   className="mt-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white py-3 rounded-2xl flex justify-center items-center font-semibold shadow-lg transition-all duration-300 hover:scale-[1.02]"
 >
   Contactar por WhatsApp
@@ -886,7 +891,13 @@ md:h-14
         <div className="grid md:grid-cols-3 gap-6">
 
           <div>
-            <img src="/logo.webp" className="w-16 rounded-full mb-2" />
+            <img
+  src="/logo.webp"
+  alt="Boutique Pet Love"
+  width="64"
+  height="64"
+  className="w-16 rounded-full mb-2"
+/>
             <h3 className="text-pink-600 font-bold">
               BOUTIQUE PET LOVE
             </h3>
