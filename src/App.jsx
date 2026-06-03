@@ -808,7 +808,7 @@ localStorage.setItem(
         ⭐ Productos Destacados
       </h2>
 
-      <p className="text-gray-500 mt-1">
+      <p className="text-gray-700 mt-1">
         Los favoritos de Boutique Pet Love
       </p>
 
