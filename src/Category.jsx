@@ -113,10 +113,13 @@ const precioBase =
     <img
       src={
         p.product_images?.[0]?.url
-          ? `${p.product_images[0].url}?width=800&quality=80`
+          ? `${p.product_images[0].url}?width=400&quality=70`
           : "/placeholder.png"
       }
       loading="lazy"
+      alt={p.name}
+      width="450"
+      height="450"
       onLoad={(e) =>
         e.target.classList.remove("opacity-0")
       }
