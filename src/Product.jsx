@@ -461,6 +461,7 @@ return (
 
       <img
         src={`${img.url}?width=200&quality=60`}
+        alt={`${product.name} miniatura ${i + 1}`}
         className="
           w-20
           h-20
@@ -1010,6 +1011,7 @@ onTouchEnd={(e) => e.stopPropagation()}
 </button>
     <img
   src={`${product.product_images?.[currentIndex]?.url}?width=1200&quality=80`}
+      alt={product.name}
 
       onClick={(e) => {
   e.stopPropagation();
