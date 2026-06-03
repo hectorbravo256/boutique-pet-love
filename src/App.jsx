@@ -766,8 +766,8 @@ localStorage.setItem(
   fetchPriority="high"
 
   alt={heroProduct.name}
-  width="1280"
-  height="1280"
+  width="700"
+  height="700"
 
   onLoad={(e) =>
     e.target.classList.remove("opacity-0")
@@ -1209,7 +1209,7 @@ localStorage.setItem(
 <img
   src={
     cat.featured_image || cat.image
-      ? `${cat.featured_image || cat.image}?width=600&quality=70`
+      ? `${cat.featured_image || cat.image}?width=400&quality=65`
       : "/placeholder.png"
   }
 
@@ -1217,16 +1217,11 @@ localStorage.setItem(
 
   loading="lazy"
 
-  onLoad={(e) =>
-    e.target.classList.remove("opacity-0")
-  }
-
-  className="
-    opacity-0
-    transition-all
-    duration-700
-    group-hover:scale-105
-  "
+className="
+  transition-transform
+  duration-700
+  group-hover:scale-105
+"
 
   style={{
     width: "100%",
