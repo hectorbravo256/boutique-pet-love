@@ -264,18 +264,16 @@ useEffect(() => {
 
   const cargarStock = async () => {
 
-    const { data } =
-      await supabase
+const { data } =
+  await supabase
+    .from("product_variants")
+    .select(`
+      product_id,
+      size,
+      stock
+    `);
 
-        .from("product_variants")
-
-        .select(`
-          product_id,
-          size,
-          stock
-        `);
-
-    setStockDB(stockDB || []);
+setStockDB(data || []);
 
   };
 
@@ -1208,23 +1206,33 @@ localStorage.setItem(
   hover:-translate-y-1
 "
     >
-      <img
-  src={`${
-  cat.featured_image || cat.image
-}?width=600&quality=70`}
+<img
+  src={
+    cat.featured_image || cat.image
+      ? `${cat.featured_image || cat.image}?width=600&quality=70`
+      : "/placeholder.png"
+  }
+
+  alt={cat.name}
+
   loading="lazy"
-  onLoad={(e) => e.target.classList.remove("opacity-0")}
+
+  onLoad={(e) =>
+    e.target.classList.remove("opacity-0")
+  }
+
   className="
-  opacity-0
-  transition-all
-  duration-700
-  group-hover:scale-105
-"
+    opacity-0
+    transition-all
+    duration-700
+    group-hover:scale-105
+  "
+
   style={{
-  width: "100%",
-  aspectRatio: "4/5",
-  objectFit: "cover"
-}}
+    width: "100%",
+    aspectRatio: "4/5",
+    objectFit: "cover"
+  }}
 />
 
       <div className="
