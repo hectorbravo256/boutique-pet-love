@@ -64,11 +64,13 @@ export default function ProductCard({
       ">
 
         <img
-          src={`${portada}?width=800&quality=80`}
+          src={`${portada}?width=450&quality=75`}
 
           alt={product.name}
 
           loading="lazy"
+          width="450"
+          height="563"
 
           className="
             w-full
