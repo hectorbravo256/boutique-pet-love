@@ -200,11 +200,28 @@ const next =
     const cargar = async () => {
       const { data } = await supabase
   .from("products")
-  .select(`
-    *,
-    product_variants (*),
-    product_images (*)
-  `)
+.select(`
+  id,
+  name,
+  slug,
+  category,
+  active,
+  featured,
+  featured_order,
+  best_seller,
+  luxury,
+  exclusive,
+  new_collection,
+  discount_active,
+  discount_percent,
+  product_images (
+    url,
+    sort_order
+  ),
+  product_variants (
+    price
+  )
+`)
   .eq("active", true)
   .order("sort_order", {
     foreignTable: "product_images",
@@ -740,7 +757,7 @@ localStorage.setItem(
       <img
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=600&quality=60`
+      ? `${heroProduct.product_images[0].url}?width=500&quality=55`
       : "/placeholder.png"
   }
 
