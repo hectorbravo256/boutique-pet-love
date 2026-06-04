@@ -353,15 +353,7 @@ if (!variant) {
   return;
 }
 
-const stock = stockMap[`${product.id}-${size}`] || 0;
-
-
-
-if (stock === 0) {
-  alert("⚠️ Producto sin stock disponible");
-  return;
-}
-
+	  
 const item = {
   id: variant.id,
   product_id: product.id,
