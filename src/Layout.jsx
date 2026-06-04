@@ -38,6 +38,16 @@ const increaseQty = (i) => {
   if (!newCart[i]) return;
 
   const currentQty = newCart[i].qty || 1;
+  const stock = newCart[i].stock || 0;
+
+  if (currentQty >= stock) {
+
+    showToast(
+      `Solo quedan ${stock} unidades disponibles`
+    );
+
+    return;
+  }
 
   newCart[i].qty = currentQty + 1;
 
@@ -705,20 +715,23 @@ useEffect(() => {
 
         <span>{item.qty || 1}</span>
 
-        <button
+<button
   onClick={() => increaseQty(i)}
-  className="
+  disabled={(item.qty || 1) >= (item.stock || 0)}
+  className={`
     w-8 h-8
     md:w-7 md:h-7
-    flex
-    items-center
-    justify-center
+    flex items-center justify-center
     rounded-full
-    bg-pink-100
-    hover:bg-pink-200
-    transition
     font-bold
-  "
+    transition
+
+    ${
+      (item.qty || 1) >= (item.stock || 0)
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : "bg-pink-100 hover:bg-pink-200"
+    }
+  `}
 >
   +
 </button>
