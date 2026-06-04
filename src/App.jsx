@@ -204,6 +204,7 @@ const cargar = async () => {
     .select(`
       id,
       name,
+	  description,
       slug,
       category,
       active,
@@ -759,7 +760,7 @@ localStorage.setItem(
       <img
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=500&quality=55`
+      ? `${heroProduct.product_images[0].url}?width=650&quality=50`
       : "/placeholder.png"
   }
 
@@ -1160,7 +1161,10 @@ localStorage.setItem(
 )}
 			 
       {/* CATÁLOGO */}
-      <section id="catalogo" className="p-6">
+      <section
+  id="catalogo"
+  className="p-6 min-h-[550px]"
+>
 
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -1230,7 +1234,7 @@ localStorage.setItem(
         <img
           src={
             cat.featured_image || cat.image
-              ? `${cat.featured_image || cat.image}?width=320&quality=60`
+              ? `${cat.featured_image || cat.image}?width=280&quality=55`
               : "/placeholder.png"
           }
           alt={cat.name}
