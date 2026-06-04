@@ -197,36 +197,40 @@ const next =
 
   // 🧩 CARGAR PRODUCTOS
   useEffect(() => {
-    const cargar = async () => {
-      const { data } = await supabase
-  .from("products")
-.select(`
-  id,
-  name,
-  slug,
-  category,
-  active,
-  featured,
-  featured_order,
-  best_seller,
-  luxury,
-  exclusive,
-  new_collection,
-  discount_active,
-  discount_percent,
-  product_images (
-    url,
-    sort_order
-  ),
-  product_variants (
-    price
-  )
-`)
-  .eq("active", true)
-  .order("sort_order", {
-    foreignTable: "product_images",
-    ascending: true
-  });
+const cargar = async () => {
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      id,
+      name,
+      slug,
+      category,
+      active,
+      featured,
+      featured_order,
+      best_seller,
+      luxury,
+      exclusive,
+      new_collection,
+      discount_active,
+      discount_percent,
+      product_images (
+        url,
+        sort_order
+      ),
+      product_variants (
+        price
+      )
+    `)
+    .eq("active", true)
+    .order("sort_order", {
+      foreignTable: "product_images",
+      ascending: true
+    });
+
+  console.log("PRODUCTS DATA:", data);
+  console.log("PRODUCTS ERROR:", error);
 
 		(data || []).forEach(product => {
 
