@@ -25,11 +25,6 @@ const total = (cart || []).reduce(
   0
 );
 
-const stockMap = Object.fromEntries(
-  (stockDB || []).map(
-    s => [`${s.product_id}-${s.size}`, s.stock]
-  )
-);
 
 const saveCart = (newCart) => {
   setCart(newCart);
@@ -39,19 +34,13 @@ const saveCart = (newCart) => {
 
 const increaseQty = (i) => {
   const newCart = [...(cart || [])];
-	if (!newCart[i]) return;
-  const stock =
-  stockMap[
-  `${newCart[i].product_id}-${newCart[i].size}`
-];
 
-const currentQty = newCart[i].qty || 1;
+  if (!newCart[i]) return;
 
-if (stock !== undefined && currentQty >= stock) {
-  return;
-}
+  const currentQty = newCart[i].qty || 1;
 
-newCart[i].qty = currentQty + 1;
+  newCart[i].qty = currentQty + 1;
+
   saveCart(newCart);
 };
 
@@ -717,41 +706,22 @@ useEffect(() => {
         <span>{item.qty || 1}</span>
 
         <button
-  onClick={() => {
-const stock =
-  stockMap[
-    `${item.product_id}-${item.size}`
-  ];
-
-if (stock === undefined) {
-  increaseQty(i); // deja pasar si no hay info aún
-  return;
-}
-
-    if ((item.qty || 1) >= stock) {
-      window.dispatchEvent(
-        new CustomEvent("toast", {
-          detail: "⚠️ Stock máximo alcanzado"
-        })
-      );
-      return;
-    }
-
-    increaseQty(i);
-  }}
-			disabled={
-  stockMap[`${item.product_id}-${item.size}`] !== undefined &&
-  (item.qty || 1) >= stockMap[`${item.product_id}-${item.size}`]
-}
-          className={`w-8 h-8 md:w-7 md:h-7 flex items-center justify-center rounded-full transition font-bold ${
-  stockMap[`${item.product_id}-${item.size}`] !== undefined &&
-  (item.qty || 1) >= stockMap[`${item.product_id}-${item.size}`]
-    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-    : "bg-pink-100 hover:bg-pink-200"
-}`}
-        >
-          +
-        </button>
+  onClick={() => increaseQty(i)}
+  className="
+    w-8 h-8
+    md:w-7 md:h-7
+    flex
+    items-center
+    justify-center
+    rounded-full
+    bg-pink-100
+    hover:bg-pink-200
+    transition
+    font-bold
+  "
+>
+  +
+</button>
       </div>
     </div>
 
