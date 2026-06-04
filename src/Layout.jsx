@@ -530,7 +530,7 @@ useEffect(() => {
         BOUTIQUE PET LOVE
       </h1>
 
-      <p className="text-purple-400 text-xs md:text-sm">
+      <p className="text-purple-600 text-xs md:text-sm">
         Moda y accesorios para mascotas
       </p>
 
