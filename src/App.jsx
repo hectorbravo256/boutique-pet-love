@@ -146,6 +146,7 @@ const heroPrecioBase =
   );
 	
   const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [stockDB, setStockDB] = useState([]);
   const [formData, setFormData] = useState({
   nombre: "",
@@ -248,16 +249,22 @@ setFeaturedProducts(destacados);
     cargar();
   }, []);
 
-	useEffect(() => {
-    supabase
-  	.from("categories")
-  	.select("*")
-	.eq("active", true)
-	.order("sort_order", {
-  	ascending: true
-	})
-  	.eq("active", true)
-    .then(({ data }) => setCategories(data || []));
+useEffect(() => {
+  supabase
+    .from("categories")
+    .select("*")
+    .eq("active", true)
+    .order("sort_order", {
+      ascending: true
+    })
+    .then(({ data }) => {
+
+      setCategories(data || []);
+
+      setLoadingCategories(false);
+
+    });
+
 }, []);
 
 // 🧩 CARGAR STOCK
@@ -1176,67 +1183,103 @@ localStorage.setItem(
   xl:grid-cols-4
   gap-4
 ">
-  {categories
-  .filter(cat =>
-    products.some(product =>
-      product.category === cat.slug
-      &&
-      product.active
-    )
-  )
-  .map(cat => (
+  {loadingCategories ? (
+
+  [...Array(8)].map((_, i) => (
     <div
-      key={cat.id}
-      onClick={() => navigate(`/categoria/${cat.slug}`)}
+      key={i}
       className="
-  group
-  cursor-pointer
-  rounded-3xl
-  overflow-hidden
-  bg-white
-  shadow-sm
-  hover:shadow-xl
-  transition-all
-  duration-500
-  hover:-translate-y-1
-"
+        rounded-3xl
+        overflow-hidden
+        bg-white
+        shadow-sm
+      "
     >
-<img
-  src={
-    cat.featured_image || cat.image
-      ? `${cat.featured_image || cat.image}?width=320&quality=60`
-      : "/placeholder.png"
-  }
+      <div
+        className="
+          w-full
+          aspect-[4/5]
+          bg-gray-200
+          animate-pulse
+        "
+      />
 
-  alt={cat.name}
-
-  loading="lazy"
-
-className="
-  transition-transform
-  duration-700
-  group-hover:scale-105
-"
-
-  style={{
-    width: "100%",
-    aspectRatio: "4/5",
-    objectFit: "cover"
-  }}
-/>
-
-      <div className="
-  p-4
-  text-center
-  font-black
-  text-gray-800
-  text-lg
-  bg-white
-">
-        {cat.name}
-      </div>
+      <div
+        className="
+          h-16
+          bg-gray-100
+          animate-pulse
+        "
+      />
     </div>
-  ))}
+  ))
+
+) : (
+
+  categories
+    .filter(cat =>
+      products.some(product =>
+        product.category === cat.slug &&
+        product.active
+      )
+    )
+    .map(cat => (
+
+      <div
+        key={cat.id}
+        onClick={() => navigate(`/categoria/${cat.slug}`)}
+        className="
+          group
+          cursor-pointer
+          rounded-3xl
+          overflow-hidden
+          bg-white
+          shadow-sm
+          hover:shadow-xl
+          transition-all
+          duration-500
+          hover:-translate-y-1
+        "
+      >
+
+        <img
+          src={
+            cat.featured_image || cat.image
+              ? `${cat.featured_image || cat.image}?width=320&quality=60`
+              : "/placeholder.png"
+          }
+          alt={cat.name}
+          loading="lazy"
+          className="
+            transition-transform
+            duration-700
+            group-hover:scale-105
+          "
+          style={{
+            width: "100%",
+            aspectRatio: "4/5",
+            objectFit: "cover"
+          }}
+        />
+
+        <div
+          className="
+            p-4
+            text-center
+            font-black
+            text-gray-800
+            text-lg
+            bg-white
+          "
+        >
+          {cat.name}
+        </div>
+
+      </div>
+
+    ))
+
+)}
 </div>
 </section>
 
