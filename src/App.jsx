@@ -33,9 +33,6 @@ function AppContent() {
   const navigate = useNavigate();
 
 
-
-
-  const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [
@@ -128,10 +125,7 @@ const heroPrecioBase =
 
  
 /* ===== CARRITO LOCAL ===== */
-  useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
+
 
   // 🧩 CARGAR PRODUCTOS
   useEffect(() => {
@@ -188,8 +182,13 @@ const destacados =
   (data || [])
     .filter(p => p.featured);
 
-    cargar();
-  }, []);
+setFeaturedProducts(destacados);
+
+	};
+
+cargar();
+
+}, []);
 
 useEffect(() => {
 
@@ -217,11 +216,6 @@ useEffect(() => {
 
 }, []);
 
-
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  	}, [cart]);
 
 
 
@@ -964,7 +958,7 @@ useEffect(() => {
 ">
   {loadingCategories ? (
 
-  [...Array(8)].map((_, i) => (
+  [...Array(1)].map((_, i) => (
     <div
       key={i}
       className="
