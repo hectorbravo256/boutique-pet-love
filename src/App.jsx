@@ -525,7 +525,7 @@ useEffect(() => {
   fetchPriority="high"
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=800&quality=55`
+      ? `${heroProduct.product_images[0].url}?width=650&quality=50`
       : "/placeholder.png"
   }
 
