@@ -312,14 +312,13 @@ const tieneDescuento =
 
 return (
   <>
-  <div className="
+<div className="
   max-w-7xl
   mx-auto
   px-4
   md:px-8
   py-8
-  pb-36
-  md:pb-8
+  pb-8
 ">
 
 <div className="
@@ -1029,110 +1028,6 @@ onTouchEnd={(e) => e.stopPropagation()}
 </div>
 
   </div>
-)}
-
-    {/* 🔥 STICKY MOBILE CTA */}
-{!showModal && (
-<div className="
-  fixed
-  bottom-0
-  left-0
-  right-0
-  z-50
-  bg-white/95
-  backdrop-blur-xl
-  border-t
-  border-pink-100
-  p-4 
-  pb-[calc(1rem+env(safe-area-inset-bottom))]
-  shadow-2xl
-  md:hidden
-  animate-[slideUp_.35s_ease]
-  relative
-
-  before:absolute
-  before:top-0
-  before:left-0
-  before:right-0
-  before:h-px
-  before:bg-gradient-to-r
-  before:from-transparent
-  before:via-pink-200
-  before:to-transparent
-">
-
-  <div className="
-    flex
-    items-center
-    justify-between
-    gap-3
-  ">
-
-    {/* 💰 PRECIO */}
-    <div>
-
-      {selectedVariant && (
-        <>
-          <p className="
-            text-xs
-            text-gray-400
-          ">
-            Total
-          </p>
-
-          <p className="
-            text-2xl
-            font-black
-            text-pink-600
-          ">
-            $
-            {(
-              (
-                tieneDescuento
-                  ? Math.round(
-                      selectedVariant.price *
-                      (1 - product.discount_percent / 100)
-                    )
-                  : selectedVariant.price
-              ) * qty
-            ).toLocaleString("es-CL")}
-          </p>
-        </>
-      )}
-
-    </div>
-
-    {/* 🔥 BOTÓN */}
-    <button
-      onClick={() => {
-        addToCart();
-      }}
-      disabled={!selectedVariant || isOutOfStock}
-      className={`
-        flex-1
-        py-4
-        rounded-2xl
-        font-bold
-        text-white
-        shadow-xl
-        transition-all
-        duration-300
-        hover:scale-[1.02]
-        active:scale-[0.98]
-        ${
-          (!selectedVariant || isOutOfStock)
-            ? "bg-gray-300"
-            : "bg-gradient-to-r from-pink-500 to-purple-500"
-        }
-      `}
-    >
-      🛒 Agregar
-    </button>
-
-  </div>
-
-</div>
-  
 )}
 
     <style>
