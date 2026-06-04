@@ -605,7 +605,6 @@ window.innerWidth >= 768
 <div className="mt-4 text-sm text-gray-500 space-y-1">
   <p>🔒 Pago protegido SSL</p>
   <p>🚚 Envíos a todo Chile</p>
-  <p>💳 Hasta 6 cuotas</p>
 </div>
 
         <button
