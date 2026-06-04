@@ -770,14 +770,8 @@ localStorage.setItem(
   width="700"
   height="700"
 
-  onLoad={(e) =>
-    e.target.classList.remove("opacity-0")
-  }
 
   className="
-    opacity-0
-    transition-opacity
-    duration-700
     relative
     z-10
     w-full
