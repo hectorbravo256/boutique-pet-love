@@ -147,7 +147,6 @@ const heroPrecioBase =
 	
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  const [stockDB, setStockDB] = useState([]);
   const [formData, setFormData] = useState({
   nombre: "",
   rut: "",
@@ -161,12 +160,6 @@ const heroPrecioBase =
   const [currentIndex, setCurrentIndex] = useState({});
   const touchStartRef = useRef({});
   const [zoomGallery, setZoomGallery] = useState(null);
-
-const stockMap = useMemo(() =>
-  Object.fromEntries(
-    stockDB.map(s => [`${s.product_id}-${s.size}`, s.stock])
-  ),
-[stockDB]);
 
   const zoomTouchStart = useRef(0);
   const handleTouchStart = (e, productId) => {
@@ -267,27 +260,7 @@ useEffect(() => {
 
 }, []);
 
-// 🧩 CARGAR STOCK
-useEffect(() => {
 
-  const cargarStock = async () => {
-
-const { data } =
-  await supabase
-    .from("product_variants")
-    .select(`
-      product_id,
-      size,
-      stock
-    `);
-
-setStockDB(data || []);
-
-  };
-
-  cargarStock();
-
-}, []);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
