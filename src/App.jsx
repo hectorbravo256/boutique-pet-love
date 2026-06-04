@@ -122,7 +122,8 @@ const heroPrecioBase =
 	
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
-
+  const loadingProducts =
+  products.length === 0;
 
   // 🧩 CARGAR PRODUCTOS
   useEffect(() => {
@@ -555,8 +556,6 @@ useEffect(() => {
 )}
 
 			 {/* 🔥 DESTACADOS */}
-{featuredProducts.length > 0 && (
-
 <section className="px-6 pt-4 pb-10">
 
   <div className="flex items-center justify-between mb-6">
@@ -575,30 +574,74 @@ useEffect(() => {
 
   </div>
 
-  <div
-    className="
+  {loadingProducts ? (
+
+    <div className="
       grid
       grid-cols-2
       md:grid-cols-3
       xl:grid-cols-4
       gap-3 md:gap-6
-    "
-  >
+    ">
 
-{featuredProducts.map(product => (
+      {[...Array(4)].map((_, i) => (
 
-  <ProductCard
-    key={product.id}
-    product={product}
-  />
+        <div
+          key={i}
+          className="
+            bg-white
+            rounded-3xl
+            overflow-hidden
+            shadow-sm
+          "
+        >
 
-))}
+          <div className="
+            aspect-[4/5]
+            bg-gray-200
+            animate-pulse
+          " />
 
-  </div>
+          <div className="
+            h-24
+            bg-gray-100
+            animate-pulse
+          " />
+
+        </div>
+
+      ))}
+
+    </div>
+
+  ) : (
+
+    featuredProducts.length > 0 && (
+
+      <div className="
+        grid
+        grid-cols-2
+        md:grid-cols-3
+        xl:grid-cols-4
+        gap-3 md:gap-6
+      ">
+
+        {featuredProducts.map(product => (
+
+          <ProductCard
+            key={product.id}
+            product={product}
+          />
+
+        ))}
+
+      </div>
+
+    )
+
+  )}
 
 </section>
-
-)}
 
 			{/* 🔥 NUEVA COLECCIÓN */}
 	{nuevosProductos.length > 0 && (
@@ -945,7 +988,7 @@ useEffect(() => {
 ">
   {loadingCategories ? (
 
-  [...Array(1)].map((_, i) => (
+  [...Array(4)].map((_, i) => (
     <div
       key={i}
       className="
