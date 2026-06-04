@@ -50,7 +50,7 @@ body {
   box-shadow: 0 4px 12px rgba(244, 114, 182, 0.4);
 
   /* 👇 AQUÍ VA EL EFECTO */
-  animation: pulse 2s infinite;
+  animation: pulse 3s infinite;
 }
 
 .btn-carrito:hover {
@@ -215,15 +215,6 @@ body {
     transform,
     opacity;
 
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;  
 }
 
 ::-webkit-scrollbar {
