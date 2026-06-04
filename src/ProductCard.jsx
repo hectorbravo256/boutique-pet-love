@@ -69,8 +69,8 @@ export default function ProductCard({
           alt={product.name}
 
           loading="lazy"
-          width="450"
-          height="563"
+          width="320"
+          height="400"
 
           className="
             w-full
