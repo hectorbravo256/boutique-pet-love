@@ -208,7 +208,6 @@ const cargar = async () => {
       category,
       active,
       featured,
-      featured_order,
       best_seller,
       luxury,
       exclusive,
@@ -230,7 +229,7 @@ const cargar = async () => {
     });
 
   console.log("PRODUCTS DATA:", data);
-  console.log("PRODUCTS ERROR:", error);
+  console.log("PRODUCTS ERROR:", JSON.stringify(error));
 
 		(data || []).forEach(product => {
 
