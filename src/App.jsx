@@ -228,8 +228,6 @@ const cargar = async () => {
       ascending: true
     });
 
-  console.log("PRODUCTS DATA:", data);
-  console.log("PRODUCTS ERROR:", JSON.stringify(error));
 
 		(data || []).forEach(product => {
 
@@ -274,8 +272,6 @@ useEffect(() => {
         ascending: true
       });
 
-    console.log("CATEGORIES DATA:", data);
-    console.log("CATEGORIES ERROR:", error);
 
     if (error) {
       console.error(error);
@@ -461,15 +457,6 @@ localStorage.setItem(
   }
 };
 
-console.log("CATEGORIES:", categories);
-
-console.log(
-  "PRODUCTS:",
-  products.map(p => ({
-    name: p.name,
-    category: p.category
-  }))
-);
 	
 /* ================= UI ================= */
   return (
