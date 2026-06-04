@@ -571,7 +571,6 @@ className="
         className="
           absolute
           inset-0
-          bg-pink-300/20
           blur-3xl
           rounded-full
         "
@@ -593,9 +592,9 @@ height="690"
 
 className="
   w-full
-  max-w-sm
-  lg:max-w-md
-  xl:max-w-lg
+  max-w-xs
+  lg:max-w-sm
+  xl:max-w-md
   aspect-[4/5]
   object-cover
   rounded-[40px]
