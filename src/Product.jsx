@@ -60,26 +60,7 @@ export default function Product() {
       v => v.id == selected
     );
 
-    // 🔥 LÓGICA DESCUENTO (IGUAL QUE PRODUCTO)
-const ahora = new Date();
-
-const inicio = product.discount_start
-  ? new Date(product.discount_start)
-  : null;
-
-const fin = product.discount_end
-  ? new Date(product.discount_end)
-  : null;
-
-const dentroDeFecha =
-  (!inicio || ahora >= inicio) &&
-  (!fin || ahora <= fin);
-
-const tieneDescuento =
-  product.discount_active &&
-  product.discount_percent > 0 &&
-  dentroDeFecha;
-
+    
 // 💰 PRECIO FINAL
 const precioFinal = tieneDescuento
   ? Math.round(variant.price * (1 - product.discount_percent / 100))
