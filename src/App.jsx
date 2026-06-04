@@ -525,7 +525,7 @@ useEffect(() => {
   fetchPriority="high"
   src={
     heroProduct?.product_images?.[0]?.url
-      ? `${heroProduct.product_images[0].url}?width=650&quality=50`
+      ? `${heroProduct.product_images[0].url}?width=550&quality=45`
       : "/placeholder.png"
   }
 
@@ -926,7 +926,7 @@ useEffect(() => {
       {/* CATÁLOGO */}
       <section
   id="catalogo"
-  className="p-6 min-h-[750px]"
+  className="p-6 min-h-[450px]"
 >
 
         <div className="flex justify-between items-center mb-6">
@@ -944,7 +944,7 @@ useEffect(() => {
 ">
   {loadingCategories ? (
 
-  [...Array(8)].map((_, i) => (
+  [...Array(1)].map((_, i) => (
     <div
       key={i}
       className="
