@@ -36,6 +36,8 @@ function AppContent() {
 
   const [products, setProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const loadingHero =
+  featuredProducts.length === 0;
   const [
   currentHero,
   setCurrentHero
@@ -224,7 +226,52 @@ useEffect(() => {
 
 
 {/* 🔥 HERO PREMIUM */}
-{heroProduct && (
+{loadingHero ? (
+
+<section
+  className="
+    px-6
+    md:px-12
+    py-4
+    md:py-20
+  "
+>
+
+  <div
+    className="
+      grid
+      md:grid-cols-2
+      gap-10
+      items-center
+    "
+  >
+
+    <div>
+
+      <div className="w-40 h-10 bg-gray-200 rounded-full animate-pulse" />
+
+      <div className="mt-6 h-20 bg-gray-200 rounded animate-pulse" />
+
+      <div className="mt-4 h-8 bg-gray-100 rounded animate-pulse" />
+
+      <div className="mt-8 h-14 w-52 bg-gray-200 rounded animate-pulse" />
+
+    </div>
+
+    <div
+      className="
+        aspect-square
+        bg-gray-200
+        rounded-[40px]
+        animate-pulse
+      "
+    />
+
+  </div>
+
+</section>
+
+) : heroProduct && (
 
 <section
   key={heroProduct.id}
@@ -536,15 +583,16 @@ useEffect(() => {
   height="700"
 
 
-  className="
-    relative
-    z-10
-    w-full
-    max-w-xl
-    rounded-[40px]
-    shadow-2xl
-    object-cover
-  "
+className="
+  relative
+  z-10
+  w-full
+  aspect-[4/5]
+  max-w-xl
+  rounded-[40px]
+  shadow-2xl
+  object-cover
+"
 />
 
     </div>
