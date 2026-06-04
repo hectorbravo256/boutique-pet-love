@@ -260,20 +260,30 @@ setFeaturedProducts(destacados);
   }, []);
 
 useEffect(() => {
-  supabase
-    .from("categories")
-    .select("*")
-    .eq("active", true)
-    .order("sort_order", {
-      ascending: true
-    })
-    .then(({ data }) => {
 
-      setCategories(data || []);
+  const cargarCategorias = async () => {
 
-      setLoadingCategories(false);
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", {
+        ascending: true
+      });
 
-    });
+    console.log("CATEGORIES DATA:", data);
+    console.log("CATEGORIES ERROR:", error);
+
+    if (error) {
+      console.error(error);
+    }
+
+    setCategories(data || []);
+    setLoadingCategories(false);
+
+  };
+
+  cargarCategorias();
 
 }, []);
 
