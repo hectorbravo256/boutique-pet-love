@@ -9,7 +9,6 @@ export default function Layout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [stockDB, setStockDB] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
@@ -149,17 +148,6 @@ useEffect(() => {
   return () => window.removeEventListener("toast", handleToast);
 }, []);
 
-	useEffect(() => {
-  const fetchStock = async () => {
-    const { data } = await supabase
-      .from("product_variants")
-      .select("*");
-
-    setStockDB(stockDB || []);
-  };
-
-  fetchStock();
-}, []);
 
 useEffect(() => {
 
