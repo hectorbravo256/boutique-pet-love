@@ -123,10 +123,6 @@ const heroPrecioBase =
   const [loadingCategories, setLoadingCategories] = useState(true);
 
 
- 
-/* ===== CARRITO LOCAL ===== */
-
-
   // 🧩 CARGAR PRODUCTOS
   useEffect(() => {
 const cargar = async () => {
@@ -215,16 +211,6 @@ useEffect(() => {
   cargarCategorias();
 
 }, []);
-
-
-
-
- /* ===== FUNCIONES ===== */
-// 🧩 FORMATEAR PRECIO
-    // 🧩 AGREGAR AL CARRITO
-
-
-
 
 
 	
