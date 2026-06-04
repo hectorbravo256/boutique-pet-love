@@ -458,6 +458,16 @@ localStorage.setItem(
   }
 };
 
+console.log("CATEGORIES:", categories);
+
+console.log(
+  "PRODUCTS:",
+  products.map(p => ({
+    name: p.name,
+    category: p.category
+  }))
+);
+	
 /* ================= UI ================= */
   return (
          <div className="bg-pink-50 min-h-screen">
@@ -1216,14 +1226,7 @@ localStorage.setItem(
 
 ) : (
 
-  categories
-    .filter(cat =>
-      products.some(product =>
-        product.category === cat.slug &&
-        product.active
-      )
-    )
-    .map(cat => (
+  categories.map(cat => (
 
       <div
         key={cat.id}
