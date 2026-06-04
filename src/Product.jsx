@@ -101,30 +101,23 @@ const existingIndex = cart.findIndex(
       cart[existingIndex].qty += qty;
     } else {
 cart.push({
-
   id: variant.id,
-
   product_id: product.id,
-
   name: product.name,
-
   size,
-
   price: precioFinal,
-
   originalPrice: variant.price,
+  discount: tieneDescuento
+    ? product.discount_percent
+    : 0,
 
-  discount:
-    tieneDescuento
-      ? product.discount_percent
-      : 0,
+  stock: variant.stock || 0,
 
   qty,
 
   image:
     product.product_images?.[0]?.url +
     "?width=400&quality=70"
-
 });
     }
 
