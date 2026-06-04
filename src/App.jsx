@@ -233,7 +233,8 @@ useEffect(() => {
     px-6
     md:px-12
     py-4
-    md:py-20
+    md:py-10
+    xl:py-12
   "
 >
 
@@ -243,6 +244,8 @@ useEffect(() => {
       md:grid-cols-2
       gap-10
       items-center
+	  min-h-[500px]
+      xl:min-h-[600px]
     "
   >
 
@@ -276,15 +279,16 @@ useEffect(() => {
 <section
   key={heroProduct.id}
 
-  className="
-    relative
-    overflow-hidden
-    px-6
-    md:px-12
-    py-4
-    md:py-20
-    animate-fade
-  "
+className="
+  relative
+  overflow-hidden
+  px-6
+  md:px-12
+  py-4
+  md:py-10
+  xl:py-12
+  animate-fade
+"
 >
 
   {/* FONDO */}
@@ -322,12 +326,14 @@ useEffect(() => {
       gap-4
       md:gap-10
       items-center
+	  max-w-[1400px]
+      mx-auto
     "
   >
 
     {/* TEXTO */}
-    <div>
-
+<div className="max-w-[520px]">
+	
       <span
         className="
           inline-flex
@@ -355,7 +361,8 @@ useEffect(() => {
           text-[34px]
           leading-[0.95]
           sm:text-5xl
-          md:text-7xl
+          md:text-5xl
+		  lg:text-6xl
           font-black
           leading-tight
           text-gray-900
@@ -371,7 +378,8 @@ useEffect(() => {
     	  mt-6
     	  text-lg
           text-gray-600
-          max-w-xl
+          max-w-md
+		  xl:max-w-lg
         "
       >
         {heroProduct.description}
@@ -579,19 +587,19 @@ useEffect(() => {
   }
 
   alt={heroProduct.name}
-  width="700"
-  height="700"
+width="550"
+height="690"
 
 
 className="
-  relative
-  z-10
   w-full
+  max-w-sm
+  lg:max-w-md
+  xl:max-w-lg
   aspect-[4/5]
-  max-w-xl
+  object-cover
   rounded-[40px]
   shadow-2xl
-  object-cover
 "
 />
 
