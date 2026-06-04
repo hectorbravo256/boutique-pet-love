@@ -926,7 +926,7 @@ useEffect(() => {
       {/* CATÁLOGO */}
       <section
   id="catalogo"
-  className="p-6"
+  className="p-6 min-h-[750px]"
 >
 
         <div className="flex justify-between items-center mb-6">
@@ -944,7 +944,7 @@ useEffect(() => {
 ">
   {loadingCategories ? (
 
-  [...Array(1)].map((_, i) => (
+  [...Array(8)].map((_, i) => (
     <div
       key={i}
       className="
