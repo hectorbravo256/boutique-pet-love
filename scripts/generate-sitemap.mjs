@@ -3,7 +3,7 @@ import fs from "fs";
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.VITE_SUPABASE_ANON_KEY
+  process.env.VITE_SUPABASE_KEY
 );
 
 const SITE_URL = "https://boutiquepetlove.cl";
