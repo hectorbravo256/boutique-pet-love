@@ -37,7 +37,7 @@ export default function ProductCard({
     <div
       onClick={() =>
         navigate(
-          `/producto/${product.id}`
+          `/producto/${product.slug}`
         )
       }
 
@@ -201,7 +201,7 @@ export default function ProductCard({
             e.stopPropagation();
 
             navigate(
-              `/producto/${product.id}`
+              `/producto/${product.slug}`
             );
 
           }}
