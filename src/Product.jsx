@@ -200,7 +200,7 @@ const prevImage = () => {
     };
 
     cargar();
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
 
