@@ -121,6 +121,23 @@ cart.push({
 });
     }
 
+    if (window.gtag) {
+  window.gtag("event", "add_to_cart", {
+    currency: "CLP",
+    value: precioFinal * qty,
+    items: [
+      {
+        item_id: product.id,
+        item_name: product.name,
+        item_category: product.category,
+        item_variant: size,
+        price: precioFinal,
+        quantity: qty
+      }
+    ]
+  });
+}
+
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("storage"));
     window.dispatchEvent(new Event("openCart"));
@@ -197,6 +214,19 @@ const prevImage = () => {
       
 
       setProduct(data);
+
+      if (window.gtag && data) {
+  window.gtag("event", "view_item", {
+    currency: "CLP",
+    items: [
+      {
+        item_id: data.id,
+        item_name: data.name,
+        item_category: data.category
+      }
+    ]
+  });
+}
     };
 
     cargar();
