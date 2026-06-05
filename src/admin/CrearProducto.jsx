@@ -76,18 +76,26 @@ export default function CrearProducto() {
 
     }
 
+    const slug = newProduct.name
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "");
+
     // 🔥 insertar producto
     const { data, error } =
       await supabase
         .from("products")
         .insert([{
-          name: newProduct.name,
-          category:
-            newProduct.category,
-          gender:
-            newProduct.gender,
-          active: true
-        }])
+  name: newProduct.name,
+  slug: slug,
+  meta_title: `${newProduct.name} para Perros | Boutique Pet Love`,
+  meta_description: `Producto premium para mascotas. ${newProduct.name} disponible en Boutique Pet Love.`,
+  category: newProduct.category,
+  gender: newProduct.gender,
+  active: true
+}])
         .select()
         .single();
 
