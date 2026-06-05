@@ -508,7 +508,7 @@ className="
         <button
           onClick={() =>
             navigate(
-              `/producto/${heroProduct.id}`
+              `/producto/${heroProduct.slug}`
             )
           }
 
