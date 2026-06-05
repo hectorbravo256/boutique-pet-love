@@ -5,7 +5,7 @@ import { supabase } from "./supabaseClient";
 const WHATSAPP = "https://wa.me/56982700002";
 
 export default function Product() {
-  const { id } = useParams();
+  const { slug } = useParams();
 
   
   const [product, setProduct] = useState(null);
@@ -188,7 +188,7 @@ const prevImage = () => {
           product_variants (*),
           product_images (*)
         `)
-        .eq("id", id)
+        .eq("slug", slug)
         .order("sort_order", {
   foreignTable: "product_images",
   ascending: true
