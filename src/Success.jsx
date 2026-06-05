@@ -16,8 +16,30 @@ export default function Success() {
       // 🔥 CARGAR ORDEN
       const saved = localStorage.getItem("lastOrder");
       if (saved) {
-        setOrder(JSON.parse(saved));
-      }
+
+  const orderData = JSON.parse(saved);
+
+  setOrder(orderData);
+
+  if (window.gtag) {
+    window.gtag("event", "purchase", {
+      transaction_id:
+        "ORD-" + new Date(orderData.date).getTime(),
+
+      currency: "CLP",
+
+      value: orderData.total,
+
+      items: orderData.cart.map(item => ({
+        item_id: item.product_id,
+        item_name: item.name,
+        item_variant: item.size,
+        price: item.price,
+        quantity: item.qty
+      }))
+    });
+  }
+}
 
       // 🔥 ACTUALIZAR CUPÓN
       const alreadyUsed = sessionStorage.getItem("couponProcessed");
