@@ -2,7 +2,16 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.VITE_SUPABASE_KEY
+  process.env.VITE_SUPABASE_KEY,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    },
+    realtime: {
+      enabled: false
+    }
+  }
 );
 
 export async function handler() {
