@@ -184,6 +184,22 @@ const stock =
   localStorage.setItem("cart", JSON.stringify(updatedCart));
 }, [stockDB, cart]);
 
+	useEffect(() => {
+  if (!window.gtag || !safeCart.length) return;
+
+  window.gtag("event", "begin_checkout", {
+    currency: "CLP",
+    value: totalConDescuento,
+    items: safeCart.map(item => ({
+      item_id: item.product_id,
+      item_name: item.name,
+      item_variant: item.size,
+      price: item.price,
+      quantity: item.qty
+    }))
+  });
+}, []);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 grid md:grid-cols-2 gap-8">
 
