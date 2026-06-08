@@ -22,6 +22,17 @@ const seoDescription =
 const seoUrl =
   `https://boutiquepetlove.cl/categoria/${slug}`;
 
+  const collectionSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+
+  name: seoTitle,
+
+  description: seoDescription,
+
+  url: seoUrl
+};
+
 useEffect(() => {
 
   const cargar = async () => {
@@ -99,6 +110,12 @@ return (
       content="website"
     />
 
+    <script
+  type="application/ld+json"
+>
+  {JSON.stringify(collectionSchema)}
+</script>
+
   </Helmet>
   
   <div className="
@@ -121,7 +138,7 @@ return (
   mb-8
   tracking-wide
 ">
-  {slug}
+  {categoryName}
 </h2>
 
 <div className="
