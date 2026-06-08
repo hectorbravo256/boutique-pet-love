@@ -466,12 +466,9 @@ return (
   content={seoImage}
 />
 
-          <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify(productSchema)
-  }}
-/>
+<script type="application/ld+json">
+  {JSON.stringify(productSchema)}
+</script>
 
   </Helmet>
 
