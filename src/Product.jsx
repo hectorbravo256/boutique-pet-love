@@ -357,6 +357,51 @@ const seoImage =
 const seoUrl =
   `https://boutiquepetlove.cl/producto/${product.slug}`;
 
+  const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+
+  name: product.name,
+
+  image:
+    product.product_images?.map(
+      img => img.url
+    ) || [],
+
+  description: seoDescription,
+
+  sku: product.slug,
+
+  brand: {
+    "@type": "Brand",
+    name: "Boutique Pet Love"
+  },
+
+  offers: {
+    "@type": "Offer",
+
+    price:
+      product.product_variants?.length
+        ? Math.min(
+            ...product.product_variants.map(
+              v => Number(v.price)
+            )
+          )
+        : 0,
+
+    priceCurrency: "CLP",
+
+    availability:
+      product.product_variants?.some(
+        v => v.stock > 0
+      )
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+
+    url: seoUrl
+  }
+};
+
 return (
   <>
 
@@ -421,72 +466,15 @@ return (
   content={seoImage}
 />
 
-
-
-    <script
+          <script
   type="application/ld+json"
   dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-
-      "@context":
-        "https://schema.org",
-
-      "@type":
-        "Product",
-
-      name:
-        product.name,
-
-      image:
-        product.product_images?.map(
-          img => img.url
-        ) || [],
-
-      description:
-        seoDescription,
-
-      sku:
-        product.slug,
-
-      brand: {
-        "@type": "Brand",
-        name: "Boutique Pet Love"
-      },
-
-      offers: {
-        "@type": "Offer",
-
-        price:
-  product.product_variants?.length
-    ? Math.min(
-        ...product.product_variants.map(
-          v => Number(v.price)
-        )
-      )
-    : 0,
-
-        priceCurrency:
-          "CLP",
-
-          priceValidUntil:
-    "2027-12-31",
-
-  availability:
-  product.product_variants?.some(
-    v => v.stock > 0
-  )
-    ? "https://schema.org/InStock"
-    : "https://schema.org/OutOfStock",
-
-        url:
-          seoUrl
-      }
-
-    })
+    __html: JSON.stringify(productSchema)
   }}
 />
 
   </Helmet>
+
     
 <div className="
   max-w-7xl
