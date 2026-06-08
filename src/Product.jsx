@@ -402,6 +402,42 @@ const seoUrl =
   }
 };
 
+  const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+
+  itemListElement: [
+
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Inicio",
+      item: "https://boutiquepetlove.cl"
+    },
+
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: product.category,
+
+      item:
+        `https://boutiquepetlove.cl/categoria/${product.category
+          ?.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-")}`
+    },
+
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: product.name,
+      item: seoUrl
+    }
+
+  ]
+};
+
 return (
   <>
 
@@ -470,6 +506,10 @@ return (
   {JSON.stringify(productSchema)}
 </script>
 
+    <script type="application/ld+json">
+  {JSON.stringify(breadcrumbSchema)}
+</script>
+
   </Helmet>
 
     
@@ -481,6 +521,39 @@ return (
   py-8
   pb-8
 ">
+
+  <div className="
+  mb-6
+  text-sm
+  text-gray-500
+">
+  <a
+    href="/"
+    className="hover:text-pink-500"
+  >
+    Inicio
+  </a>
+
+  {" > "}
+
+  <a
+    href={`/categoria/${product.category
+      ?.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+    }`}
+    className="hover:text-pink-500"
+  >
+    {product.category}
+  </a>
+
+  {" > "}
+
+  <span className="text-pink-600">
+    {product.name}
+  </span>
+</div>
 
 <div className="
   grid
