@@ -184,7 +184,7 @@ export default function Collection() {
 
               onClick={() =>
                 navigate(
-                  `/producto/${product.id}`
+                  `/producto/${product.slug}`
                 )
               }
 
