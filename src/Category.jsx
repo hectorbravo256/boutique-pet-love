@@ -165,7 +165,7 @@ const precioBase =
     
 <div
   key={p.id}
-  onClick={() => navigate(`/producto/${p.id}`)}
+  onClick={() => navigate(`/producto/${p.slug}`)}
   className="
     group
     cursor-pointer
@@ -317,7 +317,7 @@ const precioBase =
   <button
     onClick={(e) => {
   e.stopPropagation();
-  navigate(`/producto/${p.id}`);
+  navigate(`/producto/${p.slug}`);
 }}
     className="
       w-full
