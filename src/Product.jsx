@@ -468,10 +468,15 @@ return (
         priceCurrency:
           "CLP",
 
-        availability:
-          currentStock > 0
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
+          priceValidUntil:
+    "2027-12-31",
+
+  availability:
+  product.product_variants?.some(
+    v => v.stock > 0
+  )
+    ? "https://schema.org/InStock"
+    : "https://schema.org/OutOfStock",
 
         url:
           seoUrl
