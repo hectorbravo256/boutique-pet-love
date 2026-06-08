@@ -150,7 +150,7 @@ export default function Gender() {
 
               onClick={() =>
                 navigate(
-                  `/producto/${product.id}`
+                  `/producto/${product.slug}`
                 )
               }
 
