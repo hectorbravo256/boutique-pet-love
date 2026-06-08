@@ -7,17 +7,25 @@ import {
   ToastProvider
 } from "./admin/components/ToastProvider";
 
+import {
+  HelmetProvider
+} from "react-helmet-async";
+
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
 
   <React.StrictMode>
 
-    <ToastProvider>
+    <HelmetProvider>
 
-      <App />
+      <ToastProvider>
 
-    </ToastProvider>
+        <App />
+
+      </ToastProvider>
+
+    </HelmetProvider>
 
   </React.StrictMode>
 
