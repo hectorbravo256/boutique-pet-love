@@ -537,12 +537,13 @@ return (
   {" > "}
 
   <a
-    href={`/categoria/${product.category
-      ?.toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "-")
-    }`}
+href={`/categoria/${product.category
+  ?.toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/\s*-\s*/g, "-")
+  .replace(/\s+/g, "-")
+}`}
     className="hover:text-pink-500"
   >
     {product.category}
