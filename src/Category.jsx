@@ -8,30 +8,43 @@ export default function Category() {
 
   const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    const cargar = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_images (*),
-          product_variants (*)
-        `)
-        .eq("category", slug)
-        .eq("active", true)
-.order("sort_order", {
-  foreignTable: "product_images",
-  ascending: true
-});
+useEffect(() => {
 
-      if (!error) {
-        
-        setProducts(data || []);
-      }
-    };
+  const cargar = async () => {
 
-    cargar();
-  }, [slug]);
+    // Buscar categoría por slug
+    const { data: categoryData } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("slug", slug)
+      .single();
+
+    if (!categoryData) return;
+
+    // Buscar productos usando el nombre real
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        *,
+        product_images (*),
+        product_variants (*)
+      `)
+      .eq("category", categoryData.name)
+      .eq("active", true)
+      .order("sort_order", {
+        foreignTable: "product_images",
+        ascending: true
+      });
+
+    if (!error) {
+      setProducts(data || []);
+    }
+
+  };
+
+  cargar();
+
+}, [slug]);
 
 return (
   <div className="
