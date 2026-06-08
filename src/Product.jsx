@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import { Helmet } from "react-helmet-async";
 
 const WHATSAPP = "https://wa.me/56982700002";
 
@@ -340,8 +341,145 @@ const tieneDescuento =
   product?.discount_percent > 0 &&
   dentroDeFecha;
 
+  const seoTitle =
+  product.meta_title ||
+  `${product.name} | Boutique Pet Love`;
+
+const seoDescription =
+  product.meta_description ||
+  product.description ||
+  "Moda premium para mascotas";
+
+const seoImage =
+  product.product_images?.[0]?.url || "";
+
+const seoUrl =
+  `https://boutiquepetlove.cl/producto/${product.slug}`;
+
 return (
   <>
+
+    <Helmet>
+
+  <title>
+    {seoTitle}
+  </title>
+
+  <meta
+    name="description"
+    content={seoDescription}
+  />
+
+  <link
+    rel="canonical"
+    href={seoUrl}
+  />
+
+  <meta
+    property="og:title"
+    content={seoTitle}
+  />
+
+  <meta
+    property="og:description"
+    content={seoDescription}
+  />
+
+  <meta
+    property="og:image"
+    content={seoImage}
+  />
+
+  <meta
+    property="og:url"
+    content={seoUrl}
+  />
+
+  <meta
+    property="og:type"
+    content="product"
+  />
+
+    <meta
+  name="twitter:card"
+  content="summary_large_image"
+/>
+
+<meta
+  name="twitter:title"
+  content={seoTitle}
+/>
+
+<meta
+  name="twitter:description"
+  content={seoDescription}
+/>
+
+<meta
+  name="twitter:image"
+  content={seoImage}
+/>
+
+</Helmet>
+
+    <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+
+      "@context":
+        "https://schema.org",
+
+      "@type":
+        "Product",
+
+      name:
+        product.name,
+
+      image:
+        product.product_images?.map(
+          img => img.url
+        ) || [],
+
+      description:
+        seoDescription,
+
+      sku:
+        product.slug,
+
+      brand: {
+        "@type": "Brand",
+        name: "Boutique Pet Love"
+      },
+
+      offers: {
+        "@type": "Offer",
+
+        price:
+  product.product_variants?.length
+    ? Math.min(
+        ...product.product_variants.map(
+          v => Number(v.price)
+        )
+      )
+    : 0,
+
+        priceCurrency:
+          "CLP",
+
+        availability:
+          currentStock > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+
+        url:
+          seoUrl
+      }
+
+    })
+  }}
+/>
+    
 <div className="
   max-w-7xl
   mx-auto
