@@ -1,12 +1,26 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import { Helmet } from "react-helmet-async";
 
 export default function Category() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+
+  const categoryName = slug
+  ?.replaceAll("-", " ")
+  ?.replace(/\b\w/g, l => l.toUpperCase());
+
+const seoTitle =
+  `${categoryName} para Perros | Boutique Pet Love`;
+
+const seoDescription =
+  `Descubre nuestra colección ${categoryName} para perros. Diseños premium, máxima comodidad y envíos a todo Chile.`;
+
+const seoUrl =
+  `https://boutiquepetlove.cl/categoria/${slug}`;
 
 useEffect(() => {
 
@@ -47,6 +61,46 @@ useEffect(() => {
 }, [slug]);
 
 return (
+
+  <>
+  <Helmet>
+
+    <title>
+      {seoTitle}
+    </title>
+
+    <meta
+      name="description"
+      content={seoDescription}
+    />
+
+    <link
+      rel="canonical"
+      href={seoUrl}
+    />
+
+    <meta
+      property="og:title"
+      content={seoTitle}
+    />
+
+    <meta
+      property="og:description"
+      content={seoDescription}
+    />
+
+    <meta
+      property="og:url"
+      content={seoUrl}
+    />
+
+    <meta
+      property="og:type"
+      content="website"
+    />
+
+  </Helmet>
+  
   <div className="
   px-4
   md:px-8
@@ -279,5 +333,7 @@ const precioBase =
 </div>
 
 </div>
-    );
+
+</>
+);
 }
