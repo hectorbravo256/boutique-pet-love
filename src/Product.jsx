@@ -351,7 +351,8 @@ const seoDescription =
   "Moda premium para mascotas";
 
 const seoImage =
-  product.product_images?.[0]?.url || "";
+  product.product_images?.[0]?.url ||
+  "https://boutiquepetlove.cl/logo-google.webp";
 
 const seoUrl =
   `https://boutiquepetlove.cl/producto/${product.slug}`;
@@ -420,7 +421,7 @@ return (
   content={seoImage}
 />
 
-</Helmet>
+
 
     <script
   type="application/ld+json"
@@ -479,6 +480,8 @@ return (
     })
   }}
 />
+
+  </Helmet>
     
 <div className="
   max-w-7xl
