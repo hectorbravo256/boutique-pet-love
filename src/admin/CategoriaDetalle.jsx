@@ -124,6 +124,28 @@ const subirImagen = async (file) => {
 
 };
 
+  const eliminarImagen = async () => {
+
+  const { error } = await supabase
+    .from("categories")
+    .update({
+      image: null
+    })
+    .eq("id", category.id);
+
+  if (!error) {
+
+    setCategory({
+      ...category,
+      image: null
+    });
+
+    alert("Imagen eliminada");
+
+  }
+
+};
+
   if (!category) {
 
     return (
@@ -283,6 +305,7 @@ const subirImagen = async (file) => {
 <CategoryImageCard
   category={category}
   subirImagen={subirImagen}
+  eliminarImagen={eliminarImagen}
 />
 
 <CategorySEOCard
