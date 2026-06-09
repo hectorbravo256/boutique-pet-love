@@ -33,18 +33,27 @@ export default function CategoriaDetalle() {
 
   const { error } = await supabase
     .from("categories")
-    .update({
+.update({
 
-      name: category.name,
-      slug: category.slug,
+  name: category.name,
 
-      image: category.image,
+  slug: category.slug,
 
-      active: category.active,
+  image: category.image,
 
-      sort_order: category.sort_order
+  active: category.active,
 
-    })
+  sort_order: category.sort_order,
+
+  seo_title: category.seo_title,
+
+  seo_description:
+    category.seo_description,
+
+  seo_text:
+    category.seo_text
+
+})
     .eq("id", category.id);
 
   if (!error) {
