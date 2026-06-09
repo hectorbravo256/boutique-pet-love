@@ -172,11 +172,12 @@ export default function CategoryStats({
           ">
 
             {
-              category.seo_title &&
-              category.seo_description
-                ? "Optimizado"
-                : "Pendiente"
-            }
+  category.seo_title &&
+  category.seo_description &&
+  category.seo_text
+    ? "100%"
+    : "60%"
+}
 
           </div>
 
