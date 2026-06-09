@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 
 export default function CategoriaDetalle() {
 
-  const { id } = useParams();
+  const { id: slug } = useParams();
 
   const [category, setCategory] =
     useState(null);
@@ -13,7 +13,7 @@ export default function CategoriaDetalle() {
 
     cargarCategoria();
 
-  }, [id]);
+  }, [slug]);
 
   const cargarCategoria = async () => {
 
@@ -21,7 +21,7 @@ export default function CategoriaDetalle() {
       await supabase
         .from("categories")
         .select("*")
-        .eq("id", id)
+        .eq("slug", slug)
         .single();
 
     setCategory(data);
