@@ -86,17 +86,19 @@ export default function CategoryStats({
             Estado
           </div>
 
-          <div className="
-            text-xl
-            font-black
-            mt-2
+<div
+  className={`
+    text-xl
+    font-black
+    mt-2
 
-            ${
-              category.active
-                ? "text-emerald-600"
-                : "text-red-600"
-            }
-          ">
+    ${
+      category.active
+        ? "text-emerald-600"
+        : "text-red-600"
+    }
+  `}
+>
             {category.active
               ? "Activa"
               : "Inactiva"}
