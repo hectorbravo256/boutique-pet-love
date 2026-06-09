@@ -21,6 +21,99 @@ export default function CategorySEOCard({
       </h2>
 
       <div className="
+  grid
+  md:grid-cols-3
+  gap-4
+  mb-6
+">
+
+  <div className="
+    bg-blue-50
+    border
+    border-blue-100
+    rounded-2xl
+    p-4
+  ">
+    <div className="
+      text-xs
+      uppercase
+      tracking-wider
+      text-slate-500
+      mb-2
+    ">
+      SEO Title
+    </div>
+
+    <div className="
+      text-3xl
+      font-black
+      text-slate-900
+    ">
+      {(category.seo_title || "").length}
+    </div>
+  </div>
+
+  <div className="
+    bg-purple-50
+    border
+    border-purple-100
+    rounded-2xl
+    p-4
+  ">
+    <div className="
+      text-xs
+      uppercase
+      tracking-wider
+      text-slate-500
+      mb-2
+    ">
+      Meta Description
+    </div>
+
+    <div className="
+      text-3xl
+      font-black
+      text-slate-900
+    ">
+      {(category.seo_description || "").length}
+    </div>
+  </div>
+
+  <div className="
+    bg-emerald-50
+    border
+    border-emerald-100
+    rounded-2xl
+    p-4
+  ">
+    <div className="
+      text-xs
+      uppercase
+      tracking-wider
+      text-slate-500
+      mb-2
+    ">
+      SEO Score
+    </div>
+
+    <div className="
+      text-3xl
+      font-black
+      text-slate-900
+    ">
+      {
+        category.seo_title &&
+        category.seo_description &&
+        category.seo_text
+          ? "100%"
+          : "60%"
+      }
+    </div>
+  </div>
+
+</div>
+
+      <div className="
         grid
         gap-5
       ">
@@ -135,23 +228,25 @@ export default function CategorySEOCard({
   border
   border-slate-200
 
-  rounded-3xl
+  rounded-[24px]
 
   p-6
 
-  bg-slate-50
+  bg-white
+shadow-sm
 ">
 
-  <div className="
-    text-xs
-    text-green-700
-    mb-2
-  ">
+<div className="
+  text-sm
+  text-green-700
+  mb-3
+">
     boutiquepetlove.cl/categoria/{category.slug}
   </div>
 
   <div className="
-    text-xl
+    text-[22px]
+    leading-7
     text-blue-700
 
     font-medium
