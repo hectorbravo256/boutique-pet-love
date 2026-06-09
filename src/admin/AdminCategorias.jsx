@@ -15,7 +15,12 @@ from "./components/AdminInput";
 import AdminButton
 from "./components/AdminButton";
 
+import { useNavigate }
+from "react-router-dom";
+
 export default function AdminCategorias() {
+
+  const navigate = useNavigate();
 
   const [categories, setCategories] =
     useState([]);
@@ -438,9 +443,22 @@ setNewCategory({
 
         {categories.map((cat, index) => (
 
-          <AdminCard
-            key={cat.id}
-          >
+<AdminCard
+  key={cat.id}
+
+  onClick={() =>
+    navigate(
+      `/admin/categorias/${cat.id}`
+    )
+  }
+
+  className="
+    cursor-pointer
+    transition-all
+    duration-300
+    hover:scale-[1.01]
+  "
+>
 
             <div className="
               grid
@@ -678,23 +696,29 @@ setNewCategory({
 
                 </label>
 
-                <AdminButton
-                  onClick={() =>
-                    guardarCategoria(cat)
-                  }
-                >
+<AdminButton
+  onClick={(e) => {
+
+    e.stopPropagation();
+
+    guardarCategoria(cat);
+
+  }}
+>
                   💾 Guardar cambios
                 </AdminButton>
 
-                <AdminButton
-                  danger
+<AdminButton
+  danger
 
-                  onClick={() =>
-                    eliminarCategoria(
-                      cat.id
-                    )
-                  }
-                >
+  onClick={(e) => {
+
+    e.stopPropagation();
+
+    eliminarCategoria(cat.id);
+
+  }}
+>
                   🗑 Eliminar
                 </AdminButton>
 
