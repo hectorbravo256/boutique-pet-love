@@ -198,6 +198,20 @@ export default function CategoriaDetalle() {
 
       </div>
 
+      <div className="space-y-8">
+
+  <CategoryInfoCard
+
+    category={category}
+
+    setCategory={setCategory}
+
+    guardarCategoria={guardarCategoria}
+
+  />
+
+</div>
+
     </>
 
   );
