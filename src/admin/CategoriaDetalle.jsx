@@ -296,6 +296,12 @@ const subirImagen = async (file) => {
   totalProducts={totalProducts}
 />
 
+    <div className="
+    grid
+    xl:grid-cols-[1.6fr_1fr]
+    gap-8
+  ">
+
 <CategoryInfoCard
   category={category}
   setCategory={setCategory}
@@ -314,7 +320,9 @@ const subirImagen = async (file) => {
 />
 
 </div>
-
+  
+</div>
+      
     </>
 
   );
