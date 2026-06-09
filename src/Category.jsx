@@ -33,6 +33,26 @@ const seoUrl =
   url: seoUrl
 };
 
+  const itemListSchema = {
+  "@context": "https://schema.org",
+
+  "@type": "ItemList",
+
+  itemListElement: products.map(
+    (product, index) => ({
+      "@type": "ListItem",
+
+      position: index + 1,
+
+      url:
+        `https://boutiquepetlove.cl/producto/${product.slug}`,
+
+      name:
+        product.name
+    })
+  )
+};
+
 useEffect(() => {
 
   const cargar = async () => {
@@ -75,6 +95,7 @@ return (
 
   <>
   <Helmet>
+    
 
     <title>
       {seoTitle}
@@ -114,6 +135,12 @@ return (
   type="application/ld+json"
 >
   {JSON.stringify(collectionSchema)}
+</script>
+
+    <script
+  type="application/ld+json"
+>
+  {JSON.stringify(itemListSchema)}
 </script>
 
   </Helmet>
