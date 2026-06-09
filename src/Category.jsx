@@ -8,15 +8,18 @@ export default function Category() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState(null);
 
   const categoryName = slug
   ?.replaceAll("-", " ")
   ?.replace(/\b\w/g, l => l.toUpperCase());
 
 const seoTitle =
+  category?.seo_title ||
   `${categoryName} para Perros | Boutique Pet Love`;
 
 const seoDescription =
+  category?.seo_description ||
   `Descubre nuestra colección ${categoryName} para perros. Diseños premium, máxima comodidad y envíos a todo Chile.`;
 
 const seoUrl =
@@ -65,6 +68,8 @@ useEffect(() => {
       .single();
 
     if (!categoryData) return;
+    
+    setCategory(categoryData);
 
     // Buscar productos usando el nombre real
     const { data, error } = await supabase
@@ -121,6 +126,37 @@ return (
       content={seoDescription}
     />
 
+<meta
+  property="og:image"
+  content={
+    category?.image ||
+    "https://boutiquepetlove.cl/logo-google.webp"
+  }
+/>
+
+<meta
+  name="twitter:card"
+  content="summary_large_image"
+/>
+
+<meta
+  name="twitter:title"
+  content={seoTitle}
+/>
+
+<meta
+  name="twitter:description"
+  content={seoDescription}
+/>
+
+<meta
+  name="twitter:image"
+  content={
+    category?.image ||
+    "https://boutiquepetlove.cl/logo-google.webp"
+  }
+/>
+
     <meta
       property="og:url"
       content={seoUrl}
@@ -165,7 +201,7 @@ return (
   mb-8
   tracking-wide
 ">
-  {categoryName}
+  {category?.name || categoryName}
 </h2>
 
 <div className="
@@ -376,6 +412,37 @@ const precioBase =
 
 </div>
 
+    {category?.seo_text && (
+
+  <div className="
+    mt-16
+    bg-white
+    rounded-3xl
+    p-8
+    shadow-sm
+  ">
+
+    <h2 className="
+      text-2xl
+      font-black
+      text-gray-900
+      mb-4
+    ">
+      {category.name}
+    </h2>
+
+    <p className="
+      text-gray-600
+      leading-8
+      whitespace-pre-line
+    ">
+      {category.seo_text}
+    </p>
+
+  </div>
+
+)}
+    
 </div>
 
 </>
