@@ -269,38 +269,25 @@ const subirImagen = async (file) => {
 
 <div className="space-y-8">
 
-<CategoryInfoCard
-
+<CategoryStats
   category={category}
-
-  setCategory={setCategory}
-
-  guardarCategoria={guardarCategoria}
-
+  totalProducts={totalProducts}
 />
 
-  <CategoryStats
-
+<CategoryInfoCard
   category={category}
-
-  totalProducts={totalProducts}
-
+  setCategory={setCategory}
+  guardarCategoria={guardarCategoria}
 />
 
 <CategoryImageCard
-
   category={category}
-
   subirImagen={subirImagen}
-
 />
 
 <CategorySEOCard
-
   category={category}
-
   setCategory={setCategory}
-
 />
 
 </div>
