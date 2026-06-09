@@ -129,34 +129,6 @@ export default function CategoryInfoCard({
 
         </div>
 
-        {/* IMAGEN */}
-        <div>
-
-          {category.image && (
-
-            <img
-              src={category.image}
-
-              alt={category.name}
-
-              className="
-                w-full
-                rounded-[24px]
-                object-cover
-
-                shadow-[0_15px_35px_rgba(0,0,0,0.12)]
-
-                transition-all
-                duration-500
-
-                hover:scale-[1.02]
-              "
-            />
-
-          )}
-
-        </div>
-
       </div>
 
     </AdminCard>
