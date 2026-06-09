@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import CategoryInfoCard from "./category-detail/components/CategoryInfoCard";
 
 export default function CategoriaDetalle() {
 
@@ -27,6 +28,32 @@ export default function CategoriaDetalle() {
     setCategory(data);
 
   };
+
+  const guardarCategoria = async () => {
+
+  const { error } = await supabase
+    .from("categories")
+    .update({
+
+      name: category.name,
+      slug: category.slug,
+
+      image: category.image,
+
+      active: category.active,
+
+      sort_order: category.sort_order
+
+    })
+    .eq("id", category.id);
+
+  if (!error) {
+
+    alert("Categoría guardada");
+
+  }
+
+};
 
   if (!category) {
 
