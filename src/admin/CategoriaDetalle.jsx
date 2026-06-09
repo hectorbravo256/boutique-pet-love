@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import CategoryInfoCard from "./category-detail/components/CategoryInfoCard";
+import CategorySEOCard from "./category-detail/components/CategorySEOCard";
 
 export default function CategoriaDetalle() {
 
@@ -207,7 +208,7 @@ export default function CategoriaDetalle() {
 
       </div>
 
-      <div className="space-y-8">
+<div className="space-y-8">
 
   <CategoryInfoCard
 
@@ -216,6 +217,14 @@ export default function CategoriaDetalle() {
     setCategory={setCategory}
 
     guardarCategoria={guardarCategoria}
+
+  />
+
+  <CategorySEOCard
+
+    category={category}
+
+    setCategory={setCategory}
 
   />
 
