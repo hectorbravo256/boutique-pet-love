@@ -118,51 +118,90 @@ export default function CategoryInfoCard({
             text-slate-700
           ">
 
-<button
-  type="button"
+<div className="
+  flex
+  items-center
+  justify-between
 
-  onClick={() =>
-    setCategory({
-      ...category,
-      active: !category.active
-    })
-  }
+  p-5
 
-  className={`
-    w-full
+  rounded-3xl
 
-    p-5
+  bg-slate-50
+  border
+  border-slate-200
+">
 
-    rounded-3xl
+  <div>
 
-    font-black
-    text-lg
+    <div className="
+      font-bold
+      text-slate-900
+    ">
+      Estado de publicación
+    </div>
 
-    transition-all
+    <div className="
+      text-sm
+      text-slate-500
+    ">
+      Mostrar categoría en la tienda
+    </div>
 
-    ${
-      category.active
-        ? `
-          bg-emerald-50
-          text-emerald-700
-          border
-          border-emerald-200
-        `
-        : `
-          bg-red-50
-          text-red-700
-          border
-          border-red-200
-        `
+  </div>
+
+  <button
+    type="button"
+
+    onClick={() =>
+      setCategory({
+        ...category,
+        active: !category.active
+      })
     }
-  `}
->
-  {
-    category.active
-      ? "🟢 Categoría Visible"
-      : "🔴 Categoría Oculta"
-  }
-</button>
+
+    className={`
+      relative
+      w-16
+      h-9
+
+      rounded-full
+
+      transition-all
+
+      ${
+        category.active
+          ? "bg-emerald-500"
+          : "bg-slate-300"
+      }
+    `}
+  >
+
+    <span
+      className={`
+        absolute
+        top-1
+        left-1
+
+        w-7
+        h-7
+
+        bg-white
+        rounded-full
+
+        transition-all
+
+        ${
+          category.active
+            ? "translate-x-7"
+            : ""
+        }
+      `}
+    />
+
+  </button>
+
+</div>
 
           </label>
 
