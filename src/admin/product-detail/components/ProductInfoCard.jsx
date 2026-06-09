@@ -168,12 +168,12 @@ actualizarProducto(
 
   {categories.map(cat => (
 
-    <option
-      key={cat.id}
-      value={cat.slug}
-    >
-      {cat.name}
-    </option>
+<option
+  key={cat.id}
+  value={cat.name}
+>
+  {cat.name}
+</option>
 
   ))}
 
