@@ -516,56 +516,52 @@ const precioBase =
     shadow-sm
   ">
 
-    ...
+    <h2 className="
+      text-2xl
+      font-black
+      text-gray-900
+      mb-6
+    ">
+      Preguntas frecuentes
+    </h2>
+
+    <div className="space-y-6">
+
+      <div>
+        <h3 className="font-bold text-lg">
+          ¿Cómo elegir la talla adecuada?
+        </h3>
+
+        <p className="text-gray-600 mt-2">
+          Recomendamos medir cuello, pecho y largo de tu mascota antes de comprar.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="font-bold text-lg">
+          ¿Realizan envíos a todo Chile?
+        </h3>
+
+        <p className="text-gray-600 mt-2">
+          Sí, despachamos a todas las regiones del país.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="font-bold text-lg">
+          ¿Puedo cambiar una prenda?
+        </h3>
+
+        <p className="text-gray-600 mt-2">
+          Sí, sujeto a disponibilidad y condiciones de cambio vigentes.
+        </p>
+      </div>
+
+    </div>
 
   </div>
 
 )}
-
-  <h2 className="
-    text-2xl
-    font-black
-    text-gray-900
-    mb-6
-  ">
-    Preguntas frecuentes
-  </h2>
-
-  <div className="space-y-6">
-
-    <div>
-      <h3 className="font-bold text-lg">
-        ¿Cómo elegir la talla adecuada?
-      </h3>
-
-      <p className="text-gray-600 mt-2">
-        Recomendamos medir cuello, pecho y largo de tu mascota antes de comprar.
-      </p>
-    </div>
-
-    <div>
-      <h3 className="font-bold text-lg">
-        ¿Realizan envíos a todo Chile?
-      </h3>
-
-      <p className="text-gray-600 mt-2">
-        Sí, despachamos a todas las regiones del país.
-      </p>
-    </div>
-
-    <div>
-      <h3 className="font-bold text-lg">
-        ¿Puedo cambiar una prenda?
-      </h3>
-
-      <p className="text-gray-600 mt-2">
-        Sí, sujeto a disponibilidad y condiciones de cambio vigentes.
-      </p>
-    </div>
-
-  </div>
-
-</div>
     
 </div>
 
