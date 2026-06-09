@@ -22,7 +22,7 @@ const CrearProducto = lazy(() => import("./admin/CrearProducto"));
 const Ventas = lazy(() => import("./admin/Ventas"));
 const ProductoDetalle = lazy(() => import("./admin/ProductoDetalle"));
 const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
-
+const CategoriaDetalle = lazy(() => import("./admin/CategoriaDetalle"));
 
 
 /* ================= PRODUCTOS ================= */
@@ -1260,6 +1260,14 @@ export default function App() {
   element={
     <Suspense fallback={<div>Cargando...</div>}>
       <AdminCategorias />
+    </Suspense>
+  }
+/>
+	<Route
+  path="categorias/:id"
+  element={
+    <Suspense fallback={<div>Cargando...</div>}>
+      <CategoriaDetalle />
     </Suspense>
   }
 />
