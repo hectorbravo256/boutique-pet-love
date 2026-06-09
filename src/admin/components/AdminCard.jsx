@@ -1,30 +1,35 @@
 export default function AdminCard({
   children,
-  className = ""
+  className = "",
+  ...props
 }) {
 
   return (
 
-    <div className={`
-      bg-white/80
-      backdrop-blur-xl
+    <div
+      {...props}
 
-      border
-      border-white/60
+      className={`
+        bg-white/80
+        backdrop-blur-xl
 
-      rounded-[30px]
+        border
+        border-white/60
 
-      p-6
+        rounded-[30px]
 
-      shadow-[0_10px_40px_rgba(0,0,0,0.05)]
+        p-6
 
-      transition-all
-      duration-300
+        shadow-[0_10px_40px_rgba(0,0,0,0.05)]
 
-      hover:-translate-y-1
+        transition-all
+        duration-300
 
-      ${className}
-    `}>
+        hover:-translate-y-1
+
+        ${className}
+      `}
+    >
 
       {children}
 
