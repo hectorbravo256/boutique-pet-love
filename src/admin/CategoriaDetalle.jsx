@@ -4,6 +4,7 @@ import { supabase } from "../supabaseClient";
 import CategoryInfoCard from "./category-detail/components/CategoryInfoCard";
 import CategorySEOCard from "./category-detail/components/CategorySEOCard";
 import CategoryImageCard from "./category-detail/components/CategoryImageCard";
+import CategoryStats from "./category-detail/components/CategoryStats";
 
 export default function CategoriaDetalle() {
 
@@ -11,6 +12,9 @@ export default function CategoriaDetalle() {
 
   const [category, setCategory] =
     useState(null);
+
+  const [totalProducts, setTotalProducts] =
+  useState(0);
 
   useEffect(() => {
 
@@ -28,6 +32,17 @@ export default function CategoriaDetalle() {
         .single();
 
     setCategory(data);
+
+    const { count } =
+  await supabase
+    .from("products")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("category", data.name);
+
+setTotalProducts(count || 0);
 
   };
 
@@ -261,6 +276,14 @@ const subirImagen = async (file) => {
   setCategory={setCategory}
 
   guardarCategoria={guardarCategoria}
+
+/>
+
+  <CategoryStats
+
+  category={category}
+
+  totalProducts={totalProducts}
 
 />
 
