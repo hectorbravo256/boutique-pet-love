@@ -66,38 +66,46 @@ export default function CategoriaDetalle() {
 
 };
 
-  const subirImagen = async (file) => {
+const subirImagen = async (file) => {
 
   if (!file) return;
 
-  const fileName =
-    `${Date.now()}-${file.name}`;
+  const extension =
+    file.name.split(".").pop();
 
-  const { data, error } =
+  const fileName =
+    `${Date.now()}.${extension}`;
+
+  const filePath =
+    fileName;
+
+  const { error } =
     await supabase.storage
-      .from("products")
+      .from("categories")
       .upload(
-        `categorias/${fileName}`,
-        file
+        filePath,
+        file,
+        {
+          upsert: true
+        }
       );
 
   if (error) {
 
-    console.error(error);
+    alert(error.message);
     return;
 
   }
 
-  const imageUrl =
-    `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
+  const { data } =
+    supabase.storage
+      .from("categories")
+      .getPublicUrl(filePath);
 
-  setCategory(prev => ({
-
-    ...prev,
-
-    image: imageUrl
-
-  }));
+  setCategory({
+    ...category,
+    image: data.publicUrl
+  });
 
 };
 
