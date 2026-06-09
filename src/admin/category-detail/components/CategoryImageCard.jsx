@@ -25,6 +25,8 @@ export default function CategoryImageCard({
         flex
         flex-col
         items-center
+        justify-center
+        h-full
       ">
 
         {category?.image ? (
@@ -35,7 +37,7 @@ export default function CategoryImageCard({
 
             className="
               w-full
-              max-w-[500px]
+              max-w-[350px]
 
               rounded-[24px]
 
