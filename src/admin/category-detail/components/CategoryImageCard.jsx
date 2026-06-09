@@ -37,13 +37,11 @@ export default function CategoryImageCard({
 
             className="
               w-full
-              max-w-[350px]
-
-              rounded-[24px]
-
-              shadow-xl
-
+              max-w-[420px]
+              aspect-[4/3]
               object-cover
+              rounded-[28px]
+              shadow-xl
             "
           />
 
