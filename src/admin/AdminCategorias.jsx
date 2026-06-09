@@ -20,13 +20,17 @@ export default function AdminCategorias() {
   const [categories, setCategories] =
     useState([]);
 
-  const [newCategory, setNewCategory] =
-    useState({
-      name: "",
-      slug: "",
-      image: "",
-      sort_order: 0
-    });
+const [newCategory, setNewCategory] =
+  useState({
+    name: "",
+    slug: "",
+    image: "",
+    sort_order: 0,
+
+    seo_title: "",
+    seo_description: "",
+    seo_text: ""
+  });
 
   // 🔥 cargar categorías
   useEffect(() => {
@@ -81,13 +85,16 @@ export default function AdminCategorias() {
 
     }
 
-    setNewCategory({
-      name: "",
-      slug: "",
-      image: "",
-      sort_order: 0
-    });
+setNewCategory({
+  name: "",
+  slug: "",
+  image: "",
+  sort_order: 0,
 
+  seo_title: "",
+  seo_description: "",
+  seo_text: ""
+});
     cargarCategorias();
 
   };
@@ -123,10 +130,22 @@ export default function AdminCategorias() {
             name: cat.name,
             slug: cat.slug,
             image: cat.image,
+
+            seo_title:
+            cat.seo_title,
+
+            seo_description:
+            cat.seo_description,
+
+            seo_text:
+            cat.seo_text,
+
             sort_order:
-              cat.sort_order,
-            active: cat.active
-          })
+            cat.sort_order,
+
+            active:
+            cat.active
+        })
           .eq("id", cat.id);
 
       if (error) {
@@ -213,11 +232,12 @@ export default function AdminCategorias() {
                 name: value,
 
                 slug:
-                  value
-                    .toLowerCase()
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-                    .replace(/\s+/g, "-")
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s*-\s*/g, "-")
+    .replace(/\s+/g, "-")
 
               }));
 
@@ -249,6 +269,106 @@ export default function AdminCategorias() {
               }))
             }
           />
+
+          <AdminInput
+  placeholder="SEO Title"
+
+  value={newCategory.seo_title}
+
+  onChange={(e) =>
+    setNewCategory(prev => ({
+      ...prev,
+      seo_title: e.target.value
+    }))
+  }
+/>
+
+<textarea
+  placeholder="SEO Description"
+
+  value={newCategory.seo_description}
+
+  onChange={(e) =>
+    setNewCategory(prev => ({
+      ...prev,
+      seo_description: e.target.value
+    }))
+  }
+
+  className="
+    w-full
+    min-h-[90px]
+    rounded-2xl
+    border
+    p-4
+  "
+/>
+
+  <div className="
+  text-xs
+  text-slate-500
+">
+  {newCategory.seo_description.length}/160
+</div>
+
+  <div className="
+  border
+  border-slate-200
+  rounded-2xl
+  p-5
+  bg-slate-50
+">
+
+  <div className="
+    text-blue-700
+    text-lg
+    font-medium
+    line-clamp-2
+  ">
+    {newCategory.seo_title ||
+      "Título SEO"}
+  </div>
+
+  <div className="
+    text-green-700
+    text-sm
+    mt-1
+  ">
+    https://boutiquepetlove.cl/categoria/{newCategory.slug}
+  </div>
+
+  <div className="
+    text-slate-600
+    text-sm
+    mt-2
+    line-clamp-3
+  ">
+    {newCategory.seo_description ||
+      "Descripción SEO"}
+  </div>
+
+</div>
+
+<textarea
+  placeholder="SEO Text"
+
+  value={newCategory.seo_text}
+
+  onChange={(e) =>
+    setNewCategory(prev => ({
+      ...prev,
+      seo_text: e.target.value
+    }))
+  }
+
+  className="
+    w-full
+    min-h-[140px]
+    rounded-2xl
+    border
+    p-4
+  "
+/>
 
           {newCategory.image && (
 
@@ -384,6 +504,127 @@ export default function AdminCategorias() {
 
                   }}
                 />
+
+                <AdminInput
+  value={
+    cat.seo_title || ""
+  }
+
+  placeholder="SEO Title"
+
+  onChange={(e) => {
+
+    const updated =
+      [...categories];
+
+    updated[index].seo_title =
+      e.target.value;
+
+    setCategories(updated);
+
+  }}
+/>
+
+<textarea
+  value={
+    cat.seo_description || ""
+  }
+
+  placeholder="SEO Description"
+
+  onChange={(e) => {
+
+    const updated =
+      [...categories];
+
+    updated[index].seo_description =
+      e.target.value;
+
+    setCategories(updated);
+
+  }}
+
+  className="
+    w-full
+    min-h-[90px]
+    rounded-2xl
+    border
+    p-4
+  "
+/>
+
+<div className="
+  text-xs
+  text-slate-500
+">
+  {(cat.seo_description || "").length}/160
+</div>
+
+  <div className="
+  border
+  border-slate-200
+  rounded-2xl
+  p-5
+  bg-slate-50
+">
+
+  <div className="
+    text-blue-700
+    text-lg
+    font-medium
+    line-clamp-2
+  ">
+    {cat.seo_title ||
+      "Título SEO"}
+  </div>
+
+  <div className="
+    text-green-700
+    text-sm
+    mt-1
+  ">
+    https://boutiquepetlove.cl/categoria/{cat.slug}
+  </div>
+
+  <div className="
+    text-slate-600
+    text-sm
+    mt-2
+    line-clamp-3
+  ">
+    {cat.seo_description ||
+      "Descripción SEO"}
+  </div>
+
+</div>
+
+<textarea
+  value={
+    cat.seo_text || ""
+  }
+
+  placeholder="SEO Text"
+
+  onChange={(e) => {
+
+    const updated =
+      [...categories];
+
+    updated[index].seo_text =
+      e.target.value;
+
+    setCategories(updated);
+
+  }}
+
+  className="
+    w-full
+    min-h-[180px]
+    rounded-2xl
+    border
+    p-4
+  "
+/>
 
                 <AdminInput
                   type="number"
