@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import CategoryInfoCard from "./category-detail/components/CategoryInfoCard";
 import CategorySEOCard from "./category-detail/components/CategorySEOCard";
+import CategoryImageCard from "./category-detail/components/CategoryImageCard";
 
 export default function CategoriaDetalle() {
 
@@ -62,6 +63,41 @@ export default function CategoriaDetalle() {
     alert("Categoría guardada");
 
   }
+
+};
+
+  const subirImagen = async (file) => {
+
+  if (!file) return;
+
+  const fileName =
+    `${Date.now()}-${file.name}`;
+
+  const { data, error } =
+    await supabase.storage
+      .from("products")
+      .upload(
+        `categorias/${fileName}`,
+        file
+      );
+
+  if (error) {
+
+    console.error(error);
+    return;
+
+  }
+
+  const imageUrl =
+    `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/products/${data.path}`;
+
+  setCategory(prev => ({
+
+    ...prev,
+
+    image: imageUrl
+
+  }));
 
 };
 
@@ -210,23 +246,31 @@ export default function CategoriaDetalle() {
 
 <div className="space-y-8">
 
-  <CategoryInfoCard
+<CategoryInfoCard
 
-    category={category}
+  category={category}
 
-    setCategory={setCategory}
+  setCategory={setCategory}
 
-    guardarCategoria={guardarCategoria}
+  guardarCategoria={guardarCategoria}
 
-  />
+/>
 
-  <CategorySEOCard
+<CategoryImageCard
 
-    category={category}
+  category={category}
 
-    setCategory={setCategory}
+  subirImagen={subirImagen}
 
-  />
+/>
+
+<CategorySEOCard
+
+  category={category}
+
+  setCategory={setCategory}
+
+/>
 
 </div>
 
