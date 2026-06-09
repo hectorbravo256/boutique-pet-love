@@ -56,6 +56,63 @@ const seoUrl =
   )
 };
 
+  const faqSchema = {
+
+  "@context": "https://schema.org",
+
+  "@type": "FAQPage",
+
+  mainEntity: [
+
+    {
+      "@type": "Question",
+
+      name:
+        "¿Cómo elegir la talla adecuada para mi perro?",
+
+      acceptedAnswer: {
+
+        "@type": "Answer",
+
+        text:
+          "Recomendamos medir cuello, pecho y largo de tu mascota antes de seleccionar una talla."
+      }
+    },
+
+    {
+      "@type": "Question",
+
+      name:
+        "¿Realizan envíos a todo Chile?",
+
+      acceptedAnswer: {
+
+        "@type": "Answer",
+
+        text:
+          "Sí, realizamos envíos a todas las regiones de Chile mediante operadores logísticos."
+      }
+    },
+
+    {
+      "@type": "Question",
+
+      name:
+        "¿Qué pasa si la talla no queda bien?",
+
+      acceptedAnswer: {
+
+        "@type": "Answer",
+
+        text:
+          "Puedes contactarnos para gestionar un cambio sujeto a disponibilidad y políticas vigentes."
+      }
+    }
+
+  ]
+
+};
+
 useEffect(() => {
 
   const cargar = async () => {
@@ -177,6 +234,12 @@ return (
   type="application/ld+json"
 >
   {JSON.stringify(itemListSchema)}
+</script>
+
+    <script
+  type="application/ld+json"
+>
+  {JSON.stringify(faqSchema)}
 </script>
 
   </Helmet>
@@ -442,6 +505,67 @@ const precioBase =
   </div>
 
 )}
+
+{products.length > 0 && (
+
+  <div className="
+    mt-10
+    bg-white
+    rounded-3xl
+    p-8
+    shadow-sm
+  ">
+
+    ...
+
+  </div>
+
+)}
+
+  <h2 className="
+    text-2xl
+    font-black
+    text-gray-900
+    mb-6
+  ">
+    Preguntas frecuentes
+  </h2>
+
+  <div className="space-y-6">
+
+    <div>
+      <h3 className="font-bold text-lg">
+        ¿Cómo elegir la talla adecuada?
+      </h3>
+
+      <p className="text-gray-600 mt-2">
+        Recomendamos medir cuello, pecho y largo de tu mascota antes de comprar.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="font-bold text-lg">
+        ¿Realizan envíos a todo Chile?
+      </h3>
+
+      <p className="text-gray-600 mt-2">
+        Sí, despachamos a todas las regiones del país.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="font-bold text-lg">
+        ¿Puedo cambiar una prenda?
+      </h3>
+
+      <p className="text-gray-600 mt-2">
+        Sí, sujeto a disponibilidad y condiciones de cambio vigentes.
+      </p>
+    </div>
+
+  </div>
+
+</div>
     
 </div>
 
