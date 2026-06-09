@@ -35,6 +35,16 @@ export default function CategoryInfoCard({
           gap-4
         ">
 
+          <label className="
+  block
+  mb-2
+  text-sm
+  font-bold
+  text-slate-700
+">
+  Nombre categoría
+</label>
+          
           <AdminInput
             placeholder="Nombre"
 
@@ -47,6 +57,16 @@ export default function CategoryInfoCard({
               }))
             }
           />
+
+          <label className="
+  block
+  mb-2
+  text-sm
+  font-bold
+  text-slate-700
+">
+  Slug URL
+</label>
 
           <AdminInput
             placeholder="Slug"
@@ -61,19 +81,16 @@ export default function CategoryInfoCard({
             }
           />
 
-          <AdminInput
-            placeholder="URL Imagen"
-
-            value={category.image || ""}
-
-            onChange={(e) =>
-              setCategory(prev => ({
-                ...prev,
-                image: e.target.value
-              }))
-            }
-          />
-
+          <label className="
+  block
+  mb-2
+  text-sm
+  font-bold
+  text-slate-700
+">
+  Orden visual
+</label>
+          
           <AdminInput
             type="number"
 
@@ -101,23 +118,51 @@ export default function CategoryInfoCard({
             text-slate-700
           ">
 
-            <input
-              type="checkbox"
+<button
+  type="button"
 
-              checked={
-                category.active || false
-              }
+  onClick={() =>
+    setCategory({
+      ...category,
+      active: !category.active
+    })
+  }
 
-              onChange={(e) =>
-                setCategory(prev => ({
-                  ...prev,
-                  active:
-                    e.target.checked
-                }))
-              }
-            />
+  className={`
+    w-full
 
-            Categoría activa
+    p-5
+
+    rounded-3xl
+
+    font-black
+    text-lg
+
+    transition-all
+
+    ${
+      category.active
+        ? `
+          bg-emerald-50
+          text-emerald-700
+          border
+          border-emerald-200
+        `
+        : `
+          bg-red-50
+          text-red-700
+          border
+          border-red-200
+        `
+    }
+  `}
+>
+  {
+    category.active
+      ? "🟢 Categoría Visible"
+      : "🔴 Categoría Oculta"
+  }
+</button>
 
           </label>
 
