@@ -443,25 +443,15 @@ setNewCategory({
 
         {categories.map((cat, index) => (
 
-<div
+<AdminCard
   key={cat.id}
 
-  onClick={() => {
-    console.log("CLICK", cat.id);
-
+  onClick={() =>
     navigate(
       `/admin/categorias/${cat.id}`
-    );
-  }}
+    )
+  }
 >
-
-  <AdminCard>
-
-    {/* contenido actual */}
-
-  </AdminCard>
-
-</div>
 
             <div className="
               grid
