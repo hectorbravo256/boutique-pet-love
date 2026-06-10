@@ -24,46 +24,57 @@
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/abrigo-escoces-rojo</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/corderito-de-stitch</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/corderito-de-angel</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/traje-mickey-mouse</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/traje-minnie-mouse</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/traje-hello-kitty</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/osita-con-tutu</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/cuerina-forrada-con-corderito</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/chaqueta-corderito-azul</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/chaqueta-mezclilla</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://boutiquepetlove.cl/producto/vestido-princesa</loc>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
