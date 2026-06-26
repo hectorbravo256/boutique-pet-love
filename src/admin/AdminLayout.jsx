@@ -48,6 +48,11 @@ export default function AdminLayout() {
       icon: "🗂",
       path: "/admin/categorias"
     }
+        {
+      label: "Inventario",
+      icon: "📦",
+      path: "/admin/inventario"
+    }
   ];
 
   return (
