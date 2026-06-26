@@ -47,7 +47,7 @@ export default function AdminLayout() {
       label: "Categorías",
       icon: "🗂",
       path: "/admin/categorias"
-    }
+    },
         {
       label: "Inventario",
       icon: "📦",
