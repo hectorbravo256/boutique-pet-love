@@ -23,7 +23,7 @@ const Ventas = lazy(() => import("./admin/Ventas"));
 const ProductoDetalle = lazy(() => import("./admin/ProductoDetalle"));
 const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
 const CategoriaDetalle = lazy(() => import("./admin/CategoriaDetalle"));
-
+import AdminInventario from "./admin/AdminInventario";
 
 /* ================= PRODUCTOS ================= */
 
@@ -1270,6 +1270,10 @@ export default function App() {
       <CategoriaDetalle />
     </Suspense>
   }
+/>
+	<Route
+  path="/admin/inventario"
+  element={<AdminInventario />}
 />
     </Route>
 
