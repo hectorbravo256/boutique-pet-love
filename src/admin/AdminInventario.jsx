@@ -1,4 +1,5 @@
 import AdminCard from "./components/AdminCard";
+import InventoryDashboard from "./inventory/InventoryDashboard";
 
 export default function AdminInventario() {
 
@@ -36,52 +37,8 @@ export default function AdminInventario() {
         gap-6
       ">
 
-        <AdminCard className="cursor-pointer">
-          <h2 className="text-xl font-black">
-            Compras
-          </h2>
+<InventoryDashboard />
 
-          <p className="mt-2 text-slate-500">
-            Registrar ingreso de mercadería.
-          </p>
-
-        </AdminCard>
-
-        <AdminCard className="cursor-pointer">
-
-          <h2 className="text-xl font-black">
-            Ventas Locales
-          </h2>
-
-          <p className="mt-2 text-slate-500">
-            Registrar ventas presenciales.
-          </p>
-
-        </AdminCard>
-
-        <AdminCard className="cursor-pointer">
-
-          <h2 className="text-xl font-black">
-            Movimientos
-          </h2>
-
-          <p className="mt-2 text-slate-500">
-            Historial completo del inventario.
-          </p>
-
-        </AdminCard>
-
-        <AdminCard className="cursor-pointer">
-
-          <h2 className="text-xl font-black">
-            Ajustes
-          </h2>
-
-          <p className="mt-2 text-slate-500">
-            Correcciones de stock.
-          </p>
-
-        </AdminCard>
 
       </div>
 
