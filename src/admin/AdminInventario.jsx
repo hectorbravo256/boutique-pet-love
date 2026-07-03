@@ -1,5 +1,6 @@
 import AdminCard from "./components/AdminCard";
 import InventoryDashboard from "./inventory/InventoryDashboard";
+import PurchaseForm from "./inventory/PurchaseForm";
 
 export default function AdminInventario() {
 
@@ -31,6 +32,12 @@ export default function AdminInventario() {
       </div>
 
 <InventoryDashboard />
+
+      <div className="mt-8">
+
+    <PurchaseForm />
+
+</div>
 
 
     </div>
