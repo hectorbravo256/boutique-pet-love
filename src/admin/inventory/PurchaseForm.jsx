@@ -38,6 +38,8 @@ const cargarProductos = async () => {
 
     return (
 
+        <>
+
         <AdminCard>
 
             <div className="flex justify-between items-center mb-8">
@@ -106,10 +108,11 @@ products.map(product=>(
 
 </select>
 
+                 </AdminCard>
+
+            </>
+
     );
 
-            </div>
-
-        </AdminCard>
 
 }
