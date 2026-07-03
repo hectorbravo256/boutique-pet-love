@@ -78,11 +78,7 @@ const cargarProductos = async () => {
                     className="border rounded-xl p-3"
                 />
 
-            </div>
-
-        </AdminCard>
-
-        <select
+                        <select
     value={detail.product_id}
     onChange={(e)=>
         setDetail({
@@ -111,5 +107,9 @@ products.map(product=>(
 </select>
 
     );
+
+            </div>
+
+        </AdminCard>
 
 }
