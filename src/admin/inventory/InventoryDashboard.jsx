@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import AdminCard from "../components/AdminCard";
+import InventoryMovements from "./InventoryMovements";
 
 export default function InventoryDashboard() {
 
@@ -147,15 +148,7 @@ export default function InventoryDashboard() {
 
             </div>
 
-            <AdminCard>
-
-                <h2 className="text-2xl font-black">
-
-                    Últimos movimientos
-
-                </h2>
-
-            </AdminCard>
+            <InventoryMovements />
 
         </div>
 
