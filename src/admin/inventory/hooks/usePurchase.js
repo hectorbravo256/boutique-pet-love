@@ -47,13 +47,15 @@ export default function usePurchase() {
 
     useEffect(() => {
 
-        cargarProductos();
+        loadProducts();
 
     }, []);
 
     //----------------------------------------
+    // Cargar productos
+    //----------------------------------------
 
-    async function cargarProductos() {
+    async function loadProducts() {
 
         const { data } =
             await supabase
@@ -63,6 +65,23 @@ export default function usePurchase() {
                 .order("name");
 
         setProducts(data || []);
+
+    }
+
+    //----------------------------------------
+    // Cargar tallas
+    //----------------------------------------
+
+    async function loadVariants(productId) {
+
+        const { data } =
+            await supabase
+                .from("product_variants")
+                .select("*")
+                .eq("product_id", productId)
+                .order("size");
+
+        setVariants(data || []);
 
     }
 
@@ -82,13 +101,14 @@ export default function usePurchase() {
         products,
 
         variants,
-        setVariants,
 
         detail,
         setDetail,
 
         details,
-        setDetails
+        setDetails,
+
+        loadVariants
 
     };
 
