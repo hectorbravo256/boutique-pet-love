@@ -2,6 +2,7 @@ import usePurchase from "./hooks/usePurchase";
 
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseProductSelector from "./components/PurchaseProductSelector";
+import PurchaseItemsTable from "./components/PurchaseItemsTable";
 
 
 export default function PurchaseForm() {
@@ -60,6 +61,13 @@ const {
     loadVariants={loadVariants}
 
 />
+
+     <PurchaseItemsTable
+
+    details={details}
+
+/>
+            
 
         </div>
 
