@@ -1,12 +1,35 @@
 import usePurchase from "./hooks/usePurchase";
 
-import PurchaseHeader
-from "./components/PurchaseHeader";
+import PurchaseHeader from "./components/PurchaseHeader";
+import PurchaseProductSelector from "./components/PurchaseProductSelector";
+
 
 export default function PurchaseForm() {
 
-    const purchase =
-        usePurchase();
+const {
+
+    supplier,
+    setSupplier,
+
+    invoiceNumber,
+    setInvoiceNumber,
+
+    observations,
+    setObservations,
+
+    products,
+
+    variants,
+
+    detail,
+    setDetail,
+
+    details,
+    setDetails,
+
+    loadVariants
+
+} = usePurchase();
 
     return (
 
@@ -14,16 +37,29 @@ export default function PurchaseForm() {
 
             <PurchaseHeader
 
-                supplier={purchase.supplier}
-                setSupplier={purchase.setSupplier}
+    supplier={supplier}
+    setSupplier={setSupplier}
 
-                invoiceNumber={purchase.invoiceNumber}
-                setInvoiceNumber={purchase.setInvoiceNumber}
+    invoiceNumber={invoiceNumber}
+    setInvoiceNumber={setInvoiceNumber}
 
-                observations={purchase.observations}
-                setObservations={purchase.setObservations}
+    observations={observations}
+    setObservations={setObservations}
 
-            />
+/>
+
+            <PurchaseProductSelector
+
+    products={products}
+
+    variants={variants}
+
+    detail={detail}
+    setDetail={setDetail}
+
+    loadVariants={loadVariants}
+
+/>
 
         </div>
 
