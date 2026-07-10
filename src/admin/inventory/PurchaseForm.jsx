@@ -91,9 +91,11 @@ return (
 
             <PurchaseItemsTable
 
-                details={details}
+    details={details}
 
-            />
+    setDetails={setDetails}
+
+/>
 
         }
 
