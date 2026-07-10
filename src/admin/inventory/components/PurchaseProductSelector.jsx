@@ -8,9 +8,12 @@ export default function PurchaseProductSelector({
     detail,
     setDetail,
 
-    loadVariants
+    loadVariants,
+
+    addProduct
 
 }) {
+    
 
     //------------------------------------
     // Cuando cambia el producto
@@ -186,15 +189,24 @@ export default function PurchaseProductSelector({
 
             {/* Botón */}
 
-            <button
+<button
 
-                className="rounded-xl bg-pink-500 text-white font-bold"
+    onClick={addProduct}
 
-            >
+    className="
+        rounded-xl
+        bg-pink-500
+        hover:bg-pink-600
+        text-white
+        font-bold
+        transition-all
+    "
 
-                + Agregar
+>
 
-            </button>
+    + Agregar
+
+</button>
 
         </div>
 
