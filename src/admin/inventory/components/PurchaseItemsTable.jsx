@@ -2,10 +2,50 @@ import AdminCard from "../../components/AdminCard";
 
 export default function PurchaseItemsTable({
 
-    details
+    details,
+
+    setDetails
 
 }) {
 
+    function updateQuantity(index, value) {
+
+    const newDetails = [...details];
+
+    newDetails[index].quantity = Number(value);
+
+    newDetails[index].subtotal =
+        newDetails[index].quantity *
+        newDetails[index].unit_cost;
+
+    setDetails(newDetails);
+
+}
+
+function updateCost(index, value) {
+
+    const newDetails = [...details];
+
+    newDetails[index].unit_cost = Number(value);
+
+    newDetails[index].subtotal =
+        newDetails[index].quantity *
+        newDetails[index].unit_cost;
+
+    setDetails(newDetails);
+
+}
+
+function removeItem(index) {
+
+    const newDetails = [...details];
+
+    newDetails.splice(index, 1);
+
+    setDetails(newDetails);
+
+}
+    
     return (
 
         <AdminCard>
@@ -49,17 +89,71 @@ export default function PurchaseItemsTable({
                                     Talla
                                 </th>
 
-                                <th className="text-center">
-                                    Cantidad
-                                </th>
+                                <td className="text-center">
 
-                                <th className="text-right">
-                                    Costo
-                                </th>
+    <input
 
-                                <th className="text-right">
-                                    Subtotal
-                                </th>
+        type="number"
+
+        min="1"
+
+        value={item.quantity}
+
+        onChange={(e)=>
+
+            updateQuantity(
+                index,
+                e.target.value
+            )
+
+        }
+
+        className="
+            w-20
+            text-center
+            rounded-xl
+            border
+            p-2
+        "
+    />
+
+</td>
+
+                                <td className="text-right">
+
+    <input
+
+        type="number"
+
+        value={item.unit_cost}
+
+        onChange={(e)=>
+
+            updateCost(
+                index,
+                e.target.value
+            )
+
+        }
+
+        className="
+            w-28
+            text-right
+            rounded-xl
+            border
+            p-2
+        "
+    />
+
+</td>
+
+                                <td className="text-right font-black">
+
+    $
+
+    {item.subtotal.toLocaleString("es-CL")}
+
+</td>
 
                                 <th></th>
 
@@ -69,7 +163,7 @@ export default function PurchaseItemsTable({
 
                         <tbody>
 
-                            {details.map((item) => (
+                            {details.map((item, index) => (
 
                                 <tr
                                     key={item.variant_id}
@@ -115,9 +209,27 @@ export default function PurchaseItemsTable({
 
                                     <td className="text-center">
 
-                                        🗑️
+    <button
 
-                                    </td>
+        onClick={()=>
+
+            removeItem(index)
+
+        }
+
+        className="
+            text-red-500
+            hover:text-red-700
+            text-xl
+        "
+
+    >
+
+        🗑️
+
+    </button>
+
+</td>
 
                                 </tr>
 
