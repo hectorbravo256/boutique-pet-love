@@ -62,6 +62,8 @@ const {
 
     loadVariants={loadVariants}
 
+    addProduct={addProduct}
+
 />
 
      <PurchaseItemsTable
