@@ -3,7 +3,7 @@ import usePurchase from "./hooks/usePurchase";
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseProductSelector from "./components/PurchaseProductSelector";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
-
+import PurchaseLayout from "./layout/PurchaseLayout";
 
 export default function PurchaseForm() {
 
@@ -34,47 +34,72 @@ const {
 
 } = usePurchase();
 
-    return (
+return (
 
-        <div className="space-y-8">
+    <PurchaseLayout
+
+        header={
 
             <PurchaseHeader
 
-    supplier={supplier}
-    setSupplier={setSupplier}
+                supplier={supplier}
+                setSupplier={setSupplier}
 
-    invoiceNumber={invoiceNumber}
-    setInvoiceNumber={setInvoiceNumber}
+                invoiceNumber={invoiceNumber}
+                setInvoiceNumber={setInvoiceNumber}
 
-    observations={observations}
-    setObservations={setObservations}
+                observations={observations}
+                setObservations={setObservations}
 
-/>
+            />
+
+        }
+
+        summary={
+
+            <PurchaseSummary
+
+                details={details}
+
+            />
+
+        }
+
+        selector={
 
             <PurchaseProductSelector
 
-    products={products}
+                products={products}
 
-    variants={variants}
+                variants={variants}
 
-    detail={detail}
-    setDetail={setDetail}
+                detail={detail}
+                setDetail={setDetail}
 
-    loadVariants={loadVariants}
+                loadVariants={loadVariants}
 
-    addProduct={addProduct}
+                addProduct={addProduct}
 
-/>
+            />
 
-     <PurchaseItemsTable
+        }
 
-    details={details}
+        table={
 
-/>
-            
+            <PurchaseItemsTable
 
-        </div>
+                details={details}
 
-    );
+            />
 
-}
+        }
+
+        footer={
+
+            <PurchaseFooter />
+
+        }
+
+    />
+
+);
