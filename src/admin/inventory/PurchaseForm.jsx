@@ -28,7 +28,9 @@ const {
     details,
     setDetails,
 
-    loadVariants
+    loadVariants,
+
+    addProduct
 
 } = usePurchase();
 
