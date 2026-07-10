@@ -60,7 +60,7 @@ export default function usePurchase() {
         const { data } =
             await supabase
                 .from("products")
-                .select("id,name")
+                .select(` id, name, product_images(url) `)
                 .eq("active", true)
                 .order("name");
 
@@ -91,14 +91,35 @@ export default function usePurchase() {
 
 function addProduct() {
 
-    if (
-        !detail.product_id ||
-        !detail.variant_id ||
-        detail.quantity <= 0
-    ) {
-        alert("Completa todos los campos.");
+    //----------------------------------------
+    // Validaciones
+    //----------------------------------------
+
+    if (!detail.product_id) {
+
+        alert("Selecciona un producto.");
+
         return;
+
     }
+
+    if (!detail.variant_id) {
+
+        alert("Selecciona una talla.");
+
+        return;
+
+    }
+
+    if (detail.quantity <= 0) {
+
+        alert("Cantidad inválida.");
+
+        return;
+
+    }
+
+    //----------------------------------------
 
     const product =
         products.find(
@@ -110,21 +131,59 @@ function addProduct() {
             v => v.id == detail.variant_id
         );
 
+    //----------------------------------------
+
+    const subtotal =
+        Number(detail.quantity) *
+        Number(detail.unit_cost);
+
+    //----------------------------------------
+
     const newItem = {
 
-        product_id: detail.product_id,
+        product_id: product.id,
 
-        variant_id: detail.variant_id,
+        product_name: product.name,
 
-        product_name: product?.name || "",
+        variant_id: variant.id,
 
-        size: variant?.size || "",
+        size: variant.size,
 
-        quantity: detail.quantity,
+        quantity: Number(detail.quantity),
 
-        unit_cost: detail.unit_cost
+        unit_cost: Number(detail.unit_cost),
+
+        subtotal,
+
+        image:
+    product.product_images?.[0]?.url ||
+    "/placeholder.png"
 
     };
+
+    //----------------------------------------
+    // Evitar duplicados
+    //----------------------------------------
+
+    const existe = details.find(
+
+        item =>
+            item.variant_id ===
+            newItem.variant_id
+
+    );
+
+    if (existe) {
+
+        alert(
+            "Esta talla ya fue agregada."
+        );
+
+        return;
+
+    }
+
+    //----------------------------------------
 
     setDetails(prev => [
 
@@ -134,9 +193,7 @@ function addProduct() {
 
     ]);
 
-    //------------------------------------
-    // Limpiar selector
-    //------------------------------------
+    //----------------------------------------
 
     setDetail({
 
