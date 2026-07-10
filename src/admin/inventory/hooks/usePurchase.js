@@ -85,6 +85,75 @@ export default function usePurchase() {
 
     }
 
+//----------------------------------------
+// Agregar producto
+//----------------------------------------
+
+function addProduct() {
+
+    if (
+        !detail.product_id ||
+        !detail.variant_id ||
+        detail.quantity <= 0
+    ) {
+        alert("Completa todos los campos.");
+        return;
+    }
+
+    const product =
+        products.find(
+            p => p.id == detail.product_id
+        );
+
+    const variant =
+        variants.find(
+            v => v.id == detail.variant_id
+        );
+
+    const newItem = {
+
+        product_id: detail.product_id,
+
+        variant_id: detail.variant_id,
+
+        product_name: product?.name || "",
+
+        size: variant?.size || "",
+
+        quantity: detail.quantity,
+
+        unit_cost: detail.unit_cost
+
+    };
+
+    setDetails(prev => [
+
+        ...prev,
+
+        newItem
+
+    ]);
+
+    //------------------------------------
+    // Limpiar selector
+    //------------------------------------
+
+    setDetail({
+
+        product_id: "",
+
+        variant_id: "",
+
+        quantity: 1,
+
+        unit_cost: 0
+
+    });
+
+    setVariants([]);
+
+}
+
     //----------------------------------------
 
     return {
@@ -108,7 +177,9 @@ export default function usePurchase() {
         details,
         setDetails,
 
-        loadVariants
+        loadVariants,
+
+        addProduct
 
     };
 
