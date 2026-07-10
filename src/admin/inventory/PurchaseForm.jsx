@@ -1,9 +1,12 @@
 import usePurchase from "./hooks/usePurchase";
 
+import PurchaseLayout from "./layout/PurchaseLayout";
+
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseProductSelector from "./components/PurchaseProductSelector";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
-import PurchaseLayout from "./layout/PurchaseLayout";
+import PurchaseSummary from "./components/PurchaseSummary";
+import PurchaseFooter from "./components/PurchaseFooter";
 
 export default function PurchaseForm() {
 
