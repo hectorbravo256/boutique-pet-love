@@ -77,89 +77,49 @@ function removeItem(index) {
 
                     <table className="w-full">
 
-                        <thead>
+<thead>
 
-                            <tr className="border-b">
+<tr className="border-b">
 
-                                <th className="text-left py-3">
-                                    Producto
-                                </th>
+    <th className="text-left py-3">
 
-                                <th className="text-center">
-                                    Talla
-                                </th>
+        Producto
 
-                                <td className="text-center">
+    </th>
 
-    <input
+    <th className="text-center">
 
-        type="number"
+        Talla
 
-        min="1"
+    </th>
 
-        value={item.quantity}
+    <th className="text-center">
 
-        onChange={(e)=>
+        Cantidad
 
-            updateQuantity(
-                index,
-                e.target.value
-            )
+    </th>
 
-        }
+    <th className="text-right">
 
-        className="
-            w-20
-            text-center
-            rounded-xl
-            border
-            p-2
-        "
-    />
+        Costo
 
-</td>
+    </th>
 
-                                <td className="text-right">
+    <th className="text-right">
 
-    <input
+        Subtotal
 
-        type="number"
+    </th>
 
-        value={item.unit_cost}
+    <th>
 
-        onChange={(e)=>
+        Acción
 
-            updateCost(
-                index,
-                e.target.value
-            )
+    </th>
 
-        }
+</tr>
 
-        className="
-            w-28
-            text-right
-            rounded-xl
-            border
-            p-2
-        "
-    />
-
-</td>
-
-                                <td className="text-right font-black">
-
-    $
-
-    {item.subtotal.toLocaleString("es-CL")}
-
-</td>
-
-                                <th></th>
-
-                            </tr>
-
-                        </thead>
+</thead>
 
                         <tbody>
 
@@ -184,9 +144,37 @@ function removeItem(index) {
 
                                     <td className="text-center">
 
-                                        {item.quantity}
+<input
 
-                                    </td>
+type="number"
+
+min="1"
+
+value={item.quantity}
+
+onChange={(e)=>
+
+updateQuantity(
+
+index,
+
+e.target.value
+
+)
+
+}
+
+className="
+w-20
+text-center
+border
+rounded-xl
+p-2
+"
+
+/>
+
+</td>
 
                                     <td className="text-right">
 
