@@ -2,6 +2,9 @@ import AdminCard from "./components/AdminCard";
 import InventoryDashboard from "./inventory/InventoryDashboard";
 import PurchaseForm from "./inventory/PurchaseForm";
 
+import PageHeader from "./shared/ui/PageHeader";
+import Button from "./shared/ui/Button";
+
 export default function AdminInventario() {
 
   return (
