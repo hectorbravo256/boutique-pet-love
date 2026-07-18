@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
+import PurchaseService from "../services/purchaseService";
 
 export default function usePurchase() {
 
@@ -211,6 +212,35 @@ function addProduct() {
 
 }
 
+    async function savePurchase() {
+
+    try {
+
+        const purchaseId =
+            await PurchaseService.createPurchase({
+
+                supplier,
+
+                invoiceNumber,
+
+                observations
+
+            });
+
+        console.log("Compra creada:", purchaseId);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+}
+
     //----------------------------------------
 
     return {
@@ -236,7 +266,9 @@ function addProduct() {
 
         loadVariants,
 
-        addProduct
+        addProduct,
+
+        savePurchase
 
     };
 
