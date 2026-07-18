@@ -1,77 +1,65 @@
+import Card from "./Card";
+
 export default function PageHeader({
 
-    title,
+  title,
 
-    subtitle,
+  subtitle,
 
-    icon,
+  icon,
 
-    actions
+  actions,
 
 }) {
 
-    return (
+  return (
 
-        <div className="flex items-center justify-between mb-10">
+    <Card className="mb-8">
 
-            <div className="flex items-center gap-5">
+      <div className="flex justify-between items-center">
 
-                <div
-                    className="
-                        w-16
-                        h-16
-                        rounded-2xl
-                        bg-pink-100
-                        flex
-                        items-center
-                        justify-center
-                        text-4xl
-                    "
-                >
-                    {icon}
-                </div>
+        <div className="flex items-center gap-5">
 
-                <div>
+          <div className="text-5xl">
 
-                    <p
-                        className="
-                            uppercase
-                            tracking-[6px]
-                            text-pink-500
-                            text-xs
-                            font-black
-                        "
-                    >
-                        Boutique Pet Love ERP
-                    </p>
+            {icon}
 
-                    <h1
-                        className="
-                            text-5xl
-                            font-black
-                            text-slate-900
-                        "
-                    >
-                        {title}
-                    </h1>
+          </div>
 
-                    <p
-                        className="
-                            mt-2
-                            text-slate-500
-                        "
-                    >
-                        {subtitle}
-                    </p>
+          <div>
 
-                </div>
+            <p className="text-xs uppercase tracking-widest text-pink-500 font-bold">
 
-            </div>
+              Boutique Pet Love ERP
 
-            {actions}
+            </p>
+
+            <h1 className="text-3xl font-black text-slate-900">
+
+              {title}
+
+            </h1>
+
+            <p className="text-slate-500 mt-1">
+
+              {subtitle}
+
+            </p>
+
+          </div>
 
         </div>
 
-    );
+        <div>
+
+          {actions}
+
+        </div>
+
+      </div>
+
+    </Card>
+
+  );
 
 }
