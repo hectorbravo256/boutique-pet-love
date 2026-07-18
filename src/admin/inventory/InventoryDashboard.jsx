@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
-import AdminCard from "../components/AdminCard";
-import InventoryMovements from "./InventoryMovements";
+
+import InventoryKPIs from "./dashboard/components/InventoryKPIs";
+import InventoryRecentMovements from "./dashboard/components/InventoryRecentMovements";
 
 export default function InventoryDashboard() {
 
     const [dashboard, setDashboard] = useState({
-
-    stockTotal: 0,
-
-    productos: 0,
-
-    variantes: 0,
-
-    stockCritico: 0
-
-});
+        stockTotal: 0,
+        productos: 0,
+        variantes: 0,
+        stockCritico: 0,
+    });
 
     useEffect(() => {
-
-    cargarDashboard();
-
-}, []);
+        cargarDashboard();
+    }, []);
 
     async function cargarDashboard() {
 
@@ -92,63 +86,15 @@ export default function InventoryDashboard() {
 }
 
 
-    return (
+return (
 
-        <div className="grid gap-6">
+        <div className="space-y-8">
 
-            <div className="grid md:grid-cols-4 gap-6">
+            <InventoryKPIs
+                dashboard={dashboard}
+            />
 
-                <AdminCard>
-
-                    <div className="text-slate-500 text-sm">
-                        Stock total
-                    </div>
-
-                    <div className="text-4xl font-black mt-3">
-                        {dashboard.stockTotal}
-                    </div>
-
-                </AdminCard>
-
-                <AdminCard>
-
-                    <div className="text-slate-500 text-sm">
-                        Productos activos
-                    </div>
-
-                    <div className="text-4xl font-black mt-3">
-                        {dashboard.productos}
-                    </div>
-
-                </AdminCard>
-
-                <AdminCard>
-
-                    <div className="text-slate-500 text-sm">
-                        Variantes
-                    </div>
-
-                    <div className="text-4xl font-black mt-3">
-                        {dashboard.variantes}
-                    </div>
-
-                </AdminCard>
-
-                <AdminCard>
-
-                    <div className="text-slate-500 text-sm">
-                        Stock crítico
-                    </div>
-
-                    <div className="text-4xl font-black mt-3">
-                        {dashboard.stockCritico}
-                    </div>
-
-                </AdminCard>
-
-            </div>
-
-            <InventoryMovements />
+            <InventoryRecentMovements />
 
         </div>
 
