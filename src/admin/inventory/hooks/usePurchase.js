@@ -212,9 +212,13 @@ function addProduct() {
 
 }
 
-    async function savePurchase() {
+async function savePurchase() {
 
     try {
+
+        //--------------------------------
+        // Crear compra
+        //--------------------------------
 
         const purchaseId =
             await PurchaseService.createPurchase({
@@ -227,7 +231,23 @@ function addProduct() {
 
             });
 
-        console.log("Compra creada:", purchaseId);
+        //--------------------------------
+        // Guardar detalle
+        //--------------------------------
+
+        for (const item of details) {
+
+            await PurchaseService.addPurchaseDetail({
+
+                purchaseId,
+
+                item
+
+            });
+
+        }
+
+        alert("✅ Compra registrada correctamente");
 
     }
 
