@@ -1,43 +1,52 @@
-import { supabase } from "../../../lib/supabase";
+import { supabase } from "../../../supabaseClient";
 
 const InventoryService = {
-
   async getDashboard() {
-
     const [
-      { data: products, error: productsError },
-      { data: variants, error: variantsError },
+      { data: variantes, error: variantesError },
+      { count: productos, error: productosError },
+      { count: variantesCount, error: variantesCountError },
     ] = await Promise.all([
-      supabase
-        .from("products")
-        .select("id"),
-
       supabase
         .from("product_variants")
         .select("stock"),
+
+      supabase
+        .from("products")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("active", true),
+
+      supabase
+        .from("product_variants")
+        .select("*", {
+          count: "exact",
+          head: true,
+        }),
     ]);
 
-    if (productsError) throw productsError;
-    if (variantsError) throw variantsError;
+    if (variantesError) throw variantesError;
+    if (productosError) throw productosError;
+    if (variantesCountError) throw variantesCountError;
 
-    const stockTotal = variants.reduce(
-      (sum, item) => sum + (item.stock || 0),
+    const stockTotal = (variantes || []).reduce(
+      (sum, item) => sum + Number(item.stock || 0),
       0
     );
 
-    const stockCritico = variants.filter(
-      item => (item.stock || 0) <= 5
+    const stockCritico = (variantes || []).filter(
+      (item) => Number(item.stock) <= 3
     ).length;
 
     return {
       stockTotal,
-      productos: products.length,
-      variantes: variants.length,
+      productos,
+      variantes: variantesCount,
       stockCritico,
     };
-
-  }
-
+  },
 };
 
 export default InventoryService;
