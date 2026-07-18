@@ -214,6 +214,10 @@ function addProduct() {
 
 async function savePurchase() {
 
+    console.log("🚀 Guardando compra...");
+
+    console.log(details);
+
     try {
 
         await PurchaseService.savePurchase({
