@@ -4,10 +4,6 @@ import PurchaseForm from "./inventory/PurchaseForm";
 
 import Button from "./shared/ui/Button";
 import PageHeader from "./shared/ui/PageHeader";
-import StatsCard from "./shared/ui/StatsCard";
-import QuickActionCard from "./shared/ui/QuickActionCard";
-import SectionTitle from "./shared/ui/SectionTitle";
-
 
 export default function AdminInventario() {
 
@@ -27,67 +23,6 @@ export default function AdminInventario() {
     }
 />
 
-<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-
-    <StatsCard
-        title="Productos"
-        value={totalProductos}
-        icon="📦"
-    />
-
-    <StatsCard
-        title="Stock Total"
-        value={stockTotal}
-        icon="📋"
-        color="bg-blue-500"
-    />
-
-    <StatsCard
-        title="Compras"
-        value={comprasMes}
-        icon="🛒"
-        color="bg-emerald-500"
-    />
-
-    <StatsCard
-        title="Movimientos"
-        value={movimientosHoy}
-        icon="📈"
-        color="bg-orange-500"
-    />
-
-</div> 
-
-<SectionTitle>
-
-Acciones rápidas
-
-</SectionTitle>
-
-<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-    <QuickActionCard
-        icon="➕"
-        title="Nueva Compra"
-        description="Registrar ingreso de mercadería"
-        to="/admin/inventory/purchases/new"
-    />
-
-    <QuickActionCard
-        icon="📦"
-        title="Kardex"
-        description="Historial completo de movimientos"
-        to="/admin/inventory/kardex"
-    />
-
-    <QuickActionCard
-        icon="🚚"
-        title="Proveedores"
-        description="Administrar proveedores"
-        to="/admin/suppliers"
-    />
-
-</div>
 
 <InventoryDashboard />
 
