@@ -25,6 +25,37 @@ export default function AdminInventario() {
         </Button>
     }
 />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+
+    <StatsCard
+        title="Productos"
+        value={totalProductos}
+        icon="📦"
+    />
+
+    <StatsCard
+        title="Stock Total"
+        value={stockTotal}
+        icon="📋"
+        color="bg-blue-500"
+    />
+
+    <StatsCard
+        title="Compras"
+        value={comprasMes}
+        icon="🛒"
+        color="bg-emerald-500"
+    />
+
+    <StatsCard
+        title="Movimientos"
+        value={movimientosHoy}
+        icon="📈"
+        color="bg-orange-500"
+    />
+
+</div>
 
 <InventoryDashboard />
 
