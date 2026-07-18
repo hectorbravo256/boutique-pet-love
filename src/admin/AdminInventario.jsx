@@ -2,8 +2,11 @@ import AdminCard from "./components/AdminCard";
 import InventoryDashboard from "./inventory/InventoryDashboard";
 import PurchaseForm from "./inventory/PurchaseForm";
 
-import PageHeader from "./shared/ui/PageHeader";
-import Button from "./shared/ui/Button";
+import Button from "../shared/ui/Button";
+import PageHeader from "../shared/ui/PageHeader";
+import StatsCard from "../shared/ui/StatsCard";
+import QuickActionCard from "../shared/ui/QuickActionCard";
+import SectionTitle from "../shared/ui/SectionTitle";
 
 export default function AdminInventario() {
 
