@@ -33,7 +33,9 @@ const {
 
     loadVariants,
 
-    addProduct
+    addProduct,
+
+    savePurchase
 
 } = usePurchase();
 
@@ -99,11 +101,15 @@ return (
 
         }
 
-        footer={
+footer={
 
-            <PurchaseFooter />
+    <PurchaseFooter
 
-        }
+        savePurchase={savePurchase}
+
+    />
+
+}
 
     />
 
