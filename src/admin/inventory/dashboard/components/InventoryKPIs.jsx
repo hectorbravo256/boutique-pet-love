@@ -1,4 +1,4 @@
-import StatsCard from "../../shared/ui/StatsCard";
+import StatsCard from "../../../shared/ui/StatsCard";
 
 export default function InventoryKPIs({ dashboard }) {
   return (
