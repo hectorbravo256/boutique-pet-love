@@ -1,5 +1,5 @@
 import InventoryMovements from "../../InventoryMovements";
-import SectionTitle from "../../shared/ui/SectionTitle";
+import SectionTitle from "../../../shared/ui/SectionTitle";
 
 export default function InventoryRecentMovements() {
   return (
