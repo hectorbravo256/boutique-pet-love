@@ -120,7 +120,6 @@ function removeItem(index) {
 </tr>
 
 </thead>
-
                         <tbody>
 
                             {details.map((item, index) => (
@@ -142,7 +141,7 @@ function removeItem(index) {
 
                                     </td>
 
-                                    <td className="text-center">
+<td className="text-center">
 
 <input
 
@@ -176,22 +175,42 @@ p-2
 
 </td>
 
-                                    <td className="text-right">
+<td className="text-right">
 
-                                        $
-                                        {Number(item.unit_cost)
-                                            .toLocaleString("es-CL")}
+    <input
 
-                                    </td>
+        type="number"
+
+        value={item.unit_cost}
+
+        onChange={(e)=>
+
+            updateCost(
+
+                index,
+
+                e.target.value
+
+            )
+
+        }
+
+        className="
+            w-28
+            text-right
+            border
+            rounded-xl
+            p-2
+        "
+
+    />
+
+</td>
 
                                     <td className="text-right font-bold">
 
                                         $
-
-                                        {(
-                                            item.quantity *
-                                            item.unit_cost
-                                        ).toLocaleString("es-CL")}
+{item.subtotal.toLocaleString("es-CL")}
 
                                     </td>
 
