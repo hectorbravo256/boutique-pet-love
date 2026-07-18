@@ -216,38 +216,19 @@ async function savePurchase() {
 
     try {
 
-        //--------------------------------
-        // Crear compra
-        //--------------------------------
+        await PurchaseService.savePurchase({
 
-        const purchaseId =
-            await PurchaseService.createPurchase({
+            supplier,
 
-                supplier,
+            invoiceNumber,
 
-                invoiceNumber,
+            observations,
 
-                observations
+            details
 
-            });
+        });
 
-        //--------------------------------
-        // Guardar detalle
-        //--------------------------------
-
-        for (const item of details) {
-
-            await PurchaseService.addPurchaseDetail({
-
-                purchaseId,
-
-                item
-
-            });
-
-        }
-
-        alert("✅ Compra registrada correctamente");
+        alert("Compra registrada correctamente");
 
     }
 
