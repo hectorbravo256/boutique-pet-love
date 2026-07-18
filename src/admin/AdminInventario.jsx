@@ -11,7 +11,17 @@ export default function AdminInventario() {
 
     <div className="max-w-[1500px] mx-auto p-8">
 
+<PageHeader
+    icon="📦"
+    title="Inventario"
+    subtitle="Control de compras, stock y movimientos."
 
+    actions={
+        <Button>
+            Nueva Compra
+        </Button>
+    }
+/>
 
 <InventoryDashboard />
 
