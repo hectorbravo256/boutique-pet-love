@@ -57,6 +57,37 @@ export default function AdminInventario() {
 
 </div>
 
+      <SectionTitle>
+
+Acciones rápidas
+
+</SectionTitle>
+
+<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+    <QuickActionCard
+        icon="➕"
+        title="Nueva Compra"
+        description="Registrar ingreso de mercadería"
+        to="/admin/inventory/purchases/new"
+    />
+
+    <QuickActionCard
+        icon="📦"
+        title="Kardex"
+        description="Historial completo de movimientos"
+        to="/admin/inventory/kardex"
+    />
+
+    <QuickActionCard
+        icon="🚚"
+        title="Proveedores"
+        description="Administrar proveedores"
+        to="/admin/suppliers"
+    />
+
+</div>
+
 <InventoryDashboard />
 
       <div className="mt-8">
