@@ -1,11 +1,45 @@
-<QuickActionCard
+import { Link } from "react-router-dom";
+import Card from "./Card";
 
-    icon="➕"
+export default function QuickActionCard({
+  icon,
+  title,
+  description,
+  to = "#",
+}) {
+  return (
+    <Link to={to}>
 
-    title="Nueva Compra"
+      <Card
+        className="
+          hover:shadow-xl
+          hover:-translate-y-1
+          transition-all
+          cursor-pointer
+          h-full
+        "
+      >
 
-    description="Registrar ingreso de mercadería"
+        <div className="text-4xl mb-4">
 
-    to="/admin/inventory/purchases/new"
+          {icon}
 
-/>
+        </div>
+
+        <h3 className="font-bold text-lg">
+
+          {title}
+
+        </h3>
+
+        <p className="text-slate-500 mt-2">
+
+          {description}
+
+        </p>
+
+      </Card>
+
+    </Link>
+  );
+}
