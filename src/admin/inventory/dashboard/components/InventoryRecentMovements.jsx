@@ -1,4 +1,4 @@
-import InventoryMovements from "../InventoryMovements";
+import InventoryMovements from "../../InventoryMovements";
 import SectionTitle from "../../shared/ui/SectionTitle";
 
 export default function InventoryRecentMovements() {
