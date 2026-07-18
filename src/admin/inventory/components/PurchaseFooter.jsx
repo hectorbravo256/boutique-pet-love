@@ -1,6 +1,10 @@
 import AdminCard from "../../components/AdminCard";
 
-export default function PurchaseFooter() {
+export default function PurchaseFooter({
+
+    savePurchase
+
+}) {
 
     return (
 
@@ -21,6 +25,9 @@ export default function PurchaseFooter() {
                 </button>
 
                 <button
+
+                    onClick={savePurchase}
+
                     className="
                         px-6
                         py-3
