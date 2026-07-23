@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import InventoryService from "../services/InventoryService";
+import InventoryService from "@/admin/shared/services/InventoryService";
 
 export default function useInventoryDashboard() {
 
