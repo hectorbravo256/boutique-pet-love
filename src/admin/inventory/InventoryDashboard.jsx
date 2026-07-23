@@ -1,34 +1,20 @@
-import { useEffect, useState } from "react";
-
+import useInventoryDashboard from "../shared/hooks/useInventoryDashboard";
 
 import InventoryKPIs from "./dashboard/components/InventoryKPIs";
 import InventoryRecentMovements from "./dashboard/components/InventoryRecentMovements";
-import InventoryService from "../shared/services/InventoryService";
 
 export default function InventoryDashboard() {
 
-    const [dashboard, setDashboard] = useState({
-        stockTotal: 0,
-        productos: 0,
-        variantes: 0,
-        stockCritico: 0,
-    });
+    const {
+        dashboard,
+        loading
+    } = useInventoryDashboard();
 
-    useEffect(() => {
-        cargarDashboard();
-    }, []);
-
-async function cargarDashboard() {
-    try {
-        const data = await InventoryService.getDashboard();
-        setDashboard(data);
-    } catch (error) {
-        console.error("Error cargando dashboard:", error);
+    if (loading) {
+        return <p>Cargando dashboard...</p>;
     }
-}
 
-
-return (
+    return (
 
         <div className="space-y-8">
 
