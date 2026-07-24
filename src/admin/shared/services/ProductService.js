@@ -1,5 +1,5 @@
 import BaseService from "@/admin/shared/services/BaseService";
-import { supabase } from "@/supabaseClient";
+import ApiClient from "@/admin/shared/api/ApiClient";
 
 class ProductService extends BaseService {
 
@@ -9,7 +9,7 @@ class ProductService extends BaseService {
 
     async getWithVariants() {
 
-        const { data, error } = await supabase
+        const { data, error } = await ApiClient.db
 
             .from("products")
 
