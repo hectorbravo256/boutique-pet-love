@@ -92,7 +92,7 @@ const InventoryService = {
 
     return data || [];
 
-}
+},
 
   async getVariants(productId) {
 
