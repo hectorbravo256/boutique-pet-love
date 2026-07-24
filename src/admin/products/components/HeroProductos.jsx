@@ -2,6 +2,8 @@ export default function HeroProductos({ productos }) {
 
     return (
 
+        <>
+
 {/* HERO PREMIUM */}
 <div className="
   relative
@@ -143,6 +145,7 @@ export default function HeroProductos({ productos }) {
   </div>
 
 </div>
+            </>
 
     );
 
