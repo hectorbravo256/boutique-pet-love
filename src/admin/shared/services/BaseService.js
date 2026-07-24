@@ -1,4 +1,4 @@
-import { supabase } from "../../../supabaseClient";
+import ApiClient from "@/admin/shared/api/ApiClient";
 
 export default class BaseService {
 
