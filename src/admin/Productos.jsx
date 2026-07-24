@@ -23,14 +23,24 @@ from "./components/ProductsSkeleton";
 
 import HeroProductos from "@/admin/products/components/HeroProductos";
 import ProductService from "@/admin/shared/services/ProductService";
+import useProducts from "@/admin/shared/hooks/useProducts";
 
 export default function Productos() {
 
-  const [productosFull, setProductosFull] =
+const {
+    productos,
+    loading,
+    reload
+} = useProducts();
+
+const [productosFull, setProductosFull] =
     useState([]);
 
-  const [loading, setLoading] =
-  useState(true);
+  useEffect(() => {
+
+    setProductosFull(productos);
+
+}, [productos]);
 
   const [searchProduct, setSearchProduct] =
     useState("");
@@ -69,20 +79,11 @@ const [
 
   };
 
-  const recargarProductos =
-    async () => {
+const recargarProductos = async () => {
 
-const data = await ProductService.getProducts();
+    reload();
 
-      setProductosFull(
-        Array.isArray(data)
-          ? data
-          : []
-      );
-
-      setLoading(false);
-
-    };
+};
 
   const ordenarProductos =
     (lista) => {
@@ -150,11 +151,13 @@ const data = await ProductService.getProducts();
 
     };
 
-  useEffect(() => {
+/*
+useEffect(() => {
 
     recargarProductos();
 
-  }, []);
+}, []);
+*/
 
   if (loading) {
 
