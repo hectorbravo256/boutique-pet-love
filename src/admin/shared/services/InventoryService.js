@@ -93,6 +93,24 @@ const InventoryService = {
     return data || [];
 
 }
+
+  async getVariants(productId) {
+
+    const { data, error } = await ApiClient.db
+
+        .from("product_variants")
+
+        .select("*")
+
+        .eq("product_id", productId)
+
+        .order("size");
+
+    if (error) throw error;
+
+    return data || [];
+
+}
   
 };
 
