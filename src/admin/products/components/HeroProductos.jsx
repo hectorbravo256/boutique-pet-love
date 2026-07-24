@@ -147,6 +147,10 @@ export default function HeroProductos({ productos }) {
 </div>
             </>
 
+    );
+
+}
+
         function MiniStat({ label, value }) {
 
     return (
@@ -180,10 +184,6 @@ export default function HeroProductos({ productos }) {
             </div>
 
         </div>
-
-    );
-
-}
 
     );
 
