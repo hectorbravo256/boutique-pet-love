@@ -22,6 +22,7 @@ import ProductsSkeleton
 from "./components/ProductsSkeleton";
 
 import HeroProductos from "@/admin/products/components/HeroProductos";
+import ProductService from "@/admin/shared/services/ProductService";
 
 export default function Productos() {
 
@@ -71,24 +72,7 @@ const [
   const recargarProductos =
     async () => {
 
-      const { data } =
-        await supabase
-          .from("products")
-          .select(`
-            *,
-            product_variants (*),
-            product_images (*)
-          `)
-
-          .order("sort_order", {
-            foreignTable:
-              "product_images",
-            ascending: true
-          })
-
-          .order("name", {
-            ascending: true
-          });
+const data = await ProductService.getProducts();
 
       setProductosFull(
         Array.isArray(data)
