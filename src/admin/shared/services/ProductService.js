@@ -29,6 +29,34 @@ class ProductService extends BaseService {
 
     }
 
+    // 👇 NUEVO MÉTODO
+    async getProducts() {
+
+        const { data, error } = await ApiClient.db
+
+            .from("products")
+
+            .select(`
+                *,
+                product_variants(*),
+                product_images(*)
+            `)
+
+            .order("sort_order", {
+                foreignTable: "product_images",
+                ascending: true
+            })
+
+            .order("name", {
+                ascending: true
+            });
+
+        if (error) throw error;
+
+        return data || [];
+
+    }
+
 }
 
 export default new ProductService();
