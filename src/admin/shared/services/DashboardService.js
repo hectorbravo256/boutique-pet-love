@@ -4,33 +4,79 @@ class DashboardService {
 
 async getSummary() {
 
-    const [
+    try {
 
-        inventory,
+        const { data, error } =
+            await ApiClient.db
+                .from("vw_dashboard_summary")
+                .select("*")
+                .single();
 
-        sales,
+        if (error) throw error;
 
-        purchases
+        return {
 
-    ] = await Promise.all([
+            inventory: {
 
-        this.getInventoryStats(),
+                totalUnits:
+                    data.inventory_units,
 
-        this.getSalesStats(),
+                outOfStock:
+                    data.out_of_stock,
 
-        this.getPurchaseStats()
+                lowStock:
+                    data.low_stock,
 
-    ]);
+                inventoryValue:
+                    data.inventory_value
 
-    return {
+            },
 
-        inventory,
+            sales: {
 
-        sales,
+                totalSales:
+                    data.total_sales,
 
-        purchases
+                totalOrders:
+                    data.total_orders,
 
-    };
+                averageTicket:
+                    data.average_ticket,
+
+                salesMonth:
+                    data.total_sales,
+
+                salesToday: 0 // siguiente sprint
+
+            },
+
+            purchases: {
+
+                totalMonth:
+                    data.purchases_month,
+
+                countMonth:
+                    data.purchases_count
+
+            }
+
+        };
+
+    } catch (error) {
+
+        console.error(error);
+
+        return {
+
+            inventory: {},
+
+            sales: {},
+
+            purchases: {}
+
+        };
+
+    }
 
 }
 
