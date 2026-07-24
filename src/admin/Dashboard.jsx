@@ -439,15 +439,15 @@ if (ordersLoading) {
 
       </div>
 
-  <DashboardOperations
+<DashboardOperations
 
     summary={summary}
 
-    onInventory={() => navigate("/admin/inventory")}
+    onInventory={() => navigate("/admin/inventario")}
 
-    onOrders={() => navigate("/admin/orders")}
+    onOrders={() => navigate("/admin/ventas")}
 
-    onPurchase={() => navigate("/admin/purchases")}
+    onPurchase={() => navigate("/admin/crear")}
 
 />
 
