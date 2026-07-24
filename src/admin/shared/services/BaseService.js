@@ -8,7 +8,7 @@ export default class BaseService {
 
     async getAll() {
 
-        const { data, error } = await supabase
+        const { data, error } = await ApiClient.db
             .from(this.table)
             .select("*");
 
@@ -20,7 +20,7 @@ export default class BaseService {
 
     async getById(id) {
 
-        const { data, error } = await supabase
+        const { data, error } = await ApiClient.db
             .from(this.table)
             .select("*")
             .eq("id", id)
@@ -34,7 +34,7 @@ export default class BaseService {
 
     async create(values) {
 
-        const { data, error } = await supabase
+        const { data, error } = await ApiClient.db
             .from(this.table)
             .insert(values)
             .select()
@@ -48,7 +48,7 @@ export default class BaseService {
 
     async update(id, values) {
 
-        const { data, error } = await supabase
+        const { data, error } = await ApiClient.db
             .from(this.table)
             .update(values)
             .eq("id", id)
@@ -63,7 +63,7 @@ export default class BaseService {
 
     async delete(id) {
 
-        const { error } = await supabase
+        const { error } = await ApiClient.db
             .from(this.table)
             .delete()
             .eq("id", id);
