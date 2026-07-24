@@ -147,6 +147,44 @@ export default function HeroProductos({ productos }) {
 </div>
             </>
 
+        function MiniStat({ label, value }) {
+
+    return (
+
+        <div className="
+            rounded-3xl
+            bg-white/10
+            backdrop-blur-xl
+            border
+            border-white/10
+            p-4
+        ">
+
+            <div className="
+                text-xs
+                uppercase
+                tracking-[0.2em]
+                text-pink-100
+                font-bold
+            ">
+                {label}
+            </div>
+
+            <div className="
+                mt-3
+                text-xl
+                md:text-2xl
+                font-black
+            ">
+                {value}
+            </div>
+
+        </div>
+
+    );
+
+}
+
     );
 
 }
