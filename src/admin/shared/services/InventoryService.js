@@ -1,4 +1,4 @@
-import { supabase } from "../../../supabaseClient";
+import ApiClient from "@/admin/shared/api/ApiClient";
 
 const InventoryService = {
   async getDashboard() {
@@ -7,11 +7,11 @@ const InventoryService = {
       { count: productos, error: productosError },
       { count: variantesCount, error: variantesCountError },
     ] = await Promise.all([
-      supabase
+      ApiClient.db
         .from("product_variants")
         .select("stock"),
 
-      supabase
+      ApiClient.db
         .from("products")
         .select("*", {
           count: "exact",
@@ -19,7 +19,7 @@ const InventoryService = {
         })
         .eq("active", true),
 
-      supabase
+      ApiClient.db
         .from("product_variants")
         .select("*", {
           count: "exact",
@@ -50,7 +50,7 @@ const InventoryService = {
   
   async getMovements(limit = 15) {
 
-    const { data, error } = await supabase
+    const { data, error } = await ApiClient.db
 
         .from("inventory_movements")
 
