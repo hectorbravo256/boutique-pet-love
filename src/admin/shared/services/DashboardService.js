@@ -10,7 +10,7 @@ async getSummary() {
         inventory
     };
 
-},
+}
 
     async getInventoryStats() {
 
