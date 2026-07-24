@@ -57,6 +57,25 @@ class ProductService extends BaseService {
 
     }
 
+    async deleteProduct(productId) {
+
+    await ApiClient.db
+        .from("product_variants")
+        .delete()
+        .eq("product_id", productId);
+
+    await ApiClient.db
+        .from("product_images")
+        .delete()
+        .eq("product_id", productId);
+
+    await ApiClient.db
+        .from("products")
+        .delete()
+        .eq("id", productId);
+
+}
+
 }
 
 export default new ProductService();
