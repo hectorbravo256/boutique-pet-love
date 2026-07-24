@@ -38,7 +38,7 @@ async getSummary() {
 
     const { data, error } = await ApiClient.db
         .from("product_variants")
-        .select("stock");
+        .select("stock, unit_cost");
 
     if (error) throw error;
 
@@ -55,10 +55,20 @@ async getSummary() {
         item => (item.stock || 0) > 0 && (item.stock || 0) < 5
     ).length;
 
+        const inventoryValue =
+    data.reduce(
+        (acc, item) =>
+            acc +
+            Number(item.stock || 0) *
+            Number(item.cost || 0),
+        0
+    );
+
     return {
         totalUnits,
         outOfStock,
-        lowStock
+        lowStock,
+        inventoryValue
     };
 
 }
