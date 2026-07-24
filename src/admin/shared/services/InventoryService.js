@@ -47,6 +47,31 @@ const InventoryService = {
       stockCritico,
     };
   },
+  
+  async getMovements(limit = 15) {
+
+    const { data, error } = await supabase
+
+        .from("inventory_movements")
+
+        .select(`
+            *,
+            products(name),
+            product_variants(size)
+        `)
+
+        .order("created_at", {
+            ascending: false
+        })
+
+        .limit(limit);
+
+    if (error) throw error;
+
+    return data || [];
+
+},
+  
 };
 
 export default InventoryService;
