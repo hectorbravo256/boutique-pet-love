@@ -100,7 +100,7 @@ export default function HeroProductos({ productos }) {
 
       <MiniStat
         label="Productos"
-        value={productosFull.length}
+        value={productos.length}
       />
 
       <MiniStat
@@ -108,7 +108,7 @@ export default function HeroProductos({ productos }) {
         value={
           [
             ...new Set(
-              productosFull.map(
+              productos.map(
                 p => p.category
               )
             )
@@ -119,7 +119,7 @@ export default function HeroProductos({ productos }) {
       <MiniStat
         label="Variantes"
         value={
-          productosFull.reduce(
+          productos.reduce(
             (acc, p) =>
               acc +
               (
@@ -132,13 +132,9 @@ export default function HeroProductos({ productos }) {
       />
 
       <MiniStat
-        label="Resultados"
-        value={
-          ordenarProductos(
-            productosFull
-          ).length
-        }
-      />
+    label="Resultados"
+    value={productos.length}
+/>
 
     </div>
 
