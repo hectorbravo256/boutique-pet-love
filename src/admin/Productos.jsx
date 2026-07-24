@@ -21,7 +21,7 @@ from "./components/AdminModal";
 import ProductsSkeleton
 from "./components/ProductsSkeleton";
 
-import HeroProductos from "./components/HeroProductos";
+import HeroProductos from "@/admin/products/components/HeroProductos";
 
 export default function Productos() {
 
