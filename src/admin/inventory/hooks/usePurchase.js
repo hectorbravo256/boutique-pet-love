@@ -70,18 +70,14 @@ async function loadProducts() {
     // Cargar tallas
     //----------------------------------------
 
-    async function loadVariants(productId) {
+async function loadVariants(productId) {
 
-        const { data } =
-            await supabase
-                .from("product_variants")
-                .select("*")
-                .eq("product_id", productId)
-                .order("size");
+    const data =
+        await InventoryService.getVariants(productId);
 
-        setVariants(data || []);
+    setVariants(data);
 
-    }
+}
 
 //----------------------------------------
 // Agregar producto
