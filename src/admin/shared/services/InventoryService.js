@@ -71,6 +71,28 @@ const InventoryService = {
     return data || [];
 
 },
+
+  async getActiveProducts() {
+
+    const { data, error } = await ApiClient.db
+
+        .from("products")
+
+        .select(`
+            id,
+            name,
+            product_images(url)
+        `)
+
+        .eq("active", true)
+
+        .order("name");
+
+    if (error) throw error;
+
+    return data || [];
+
+}
   
 };
 
