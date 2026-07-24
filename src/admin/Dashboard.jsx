@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import {
   useEffect,
   useState,
@@ -20,6 +22,8 @@ import DashboardSkeleton
 from "./components/DashboardSkeleton";
 
 import useDashboard from "@/admin/shared/hooks/useDashboard";
+import DashboardOperations from "./components/DashboardOperations";
+
 
 export default function Dashboard() {
 
@@ -32,6 +36,8 @@ export default function Dashboard() {
     reload
 
 } = useDashboard();
+
+  const navigate = useNavigate();
 
 const [ordersLoading, setOrdersLoading] = useState(true);
 
@@ -432,6 +438,18 @@ if (ordersLoading) {
 />
 
       </div>
+
+  <DashboardOperations
+
+    summary={summary}
+
+    onInventory={() => navigate("/admin/inventory")}
+
+    onOrders={() => navigate("/admin/orders")}
+
+    onPurchase={() => navigate("/admin/purchases")}
+
+/>
 
       {/* GRID */}
       <div className="
