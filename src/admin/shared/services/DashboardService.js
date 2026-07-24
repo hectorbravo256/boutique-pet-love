@@ -14,280 +14,103 @@ async getSummary() {
 
         if (error) throw error;
 
-        return {
+        const alerts =
+    await this.getAlerts();
 
-            inventory: {
+return {
 
-                totalUnits:
-                    data.inventory_units,
+    inventory: {
 
-                outOfStock:
-                    data.out_of_stock,
+        totalUnits: data.inventory_units,
 
-                lowStock:
-                    data.low_stock,
+        outOfStock: data.out_of_stock,
 
-                inventoryValue:
-                    data.inventory_value
+        lowStock: data.low_stock,
 
-            },
+        inventoryValue: data.inventory_value
 
-            sales: {
+    },
 
-                totalSales:
-                    data.total_sales,
+    sales: {
 
-                totalOrders:
-                    data.total_orders,
+        totalSales: data.total_sales,
 
-                averageTicket:
-                    data.average_ticket,
+        totalOrders: data.total_orders,
 
-                salesMonth:
-                    data.total_sales,
+        averageTicket: data.average_ticket,
 
-                salesToday: 0 // siguiente sprint
+        salesMonth: data.total_sales,
 
-            },
+        salesToday: 0
 
-            purchases: {
+    },
 
-                totalMonth:
-                    data.purchases_month,
+    purchases: {
 
-                countMonth:
-                    data.purchases_count
+        totalMonth: data.purchases_month,
 
-            }
+        countMonth: data.purchases_count
 
-        };
+    },
+
+    alerts
+
+};
 
     } catch (error) {
 
         console.error(error);
 
-        return {
+return {
 
-            inventory: {},
+    inventory: {},
 
-            sales: {},
+    sales: {},
 
-            purchases: {}
+    purchases: {},
 
-        };
+    alerts: {
+
+        outOfStock: 0,
+
+        lowStock: 0,
+
+        alerts: []
+
+    }
+
+};
 
     }
 
 }
 
-    async getInventoryStats() {
 
-const { data: variants, error: variantsError } =
-    await ApiClient.db
-        .from("product_variants")
-        .select("stock");
 
-const { data: inventory, error: inventoryError } =
-    await ApiClient.db
-        .from("vw_inventory_value")
-        .select("inventory_value");
-        
-if (variantsError) throw variantsError;
-if (inventoryError) throw inventoryError;
-
-const totalUnits =
-    variants.reduce(
-        (acc, item) =>
-            acc + Number(item.stock || 0),
-        0
-    );
-
-const outOfStock =
-    variants.filter(v => v.stock <= 0).length;
-
-const lowStock =
-    variants.filter(
-        v => v.stock > 0 && v.stock <= 2
-    ).length;
-
-const inventoryValue =
-    inventory.reduce(
-
-        (acc, item) =>
-
-            acc +
-
-            Number(
-                item.inventory_value || 0
-            ),
-
-        0
-
-    );
-
-    return {
-        totalUnits,
-        outOfStock,
-        lowStock,
-        inventoryValue
-    };
-
-}
-
-    async getSalesStats() {
-
-    try {
-
-        const response = await fetch(
-            "/.netlify/functions/get-orders"
-        );
-
-        const orders = await response.json();
-
-        const totalOrders = orders.length;
-
-        const totalSales = orders.reduce(
-            (acc, order) =>
-                acc + Number(order.total || 0),
-            0
-        );
-
-        const averageTicket =
-            totalOrders > 0
-                ? totalSales / totalOrders
-                : 0;
-
-        const today = new Date().toLocaleDateString();
-
-        const salesToday = orders
-            .filter(order => {
-
-                const date = new Date(
-                    order.created_at
-                ).toLocaleDateString();
-
-                return date === today;
-
-            })
-            .reduce(
-                (acc, order) =>
-                    acc + Number(order.total || 0),
-                0
-            );
-
-        const now = new Date();
-
-        const salesMonth = orders
-            .filter(order => {
-
-                const date =
-                    new Date(order.created_at);
-
-                return (
-
-                    date.getMonth() ===
-                    now.getMonth()
-
-                    &&
-
-                    date.getFullYear() ===
-                    now.getFullYear()
-
-                );
-
-            })
-            .reduce(
-                (acc, order) =>
-                    acc + Number(order.total || 0),
-                0
-            );
-
-        return {
-
-            totalOrders,
-
-            totalSales,
-
-            averageTicket,
-
-            salesToday,
-
-            salesMonth
-
-        };
-
-    } catch (error) {
-
-        console.error(error);
-
-        return {
-
-            totalOrders: 0,
-
-            totalSales: 0,
-
-            averageTicket: 0,
-
-            salesToday: 0,
-
-            salesMonth: 0
-
-        };
-
-    }
-
-}
-
-    async getPurchaseStats() {
+    async getAlerts() {
 
     try {
 
         const { data, error } =
             await ApiClient.db
-                .from("purchases")
-                .select("total, purchase_date");
+                .from("vw_dashboard_alerts")
+                .select("*");
 
         if (error) throw error;
 
-        const now = new Date();
-
-        const monthPurchases =
-            data.filter(p => {
-
-                const date =
-                    new Date(p.purchase_date);
-
-                return (
-
-                    date.getMonth() === now.getMonth()
-
-                    &&
-
-                    date.getFullYear() === now.getFullYear()
-
-                );
-
-            });
-
-        const totalMonth =
-            monthPurchases.reduce(
-
-                (acc, purchase) =>
-
-                    acc + Number(
-                        purchase.total || 0
-                    ),
-
-                0
-
-            );
-
         return {
 
-            totalMonth,
+            outOfStock:
+                data.filter(
+                    a => a.alert_type === "OUT_OF_STOCK"
+                ).length,
 
-            countMonth:
-                monthPurchases.length
+            lowStock:
+                data.filter(
+                    a => a.alert_type === "LOW_STOCK"
+                ).length,
+
+            alerts: data
 
         };
 
@@ -297,9 +120,11 @@ const inventoryValue =
 
         return {
 
-            totalMonth: 0,
+            outOfStock: 0,
 
-            countMonth: 0
+            lowStock: 0,
+
+            alerts: []
 
         };
 
