@@ -22,7 +22,7 @@ import DashboardSkeleton
 from "./components/DashboardSkeleton";
 
 import useDashboard from "@/admin/shared/hooks/useDashboard";
-import DashboardOperations from "./components/DashboardOperations";
+import DashboardOperations from "./dashboard/components/DashboardOperations";
 
 
 export default function Dashboard() {
