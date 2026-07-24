@@ -423,6 +423,13 @@ if (ordersLoading) {
     }
     color="text-orange-600"
 />
+        <StatCard
+    title="💎 Valor Inventario"
+    value={`$${(
+        summary?.inventory?.inventoryValue ?? 0
+    ).toLocaleString("es-CL")}`}
+    color="text-indigo-600"
+/>
 
       </div>
 
