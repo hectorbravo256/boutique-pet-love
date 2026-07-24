@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import PurchaseService from "../services/purchaseService";
+import InventoryService from "@/admin/shared/services/InventoryService";
 
 export default function usePurchase() {
 
@@ -56,18 +57,14 @@ export default function usePurchase() {
     // Cargar productos
     //----------------------------------------
 
-    async function loadProducts() {
+async function loadProducts() {
 
-        const { data } =
-            await supabase
-                .from("products")
-                .select(` id, name, product_images(url) `)
-                .eq("active", true)
-                .order("name");
+    const data =
+        await InventoryService.getActiveProducts();
 
-        setProducts(data || []);
+    setProducts(data);
 
-    }
+}
 
     //----------------------------------------
     // Cargar tallas
