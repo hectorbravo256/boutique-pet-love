@@ -485,29 +485,7 @@ useEffect(() => {
         if (!productoEliminar)
           return;
 
-        await supabase
-          .from("product_variants")
-          .delete()
-          .eq(
-            "product_id",
-            productoEliminar.id
-          );
-
-        await supabase
-          .from("product_images")
-          .delete()
-          .eq(
-            "product_id",
-            productoEliminar.id
-          );
-
-        await supabase
-          .from("products")
-          .delete()
-          .eq(
-            "id",
-            productoEliminar.id
-          );
+await ProductService.deleteProduct(productoEliminar.id);
 
         setProductosFull(prev =>
           prev.filter(
