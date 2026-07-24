@@ -19,10 +19,21 @@ from "./components/AdminCard";
 import DashboardSkeleton
 from "./components/DashboardSkeleton";
 
+import useDashboard from "@/admin/shared/hooks/useDashboard";
+
 export default function Dashboard() {
 
-  const [loading, setLoading] =
-  useState(true);
+  const {
+
+    summary,
+
+    loading,
+
+    reload
+
+} = useDashboard();
+
+const [ordersLoading, setOrdersLoading] = useState(true);
 
   const [orders, setOrders] =
     useState([]);
@@ -36,7 +47,7 @@ export default function Dashboard() {
       .then(data => {
 
   setOrders(data);
-  setLoading(false);
+  setOrdersLoading(false);
 
 });
 
@@ -192,8 +203,8 @@ export default function Dashboard() {
 
     }, [orders]);
 
-    if (loading) {
-  return <DashboardSkeleton />;
+if (ordersLoading) {
+    return <DashboardSkeleton />;
 }
   
   return (
@@ -380,6 +391,28 @@ export default function Dashboard() {
           value={`$${ventasMes.toLocaleString("es-CL")}`}
           color="text-red-600"
         />
+
+        <StatCard
+    title="📦 Unidades en Stock"
+    value={
+        summary?.inventory?.totalUnits ?? 0
+    }
+    color="text-emerald-600"
+/>
+        <StatCard
+    title="🚫 Sin Stock"
+    value={
+        summary?.inventory?.outOfStock ?? 0
+    }
+    color="text-red-600"
+/>
+        <StatCard
+    title="⚠️ Stock Crítico"
+    value={
+        summary?.inventory?.lowStock ?? 0
+    }
+    color="text-orange-600"
+/>
 
       </div>
 
