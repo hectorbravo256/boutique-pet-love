@@ -350,15 +350,19 @@ if (ordersLoading) {
         gap-5
       ">
 
-        <StatCard
-          title="💰 Ventas Totales"
-          value={`$${totalVentas.toLocaleString("es-CL")}`}
-          color="text-emerald-600"
-        />
+<StatCard
+    title="💰 Ventas Totales"
+    value={`$${(
+        summary?.sales?.totalSales ?? 0
+    ).toLocaleString("es-CL")}`}
+    color="text-emerald-600"
+/>
 
         <StatCard
           title="📦 Pedidos"
-          value={totalPedidos}
+          value={
+    summary?.sales?.totalOrders ?? 0
+}
           color="text-blue-600"
         />
 
@@ -376,19 +380,25 @@ if (ordersLoading) {
 
         <StatCard
           title="🛒 Ticket Promedio"
-          value={`$${Math.round(ticketPromedio).toLocaleString("es-CL")}`}
+          value={`$${Math.round(
+    summary?.sales?.averageTicket ?? 0
+).toLocaleString("es-CL")}`}
           color="text-pink-600"
         />
 
         <StatCard
           title="📅 Ventas Hoy"
-          value={`$${ventasHoy.toLocaleString("es-CL")}`}
+          value={`$${(
+    summary?.sales?.salesToday ?? 0
+).toLocaleString("es-CL")}`}
           color="text-cyan-600"
         />
 
         <StatCard
           title="📈 Ventas Mes"
-          value={`$${ventasMes.toLocaleString("es-CL")}`}
+          value={`$${(
+    summary?.sales?.salesMonth ?? 0
+).toLocaleString("es-CL")}`}
           color="text-red-600"
         />
 
