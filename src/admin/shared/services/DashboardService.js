@@ -8,13 +8,17 @@ async getSummary() {
 
         inventory,
 
-        sales
+        sales,
+
+        purchases
 
     ] = await Promise.all([
 
         this.getInventoryStats(),
 
-        this.getSalesStats()
+        this.getSalesStats(),
+
+        this.getPurchaseStats()
 
     ]);
 
@@ -22,7 +26,9 @@ async getSummary() {
 
         inventory,
 
-        sales
+        sales,
+
+        purchases
 
     };
 
@@ -154,6 +160,75 @@ async getSummary() {
             salesToday: 0,
 
             salesMonth: 0
+
+        };
+
+    }
+
+}
+
+    async getPurchaseStats() {
+
+    try {
+
+        const { data, error } =
+            await ApiClient.db
+                .from("purchases")
+                .select("total, purchase_date");
+
+        if (error) throw error;
+
+        const now = new Date();
+
+        const monthPurchases =
+            data.filter(p => {
+
+                const date =
+                    new Date(p.purchase_date);
+
+                return (
+
+                    date.getMonth() === now.getMonth()
+
+                    &&
+
+                    date.getFullYear() === now.getFullYear()
+
+                );
+
+            });
+
+        const totalMonth =
+            monthPurchases.reduce(
+
+                (acc, purchase) =>
+
+                    acc + Number(
+                        purchase.total || 0
+                    ),
+
+                0
+
+            );
+
+        return {
+
+            totalMonth,
+
+            countMonth:
+                monthPurchases.length
+
+        };
+
+    } catch (error) {
+
+        console.error(error);
+
+        return {
+
+            totalMonth: 0,
+
+            countMonth: 0
 
         };
 
