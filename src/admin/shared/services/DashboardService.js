@@ -36,32 +36,47 @@ async getSummary() {
 
     async getInventoryStats() {
 
-    const { data, error } = await ApiClient.db
+const { data: variants, error: variantsError } =
+    await ApiClient.db
         .from("product_variants")
-        .select("stock, unit_cost");
+        .select("stock");
 
-    if (error) throw error;
+const { data: inventory, error: inventoryError } =
+    await ApiClient.db
+        .from("vw_inventory_value")
+        .select("inventory_value");
+        
+if (variantsError) throw variantsError;
+if (inventoryError) throw inventoryError;
 
-    const totalUnits = data.reduce(
-        (sum, item) => sum + (item.stock || 0),
+const totalUnits =
+    variants.reduce(
+        (acc, item) =>
+            acc + Number(item.stock || 0),
         0
     );
 
-    const outOfStock = data.filter(
-        item => (item.stock || 0) === 0
+const outOfStock =
+    variants.filter(v => v.stock <= 0).length;
+
+const lowStock =
+    variants.filter(
+        v => v.stock > 0 && v.stock <= 2
     ).length;
 
-    const lowStock = data.filter(
-        item => (item.stock || 0) > 0 && (item.stock || 0) < 5
-    ).length;
+const inventoryValue =
+    inventory.reduce(
 
-        const inventoryValue =
-    data.reduce(
         (acc, item) =>
+
             acc +
-            Number(item.stock || 0) *
-            Number(item.cost || 0),
+
+            Number(
+                item.inventory_value || 0
+            ),
+
         0
+
     );
 
     return {
