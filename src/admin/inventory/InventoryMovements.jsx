@@ -1,38 +1,29 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient";
 import AdminCard from "../components/AdminCard";
+import useInventoryMovements from "@/admin/shared/hooks/useInventoryMovements";
 
 export default function InventoryMovements() {
 
-    const [movimientos, setMovimientos] = useState([]);
+const {
 
-    useEffect(() => {
+    movimientos,
 
-        cargar();
+    loading
 
-    }, []);
+} = useInventoryMovements();
 
-    async function cargar() {
+   if (loading) {
 
-        const { data } = await supabase
+    return (
 
-            .from("inventory_movements")
+        <AdminCard>
 
-            .select(`
-                *,
-                products(name),
-                product_variants(size)
-            `)
+            Cargando movimientos...
 
-            .order("created_at", {
-                ascending: false
-            })
+        </AdminCard>
 
-            .limit(15);
+    );
 
-        setMovimientos(data || []);
-
-    }
+}
 
     return (
 
