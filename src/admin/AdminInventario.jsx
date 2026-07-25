@@ -26,7 +26,13 @@ export default function AdminInventario() {
 
 <InventoryDashboard />
 
-      <div className="mt-8">
+<div className="mt-8">
+
+    <InventoryMasterTable />
+
+</div>
+
+<div className="mt-8">
 
     <PurchaseForm />
 
