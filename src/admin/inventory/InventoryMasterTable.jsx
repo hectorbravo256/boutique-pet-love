@@ -3,7 +3,21 @@ import AdminCard from "../components/AdminCard";
 
 export default function InventoryMasterTable() {
 
-    const { inventory, loading } = useInventoryMaster();
+    const {
+
+    inventory,
+
+    loading,
+
+    search,
+
+    setSearch,
+
+    statusFilter,
+
+    setStatusFilter
+
+} = useInventoryMaster();
 
     if (loading) {
         return <p>Cargando inventario...</p>;
@@ -18,6 +32,55 @@ export default function InventoryMasterTable() {
                 Inventario Maestro
 
             </h2>
+
+            <div className="flex flex-wrap gap-4 mb-6">
+
+    <input
+
+        value={search}
+
+        onChange={(e)=>
+            setSearch(e.target.value)
+        }
+
+        placeholder="Buscar producto..."
+
+        className="
+            border
+            rounded-xl
+            p-3
+            w-80
+        "
+
+    />
+
+    <select
+
+        value={statusFilter}
+
+        onChange={(e)=>
+            setStatusFilter(e.target.value)
+        }
+
+        className="
+            border
+            rounded-xl
+            p-3
+        "
+
+    >
+
+        <option value="TODOS">Todos</option>
+
+        <option value="OK">OK</option>
+
+        <option value="CRITICO">Crítico</option>
+
+        <option value="SIN STOCK">Sin stock</option>
+
+    </select>
+
+</div>
 
             <div className="overflow-x-auto">
 
