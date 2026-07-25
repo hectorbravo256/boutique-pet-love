@@ -102,6 +102,10 @@ export default function InventoryMasterTable() {
 
                             <th>Estado</th>
 
+                            <th className="text-center">
+                                Acciones
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -112,7 +116,12 @@ export default function InventoryMasterTable() {
 
                             <tr
                                 key={item.variant_id}
-                                className="border-b hover:bg-slate-50"
+                                className="
+                                        border-b
+                                        transition-all
+                                        hover:bg-pink-50
+                                        hover:shadow-sm
+                                        "
                             >
 
                                 <td className="py-3">
@@ -124,11 +133,13 @@ export default function InventoryMasterTable() {
                                         alt={item.product_name}
 
                                         className="
-                                            w-14
-                                            h-14
-                                            rounded-xl
-                                            object-cover
-                                        "
+                                                    w-16
+                                                    h-16
+                                                    rounded-2xl
+                                                    object-cover
+                                                    shadow-sm
+                                                    border
+                                                    "
 
                                     />
 
@@ -156,11 +167,31 @@ export default function InventoryMasterTable() {
 
                                 </td>
 
-                                <td className="text-center font-bold">
+<td className="text-center">
 
-                                    {item.stock}
+    <span
+        className={`
+            font-black
 
-                                </td>
+            ${
+                item.stock === 0
+
+                    ? "text-red-600"
+
+                : item.stock <= 3
+
+                    ? "text-orange-500"
+
+                : "text-green-600"
+            }
+        `}
+    >
+
+        {item.stock}
+
+    </span>
+
+</td>
 
                                 <td className="text-right">
 
@@ -172,11 +203,56 @@ export default function InventoryMasterTable() {
 
                                 </td>
 
-                                <td className="text-center">
+<td className="text-center">
 
-                                    {item.status}
+    <span
+        className={`
+            px-3
+            py-1
+            rounded-full
+            text-xs
+            font-bold
 
-                                </td>
+            ${
+                item.status === "OK"
+                    ? "bg-green-100 text-green-700"
+
+                : item.status === "CRITICO"
+                    ? "bg-orange-100 text-orange-700"
+
+                : "bg-red-100 text-red-700"
+            }
+        `}
+    >
+
+        {item.status}
+
+    </span>
+
+</td>
+
+        <td className="text-center">
+
+    <button
+
+        className="
+            px-3
+            py-2
+            rounded-xl
+            bg-slate-100
+            hover:bg-pink-500
+            hover:text-white
+            transition-all
+        "
+
+    >
+
+        ✏️
+
+    </button>
+
+</td>
+                                
 
                             </tr>
 
