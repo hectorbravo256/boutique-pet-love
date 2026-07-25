@@ -110,6 +110,24 @@ const InventoryService = {
 
     return data || [];
 
+},
+
+  async getInventoryMaster() {
+
+    const { data, error } = await ApiClient.db
+
+        .from("vw_inventory_master")
+
+        .select("*")
+
+        .order("product_name", {
+            ascending: true
+        });
+
+    if (error) throw error;
+
+    return data || [];
+
 }
   
 };
