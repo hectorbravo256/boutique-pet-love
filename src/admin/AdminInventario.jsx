@@ -1,5 +1,6 @@
 import AdminCard from "./components/AdminCard";
 import InventoryDashboard from "./inventory/InventoryDashboard";
+import InventoryMasterTable from "./inventory/InventoryMasterTable";
 import PurchaseForm from "./inventory/PurchaseForm";
 
 import Button from "./shared/ui/Button";
