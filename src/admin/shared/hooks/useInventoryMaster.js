@@ -7,6 +7,10 @@ export default function useInventoryMaster() {
 
     const [loading, setLoading] = useState(true);
 
+    const [search, setSearch] = useState("");
+
+    const [statusFilter, setStatusFilter] = useState("TODOS");
+
     async function reload() {
 
         try {
@@ -40,14 +44,38 @@ export default function useInventoryMaster() {
 
     }, []);
 
-    return {
+    const filteredInventory = inventory.filter(item => {
 
-        inventory,
+    const matchesSearch =
+        item.product_name
+            .toLowerCase()
+            .includes(search.toLowerCase());
 
-        loading,
+    const matchesStatus =
+        statusFilter === "TODOS"
+            ? true
+            : item.status === statusFilter;
 
-        reload
+    return matchesSearch && matchesStatus;
 
-    };
+});
+
+return {
+
+    inventory: filteredInventory,
+
+    loading,
+
+    reload,
+
+    search,
+
+    setSearch,
+
+    statusFilter,
+
+    setStatusFilter
+
+};
 
 }
