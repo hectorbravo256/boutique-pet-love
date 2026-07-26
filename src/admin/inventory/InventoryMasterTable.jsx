@@ -235,21 +235,27 @@ export default function InventoryMasterTable() {
 
     <button
 
-        className="
-            px-3
-            py-2
-            rounded-xl
-            bg-slate-100
-            hover:bg-pink-500
-            hover:text-white
-            transition-all
-        "
+    onClick={() => {
 
-    >
+        console.log(item);
 
-        ✏️
+    }}
 
-    </button>
+    className="
+        px-3
+        py-2
+        rounded-xl
+        bg-slate-100
+        hover:bg-pink-500
+        hover:text-white
+        transition-all
+    "
+
+>
+
+    ✏️ Editar
+
+</button>
 
 </td>
                                 
