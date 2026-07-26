@@ -1,5 +1,7 @@
 import useInventoryMaster from "../shared/hooks/useInventoryMaster";
 import AdminCard from "../components/AdminCard";
+import { useState } from "react";
+import InventoryEditor from "./InventoryEditor";
 
 export default function InventoryMasterTable() {
 
@@ -18,6 +20,8 @@ export default function InventoryMasterTable() {
     setStatusFilter
 
 } = useInventoryMaster();
+
+    const [selectedItem, setSelectedItem] = useState(null);
 
     if (loading) {
         return <p>Cargando inventario...</p>;
@@ -235,11 +239,7 @@ export default function InventoryMasterTable() {
 
     <button
 
-    onClick={() => {
-
-        console.log(item);
-
-    }}
+onClick={() => setSelectedItem(item)}
 
     className="
         px-3
@@ -267,8 +267,24 @@ export default function InventoryMasterTable() {
                     </tbody>
 
                 </table>
-
+                
             </div>
+
+            {selectedItem && (
+
+    <div className="mt-8">
+
+        <InventoryEditor
+
+            item={selectedItem}
+
+            onClose={() => setSelectedItem(null)}
+
+        />
+
+    </div>
+
+)}
 
         </AdminCard>
 
