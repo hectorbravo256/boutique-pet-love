@@ -86,29 +86,29 @@ export default function InventoryMasterTable() {
 
 </div>
 
-            <div className="overflow-x-auto">
+       
+        
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-                <table className="w-full">
+    {/* Tabla */}
 
-                    <thead>
+    <div className="xl:col-span-2">
 
-                        <tr className="border-b text-slate-500">
+                    <div className="overflow-auto max-h-[75vh] rounded-2xl border">
 
-                            <th className="text-left py-3">Imagen</th>
+                <table className="w-full table-fixed">
 
-                            <th className="text-left">Producto</th>
+                    <thead className="sticky top-0 bg-white z-10">
 
-                            <th>Talla</th>
+                        <tr className="border-b text-slate-500 bg-white">
 
-                            <th>Stock</th>
-
-                            <th>Precio</th>
-
-                            <th>Estado</th>
-
-                            <th className="text-center">
-                                Acciones
-                            </th>
+                            <th className="w-24">Imagen</th>
+<th>Producto</th>
+<th className="w-20">Talla</th>
+<th className="w-24">Stock</th>
+<th className="w-32">Precio</th>
+<th className="w-32">Estado</th>
+<th className="w-28">Acciones</th>
 
                         </tr>
 
@@ -119,14 +119,21 @@ export default function InventoryMasterTable() {
                         {inventory.map(item => (
 
                             <tr
-                                key={item.variant_id}
-                                className="
-                                        border-b
-                                        transition-all
-                                        hover:bg-pink-50
-                                        hover:shadow-sm
-                                        "
-                            >
+    key={item.variant_id}
+    onClick={() => setSelectedItem(item)}
+    className={`
+        cursor-pointer
+        border-b
+        transition-all
+        hover:bg-pink-50
+        hover:shadow-sm
+        ${
+            selectedItem?.variant_id === item.variant_id
+                ? "bg-pink-100"
+                : ""
+        }
+    `}
+>
 
                                 <td className="py-3">
 
@@ -237,10 +244,11 @@ export default function InventoryMasterTable() {
 
         <td className="text-center">
 
-    <button
-
-onClick={() => setSelectedItem(item)}
-
+<button
+    onClick={(e) => {
+        e.stopPropagation();
+        setSelectedItem(item);
+    }}
     className="
         px-3
         py-2
@@ -250,11 +258,8 @@ onClick={() => setSelectedItem(item)}
         hover:text-white
         transition-all
     "
-
 >
-
     ✏️ Editar
-
 </button>
 
 </td>
@@ -270,23 +275,55 @@ onClick={() => setSelectedItem(item)}
                 
             </div>
 
-            {selectedItem && (
+    </div>
 
-    <div className="mt-8">
+    {/* Panel */}
 
-        <InventoryEditor
+    <div className="xl:sticky xl:top-6 self-start">
+        
+        {selectedItem ? (
 
-            item={selectedItem}
+            <InventoryEditor
 
-            onClose={() => setSelectedItem(null)}
+                item={selectedItem}
 
-        />
+                onClose={() => setSelectedItem(null)}
+
+            />
+
+        ) : (
+
+            <AdminCard>
+
+                <div className="text-center py-20">
+
+                    <div className="text-5xl mb-4">
+
+                        📦
+
+                    </div>
+
+                    <h3 className="text-xl font-bold">
+
+                        Selecciona una variante
+
+                    </h3>
+
+                    <p className="text-slate-500 mt-2">
+
+                        Haz clic en "Editar" para ver los detalles.
+
+                    </p>
+
+                </div>
+
+            </AdminCard>
+
+        )}
 
     </div>
 
-)}
-
-        </AdminCard>
+</div>
 
     );
 
