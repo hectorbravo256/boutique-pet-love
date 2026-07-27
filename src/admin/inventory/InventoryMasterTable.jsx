@@ -96,23 +96,35 @@ export default function InventoryMasterTable() {
 
                     <div className="overflow-auto max-h-[75vh] rounded-2xl border">
 
-                <table className="w-full table-fixed">
+                <table className="w-full">
 
-                    <thead className="sticky top-0 bg-white z-10">
+<thead className="sticky top-0 bg-white z-10">
+    <tr className="border-b text-slate-500 bg-white">
 
-                        <tr className="border-b text-slate-500 bg-white">
+        <th className="w-24 py-3">Imagen</th>
 
-                            <th className="w-24">Imagen</th>
-<th>Producto</th>
-<th className="w-20">Talla</th>
-<th className="w-24">Stock</th>
-<th className="w-32">Precio</th>
-<th className="w-32">Estado</th>
-<th className="w-28">Acciones</th>
+        <th className="min-w-[280px] text-left">
+            Producto
+        </th>
 
-                        </tr>
+        <th className="w-24 text-center">
+            Talla
+        </th>
 
-                    </thead>
+        <th className="w-24 text-center">
+            Stock
+        </th>
+
+        <th className="w-32 text-right">
+            Precio
+        </th>
+
+        <th className="w-32 text-center">
+            Estado
+        </th>
+
+    </tr>
+</thead>
 
                     <tbody>
 
@@ -156,21 +168,21 @@ export default function InventoryMasterTable() {
 
                                 </td>
 
-                                <td>
+                                <td className="py-3">
 
-                                    <div className="font-bold">
+    <div className="font-bold text-base">
 
-                                        {item.product_name}
+        {item.product_name}
 
-                                    </div>
+    </div>
 
-                                    <div className="text-sm text-slate-500">
+    <div className="text-sm text-slate-500">
 
-                                        {item.category}
+        {item.category}
 
-                                    </div>
+    </div>
 
-                                </td>
+</td>
 
                                 <td className="text-center">
 
