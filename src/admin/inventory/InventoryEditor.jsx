@@ -23,7 +23,7 @@ useEffect(() => {
 
     return (
 
-        <AdminCard>
+        <AdminCard className="h-full flex flex-col">
 
             <div className="flex justify-between items-center mb-6">
 
@@ -50,7 +50,7 @@ useEffect(() => {
 
             </div>
 
-<div className="space-y-6">
+<div className="flex-1 overflow-y-auto space-y-6 pr-2">
 
 <div
     className="
