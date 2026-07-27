@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import PageHeader from "../../shared/ui/PageHeader";
 import Button from "../../shared/ui/Button";
 
-import SupplierTable from "./SupplierTable";
 import SupplierModal from "./SupplierModal";
+import useSuppliers from "./useSuppliers";
+import DataTable from "../../shared/ui/DataTable";
 
 import { createSupplier } from "./supplierService";
 
@@ -13,25 +14,75 @@ export default function SuppliersPage() {
 
     const [open, setOpen] = useState(false);
 
-    async function handleSave(values) {
+const {
 
-        try {
+    suppliers,
 
-            await createSupplier(values);
+    loading,
 
-            setOpen(false);
+    reload
 
-            // Más adelante recargaremos automáticamente la tabla
+} = useSuppliers();
 
-        } catch (error) {
+    const columns = [
 
-            console.error(error);
+    {
+        key: "name",
+        label: "Proveedor"
+    },
 
-            alert("Error al guardar el proveedor");
+    {
+        key: "contact_name",
+        label: "Contacto"
+    },
 
-        }
+    {
+        key: "phone",
+        label: "Teléfono"
+    },
+
+    {
+        key: "email",
+        label: "Correo"
+    },
+
+    {
+        key: "active",
+        label: "Estado",
+
+        render: row => (
+
+            row.active
+
+                ? "🟢 Activo"
+
+                : "🔴 Inactivo"
+
+        )
 
     }
+
+];
+
+async function handleSave(values) {
+
+    try {
+
+        await createSupplier(values);
+
+        await reload();
+
+        setOpen(false);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error al guardar el proveedor");
+
+    }
+
+}
 
     return (
 
@@ -59,7 +110,18 @@ export default function SuppliersPage() {
                 }
             />
 
-            <SupplierTable />
+            <DataTable
+
+    columns={columns}
+
+    data={suppliers}
+
+    loading={loading}
+
+    emptyMessage="No existen proveedores."
+
+/>
+
 
             <SupplierModal
                 open={open}
