@@ -25,6 +25,7 @@ const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
 const CategoriaDetalle = lazy(() => import("./admin/CategoriaDetalle"));
 import AdminInventario from "./admin/AdminInventario";
 const InventoryMasterPage = lazy(() => import("./admin/inventory/master/InventoryMasterPage"));
+const PurchasePage = lazy(() => import("./admin/inventory/purchases/PurchasePage"));
 
 /* ================= PRODUCTOS ================= */
 
@@ -1281,6 +1282,14 @@ export default function App() {
   element={
     <Suspense fallback={<div>Cargando...</div>}>
       <InventoryMasterPage />
+    </Suspense>
+  }
+/>
+	<Route
+  path="/admin/inventario/compras"
+  element={
+    <Suspense fallback={<div>Cargando...</div>}>
+      <PurchasePage />
     </Suspense>
   }
 />
