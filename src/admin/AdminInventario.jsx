@@ -14,12 +14,6 @@ export default function AdminInventario() {
     icon="📦"
     title="Inventario"
     subtitle="Control de compras, stock y movimientos."
-
-    actions={
-        <Button>
-            Nueva Compra
-        </Button>
-    }
 />
 
 
