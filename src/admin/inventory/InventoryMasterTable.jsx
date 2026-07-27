@@ -88,13 +88,13 @@ export default function InventoryMasterTable() {
 
        
         
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 h-[78vh]">
 
     {/* Tabla */}
 
-    <div className="xl:col-span-3">
+    <div className="xl:col-span-8 h-full">
 
-                    <div className="overflow-auto max-h-[75vh] rounded-2xl border">
+                    <div className="overflow-auto h-full rounded-2xl border">
 
                 <table className="w-full">
 
@@ -268,7 +268,7 @@ export default function InventoryMasterTable() {
 
     {/* Panel */}
 
-    <div className="xl:col-span-2 xl:sticky xl:top-6 self-start">
+    <div className="xl:col-span-4 h-full">
         
         {selectedItem ? (
 
