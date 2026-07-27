@@ -17,6 +17,13 @@ const modules = [
         color: "from-pink-500 to-fuchsia-600",
     },
     {
+        title: "Proveedores",
+        description: "Administrar proveedores, contactos y empresas.",
+        icon: "🤝",
+        to: "/admin/inventario/proveedores",
+        color: "from-sky-500 to-cyan-500",
+    },
+    {
         title: "Ventas",
         description: "Registrar ventas presenciales y online.",
         icon: "🛒",
