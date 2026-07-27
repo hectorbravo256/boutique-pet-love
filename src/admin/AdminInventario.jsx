@@ -1,7 +1,5 @@
-import AdminCard from "./components/AdminCard";
 import InventoryDashboard from "./inventory/InventoryDashboard";
-import InventoryMasterTable from "./inventory/InventoryMasterTable";
-import PurchaseForm from "./inventory/PurchaseForm";
+import InventoryHome from "./inventory/InventoryHome";
 
 import Button from "./shared/ui/Button";
 import PageHeader from "./shared/ui/PageHeader";
@@ -28,15 +26,7 @@ export default function AdminInventario() {
 <InventoryDashboard />
 
 <div className="mt-8">
-
-    <InventoryMasterTable />
-
-</div>
-
-<div className="mt-8">
-
-    <PurchaseForm />
-
+    <InventoryHome />
 </div>
 
 
