@@ -212,7 +212,7 @@ useEffect(() => {
             >
                 {item.status}
             </span>
-
+</div>
 
     </div>
 
@@ -254,6 +254,8 @@ useEffect(() => {
 
 </div>
 
+    </div>
+            
         </AdminCard>
 
     );
