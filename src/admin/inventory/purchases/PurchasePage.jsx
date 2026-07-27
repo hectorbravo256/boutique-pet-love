@@ -28,11 +28,6 @@ export default function PurchasePage() {
                 icon="📥"
                 title="Compras"
                 subtitle="Recepción de mercadería y actualización de stock."
-                actions={
-                    <Button>
-                        Nueva Compra
-                    </Button>
-                }
             />
 
             <PurchaseDashboard />
