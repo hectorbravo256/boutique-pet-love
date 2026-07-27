@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import AdminCard from "../components/AdminCard";
 
 export default function InventoryEditor({
@@ -10,6 +11,14 @@ export default function InventoryEditor({
 
     if (!item) return null;
 
+    const [stock, setStock] = useState(item.stock);
+    const [price, setPrice] = useState(item.sale_price);
+
+useEffect(() => {
+    setStock(item.stock);
+    setPrice(item.sale_price);
+}, [item]);
+
     return (
 
         <AdminCard>
@@ -17,10 +26,8 @@ export default function InventoryEditor({
             <div className="flex justify-between items-center mb-6">
 
                 <h2 className="text-2xl font-black">
-
-                    Editar Inventario
-
-                </h2>
+    Detalle de Variante
+</h2>
 
                 <button
 
@@ -41,64 +48,152 @@ export default function InventoryEditor({
 
             </div>
 
-            <div className="flex gap-6">
+<div className="space-y-6">
 
-                <img
+    <div className="flex gap-4 items-center">
 
-                    src={item.image}
+        <img
+            src={item.image}
+            alt={item.product_name}
+            className="w-24 h-24 rounded-2xl object-cover"
+        />
 
-                    alt={item.product_name}
+        <div>
 
-                    className="
-                        w-28
-                        h-28
-                        rounded-2xl
-                        object-cover
-                    "
+            <h3 className="text-xl font-bold">
+                {item.product_name}
+            </h3>
 
-                />
+            <p className="text-slate-500">
+                {item.category}
+            </p>
 
-                <div className="space-y-2">
+        </div>
 
-                    <h3 className="text-xl font-bold">
+    </div>
 
-                        {item.product_name}
+    <div className="bg-slate-50 rounded-xl p-4">
 
-                    </h3>
+        <label className="text-xs text-slate-500">
+            Talla
+        </label>
 
-                    <p>
+        <div className="text-lg font-bold mt-1">
+            {item.size}
+        </div>
 
-                        <strong>Talla:</strong> {item.size}
+    </div>
 
-                    </p>
+    <div className="bg-slate-50 rounded-xl p-4">
 
-                    <p>
+        <label className="text-xs text-slate-500">
+            Stock
+        </label>
 
-                        <strong>Stock:</strong> {item.stock}
+        <input
+            type="number"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            className="
+                mt-2
+                w-full
+                border
+                rounded-xl
+                p-3
+            "
+        />
 
-                    </p>
+    </div>
 
-                    <p>
+    <div className="bg-slate-50 rounded-xl p-4">
 
-                        <strong>Precio:</strong>
+        <label className="text-xs text-slate-500">
+            Precio
+        </label>
 
-                        {" "}
-                        ${Number(item.sale_price).toLocaleString("es-CL")}
+        <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="
+                mt-2
+                w-full
+                border
+                rounded-xl
+                p-3
+            "
+        />
 
-                    </p>
+    </div>
 
-                    <p>
+    <div>
 
-                        <strong>Estado:</strong>
+        <label className="text-xs text-slate-500">
+            Estado
+        </label>
 
-                        {" "}
-                        {item.status}
+        <div className="mt-2">
 
-                    </p>
+            <span
+                className={`
+                    inline-flex
+                    px-4
+                    py-2
+                    rounded-full
+                    text-sm
+                    font-bold
 
-                </div>
+                    ${
+                        item.status === "OK"
+                            ? "bg-green-100 text-green-700"
 
-            </div>
+                        : item.status === "CRITICO"
+                            ? "bg-orange-100 text-orange-700"
+
+                        : "bg-red-100 text-red-700"
+                    }
+                `}
+            >
+                {item.status}
+            </span>
+
+        </div>
+
+    </div>
+
+    <div className="flex gap-3 pt-4">
+
+        <button
+            className="
+                flex-1
+                bg-pink-600
+                hover:bg-pink-700
+                text-white
+                rounded-xl
+                py-3
+                font-bold
+                transition
+            "
+        >
+            Guardar cambios
+        </button>
+
+        <button
+            onClick={onClose}
+            className="
+                px-5
+                rounded-xl
+                border
+                hover:bg-slate-100
+                transition
+            "
+        >
+            Cancelar
+        </button>
+
+    </div>
+
+</div>
 
         </AdminCard>
 
