@@ -30,11 +30,6 @@ export default function InventoryMasterPage() {
                 icon="📦"
                 title="Inventario Maestro"
                 subtitle="Administración completa de productos, stock y variantes."
-                actions={
-                    <Button>
-                        Nuevo Producto
-                    </Button>
-                }
             />
 
             <div className="mt-8">
