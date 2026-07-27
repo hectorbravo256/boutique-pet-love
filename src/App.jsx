@@ -24,6 +24,7 @@ const ProductoDetalle = lazy(() => import("./admin/ProductoDetalle"));
 const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
 const CategoriaDetalle = lazy(() => import("./admin/CategoriaDetalle"));
 import AdminInventario from "./admin/AdminInventario";
+const InventoryMasterPage = lazy(() => import("./admin/inventory/master/InventoryMasterPage"));
 
 /* ================= PRODUCTOS ================= */
 
@@ -1274,6 +1275,14 @@ export default function App() {
 	<Route
   path="/admin/inventario"
   element={<AdminInventario />}
+/>
+	<Route
+  path="/admin/inventario/master"
+  element={
+    <Suspense fallback={<div>Cargando...</div>}>
+      <InventoryMasterPage />
+    </Suspense>
+  }
 />
     </Route>
 
