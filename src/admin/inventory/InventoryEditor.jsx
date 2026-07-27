@@ -23,7 +23,7 @@ useEffect(() => {
 
     return (
 
-        <AdminCard className="h-full flex flex-col">
+        <AdminCard className="h-full flex flex-col overflow-hidden">
 
             <div className="flex justify-between items-center mb-6">
 
@@ -50,16 +50,16 @@ useEffect(() => {
 
             </div>
 
-<div className="flex-1 overflow-y-auto space-y-6 pr-2">
+<div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6">
 
 <div
     className="
         bg-white
         rounded-2xl
         border
-        p-6
+        p-5
         flex
-        gap-5
+        gap-4
         items-center
     "
 >
@@ -68,8 +68,9 @@ useEffect(() => {
             src={item.image}
             alt={item.product_name}
             className="
-    w-32
-    h-32
+    w-28
+    h-28
+    flex-shrink-0
     rounded-3xl
     object-cover
     shadow-md
@@ -78,7 +79,14 @@ useEffect(() => {
 
         <div>
 
-<h3 className="text-2xl font-bold leading-tight">
+<h3
+    className="
+        text-2xl
+        font-bold
+        leading-tight
+        break-words
+    "
+>
     {item.product_name}
 </h3>
 
