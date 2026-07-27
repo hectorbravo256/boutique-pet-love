@@ -29,7 +29,7 @@ export default function InventoryMasterTable() {
 
     return (
 
-        <AdminCard>
+        <AdminCard className="h-[calc(100vh-140px)] flex flex-col">
 
             <h2 className="text-3xl font-black mb-6">
 
@@ -88,13 +88,13 @@ export default function InventoryMasterTable() {
 
        
         
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 h-[78vh]">
+        <div className="grid flex-1 grid-cols-1 xl:grid-cols-12 gap-8 min-h-0">
 
     {/* Tabla */}
 
-    <div className="xl:col-span-8 h-full">
+    <div className="xl:col-span-8 h-full min-h-0">
 
-                    <div className="overflow-auto h-full rounded-2xl border">
+                    <div className="h-full overflow-auto rounded-2xl border">
 
                 <table className="w-full">
 
@@ -268,7 +268,7 @@ export default function InventoryMasterTable() {
 
     {/* Panel */}
 
-    <div className="xl:col-span-4 h-full">
+    <div className="xl:col-span-4 h-full min-h-0">
         
         {selectedItem ? (
 
