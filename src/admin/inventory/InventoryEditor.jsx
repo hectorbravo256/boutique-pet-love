@@ -27,7 +27,7 @@ useEffect(() => {
 
             <div className="flex justify-between items-center mb-6">
 
-                <h2 className="text-2xl font-black">
+                <h2 className="text-xl font-black">
     Detalle de Variante
 </h2>
 
@@ -36,10 +36,15 @@ useEffect(() => {
                     onClick={onClose}
 
                     className="
-                        px-4
-                        py-2
-                        rounded-xl
-                        bg-slate-100
+                        w-11
+h-11
+rounded-xl
+flex
+items-center
+justify-center
+bg-slate-100
+hover:bg-slate-200
+transition
                     "
 
                 >
@@ -52,58 +57,61 @@ useEffect(() => {
 
 <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6">
 
+
 <div
     className="
         bg-white
         rounded-2xl
         border
-        p-5
+        p-6
         flex
-        gap-4
+        flex-col
         items-center
+        text-center
     "
 >
 
-        <img
-            src={item.image}
-            alt={item.product_name}
-            className="
+    <img
+        src={item.image}
+        alt={item.product_name}
+        className="
     w-28
     h-28
-    flex-shrink-0
-    rounded-3xl
+    rounded-2xl
     object-cover
-    shadow-md
+    shadow-lg
 "
-        />
+    />
 
-        <div>
+    <div className="mt-5 w-full">
 
-<h3
-    className="
-        text-2xl
-        font-bold
-        leading-tight
-        break-words
-    "
->
-    {item.product_name}
-</h3>
+        <h3
+            className="
+                text-2xl
+                font-bold
+                leading-tight
+            "
+        >
+            {item.product_name}
+        </h3>
 
-<p className="text-slate-500 mt-1">
-    {item.category}
-</p>
-
-        </div>
+        <p className="mt-2 text-slate-500">
+            {item.category.replace(" - ", " · ")}
+        </p>
 
     </div>
 
-    <div className="
-    bg-slate-50
-    rounded-2xl
-    p-5
-    space-y-5
-">
+</div>
+
+<div
+    className="
+        bg-slate-50
+        rounded-2xl
+        p-6
+        space-y-8
+        w-full
+    "
+>
 
     <h4 className="
     text-xs
@@ -116,13 +124,17 @@ useEffect(() => {
 </h4>
     
 
-        <label className="text-xs text-slate-500">
-            Talla
-        </label>
+<div className="flex justify-between items-center">
 
-        <div className="text-lg font-bold mt-1">
-            {item.size}
-        </div>
+    <span className="text-sm text-slate-500">
+        Talla
+    </span>
+
+    <span className="font-bold text-lg">
+        {item.size}
+    </span>
+
+</div>
 
 
     <h4 className="
@@ -135,10 +147,11 @@ useEffect(() => {
     Edición
 </h4>
 
+<div className="space-y-2">
 
-        <label className="text-xs text-slate-500">
-            Stock
-        </label>
+    <label className="text-sm text-slate-500">
+        Stock
+    </label>
 
         <input
             type="number"
@@ -162,6 +175,7 @@ useEffect(() => {
 "
         />
 
+    </div>
 
         <label className="text-xs text-slate-500">
             Precio
@@ -192,9 +206,11 @@ useEffect(() => {
 
     <div>
 
-        <label className="text-xs text-slate-500">
-            Estado
-        </label>
+        <div className="flex justify-between items-center">
+
+    <span className="text-sm text-slate-500">
+        Estado
+    </span>
 
         <div className="mt-2">
 
@@ -220,6 +236,8 @@ useEffect(() => {
             >
                 {item.status}
             </span>
+
+            </div>
 </div>
 
     </div>
@@ -248,12 +266,15 @@ useEffect(() => {
         <button
             onClick={onClose}
             className="
-                px-5
-                rounded-xl
-                border
-                hover:bg-slate-100
-                transition
-            "
+    h-12
+    px-6
+    rounded-xl
+    border
+    border-slate-300
+    bg-white
+    hover:bg-slate-100
+    transition
+"
         >
             Cancelar
         </button>
