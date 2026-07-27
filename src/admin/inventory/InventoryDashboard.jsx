@@ -22,8 +22,6 @@ export default function InventoryDashboard() {
                 dashboard={dashboard}
             />
 
-            <InventoryRecentMovements />
-
         </div>
 
     );
