@@ -325,6 +325,8 @@ export default function InventoryMasterTable() {
 
 </div>
 
+            </AdminCard>
+
     );
 
 }
