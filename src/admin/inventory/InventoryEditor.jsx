@@ -213,7 +213,6 @@ useEffect(() => {
                 {item.status}
             </span>
 
-        </div>
 
     </div>
 
