@@ -4,7 +4,7 @@ import Button from "../../shared/ui/Button";
 import PageHeader from "../../shared/ui/PageHeader";
 
 import PurchaseDashboard from "./PurchaseDashboard";
-import PurchaseForm from "./PurchaseForm";
+import PurchaseForm from "../PurchaseForm";
 import PurchaseHistory from "./PurchaseHistory";
 
 export default function PurchasePage() {
