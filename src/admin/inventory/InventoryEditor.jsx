@@ -9,8 +9,6 @@ export default function InventoryEditor({
 
 }) {
 
-    if (!item) return null;
-
     const [stock, setStock] = useState(item.stock);
     const [price, setPrice] = useState(item.sale_price);
 
@@ -18,6 +16,10 @@ useEffect(() => {
     setStock(item.stock);
     setPrice(item.sale_price);
 }, [item]);
+
+    
+    if (!item) return null;
+
 
     return (
 
@@ -50,29 +52,61 @@ useEffect(() => {
 
 <div className="space-y-6">
 
-    <div className="flex gap-4 items-center">
+<div
+    className="
+        bg-white
+        rounded-2xl
+        border
+        p-6
+        flex
+        gap-5
+        items-center
+    "
+>
 
         <img
             src={item.image}
             alt={item.product_name}
-            className="w-24 h-24 rounded-2xl object-cover"
+            className="
+    w-32
+    h-32
+    rounded-3xl
+    object-cover
+    shadow-md
+"
         />
 
         <div>
 
-            <h3 className="text-xl font-bold">
-                {item.product_name}
-            </h3>
+<h3 className="text-2xl font-bold leading-tight">
+    {item.product_name}
+</h3>
 
-            <p className="text-slate-500">
-                {item.category}
-            </p>
+<p className="text-slate-500 mt-1">
+    {item.category}
+</p>
 
         </div>
 
     </div>
 
-    <div className="bg-slate-50 rounded-xl p-4">
+    <div className="
+    bg-slate-50
+    rounded-2xl
+    p-5
+    space-y-5
+">
+
+    <h4 className="
+    text-xs
+    uppercase
+    tracking-widest
+    text-slate-400
+    font-bold
+">
+    Información
+</h4>
+    
 
         <label className="text-xs text-slate-500">
             Talla
@@ -82,9 +116,17 @@ useEffect(() => {
             {item.size}
         </div>
 
-    </div>
 
-    <div className="bg-slate-50 rounded-xl p-4">
+    <h4 className="
+    text-xs
+    uppercase
+    tracking-widest
+    text-slate-400
+    font-bold
+">
+    Edición
+</h4>
+
 
         <label className="text-xs text-slate-500">
             Stock
@@ -95,17 +137,23 @@ useEffect(() => {
             value={stock}
             onChange={(e) => setStock(e.target.value)}
             className="
-                mt-2
-                w-full
-                border
-                rounded-xl
-                p-3
-            "
+    mt-2
+    w-full
+    rounded-xl
+    border
+    border-slate-300
+    px-4
+    py-3
+    text-lg
+    font-semibold
+    focus:border-pink-500
+    focus:ring-2
+    focus:ring-pink-200
+    outline-none
+    transition
+"
         />
 
-    </div>
-
-    <div className="bg-slate-50 rounded-xl p-4">
 
         <label className="text-xs text-slate-500">
             Precio
@@ -116,15 +164,23 @@ useEffect(() => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             className="
-                mt-2
-                w-full
-                border
-                rounded-xl
-                p-3
-            "
+    mt-2
+    w-full
+    rounded-xl
+    border
+    border-slate-300
+    px-4
+    py-3
+    text-lg
+    font-semibold
+    focus:border-pink-500
+    focus:ring-2
+    focus:ring-pink-200
+    outline-none
+    transition
+"
         />
 
-    </div>
 
     <div>
 
@@ -165,15 +221,19 @@ useEffect(() => {
 
         <button
             className="
-                flex-1
-                bg-pink-600
-                hover:bg-pink-700
-                text-white
-                rounded-xl
-                py-3
-                font-bold
-                transition
-            "
+    flex-1
+    bg-gradient-to-r
+    from-pink-500
+    to-fuchsia-600
+    text-white
+    rounded-xl
+    py-3
+    font-bold
+    shadow-lg
+    hover:shadow-xl
+    hover:scale-[1.02]
+    transition-all
+"
         >
             Guardar cambios
         </button>
