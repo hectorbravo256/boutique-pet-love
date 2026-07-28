@@ -40,6 +40,8 @@ const {
 
 } = usePurchase();
 
+const [openProductModal, setOpenProductModal] = useState(false);
+
 return (
 
     <PurchaseLayout
@@ -75,20 +77,39 @@ return (
 
         selector={
 
-            <PurchaseProductSelector
+<AdminCard>
 
-                products={products}
+    <div className="flex items-center justify-between">
 
-                variants={variants}
+        <div>
 
-                detail={detail}
-                setDetail={setDetail}
+            <h2 className="text-2xl font-black">
 
-                loadVariants={loadVariants}
+                Productos
 
-                addProduct={addProduct}
+            </h2>
 
-            />
+            <p className="text-slate-500">
+
+                Agrega uno o más productos.
+
+            </p>
+
+        </div>
+
+        <Button
+
+            onClick={() => setOpenProductModal(true)}
+
+        >
+
+            + Agregar producto
+
+        </Button>
+
+    </div>
+
+</AdminCard>
 
         }
 
@@ -100,9 +121,35 @@ return (
 
     setDetails={setDetails}
 
-/>
+/>,
+            
+    <PurchaseProductModal
 
+    open={openProductModal}
+
+    onClose={() => setOpenProductModal(false)}
+
+    products={products}
+
+    variants={variants}
+
+    detail={detail}
+
+    setDetail={setDetail}
+
+    loadVariants={loadVariants}
+
+    addProduct={() => {
+
+        addProduct();
+
+        setOpenProductModal(false);
+
+    }}
+
+/>
         }
+        
 
 footer={
 
