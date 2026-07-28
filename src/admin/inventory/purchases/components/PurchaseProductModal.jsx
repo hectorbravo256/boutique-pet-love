@@ -1,6 +1,6 @@
 import Modal from "../../../shared/ui/Modal";
 
-import PurchaseProductSelector from "./PurchaseProductSelector";
+import PurchaseProductSelector from "../../components/PurchaseProductSelector";
 
 export default function PurchaseProductModal({
 
