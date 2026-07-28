@@ -40,6 +40,9 @@ const {
 
     addProduct,
 
+    variantSummary,
+    loadVariantSummary,
+
     savePurchase
 
 } = usePurchase();
