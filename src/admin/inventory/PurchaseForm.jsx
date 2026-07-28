@@ -1,3 +1,6 @@
+import { useState } from "react";
+import AdminCard from "../../components/AdminCard";
+import Button from "../../shared/ui/Button";
 import usePurchase from "./hooks/usePurchase";
 
 import PurchaseLayout from "./layout/PurchaseLayout";
@@ -7,6 +10,7 @@ import PurchaseProductSelector from "./components/PurchaseProductSelector";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
 import PurchaseSummary from "./components/PurchaseSummary";
 import PurchaseFooter from "./components/PurchaseFooter";
+import PurchaseProductModal from "./purchases/components/PurchaseProductModal";
 
 export default function PurchaseForm() {
 
@@ -114,6 +118,7 @@ return (
         }
 
         table={
+            <>
 
             <PurchaseItemsTable
 
@@ -121,7 +126,7 @@ return (
 
     setDetails={setDetails}
 
-/>,
+/>
             
     <PurchaseProductModal
 
@@ -147,7 +152,8 @@ return (
 
     }}
 
-/>
+/>    
+            </>
         }
         
 
