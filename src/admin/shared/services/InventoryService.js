@@ -125,6 +125,20 @@ const InventoryService = {
 
 },
 
+  async getVariantSummary(variantId) {
+
+    const { data, error } = await ApiClient.db
+        .from("vw_variant_summary")
+        .select("*")
+        .eq("variant_id", variantId)
+        .single();
+
+    if (error) throw error;
+
+    return data;
+
+},
+
   async getInventoryMaster() {
 
     const { data, error } = await ApiClient.db
