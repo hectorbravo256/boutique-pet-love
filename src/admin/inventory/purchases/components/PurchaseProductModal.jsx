@@ -1,4 +1,4 @@
-import Modal from "../../shared/ui/Modal";
+import Modal from "../../../shared/ui/Modal";
 
 import PurchaseProductSelector from "./PurchaseProductSelector";
 
