@@ -112,6 +112,19 @@ const InventoryService = {
 
 },
 
+  async getVariantInfo(variantId) {
+
+    const { data, error } = await ApiClient.db
+        .rpc("inventory_variant_info", {
+            p_variant_id: variantId
+        });
+
+    if (error) throw error;
+
+    return data?.[0] ?? null;
+
+},
+
   async getInventoryMaster() {
 
     const { data, error } = await ApiClient.db
