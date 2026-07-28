@@ -12,6 +12,7 @@ export default function usePurchase() {
 
     const [supplier, setSupplier] = useState("");
     const [suppliers, setSuppliers] = useState([]);
+    const [variantSummary, setVariantSummary] = useState(null);
 
     const [invoiceNumber, setInvoiceNumber] = useState("");
 
@@ -251,6 +252,25 @@ async function loadSuppliers() {
 
 }
 
+async function loadVariantSummary(variantId) {
+
+    if (!variantId) {
+
+        setVariantSummary(null);
+
+        return;
+
+    }
+
+    const data =
+        await InventoryService.getVariantSummary(
+            variantId
+        );
+
+    setVariantSummary(data);
+
+}
+
     //----------------------------------------
 
     return {
@@ -278,6 +298,10 @@ async function loadSuppliers() {
         loadVariants,
 
         addProduct,
+
+        variantSummary,
+
+        loadVariantSummary,
 
         savePurchase
 
