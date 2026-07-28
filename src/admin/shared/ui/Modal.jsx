@@ -154,11 +154,23 @@ export default function Modal({
 
                 </div>
 
-                <div className="p-8">
+<div
 
-                    {children}
+    className="
 
-                </div>
+        p-8
+
+        max-h-[75vh]
+
+        overflow-y-auto
+
+    "
+
+>
+
+    {children}
+
+</div>
 
             </div>
 
