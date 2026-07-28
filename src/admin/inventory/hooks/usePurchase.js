@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import PurchaseService from "../services/purchaseService";
 import InventoryService from "@/admin/shared/services/InventoryService";
+import { getActiveSuppliers } from "../suppliers/supplierService";
 
 export default function usePurchase() {
 
@@ -10,6 +11,7 @@ export default function usePurchase() {
     //----------------------------------------
 
     const [supplier, setSupplier] = useState("");
+    const [suppliers, setSuppliers] = useState([]);
 
     const [invoiceNumber, setInvoiceNumber] = useState("");
 
@@ -47,11 +49,13 @@ export default function usePurchase() {
 
     //----------------------------------------
 
-    useEffect(() => {
+useEffect(() => {
 
-        loadProducts();
+    loadProducts();
 
-    }, []);
+    loadSuppliers();
+
+}, []);
 
     //----------------------------------------
     // Cargar productos
@@ -239,11 +243,20 @@ async function savePurchase() {
 
 }
 
+async function loadSuppliers() {
+
+    const data = await getActiveSuppliers();
+
+    setSuppliers(data);
+
+}
+
     //----------------------------------------
 
     return {
 
         supplier,
+        suppliers,
         setSupplier,
 
         invoiceNumber,
