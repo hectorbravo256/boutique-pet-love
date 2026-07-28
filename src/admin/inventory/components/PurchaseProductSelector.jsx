@@ -89,23 +89,25 @@ export default function PurchaseProductSelector({
 
             <select
 
-                value={detail.variant_id}
+    value={detail.variant_id}
 
-                onChange={(e)=>
+    onChange={async (e) => {
 
-                    setDetail({
+        const value = e.target.value;
 
-                        ...detail,
+        setDetail({
 
-                        variant_id:e.target.value
+            ...detail,
 
-                    })
+            variant_id: value
 
-                }
+        });
 
-                className="border rounded-xl p-3"
+        await loadVariantSummary(value);
 
-            >
+    }}
+
+>
 
                 <option value="">
 
