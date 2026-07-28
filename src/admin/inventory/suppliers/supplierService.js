@@ -54,3 +54,16 @@ export async function deleteSupplier(id) {
     if (error) throw error;
 
 }
+
+export async function getActiveSuppliers() {
+
+    const { data, error } = await supabase
+        .from("suppliers")
+        .select("id, name")
+        .eq("active", true)
+        .order("name");
+
+    if (error) throw error;
+
+    return data;
+}
