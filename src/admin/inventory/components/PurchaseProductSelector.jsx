@@ -10,9 +10,13 @@ export default function PurchaseProductSelector({
 
     loadVariants,
 
-    addProduct
+    addProduct,
 
-}) {
+    variantSummary,
+    loadVariantSummary
+
+}) 
+{
     
 
     //------------------------------------
@@ -108,15 +112,7 @@ export default function PurchaseProductSelector({
     }}
 
 >
-                {variantSummary && (
 
-    <pre className="mt-4 text-xs bg-slate-100 p-4 rounded-xl">
-
-        {JSON.stringify(variantSummary, null, 2)}
-
-    </pre>
-
-)}
 
                 <option value="">
 
@@ -145,6 +141,16 @@ export default function PurchaseProductSelector({
                 }
 
             </select>
+
+                            {variantSummary && (
+
+    <pre className="mt-4 text-xs bg-slate-100 p-4 rounded-xl">
+
+        {JSON.stringify(variantSummary, null, 2)}
+
+    </pre>
+
+)}
 
             {/* Cantidad */}
 
