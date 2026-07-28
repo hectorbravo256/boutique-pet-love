@@ -5,6 +5,8 @@ export default function PurchaseHeader({
     supplier,
     setSupplier,
 
+    suppliers,
+
     invoiceNumber,
     setInvoiceNumber,
 
@@ -33,19 +35,43 @@ export default function PurchaseHeader({
 
                     </label>
 
-                    <input
+<select
 
-                        value={supplier}
+    value={supplier}
 
-                        onChange={(e)=>
-                            setSupplier(e.target.value)
-                        }
+    onChange={(e)=>setSupplier(e.target.value)}
 
-                        placeholder="Ej: Mascotas SPA"
+    className="w-full mt-2 border rounded-2xl p-3"
 
-                        className="w-full mt-2 border rounded-2xl p-3"
+>
 
-                    />
+    <option value="">
+
+        Seleccione un proveedor
+
+    </option>
+
+    {
+
+        suppliers.map(item => (
+
+            <option
+
+                key={item.id}
+
+                value={item.name}
+
+            >
+
+                {item.name}
+
+            </option>
+
+        ))
+
+    }
+
+</select>
 
                 </div>
 
