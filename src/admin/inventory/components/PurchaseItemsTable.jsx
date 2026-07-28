@@ -1,4 +1,5 @@
 import AdminCard from "../../components/AdminCard";
+import DataTable from "../../shared/ui/DataTable";
 
 export default function PurchaseItemsTable({
 
@@ -45,213 +46,160 @@ function removeItem(index) {
     setDetails(newDetails);
 
 }
+
+const columns = [
+
+    {
+        key: "image",
+        label: "",
+
+        render: row => (
+
+            <img
+                src={row.image}
+                alt={row.product_name}
+                className="w-14 h-14 rounded-xl object-cover border"
+            />
+
+        )
+
+    },
+
+    {
+        key: "product_name",
+        label: "Producto"
+    },
+
+    {
+        key: "size",
+        label: "Talla"
+    },
+
+    {
+        key: "quantity",
+        label: "Cantidad",
+
+        render: (row) => {
+
+            const index = details.findIndex(
+                d => d.variant_id === row.variant_id
+            );
+
+            return (
+
+                <input
+                    type="number"
+                    min="1"
+                    value={row.quantity}
+                    onChange={(e) =>
+                        updateQuantity(index, e.target.value)
+                    }
+                    className="w-20 rounded-xl border p-2 text-center"
+                />
+
+            );
+
+        }
+
+    },
+
+    {
+        key: "unit_cost",
+        label: "Costo",
+
+        render: (row) => {
+
+            const index = details.findIndex(
+                d => d.variant_id === row.variant_id
+            );
+
+            return (
+
+                <input
+                    type="number"
+                    value={row.unit_cost}
+                    onChange={(e) =>
+                        updateCost(index, e.target.value)
+                    }
+                    className="w-28 rounded-xl border p-2 text-right"
+                />
+
+            );
+
+        }
+
+    },
+
+    {
+        key: "subtotal",
+        label: "Subtotal",
+
+        render: row => (
+
+            <strong>
+
+                {new Intl.NumberFormat(
+                    "es-CL",
+                    {
+                        style: "currency",
+                        currency: "CLP"
+                    }
+                ).format(row.subtotal)}
+
+            </strong>
+
+        )
+
+    }
+
+];
     
-    return (
+return (
 
-        <AdminCard>
+    <AdminCard>
 
-            <h2 className="text-2xl font-black mb-6">
+        <h2 className="text-2xl font-black mb-6">
 
-                Productos de la compra
+            Productos de la compra
 
-            </h2>
+        </h2>
 
-            {
-                details.length === 0 && (
+        <DataTable
 
-                    <div className="
-                        text-center
-                        py-16
-                        text-slate-400
-                    ">
+            columns={columns}
 
-                        Aún no hay productos agregados.
+            data={details}
 
-                    </div>
+            emptyMessage="Aún no hay productos agregados."
 
-                )
-            }
+            actions={(row) => {
 
-            {
-                details.length > 0 && (
+                const index = details.findIndex(
+                    d => d.variant_id === row.variant_id
+                );
 
-                    <table className="w-full">
+                return (
 
-<thead>
+                    <button
 
-<tr className="border-b">
+                        onClick={() => removeItem(index)}
 
-    <th className="text-left py-3">
+                        className="text-red-500 hover:text-red-700"
 
-        Producto
+                    >
 
-    </th>
+                        🗑️
 
-    <th className="text-center">
+                    </button>
 
-        Talla
+                );
 
-    </th>
+            }}
 
-    <th className="text-center">
+        />
 
-        Cantidad
+    </AdminCard>
 
-    </th>
-
-    <th className="text-right">
-
-        Costo
-
-    </th>
-
-    <th className="text-right">
-
-        Subtotal
-
-    </th>
-
-    <th>
-
-        Acción
-
-    </th>
-
-</tr>
-
-</thead>
-                        <tbody>
-
-                            {details.map((item, index) => (
-
-                                <tr
-                                    key={item.variant_id}
-                                    className="border-b"
-                                >
-
-                                    <td className="py-4">
-
-                                        {item.product_name}
-
-                                    </td>
-
-                                    <td className="text-center">
-
-                                        {item.size}
-
-                                    </td>
-
-<td className="text-center">
-
-<input
-
-type="number"
-
-min="1"
-
-value={item.quantity}
-
-onChange={(e)=>
-
-updateQuantity(
-
-index,
-
-e.target.value
-
-)
-
-}
-
-className="
-w-20
-text-center
-border
-rounded-xl
-p-2
-"
-
-/>
-
-</td>
-
-<td className="text-right">
-
-    <input
-
-        type="number"
-
-        value={item.unit_cost}
-
-        onChange={(e)=>
-
-            updateCost(
-
-                index,
-
-                e.target.value
-
-            )
-
-        }
-
-        className="
-            w-28
-            text-right
-            border
-            rounded-xl
-            p-2
-        "
-
-    />
-
-</td>
-
-                                    <td className="text-right font-bold">
-
-                                        $
-{item.subtotal.toLocaleString("es-CL")}
-
-                                    </td>
-
-                                    <td className="text-center">
-
-    <button
-
-        onClick={()=>
-
-            removeItem(index)
-
-        }
-
-        className="
-            text-red-500
-            hover:text-red-700
-            text-xl
-        "
-
-    >
-
-        🗑️
-
-    </button>
-
-</td>
-
-                                </tr>
-
-                            ))}
-
-                        </tbody>
-
-                    </table>
-
-                )
-
-            }
-
-        </AdminCard>
-
-    );
+);
 
 }
