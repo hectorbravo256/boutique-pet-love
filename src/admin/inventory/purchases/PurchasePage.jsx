@@ -1,8 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
-import Modal from "../../shared/ui/Modal";
-import Button from "../../shared/ui/Button";
 
 import PageHeader from "../../shared/ui/PageHeader";
 
@@ -12,7 +9,6 @@ import PurchaseHistory from "./PurchaseHistory";
 
 export default function PurchasePage() {
 
-    const [testModal, setTestModal] = useState(false);
 
     return (
 
@@ -37,12 +33,6 @@ export default function PurchasePage() {
 
             <div className="mt-6 mb-6">
 
-    <Button onClick={() => setTestModal(true)}>
-
-        🧪 Probar Modal
-
-    </Button>
-
 </div>
 
             <PurchaseDashboard />
@@ -58,40 +48,6 @@ export default function PurchasePage() {
                 <PurchaseHistory />
 
             </div>
-
-            <Modal
-
-    open={testModal}
-
-    onClose={() => setTestModal(false)}
-
-    title="Modal de prueba"
-
->
-
-    <div className="space-y-4">
-
-        <p>
-
-            ¡Felicitaciones!
-
-            Tu componente Modal está funcionando correctamente.
-
-        </p>
-
-        <Button
-
-            onClick={() => setTestModal(false)}
-
-        >
-
-            Cerrar
-
-        </Button>
-
-    </div>
-
-</Modal>
 
         </div>
 
