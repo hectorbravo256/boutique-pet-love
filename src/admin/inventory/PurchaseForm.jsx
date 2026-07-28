@@ -151,6 +151,8 @@ return (
         setOpenProductModal(false);
 
     }}
+            variantSummary={variantSummary}
+    loadVariantSummary={loadVariantSummary}
 
 />    
             </>
