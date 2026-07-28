@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AdminCard from "../components/AdminCard";
-import Button from "../../shared/ui/Button";
+import Button from "../shared/ui/Button";
 import usePurchase from "./hooks/usePurchase";
 
 import PurchaseLayout from "./layout/PurchaseLayout";
