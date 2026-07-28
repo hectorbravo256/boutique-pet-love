@@ -3,13 +3,6 @@ import AdminCard from "../components/AdminCard";
 
 const modules = [
     {
-        title: "Compras",
-        description: "Registrar compras y recepción de mercadería.",
-        icon: "📥",
-        to: "/admin/inventario/compras",
-        color: "from-blue-500 to-cyan-500",
-    },
-    {
         title: "Inventario Maestro",
         description: "Administrar stock, precios y variantes.",
         icon: "📦",
@@ -24,11 +17,11 @@ const modules = [
         color: "from-sky-500 to-cyan-500",
     },
     {
-        title: "Ventas",
-        description: "Registrar ventas presenciales y online.",
-        icon: "🛒",
-        to: "/admin/inventario/ventas",
-        color: "from-green-500 to-emerald-500",
+        title: "Compras",
+        description: "Registrar compras y recepción de mercadería.",
+        icon: "📥",
+        to: "/admin/inventario/compras",
+        color: "from-blue-500 to-cyan-500",
     },
     {
         title: "Movimientos",
@@ -36,6 +29,13 @@ const modules = [
         icon: "🔄",
         to: "/admin/inventario/movimientos",
         color: "from-orange-500 to-amber-500",
+    },
+    {
+        title: "Ventas",
+        description: "Registrar ventas presenciales y online.",
+        icon: "🛒",
+        to: "/admin/inventario/ventas",
+        color: "from-green-500 to-emerald-500",
     },
     {
         title: "Reportes",
