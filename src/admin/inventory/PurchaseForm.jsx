@@ -13,6 +13,7 @@ export default function PurchaseForm() {
 const {
 
     supplier,
+    suppliers,
     setSupplier,
 
     invoiceNumber,
@@ -49,6 +50,8 @@ return (
 
                 supplier={supplier}
                 setSupplier={setSupplier}
+
+                suppliers={suppliers}
 
                 invoiceNumber={invoiceNumber}
                 setInvoiceNumber={setInvoiceNumber}
