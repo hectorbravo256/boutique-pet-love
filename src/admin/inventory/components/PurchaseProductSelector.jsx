@@ -142,15 +142,143 @@ export default function PurchaseProductSelector({
 
             </select>
 
-                            {variantSummary && (
+{
+variantSummary && (
 
-    <pre className="mt-4 text-xs bg-slate-100 p-4 rounded-xl">
+<div className="
 
-        {JSON.stringify(variantSummary, null, 2)}
+mt-5
 
-    </pre>
+rounded-2xl
 
-)}
+border
+
+bg-slate-50
+
+p-5
+
+">
+
+<h3 className="
+
+font-bold
+
+text-slate-700
+
+mb-4
+
+">
+
+Información del Inventario
+
+</h3>
+
+<div className="grid grid-cols-2 gap-4">
+
+<div>
+
+<p className="text-xs text-slate-500">
+
+Stock actual
+
+</p>
+
+<p className="text-xl font-bold">
+
+{variantSummary.stock}
+
+</p>
+
+</div>
+
+<div>
+
+<p className="text-xs text-slate-500">
+
+Último costo
+
+</p>
+
+<p className="text-xl font-bold">
+
+{
+
+variantSummary.last_cost
+
+? "$" +
+
+Number(
+
+variantSummary.last_cost
+
+).toLocaleString("es-CL")
+
+: "-"
+
+}
+
+</p>
+
+</div>
+
+<div>
+
+<p className="text-xs text-slate-500">
+
+Costo promedio
+
+</p>
+
+<p className="text-xl font-bold">
+
+{
+
+variantSummary.average_cost
+
+? "$"+
+
+Number(
+
+variantSummary.average_cost
+
+).toLocaleString("es-CL")
+
+: "-"
+
+}
+
+</p>
+
+</div>
+
+<div>
+
+<p className="text-xs text-slate-500">
+
+Último proveedor
+
+</p>
+
+<p className="font-semibold">
+
+{
+
+variantSummary.last_supplier ??
+
+"Sin historial"
+
+}
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+)
+}
 
             {/* Cantidad */}
 
