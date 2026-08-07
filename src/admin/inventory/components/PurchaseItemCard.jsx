@@ -63,7 +63,7 @@ export default function PurchaseItemCard({
 
                 {/* Producto */}
 
-                <div className="col-span-3">
+                <div className="flex-1 min-w-[220px]">
 
                     <h3 className="font-bold leading-tight">
 
@@ -104,31 +104,31 @@ export default function PurchaseItemCard({
 
                 {/* Cantidad */}
 
-                <div className="col-span-3">
+<div className="w-[160px]">
 
-                    <QuantityInput
+    <QuantityInput
 
-                        value={item.quantity}
+        value={item.quantity}
 
-                        onChange={(value)=>
+        onChange={(value)=>
 
-                            updateQuantity(
+            updateQuantity(
 
-                                index,
+                index,
 
-                                value
+                value
 
-                            )
+            )
 
-                        }
+        }
 
-                    />
+    />
 
-                </div>
+</div>
 
                 {/* Costo */}
 
-                <div className="col-span-2">
+                <div className="w-[170px]">
 
                     <CurrencyInput
 
@@ -152,7 +152,7 @@ export default function PurchaseItemCard({
 
                 {/* Subtotal */}
 
-                <div className="col-span-2">
+                <div className="w-[150px]">
 
                     <div
                         className="
@@ -176,7 +176,7 @@ export default function PurchaseItemCard({
 
                 {/* Eliminar */}
 
-                <div className="col-span-1 flex justify-end">
+                <div className="flex justify-center items-center w-12">
 
                     <button
 
