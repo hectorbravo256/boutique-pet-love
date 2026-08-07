@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import ProductVariantSelector from "./ProductVariantSelector";
 
 export default function PurchaseProductSelector({
 
@@ -99,27 +100,31 @@ export default function PurchaseProductSelector({
 
             {/* Variante */}
 
-            <select
+<ProductVariantSelector
 
-    value={detail.variant_id}
+    variants={variants}
 
-    onChange={async (e) => {
+    selected={detail.variant_id}
 
-        const value = e.target.value;
+    onSelect={async (variant)=>{
 
         setDetail({
 
             ...detail,
 
-            variant_id: value
+            variant_id: variant.id
 
         });
 
-        await loadVariantSummary(value);
+        await loadVariantSummary(
+
+            variant.id
+
+        );
 
     }}
 
->
+/>
 
 
                 <option value="">
