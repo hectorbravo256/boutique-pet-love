@@ -7,7 +7,6 @@ import PurchaseLayout from "./layout/PurchaseLayout";
 
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
-import PurchaseSummary from "./components/PurchaseSummary";
 import PurchaseFooter from "./components/PurchaseFooter";
 import PurchaseProductModal from "./purchases/components/PurchaseProductModal";
 
@@ -71,15 +70,7 @@ return (
 
         }
 
-        summary={
-
-            <PurchaseSummary
-
-                details={details}
-
-            />
-
-        }
+summary={<></>}
 
         selector={
 
