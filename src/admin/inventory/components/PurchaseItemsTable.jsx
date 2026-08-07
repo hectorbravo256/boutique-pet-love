@@ -1,5 +1,5 @@
 import AdminCard from "../../components/AdminCard";
-import DataTable from "../../shared/ui/DataTable";
+import PurchaseItemCard from "./PurchaseItemCard";
 
 export default function PurchaseItemsTable({
 
@@ -9,197 +9,173 @@ export default function PurchaseItemsTable({
 
 }) {
 
-    function updateQuantity(index, value) {
+    //---------------------------------------
+    // Actualizar cantidad
+    //---------------------------------------
 
-    const newDetails = [...details];
+    function updateQuantity(index, quantity) {
 
-    newDetails[index].quantity = Number(value);
+        const newDetails = [...details];
 
-    newDetails[index].subtotal =
-        newDetails[index].quantity *
-        newDetails[index].unit_cost;
+        newDetails[index].quantity = quantity;
 
-    setDetails(newDetails);
+        newDetails[index].subtotal =
+            quantity *
+            newDetails[index].unit_cost;
 
-}
-
-function updateCost(index, value) {
-
-    const newDetails = [...details];
-
-    newDetails[index].unit_cost = Number(value);
-
-    newDetails[index].subtotal =
-        newDetails[index].quantity *
-        newDetails[index].unit_cost;
-
-    setDetails(newDetails);
-
-}
-
-function removeItem(index) {
-
-    const newDetails = [...details];
-
-    newDetails.splice(index, 1);
-
-    setDetails(newDetails);
-
-}
-
-const columns = [
-
-    {
-        key: "image",
-        label: "",
-
-        render: row => (
-
-            <img
-                src={row.image}
-                alt={row.product_name}
-                className="w-14 h-14 rounded-xl object-cover border"
-            />
-
-        )
-
-    },
-
-    {
-        key: "product_name",
-        label: "Producto"
-    },
-
-    {
-        key: "size",
-        label: "Talla"
-    },
-
-    {
-        key: "quantity",
-        label: "Cantidad",
-
-        render: (row) => {
-
-            const index = details.findIndex(
-                d => d.variant_id === row.variant_id
-            );
-
-            return (
-
-                <input
-                    type="number"
-                    min="1"
-                    value={row.quantity}
-                    onChange={(e) =>
-                        updateQuantity(index, e.target.value)
-                    }
-                    className="w-20 rounded-xl border p-2 text-center"
-                />
-
-            );
-
-        }
-
-    },
-
-    {
-        key: "unit_cost",
-        label: "Costo",
-
-        render: (row) => {
-
-            const index = details.findIndex(
-                d => d.variant_id === row.variant_id
-            );
-
-            return (
-
-                <input
-                    type="number"
-                    value={row.unit_cost}
-                    onChange={(e) =>
-                        updateCost(index, e.target.value)
-                    }
-                    className="w-28 rounded-xl border p-2 text-right"
-                />
-
-            );
-
-        }
-
-    },
-
-    {
-        key: "subtotal",
-        label: "Subtotal",
-
-        render: row => (
-
-            <strong>
-
-                {new Intl.NumberFormat(
-                    "es-CL",
-                    {
-                        style: "currency",
-                        currency: "CLP"
-                    }
-                ).format(row.subtotal)}
-
-            </strong>
-
-        )
+        setDetails(newDetails);
 
     }
 
-];
-    
-return (
+    //---------------------------------------
+    // Actualizar costo
+    //---------------------------------------
 
-    <AdminCard>
+    function updateCost(index, cost) {
 
-        <h2 className="text-2xl font-black mb-6">
+        const newDetails = [...details];
 
-            Productos de la compra
+        newDetails[index].unit_cost = cost;
 
-        </h2>
+        newDetails[index].subtotal =
+            cost *
+            newDetails[index].quantity;
 
-        <DataTable
+        setDetails(newDetails);
 
-            columns={columns}
+    }
 
-            data={details}
+    //---------------------------------------
+    // Eliminar producto
+    //---------------------------------------
 
-            emptyMessage="Aún no hay productos agregados."
+    function removeItem(index) {
 
-            actions={(row) => {
+        const newDetails = [...details];
 
-                const index = details.findIndex(
-                    d => d.variant_id === row.variant_id
-                );
+        newDetails.splice(index, 1);
 
-                return (
+        setDetails(newDetails);
 
-                    <button
+    }
 
-                        onClick={() => removeItem(index)}
+    //---------------------------------------
 
-                        className="text-red-500 hover:text-red-700"
+    return (
 
+        <AdminCard>
+
+            <div className="flex items-center justify-between mb-8">
+
+                <div>
+
+                    <h2 className="text-3xl font-black">
+
+                        Productos de la compra
+
+                    </h2>
+
+                    <p className="text-slate-500 mt-1">
+
+                        Revisa los productos antes de guardar la compra.
+
+                    </p>
+
+                </div>
+
+                <div
+                    className="
+                        rounded-2xl
+                        bg-pink-50
+                        px-5
+                        py-3
+                        text-center
+                    "
+                >
+
+                    <div className="text-sm text-slate-500">
+
+                        Productos
+
+                    </div>
+
+                    <div className="text-2xl font-black text-pink-600">
+
+                        {details.length}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {
+
+                details.length === 0 && (
+
+                    <div
+                        className="
+                            py-20
+                            text-center
+                            text-slate-400
+                        "
                     >
 
-                        🗑️
+                        <div className="text-6xl mb-5">
 
-                    </button>
+                            📦
 
-                );
+                        </div>
 
-            }}
+                        <h3 className="text-2xl font-bold">
 
-        />
+                            No hay productos agregados
 
-    </AdminCard>
+                        </h3>
 
-);
+                        <p className="mt-2">
+
+                            Presiona "Agregar producto"
+                            para comenzar la compra.
+
+                        </p>
+
+                    </div>
+
+                )
+
+            }
+
+            <div className="space-y-5">
+
+                {
+
+                    details.map((item, index)=>(
+
+                        <PurchaseItemCard
+
+                            key={`${item.variant_id}-${index}`}
+
+                            item={item}
+
+                            index={index}
+
+                            updateQuantity={updateQuantity}
+
+                            updateCost={updateCost}
+
+                            removeItem={removeItem}
+
+                        />
+
+                    ))
+
+                }
+
+            </div>
+
+        </AdminCard>
+
+    );
 
 }
