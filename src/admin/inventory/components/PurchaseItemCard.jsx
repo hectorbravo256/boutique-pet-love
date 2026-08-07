@@ -283,6 +283,8 @@ export default function PurchaseItemCard({
 
                         </div>
 
+                        </div>
+
                     </div>
 
                 </div>
