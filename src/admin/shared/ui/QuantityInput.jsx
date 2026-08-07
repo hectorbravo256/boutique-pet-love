@@ -10,7 +10,9 @@ export default function QuantityInput({
 
     max = 999999,
 
-    step = 1
+    step = 1,
+
+    size = "sm"
 
 }) {
 
@@ -56,6 +58,32 @@ export default function QuantityInput({
 
     }
 
+    const sizes = {
+
+    sm: {
+
+        container: "w-[160px]",
+
+        input: "w-16",
+
+        button: "w-10"
+
+    },
+
+    lg: {
+
+        container: "w-[260px]",
+
+        input: "w-24",
+
+        button: "w-12"
+
+    }
+
+};
+
+const current = sizes[size];
+
     return (
 
         <div
@@ -77,8 +105,8 @@ export default function QuantityInput({
 
                 onClick={decrease}
 
-                className="
-                    w-10
+                className={`
+                    ${current.button}
                     h-12
                     flex
                     items-center
@@ -103,8 +131,8 @@ export default function QuantityInput({
 
                 onChange={handleChange}
 
-                className="
-                    w-[80px]
+               className={`
+                    ${current.input}
                     h-12
                     text-center
                     font-bold
@@ -119,8 +147,8 @@ export default function QuantityInput({
 
                 onClick={increase}
 
-                className="
-                    w-10
+                className={`
+                    ${current.button}
                     h-12
                     flex
                     items-center
