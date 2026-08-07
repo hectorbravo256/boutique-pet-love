@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import ProductCard from "../shared/ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
 import QuantityInput from "../../shared/ui/QuantityInput";
+import CurrencyInput from "../../shared/ui/CurrencyInput";
 
 export default function PurchaseProductSelector({
     products,
@@ -211,34 +212,23 @@ export default function PurchaseProductSelector({
 
                             </label>
 
-                            <input
+<CurrencyInput
 
-                                type="number"
+    value={detail.unit_cost}
 
-                                min="0"
+    onChange={(value)=>
 
-                                value={detail.unit_cost}
+        setDetail({
 
-                                onChange={(e) =>
+            ...detail,
 
-                                    setDetail({
+            unit_cost: value
 
-                                        ...detail,
+        })
 
-                                        unit_cost: Number(e.target.value)
+    }
 
-                                    })
-
-                                }
-
-                                className="
-                                    w-full
-                                    rounded-xl
-                                    border
-                                    p-3
-                                "
-
-                            />
+/>
 
                         </div>
 
