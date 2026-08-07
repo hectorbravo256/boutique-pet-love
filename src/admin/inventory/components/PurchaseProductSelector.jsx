@@ -127,167 +127,107 @@ export default function PurchaseProductSelector({
 />
 
 
-                <option value="">
-
-                    Talla
-
-                </option>
-
-                {
-
-                    variants.map(v=>(
-
-                        <option
-
-                            key={v.id}
-
-                            value={v.id}
-
-                        >
-
-                            {v.size}
-
-                        </option>
-
-                    ))
-
-                }
-
-            </select>
-
 {
 variantSummary && (
 
-<div className="
+<div className="mt-5 rounded-2xl border bg-slate-50 p-5">
 
-mt-5
+    <h3 className="font-bold text-slate-700 mb-4">
 
-rounded-2xl
+        Información del Inventario
 
-border
+    </h3>
 
-bg-slate-50
+    <div className="grid grid-cols-2 gap-6">
 
-p-5
+        <div>
 
-">
+            <p className="text-xs text-slate-500">
 
-<h3 className="
+                Stock actual
 
-font-bold
+            </p>
 
-text-slate-700
+            <p className="text-xl font-bold">
 
-mb-4
+                {variantSummary.stock}
 
-">
+            </p>
 
-Información del Inventario
+        </div>
 
-</h3>
+        <div>
 
-<div className="grid grid-cols-2 gap-4">
+            <p className="text-xs text-slate-500">
 
-<div>
+                Último costo
 
-<p className="text-xs text-slate-500">
+            </p>
 
-Stock actual
+            <p className="text-xl font-bold">
 
-</p>
+                {
 
-<p className="text-xl font-bold">
+                    variantSummary.last_cost
 
-{variantSummary.stock}
+                        ? "$" + Number(variantSummary.last_cost).toLocaleString("es-CL")
 
-</p>
+                        : "-"
 
-</div>
+                }
 
-<div>
+            </p>
 
-<p className="text-xs text-slate-500">
+        </div>
 
-Último costo
+        <div>
 
-</p>
+            <p className="text-xs text-slate-500">
 
-<p className="text-xl font-bold">
+                Costo promedio
 
-{
+            </p>
 
-variantSummary.last_cost
+            <p className="text-xl font-bold">
 
-? "$" +
+                {
 
-Number(
+                    variantSummary.average_cost
 
-variantSummary.last_cost
+                        ? "$" + Number(variantSummary.average_cost).toLocaleString("es-CL")
 
-).toLocaleString("es-CL")
+                        : "-"
 
-: "-"
+                }
 
-}
+            </p>
 
-</p>
+        </div>
 
-</div>
+        <div>
 
-<div>
+            <p className="text-xs text-slate-500">
 
-<p className="text-xs text-slate-500">
+                Último proveedor
 
-Costo promedio
+            </p>
 
-</p>
+            <p className="font-semibold">
 
-<p className="text-xl font-bold">
+                {
 
-{
+                    variantSummary.last_supplier ??
 
-variantSummary.average_cost
+                    "Sin historial"
 
-? "$"+
+                }
 
-Number(
+            </p>
 
-variantSummary.average_cost
+        </div>
 
-).toLocaleString("es-CL")
+    </div>
 
-: "-"
-
-}
-
-</p>
-
-</div>
-
-<div>
-
-<p className="text-xs text-slate-500">
-
-Último proveedor
-
-</p>
-
-<p className="font-semibold">
-
-{
-
-variantSummary.last_supplier ??
-
-"Sin historial"
-
-}
-
-</p>
-
-</div>
-
-</div>
-    
 </div>
 
 )
