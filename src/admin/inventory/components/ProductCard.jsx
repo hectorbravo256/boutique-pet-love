@@ -1,47 +1,64 @@
-export default function ProductCard({
-
-    product
-
-}) {
+export default function ProductCard({ product }) {
 
     if (!product) return null;
 
+    const image =
+
+        product.product_images?.[0]?.url ||
+
+        "/placeholder-product.png";
+
     return (
 
-        <div className="flex gap-6 items-center">
+        <div className="flex flex-col items-center text-center">
 
             <img
 
-                src={product.image}
+                src={image}
 
                 alt={product.name}
 
                 className="
-                    w-28
-                    h-28
-                    rounded-2xl
+                    w-40
+                    h-40
+                    rounded-3xl
                     object-cover
-                    shadow
                     border
+                    shadow-md
                 "
 
             />
 
-            <div>
+            <h2 className="
 
-                <h2 className="text-2xl font-black">
+                mt-5
+                text-2xl
+                font-black
 
-                    {product.name}
+            ">
 
-                </h2>
+                {product.name}
 
-                <p className="text-slate-500 mt-2">
+            </h2>
 
-                    {product.category}
+            {
 
-                </p>
+                product.category && (
 
-            </div>
+                    <p className="
+
+                        mt-2
+                        text-slate-500
+
+                    ">
+
+                        {product.category}
+
+                    </p>
+
+                )
+
+            }
 
         </div>
 
