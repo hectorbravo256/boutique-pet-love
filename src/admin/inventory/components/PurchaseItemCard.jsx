@@ -32,90 +32,141 @@ export default function PurchaseItemCard({
             "
         >
 
-            <div className="flex gap-6">
+            <div className="flex items-center gap-5">
 
-                {/* Imagen */}
+    {/* Imagen */}
 
-                <img
+    <img
 
-                    src={
-                        item.image ||
-                        "/placeholder-product.png"
-                    }
+        src={
 
-                    alt={item.product_name}
+            item.image ||
 
-                    className="
-                        w-28
-                        h-28
-                        rounded-2xl
-                        object-cover
-                        border
-                    "
+            "/placeholder-product.png"
 
-                />
+        }
 
-                {/* Información */}
+        alt={item.product_name}
 
-                <div className="flex-1">
+        className="
 
-                    <div className="flex justify-between">
+            w-20
 
-                        <div>
+            h-20
 
-                            <h3 className="text-xl font-black">
+            rounded-xl
 
-                                {item.product_name}
+            object-cover
 
-                            </h3>
+            border
 
-                            <p className="text-slate-500">
+            flex-shrink-0
 
-                                SKU {item.sku}
+        "
 
-                            </p>
+    />
 
-                            <span
-                                className="
-                                    inline-block
-                                    mt-2
-                                    px-3
-                                    py-1
-                                    rounded-full
-                                    bg-pink-100
-                                    text-pink-600
-                                    text-sm
-                                    font-semibold
-                                "
-                            >
+    {/* Información */}
 
-                                {item.size}
+    <div className="flex-1">
 
-                            </span>
+        <h3 className="
 
-                        </div>
+            text-xl
 
-                        <button
+            font-black
 
-                            onClick={()=>
+            leading-tight
 
-                                removeItem(index)
+        ">
 
-                            }
+            {item.product_name}
 
-                            className="
-                                text-red-500
-                                hover:text-red-700
-                                text-2xl
-                            "
+        </h3>
 
-                        >
+        <div className="
 
-                            🗑️
+            flex
 
-                        </button>
+            items-center
 
-                    </div>
+            gap-3
+
+            mt-2
+
+            text-sm
+
+        ">
+
+            <span className="text-slate-500">
+
+                {item.sku}
+
+            </span>
+
+            <span className="
+
+                px-3
+
+                py-1
+
+                rounded-full
+
+                bg-pink-100
+
+                text-pink-600
+
+                font-semibold
+
+            ">
+
+                {item.size}
+
+            </span>
+
+        </div>
+
+    </div>
+
+    {/* Eliminar */}
+
+    <button
+
+        onClick={() => removeItem(index)}
+
+        className="
+
+            w-10
+
+            h-10
+
+            rounded-full
+
+            hover:bg-red-50
+
+            text-red-500
+
+            hover:text-red-700
+
+            transition
+
+            flex
+
+            items-center
+
+            justify-center
+
+            text-xl
+
+        "
+
+    >
+
+        🗑️
+
+    </button>
+
+</div>
 
                     <div
                         className="
