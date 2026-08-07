@@ -3,59 +3,97 @@ export default function ProductCard({ product }) {
     if (!product) return null;
 
     const image =
-
         product.product_images?.[0]?.url ||
-
         "/placeholder-product.png";
 
-return (
+    return (
 
-<div
-    className="
-        w-56
-        flex
-        flex-col
-        items-center
-        text-center
-        rounded-2xl
-        border
-        bg-white
-        p-5
-        shadow-sm
-    "
->
+        <div
+            className="
+                w-60
+                rounded-3xl
+                border
+                bg-white
+                shadow-sm
+                overflow-hidden
+                flex
+                flex-col
+            "
+        >
 
-    <img
+            {/* Imagen */}
 
-        src={image}
+            <div className="p-6">
 
-        alt={product.name}
+                <img
 
-        className="
-            w-40
-            h-40
-            object-cover
-            rounded-3xl
-        "
+                    src={image}
 
-    />
+                    alt={product.name}
 
-    <h2 className="
+                    className="
+                        w-full
+                        aspect-square
+                        object-cover
+                        rounded-2xl
+                        bg-slate-100
+                    "
 
-        mt-5
+                />
 
-        text-xl
+            </div>
 
-        font-black
+            {/* Información */}
 
-    ">
+            <div className="px-6 pb-6">
 
-        {product.name}
+                <h2
+                    className="
+                        text-3xl
+                        font-black
+                        leading-tight
+                        mb-5
+                    "
+                >
+                    {product.name}
+                </h2>
 
-    </h2>
+                <div className="space-y-3">
 
-</div>
+                    <div
+                        className="
+                            inline-flex
+                            items-center
+                            rounded-full
+                            bg-pink-100
+                            text-pink-700
+                            px-3
+                            py-1
+                            text-sm
+                            font-semibold
+                        "
+                    >
+                        🏷 {product.category || "Sin categoría"}
+                    </div>
 
-);
+                    <div className="text-sm text-slate-500">
+
+                        SKU
+
+                    </div>
+
+                    <div className="font-semibold">
+
+                        PET-{String(product.id).padStart(4,"0")}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
 
 }
