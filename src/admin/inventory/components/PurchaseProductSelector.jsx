@@ -1,5 +1,8 @@
 import { useEffect } from "react";
+
+import ProductCard from "./ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
+
 
 export default function PurchaseProductSelector({
 
@@ -33,6 +36,12 @@ export default function PurchaseProductSelector({
     }, [detail.product_id]);
 
     //------------------------------------
+
+    const selectedProduct = products.find(
+
+    p => p.id == detail.product_id
+
+);
 
     return (
 
@@ -97,6 +106,12 @@ export default function PurchaseProductSelector({
                 }
 
             </select>
+
+                <ProductCard
+
+    product={selectedProduct}
+
+/>
 
             {/* Variante */}
 
