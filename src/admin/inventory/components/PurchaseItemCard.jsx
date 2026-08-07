@@ -34,7 +34,7 @@ export default function PurchaseItemCard({
             "
         >
 
-            <div className="grid grid-cols-12 gap-4 items-center">
+            <div className="grid flex gap-4 items-center">
 
                 {/* Imagen */}
 
