@@ -78,13 +78,15 @@ export default function QuantityInput({
                 onClick={decrease}
 
                 className="
-                    w-12
+                    w-14
                     h-full
                     flex
                     items-center
                     justify-center
                     hover:bg-slate-100
                     transition
+                    hover:bg-red-50
+                    hover:text-red-600
                 "
 
             >
@@ -119,13 +121,15 @@ export default function QuantityInput({
                 onClick={increase}
 
                 className="
-                    w-12
+                    w-14
                     h-full
                     flex
                     items-center
                     justify-center
                     hover:bg-slate-100
                     transition
+                    hover:bg-green-50
+                    hover:text-green-600
                 "
 
             >
