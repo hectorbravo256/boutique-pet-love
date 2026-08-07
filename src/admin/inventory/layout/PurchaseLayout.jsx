@@ -12,23 +12,41 @@ export default function PurchaseLayout({
 
 }) {
 
+    const hasSummary = !!summary;
+
     return (
 
         <div className="space-y-8">
 
-            <div className="grid xl:grid-cols-3 gap-8">
+            <div
+                className={
+                    hasSummary
+                        ? "grid xl:grid-cols-3 gap-8"
+                        : "w-full"
+                }
+            >
 
-                <div className="xl:col-span-2">
+                <div
+                    className={
+                        hasSummary
+                            ? "xl:col-span-2"
+                            : "w-full"
+                    }
+                >
 
                     {header}
 
                 </div>
 
-                <div>
+                {hasSummary && (
 
-                    {summary}
+                    <div>
 
-                </div>
+                        {summary}
+
+                    </div>
+
+                )}
 
             </div>
 
