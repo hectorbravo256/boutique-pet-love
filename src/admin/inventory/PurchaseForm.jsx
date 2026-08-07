@@ -4,7 +4,7 @@ import Button from "../shared/ui/Button";
 import usePurchase from "./hooks/usePurchase";
 
 import PurchaseLayout from "./layout/PurchaseLayout";
-
+import PurchaseSummary from "./components/PurchaseSummary";
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
 import PurchaseFooter from "./components/PurchaseFooter";
@@ -118,6 +118,11 @@ summary={<></>}
     details={details}
 
     setDetails={setDetails}
+
+/>
+                <PurchaseSummary
+
+    details={details}
 
 />
             
