@@ -115,7 +115,7 @@ const current = sizes[size];
                     transition
                     hover:bg-red-50
                     hover:text-red-600
-                "
+                `}
 
             >
 
@@ -137,7 +137,7 @@ const current = sizes[size];
                     text-center
                     font-bold
                     outline-none
-                "
+                `}
 
             />
 
@@ -157,7 +157,7 @@ const current = sizes[size];
                     transition
                     hover:bg-green-50
                     hover:text-green-600
-                "
+                `}
 
             >
 
