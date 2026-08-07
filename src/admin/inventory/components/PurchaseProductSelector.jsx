@@ -42,6 +42,7 @@ export default function PurchaseProductSelector({
     p => p.id == detail.product_id
 
 );
+    console.log(selectedProduct);
 
     return (
 
