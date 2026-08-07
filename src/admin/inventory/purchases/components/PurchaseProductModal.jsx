@@ -21,7 +21,7 @@ export default function PurchaseProductModal({
             title="Agregar producto"
             open={open}
             onClose={onClose}
-            maxWidth="5xl"
+            size="xxl"
 
         >
 
