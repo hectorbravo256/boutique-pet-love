@@ -1,162 +1,277 @@
 import ApiClient from "@/admin/shared/api/ApiClient";
 
 const InventoryService = {
-  async getDashboard() {
-    const [
-      { data: variantes, error: variantesError },
-      { count: productos, error: productosError },
-      { count: variantesCount, error: variantesCountError },
-    ] = await Promise.all([
-      ApiClient.db
-        .from("product_variants")
-        .select("stock"),
 
-      ApiClient.db
-        .from("products")
-        .select("*", {
-          count: "exact",
-          head: true,
-        })
-        .eq("active", true),
+    //---------------------------------------------------------
+    // DASHBOARD
+    //---------------------------------------------------------
 
-      ApiClient.db
-        .from("product_variants")
-        .select("*", {
-          count: "exact",
-          head: true,
-        }),
-    ]);
+    async getDashboard() {
 
-    if (variantesError) throw variantesError;
-    if (productosError) throw productosError;
-    if (variantesCountError) throw variantesCountError;
+        const [
 
-    const stockTotal = (variantes || []).reduce(
-      (sum, item) => sum + Number(item.stock || 0),
-      0
-    );
+            { data: variants, error: variantsError },
 
-    const stockCritico = (variantes || []).filter(
-      (item) => Number(item.stock) <= 3
-    ).length;
+            { count: products, error: productsError },
 
-    return {
-      stockTotal,
-      productos,
-      variantes: variantesCount,
-      stockCritico,
-    };
-  },
-  
-  async getMovements(limit = 15) {
+            { count: variantsCount, error: variantsCountError }
 
-    const { data, error } = await ApiClient.db
+        ] = await Promise.all([
 
-        .from("inventory_movements")
+            ApiClient.db
 
-        .select(`
-            *,
-            products(name),
-            product_variants(size)
-        `)
+                .from("product_variants")
 
-        .order("created_at", {
-            ascending: false
-        })
+                .select("stock"),
 
-        .limit(limit);
+            ApiClient.db
 
-    if (error) throw error;
+                .from("products")
 
-    return data || [];
+                .select("*", {
 
-},
+                    count: "exact",
 
-  async getActiveProducts() {
+                    head: true
 
-    const { data, error } = await ApiClient.db
+                })
 
-        .from("products")
+                .eq("active", true),
 
-        .select(`
-            id,
-            name,
-            product_images(url)
-        `)
+            ApiClient.db
 
-        .eq("active", true)
+                .from("product_variants")
 
-        .order("name");
+                .select("*", {
 
-    if (error) throw error;
+                    count: "exact",
 
-    return data || [];
+                    head: true
 
-},
+                })
 
-  async getVariants(productId) {
+        ]);
 
-    const { data, error } = await ApiClient.db
+        if (variantsError) throw variantsError;
+        if (productsError) throw productsError;
+        if (variantsCountError) throw variantsCountError;
 
-        .from("product_variants")
+        const stockTotal =
 
-        .select("*")
+            (variants || []).reduce(
 
-        .eq("product_id", productId)
+                (sum, item) =>
 
-        .order("size");
+                    sum + Number(item.stock || 0),
 
-    if (error) throw error;
+                0
 
-    return data || [];
+            );
 
-},
+        const stockCritico =
 
-  async getVariantInfo(variantId) {
+            (variants || []).filter(
 
-    const { data, error } = await ApiClient.db
-        .rpc("inventory_variant_info", {
-            p_variant_id: variantId
+                item => Number(item.stock) <= 3
+
+            ).length;
+
+        return {
+
+            stockTotal,
+
+            productos: products,
+
+            variantes: variantsCount,
+
+            stockCritico
+
+        };
+
+    },
+
+    //---------------------------------------------------------
+    // MOVIMIENTOS
+    //---------------------------------------------------------
+
+    async getMovements(limit = 15) {
+
+        const { data, error } = await ApiClient.db
+
+            .from("inventory_movements")
+
+            .select(`
+                *,
+                products(name),
+                product_variants(size)
+            `)
+
+            .order("created_at", {
+
+                ascending: false
+
+            })
+
+            .limit(limit);
+
+        if (error) throw error;
+
+        return data || [];
+
+    },
+
+    //---------------------------------------------------------
+    // PRODUCTOS ACTIVOS
+    //---------------------------------------------------------
+
+    async getActiveProducts() {
+
+        const { data, error } = await ApiClient.db
+
+            .from("products")
+
+            .select(`
+                id,
+                name,
+                category,
+                product_images(
+                    url,
+                    sort_order
+                )
+            `)
+
+            .eq("active", true)
+
+            .order("name");
+
+        if (error) throw error;
+
+        //---------------------------------------
+        // Ordenar imágenes
+        //---------------------------------------
+
+        (data || []).forEach(product => {
+
+            product.product_images.sort(
+
+                (a, b) =>
+
+                    (a.sort_order ?? 999) -
+
+                    (b.sort_order ?? 999)
+
+            );
+
         });
 
-    if (error) throw error;
+        return data || [];
 
-    return data?.[0] ?? null;
+    },
 
-},
+    //---------------------------------------------------------
+    // VARIANTES
+    //---------------------------------------------------------
 
-  async getVariantSummary(variantId) {
+    async getVariants(productId) {
 
-    const { data, error } = await ApiClient.db
-        .from("vw_variant_summary")
-        .select("*")
-        .eq("variant_id", variantId)
-        .single();
+        const { data, error } = await ApiClient.db
 
-    if (error) throw error;
+            .from("product_variants")
 
-    return data;
+            .select("*")
 
-},
+            .eq("product_id", productId);
 
-  async getInventoryMaster() {
+        if (error) throw error;
 
-    const { data, error } = await ApiClient.db
+        //---------------------------------------
+        // Orden natural de tallas
+        //---------------------------------------
 
-        .from("vw_inventory_master")
+        (data || []).sort((a, b) => {
 
-        .select("*")
+            const sizeA = parseInt(
 
-        .order("product_name", {
-            ascending: true
+                String(a.size).replace(/\D/g, "")
+
+            );
+
+            const sizeB = parseInt(
+
+                String(b.size).replace(/\D/g, "")
+
+            );
+
+            return sizeA - sizeB;
+
         });
 
-    if (error) throw error;
+        return data || [];
 
-    return data || [];
+    },
 
-}
-  
+    //---------------------------------------------------------
+    // INFORMACIÓN VARIANTE
+    //---------------------------------------------------------
+
+    async getVariantInfo(variantId) {
+
+        const { data, error } = await ApiClient.db
+
+            .rpc("inventory_variant_info", {
+
+                p_variant_id: variantId
+
+            });
+
+        if (error) throw error;
+
+        return data?.[0] ?? null;
+
+    },
+
+    //---------------------------------------------------------
+    // RESUMEN VARIANTE
+    //---------------------------------------------------------
+
+    async getVariantSummary(variantId) {
+
+        const { data, error } = await ApiClient.db
+
+            .from("vw_variant_summary")
+
+            .select("*")
+
+            .eq("variant_id", variantId)
+
+            .single();
+
+        if (error) throw error;
+
+        return data;
+
+    },
+
+    //---------------------------------------------------------
+    // INVENTARIO MAESTRO
+    //---------------------------------------------------------
+
+    async getInventoryMaster() {
+
+        const { data, error } = await ApiClient.db
+
+            .from("vw_inventory_master")
+
+            .select("*")
+
+            .order("product_name");
+
+        if (error) throw error;
+
+        return data || [];
+
+    }
+
 };
 
 export default InventoryService;
