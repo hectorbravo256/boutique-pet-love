@@ -153,7 +153,7 @@ export default function PurchaseProductSelector({
                             </label>
 
 <QuantityInput
-
+    size="lg"    
     value={detail.quantity}
 
     onChange={(value)=>
