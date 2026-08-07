@@ -34,11 +34,11 @@ export default function PurchaseItemCard({
             "
         >
 
-            <div className="grid flex gap-4 items-center">
+            <div className="flex items-center gap-5">
 
                 {/* Imagen */}
 
-                <div className="col-span-1">
+                <div className="flex-shrink-0">
 
                     <img
 
@@ -81,7 +81,7 @@ export default function PurchaseItemCard({
 
                 {/* Talla */}
 
-                <div className="col-span-1 text-center">
+                <div className="w-24 flex justify-center">
 
                     <span
                         className="
@@ -176,7 +176,7 @@ export default function PurchaseItemCard({
 
                 {/* Eliminar */}
 
-                <div className="flex justify-center items-center w-12">
+                <div className="w-12 flex justify-center flex-shrink-0">
 
                     <button
 
