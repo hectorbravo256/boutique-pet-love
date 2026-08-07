@@ -4,6 +4,7 @@ import ProductCard from "../shared/ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
 import QuantityInput from "../../shared/ui/QuantityInput";
 import CurrencyInput from "../../shared/ui/CurrencyInput";
+import ProductSearch from "../../shared/ui/ProductSearch";
 
 export default function PurchaseProductSelector({
     products,
@@ -77,60 +78,27 @@ export default function PurchaseProductSelector({
 
                         </label>
 
-                        <select
+                        <ProductSearch
 
-                            value={detail.product_id}
+    products={products}
 
-                            onChange={(e) =>
+    value={detail.product_id}
 
-                                setDetail({
+    onSelect={(product)=>{
 
-                                    ...detail,
+        setDetail({
 
-                                    product_id: e.target.value,
+            ...detail,
 
-                                    variant_id: ""
+            product_id: product.id,
 
-                                })
+            variant_id: ""
 
-                            }
+        });
 
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                p-3
-                            "
+    }}
 
-                        >
-
-                            <option value="">
-
-                                Seleccionar producto
-
-                            </option>
-
-                            {
-
-                                products.map(product => (
-
-                                    <option
-
-                                        key={product.id}
-
-                                        value={product.id}
-
-                                    >
-
-                                        {product.name}
-
-                                    </option>
-
-                                ))
-
-                            }
-
-                        </select>
+/>
 
                     </div>
 
