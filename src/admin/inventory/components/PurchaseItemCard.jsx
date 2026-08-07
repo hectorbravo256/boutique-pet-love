@@ -16,274 +16,191 @@ export default function PurchaseItemCard({
 }) {
 
     const subtotal =
-        item.quantity * item.unit_cost;
+        Number(item.quantity) *
+        Number(item.unit_cost);
 
     return (
 
         <div
             className="
                 bg-white
-                rounded-3xl
                 border
+                rounded-2xl
+                px-5
+                py-3
                 shadow-sm
-                p-6
                 hover:shadow-md
                 transition-all
             "
         >
 
-            <div className="flex items-center gap-5">
+            <div className="grid grid-cols-12 gap-4 items-center">
 
-    {/* Imagen */}
+                {/* Imagen */}
 
-    <img
+                <div className="col-span-1">
 
-        src={
+                    <img
 
-            item.image ||
+                        src={
+                            item.image ||
+                            "/placeholder-product.png"
+                        }
 
-            "/placeholder-product.png"
+                        alt={item.product_name}
 
-        }
-
-        alt={item.product_name}
-
-        className="
-
-            w-20
-
-            h-20
-
-            rounded-xl
-
-            object-cover
-
-            border
-
-            flex-shrink-0
-
-        "
-
-    />
-
-    {/* Información */}
-
-    <div className="flex-1">
-
-        <h3 className="
-
-            text-xl
-
-            font-black
-
-            leading-tight
-
-        ">
-
-            {item.product_name}
-
-        </h3>
-
-        <div className="
-
-            flex
-
-            items-center
-
-            gap-3
-
-            mt-2
-
-            text-sm
-
-        ">
-
-            <span className="text-slate-500">
-
-                {item.sku}
-
-            </span>
-
-            <span className="
-
-                px-3
-
-                py-1
-
-                rounded-full
-
-                bg-pink-100
-
-                text-pink-600
-
-                font-semibold
-
-            ">
-
-                {item.size}
-
-            </span>
-
-        </div>
-
-    </div>
-
-    {/* Eliminar */}
-
-    <button
-
-        onClick={() => removeItem(index)}
-
-        className="
-
-            w-10
-
-            h-10
-
-            rounded-full
-
-            hover:bg-red-50
-
-            text-red-500
-
-            hover:text-red-700
-
-            transition
-
-            flex
-
-            items-center
-
-            justify-center
-
-            text-xl
-
-        "
-
-    >
-
-        🗑️
-
-    </button>
-
-</div>
-
-                    <div
                         className="
-                            grid
-                            grid-cols-3
-                            gap-5
-                            mt-6
+                            w-16
+                            h-16
+                            rounded-xl
+                            object-cover
+                            border
+                        "
+
+                    />
+
+                </div>
+
+                {/* Producto */}
+
+                <div className="col-span-3">
+
+                    <h3 className="font-bold leading-tight">
+
+                        {item.product_name}
+
+                    </h3>
+
+                    <div className="text-xs text-slate-500 mt-1">
+
+                        {item.sku || "Sin SKU"}
+
+                    </div>
+
+                </div>
+
+                {/* Talla */}
+
+                <div className="col-span-1 text-center">
+
+                    <span
+                        className="
+                            inline-flex
+                            px-3
+                            py-1
+                            rounded-full
+                            bg-pink-100
+                            text-pink-600
+                            font-semibold
+                            text-sm
                         "
                     >
 
-                        <div>
+                        {item.size}
 
-                            <label
-                                className="
-                                    text-sm
-                                    font-semibold
-                                    mb-2
-                                    block
-                                "
-                            >
+                    </span>
 
-                                Cantidad
+                </div>
 
-                            </label>
+                {/* Cantidad */}
 
-                            <QuantityInput
+                <div className="col-span-2">
 
-                                value={item.quantity}
+                    <QuantityInput
 
-                                onChange={(value)=>
+                        value={item.quantity}
 
-                                    updateQuantity(
+                        onChange={(value)=>
 
-                                        index,
+                            updateQuantity(
 
-                                        value
+                                index,
 
-                                    )
+                                value
 
-                                }
+                            )
 
-                            />
+                        }
 
-                        </div>
+                    />
 
-                        <div>
+                </div>
 
-                            <label
-                                className="
-                                    text-sm
-                                    font-semibold
-                                    mb-2
-                                    block
-                                "
-                            >
+                {/* Costo */}
 
-                                Costo
+                <div className="col-span-2">
 
-                            </label>
+                    <CurrencyInput
 
-                            <CurrencyInput
+                        value={item.unit_cost}
 
-                                value={item.unit_cost}
+                        onChange={(value)=>
 
-                                onChange={(value)=>
+                            updateCost(
 
-                                    updateCost(
+                                index,
 
-                                        index,
+                                value
 
-                                        value
+                            )
 
-                                    )
+                        }
 
-                                }
+                    />
 
-                            />
+                </div>
 
-                        </div>
+                {/* Subtotal */}
 
-                        <div>
+                <div className="col-span-2">
 
-                            <label
-                                className="
-                                    text-sm
-                                    font-semibold
-                                    mb-2
-                                    block
-                                "
-                            >
+                    <div
+                        className="
+                            h-12
+                            rounded-xl
+                            bg-slate-100
+                            flex
+                            items-center
+                            justify-center
+                            font-black
+                        "
+                    >
 
-                                Subtotal
+                        $
 
-                            </label>
-
-                            <div
-                                className="
-                                    h-12
-                                    flex
-                                    items-center
-                                    px-4
-                                    rounded-xl
-                                    bg-slate-100
-                                    font-black
-                                    text-xl
-                                "
-                            >
-
-                                $
-
-                                {subtotal.toLocaleString("es-CL")}
-
-                            </div>
-
-
+                        {subtotal.toLocaleString("es-CL")}
 
                     </div>
+
+                </div>
+
+                {/* Eliminar */}
+
+                <div className="col-span-1 flex justify-end">
+
+                    <button
+
+                        onClick={()=>
+
+                            removeItem(index)
+
+                        }
+
+                        className="
+                            w-10
+                            h-10
+                            rounded-full
+                            hover:bg-red-50
+                            text-red-500
+                            hover:text-red-700
+                            transition
+                        "
+
+                    >
+
+                        🗑️
+
+                    </button>
 
                 </div>
 
