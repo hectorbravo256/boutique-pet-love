@@ -78,8 +78,8 @@ export default function QuantityInput({
                 onClick={decrease}
 
                 className="
-                    w-14
-                    h-full
+                    w-10
+                    h-12
                     flex
                     items-center
                     justify-center
@@ -104,12 +104,11 @@ export default function QuantityInput({
                 onChange={handleChange}
 
                 className="
-                    flex-1
-                    h-full
+                    w-[80px]
+                    h-12
                     text-center
-                    font-semibold
+                    font-bold
                     outline-none
-                    border-x
                 "
 
             />
@@ -121,8 +120,8 @@ export default function QuantityInput({
                 onClick={increase}
 
                 className="
-                    w-14
-                    h-full
+                    w-10
+                    h-12
                     flex
                     items-center
                     justify-center
