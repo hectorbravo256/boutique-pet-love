@@ -4,7 +4,6 @@ import ProductCard from "../shared/ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
 
 export default function PurchaseProductSelector({
-
     products,
     variants,
 
@@ -15,14 +14,20 @@ export default function PurchaseProductSelector({
 
     addProduct,
 
-    variantSummary,
     loadVariantSummary
-
 }) {
 
-    //------------------------------------
-    // Cargar variantes cuando cambia
-    //------------------------------------
+    //----------------------------------------
+    // Producto seleccionado
+    //----------------------------------------
+
+    const selectedProduct = products.find(
+        p => p.id == detail.product_id
+    );
+
+    //----------------------------------------
+    // Cargar variantes
+    //----------------------------------------
 
     useEffect(() => {
 
@@ -32,25 +37,19 @@ export default function PurchaseProductSelector({
 
     }, [detail.product_id]);
 
-    //------------------------------------
-
-    const selectedProduct = products.find(
-
-        p => p.id == detail.product_id
-
-    );
+    //----------------------------------------
 
     return (
 
-        <div className="space-y-6">
+        <div className="rounded-3xl border bg-white p-8">
 
-            <div className="rounded-2xl border bg-white p-6">
+            <div className="flex gap-8 items-start">
 
-                <div className="flex gap-8">
+                {/*======================================
+                    COLUMNA IZQUIERDA
+                ======================================*/}
 
-                    {/* ==========================
-                        Columna izquierda
-                    =========================== */}
+                <div className="shrink-0">
 
                     <ProductCard
 
@@ -58,25 +57,138 @@ export default function PurchaseProductSelector({
 
                     />
 
-                    {/* ==========================
-                        Columna derecha
-                    =========================== */}
+                </div>
 
-                    <div className="flex-1 space-y-6">
+                {/*======================================
+                    COLUMNA DERECHA
+                ======================================*/}
 
-                        {/* Producto */}
+                <div className="flex-1">
+
+                    {/* Producto */}
+
+                    <div className="mb-6">
+
+                        <label className="block mb-2 text-sm font-semibold">
+
+                            Producto
+
+                        </label>
+
+                        <select
+
+                            value={detail.product_id}
+
+                            onChange={(e) =>
+
+                                setDetail({
+
+                                    ...detail,
+
+                                    product_id: e.target.value,
+
+                                    variant_id: ""
+
+                                })
+
+                            }
+
+                            className="
+                                w-full
+                                rounded-xl
+                                border
+                                p-3
+                            "
+
+                        >
+
+                            <option value="">
+
+                                Seleccionar producto
+
+                            </option>
+
+                            {
+
+                                products.map(product => (
+
+                                    <option
+
+                                        key={product.id}
+
+                                        value={product.id}
+
+                                    >
+
+                                        {product.name}
+
+                                    </option>
+
+                                ))
+
+                            }
+
+                        </select>
+
+                    </div>
+
+                    {/* Tallas */}
+
+                    <div className="mb-8">
+
+                        <label className="block mb-3 text-sm font-semibold">
+
+                            Talla
+
+                        </label>
+
+                        <ProductVariantSelector
+
+                            variants={variants}
+
+                            selected={detail.variant_id}
+
+                            onSelect={async (variant) => {
+
+                                setDetail({
+
+                                    ...detail,
+
+                                    variant_id: variant.id
+
+                                });
+
+                                await loadVariantSummary(
+
+                                    variant.id
+
+                                );
+
+                            }}
+
+                        />
+
+                    </div>
+
+                    {/* Cantidad + Costo */}
+
+                    <div className="grid grid-cols-2 gap-5 mb-8">
 
                         <div>
 
-                            <label className="block text-sm font-semibold mb-2">
+                            <label className="block mb-2 text-sm font-semibold">
 
-                                Producto
+                                Cantidad
 
                             </label>
 
-                            <select
+                            <input
 
-                                value={detail.product_id}
+                                type="number"
+
+                                min="1"
+
+                                value={detail.quantity}
 
                                 onChange={(e) =>
 
@@ -84,9 +196,7 @@ export default function PurchaseProductSelector({
 
                                         ...detail,
 
-                                        product_id: e.target.value,
-
-                                        variant_id: ""
+                                        quantity: Number(e.target.value)
 
                                     })
 
@@ -99,71 +209,44 @@ export default function PurchaseProductSelector({
                                     p-3
                                 "
 
-                            >
-
-                                <option value="">
-
-                                    Seleccionar producto
-
-                                </option>
-
-                                {
-
-                                    products.map(product => (
-
-                                        <option
-
-                                            key={product.id}
-
-                                            value={product.id}
-
-                                        >
-
-                                            {product.name}
-
-                                        </option>
-
-                                    ))
-
-                                }
-
-                            </select>
+                            />
 
                         </div>
 
-                        {/* Tallas */}
-
                         <div>
 
-                            <label className="block text-sm font-semibold mb-3">
+                            <label className="block mb-2 text-sm font-semibold">
 
-                                Talla
+                                Costo Unitario
 
                             </label>
 
-                            <ProductVariantSelector
+                            <input
 
-                                variants={variants}
+                                type="number"
 
-                                selected={detail.variant_id}
+                                min="0"
 
-                                onSelect={async (variant) => {
+                                value={detail.unit_cost}
+
+                                onChange={(e) =>
 
                                     setDetail({
 
                                         ...detail,
 
-                                        variant_id: variant.id
+                                        unit_cost: Number(e.target.value)
 
-                                    });
+                                    })
 
-                                    await loadVariantSummary(
+                                }
 
-                                        variant.id
-
-                                    );
-
-                                }}
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    p-3
+                                "
 
                             />
 
@@ -171,96 +254,36 @@ export default function PurchaseProductSelector({
 
                     </div>
 
+                    {/* Botón */}
+
+                    <button
+
+                        onClick={addProduct}
+
+                        className="
+                            w-full
+                            h-14
+                            rounded-2xl
+                            bg-gradient-to-r
+                            from-pink-500
+                            to-fuchsia-600
+                            text-white
+                            text-lg
+                            font-bold
+                            shadow-lg
+                            hover:scale-[1.01]
+                            transition-all
+                        "
+
+                    >
+
+                        ➕ Agregar producto
+
+                    </button>
+
                 </div>
 
             </div>
-
-            {/* Cantidad + Costo */}
-
-            <div className="grid grid-cols-2 gap-4">
-
-                <input
-
-                    type="number"
-
-                    min="1"
-
-                    value={detail.quantity}
-
-                    onChange={(e) =>
-
-                        setDetail({
-
-                            ...detail,
-
-                            quantity: Number(e.target.value)
-
-                        })
-
-                    }
-
-                    className="
-                        rounded-xl
-                        border
-                        p-3
-                    "
-
-                    placeholder="Cantidad"
-
-                />
-
-                <input
-
-                    type="number"
-
-                    min="0"
-
-                    value={detail.unit_cost}
-
-                    onChange={(e) =>
-
-                        setDetail({
-
-                            ...detail,
-
-                            unit_cost: Number(e.target.value)
-
-                        })
-
-                    }
-
-                    className="
-                        rounded-xl
-                        border
-                        p-3
-                    "
-
-                    placeholder="Costo unitario"
-
-                />
-
-            </div>
-
-            <button
-
-                onClick={addProduct}
-
-                className="
-                    w-full
-                    rounded-xl
-                    bg-pink-500
-                    hover:bg-pink-600
-                    text-white
-                    font-bold
-                    py-4
-                    transition-all
-                "
-
-            >
-
-                ➕ Agregar producto
-
-            </button>
 
         </div>
 
