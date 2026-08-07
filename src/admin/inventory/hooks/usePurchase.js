@@ -269,6 +269,16 @@ async function loadVariantSummary(variantId) {
 
     setVariantSummary(data);
 
+    setDetail(prev => ({
+
+        ...prev,
+
+        unit_cost: data?.last_cost
+            ? Number(data.last_cost)
+            : prev.unit_cost
+
+    }));
+
 }
 
     //----------------------------------------
