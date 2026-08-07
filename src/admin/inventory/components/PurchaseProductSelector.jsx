@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import ProductCard from "./ProductCard";
+import ProductCard from "../shared/ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
 
 export default function PurchaseProductSelector({
