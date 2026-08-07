@@ -104,7 +104,7 @@ export default function PurchaseItemCard({
 
                 {/* Cantidad */}
 
-                <div className="col-span-2">
+                <div className="col-span-3">
 
                     <QuantityInput
 
