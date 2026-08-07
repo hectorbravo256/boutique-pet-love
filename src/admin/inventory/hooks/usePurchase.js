@@ -80,7 +80,25 @@ async function loadVariants(productId) {
     const data =
         await InventoryService.getVariants(productId);
 
-    setVariants(data);
+    data.sort((a, b) => {
+
+    const sizeA = parseInt(
+
+        a.size.replace(/\D/g, "")
+
+    );
+
+    const sizeB = parseInt(
+
+        b.size.replace(/\D/g, "")
+
+    );
+
+    return sizeA - sizeB;
+
+});
+
+setVariants(data);
 
 }
 
