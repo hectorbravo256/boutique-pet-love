@@ -16,14 +16,13 @@ export default function PurchaseProductModal({
 
     return (
 
-        <Modal
-
-            title="Agregar producto"
-            open={open}
-            onClose={onClose}
-            size="xxl"
-
-        >
+ <Modal
+    open={open}
+    onClose={onClose}
+    title="Agregar producto"
+    size="xxl"
+    workspace
+>
 
             <PurchaseProductSelector
 
