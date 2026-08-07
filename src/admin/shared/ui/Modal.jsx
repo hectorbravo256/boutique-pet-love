@@ -44,19 +44,21 @@ export default function Modal({
 
     if (!open) return null;
 
-    const sizes = {
+const sizes = {
 
-        sm: "max-w-md",
+    sm: "max-w-md",
 
-        md: "max-w-2xl",
+    md: "max-w-2xl",
 
-        lg: "max-w-4xl",
+    lg: "max-w-4xl",
 
-        xl: "max-w-6xl",
+    xl: "max-w-6xl",
 
-        full: "max-w-[95vw]"
+    xxl: "max-w-[1180px]",
 
-    };
+    full: "max-w-[95vw]"
+
+};
 
     return (
 
@@ -160,7 +162,7 @@ export default function Modal({
 
         p-8
 
-        max-h-[75vh]
+        max-h-[88vh]
 
         overflow-y-auto
 
