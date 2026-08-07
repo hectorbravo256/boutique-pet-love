@@ -12,7 +12,9 @@ export default function Modal({
 
     size = "lg",
 
-    closeOnBackdrop = true
+    closeOnBackdrop = true,
+
+    workspace = false
 
 }) {
 
@@ -62,11 +64,17 @@ const sizes = {
 
     return (
 
-        <div
-
-            className="fixed inset-0 z-50 flex items-center justify-center"
-
-        >
+<div
+    className={`
+        fixed
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        ${workspace ? "pl-[260px]" : ""}
+    `}
+>
 
             <div
 
