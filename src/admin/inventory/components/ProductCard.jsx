@@ -8,60 +8,54 @@ export default function ProductCard({ product }) {
 
         "/placeholder-product.png";
 
-    return (
+return (
 
-        <div className="flex flex-col items-center text-center">
+<div
+    className="
+        w-56
+        flex
+        flex-col
+        items-center
+        text-center
+        rounded-2xl
+        border
+        bg-white
+        p-5
+        shadow-sm
+    "
+>
 
-            <img
+    <img
 
-                src={image}
+        src={image}
 
-                alt={product.name}
+        alt={product.name}
 
-                className="
-                    w-40
-                    h-40
-                    rounded-3xl
-                    object-cover
-                    border
-                    shadow-md
-                "
+        className="
+            w-40
+            h-40
+            object-cover
+            rounded-3xl
+        "
 
-            />
+    />
 
-            <h2 className="
+    <h2 className="
 
-                mt-5
-                text-2xl
-                font-black
+        mt-5
 
-            ">
+        text-xl
 
-                {product.name}
+        font-black
 
-            </h2>
+    ">
 
-            {
+        {product.name}
 
-                product.category && (
+    </h2>
 
-                    <p className="
+</div>
 
-                        mt-2
-                        text-slate-500
-
-                    ">
-
-                        {product.category}
-
-                    </p>
-
-                )
-
-            }
-
-        </div>
-
-    );
+);
 
 }
