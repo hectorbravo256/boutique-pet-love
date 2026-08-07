@@ -1,63 +1,148 @@
 import AdminCard from "../../components/AdminCard";
 
-export default function PurchaseSummary({ details }) {
+export default function PurchaseSummary({
 
-    const totalProductos = details.length;
+    details
 
-    const totalUnidades = details.reduce(
+}) {
+
+    //---------------------------------------
+
+    const totalProducts = details.length;
+
+    const totalUnits = details.reduce(
+
         (acc, item) => acc + Number(item.quantity),
+
         0
+
     );
 
-    const totalCompra = details.reduce(
+    const subtotal = details.reduce(
+
         (acc, item) =>
-            acc + item.quantity * item.unit_cost,
+
+            acc +
+
+            Number(item.quantity) *
+
+            Number(item.unit_cost),
+
         0
+
     );
+
+    const iva = Math.round(subtotal * 0.19);
+
+    const total = subtotal + iva;
+
+    //---------------------------------------
+
+    function money(value) {
+
+        return "$" +
+
+            value.toLocaleString("es-CL");
+
+    }
+
+    //---------------------------------------
 
     return (
 
         <AdminCard>
 
-            <h2 className="text-2xl font-black mb-6">
+            <h2 className="text-2xl font-black mb-8">
 
-                Resumen
+                Resumen de la compra
 
             </h2>
 
             <div className="space-y-5">
 
-                <div className="flex justify-between">
+                <Row
 
-                    <span>Productos</span>
+                    label="Productos"
 
-                    <strong>{totalProductos}</strong>
+                    value={totalProducts}
 
-                </div>
+                />
 
-                <div className="flex justify-between">
+                <Row
 
-                    <span>Unidades</span>
+                    label="Unidades"
 
-                    <strong>{totalUnidades}</strong>
+                    value={totalUnits}
 
-                </div>
+                />
 
-                <div className="flex justify-between">
+                <Row
 
-                    <span>Total compra</span>
+                    label="Subtotal"
 
-                    <strong>
+                    value={money(subtotal)}
 
-                        ${totalCompra.toLocaleString("es-CL")}
+                />
 
-                    </strong>
+                <Row
+
+                    label="IVA (19%)"
+
+                    value={money(iva)}
+
+                />
+
+                <hr />
+
+                <div className="flex justify-between items-center">
+
+                    <span className="text-xl font-black">
+
+                        TOTAL
+
+                    </span>
+
+                    <span className="text-3xl font-black text-pink-600">
+
+                        {money(total)}
+
+                    </span>
 
                 </div>
 
             </div>
 
         </AdminCard>
+
+    );
+
+}
+
+function Row({
+
+    label,
+
+    value
+
+}) {
+
+    return (
+
+        <div className="flex justify-between">
+
+            <span className="text-slate-500">
+
+                {label}
+
+            </span>
+
+            <span className="font-bold">
+
+                {value}
+
+            </span>
+
+        </div>
 
     );
 
