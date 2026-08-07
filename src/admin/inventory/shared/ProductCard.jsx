@@ -10,7 +10,7 @@ export default function ProductCard({ product }) {
 
         <div
             className="
-                w-60
+                w-56
                 rounded-3xl
                 border
                 bg-white
@@ -23,7 +23,7 @@ export default function ProductCard({ product }) {
 
             {/* Imagen */}
 
-            <div className="p-6">
+            <div className="p-4">
 
                 <img
 
