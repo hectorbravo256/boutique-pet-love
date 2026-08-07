@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import ProductCard from "../shared/ProductCard";
 import ProductVariantSelector from "./ProductVariantSelector";
+import QuantityInput from "../../shared/ui/QuantityInput";
 
 export default function PurchaseProductSelector({
     products,
@@ -182,34 +183,23 @@ export default function PurchaseProductSelector({
 
                             </label>
 
-                            <input
+<QuantityInput
 
-                                type="number"
+    value={detail.quantity}
 
-                                min="1"
+    onChange={(value)=>
 
-                                value={detail.quantity}
+        setDetail({
 
-                                onChange={(e) =>
+            ...detail,
 
-                                    setDetail({
+            quantity: value
 
-                                        ...detail,
+        })
 
-                                        quantity: Number(e.target.value)
+    }
 
-                                    })
-
-                                }
-
-                                className="
-                                    w-full
-                                    rounded-xl
-                                    border
-                                    p-3
-                                "
-
-                            />
+/>
 
                         </div>
 
