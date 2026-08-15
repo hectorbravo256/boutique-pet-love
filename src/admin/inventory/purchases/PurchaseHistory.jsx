@@ -7,9 +7,31 @@ export default function PurchaseHistory() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
+useEffect(() => {
+
+    loadPurchases();
+
+    function handlePurchaseCreated() {
+
         loadPurchases();
-    }, []);
+
+    }
+
+    window.addEventListener(
+        "purchase:created",
+        handlePurchaseCreated
+    );
+
+    return () => {
+
+        window.removeEventListener(
+            "purchase:created",
+            handlePurchaseCreated
+        );
+
+    };
+
+}, []);
 
     async function loadPurchases() {
 
