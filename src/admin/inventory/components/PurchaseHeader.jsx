@@ -4,8 +4,10 @@ export default function PurchaseHeader({
 
     supplier,
     setSupplier,
-
     suppliers,
+
+    documentType,
+    setDocumentType,
 
     invoiceNumber,
     setInvoiceNumber,
