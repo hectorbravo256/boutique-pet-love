@@ -109,6 +109,9 @@ export default function PurchaseHeader({
             <option value="boleta">
                 Boleta
             </option>
+            <option value="Otro_tipo_comprobante">
+                Otro Tipo Comprobante
+            </option>
         </select>
     </div>
 
@@ -117,7 +120,7 @@ export default function PurchaseHeader({
 
                     <label className="text-sm font-semibold text-slate-500">
 
-                        Nº Factura
+                        Nº Documento
 
                     </label>
 
