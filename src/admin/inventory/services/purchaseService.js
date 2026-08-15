@@ -6,6 +6,8 @@ class PurchaseService {
 
         supplier,
 
+        documentType,
+
         invoiceNumber,
 
         observations,
@@ -21,6 +23,8 @@ class PurchaseService {
 
                     p_supplier: supplier,
 
+                    p_document_type: documentType,
+
                     p_invoice: invoiceNumber,
 
                     p_observations: observations,
@@ -28,7 +32,6 @@ class PurchaseService {
                     p_items: details
 
                 }
-
             );
 
         if (error) throw error;
