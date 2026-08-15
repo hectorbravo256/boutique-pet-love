@@ -128,6 +128,7 @@ summary={<></>}
                 <PurchaseSummary
 
     details={details}
+    documentType={documentType}
 
 />
             
