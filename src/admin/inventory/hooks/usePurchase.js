@@ -13,9 +13,8 @@ export default function usePurchase() {
     const [supplier, setSupplier] = useState("");
     const [suppliers, setSuppliers] = useState([]);
     const [variantSummary, setVariantSummary] = useState(null);
-
+    const [documentType, setDocumentType] = useState("factura_afecta");
     const [invoiceNumber, setInvoiceNumber] = useState("");
-
     const [observations, setObservations] = useState("");
 
     //----------------------------------------
@@ -306,6 +305,9 @@ async function loadVariantSummary(variantId) {
         supplier,
         suppliers,
         setSupplier,
+
+        documentType,
+        setDocumentType,
 
         invoiceNumber,
         setInvoiceNumber,
