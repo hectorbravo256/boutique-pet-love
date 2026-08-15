@@ -75,6 +75,42 @@ export default function PurchaseHeader({
 
                 </div>
 
+                {/* TIPO DE DOCUMENTO */}
+    <div>
+        <label className="block mb-2 text-sm font-bold text-slate-600">
+            Tipo de documento
+        </label>
+
+        <select
+            value={documentType}
+            onChange={(e) => setDocumentType(e.target.value)}
+            className="
+                w-full
+                h-12
+                rounded-xl
+                border
+                border-slate-300
+                bg-white
+                px-4
+                outline-none
+                focus:border-pink-500
+            "
+        >
+            <option value="factura_afecta">
+                Factura afecta
+            </option>
+
+            <option value="factura_exenta">
+                Factura exenta
+            </option>
+
+            <option value="boleta">
+                Boleta
+            </option>
+        </select>
+    </div>
+
+
                 <div>
 
                     <label className="text-sm font-semibold text-slate-500">
