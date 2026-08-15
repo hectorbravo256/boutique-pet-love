@@ -17,6 +17,8 @@ const {
     supplier,
     suppliers,
     setSupplier,
+    documentType,
+    setDocumentType,
 
     invoiceNumber,
     setInvoiceNumber,
@@ -59,6 +61,9 @@ return (
                 setSupplier={setSupplier}
 
                 suppliers={suppliers}
+                
+                documentType={documentType}
+                setDocumentType={setDocumentType}
 
                 invoiceNumber={invoiceNumber}
                 setInvoiceNumber={setInvoiceNumber}
