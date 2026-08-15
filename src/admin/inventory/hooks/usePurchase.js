@@ -487,23 +487,63 @@ export default function usePurchase() {
 
         try {
 
-            await PurchaseService.savePurchase({
+const purchaseId = await PurchaseService.savePurchase({
 
-                supplier,
+    supplier,
 
-                documentType,
+    documentType,
 
-                invoiceNumber,
+    invoiceNumber,
 
-                observations,
+    observations,
 
-                details
+    details
 
-            });
+});
 
-            alert(
-                "Compra registrada correctamente"
-            );
+console.log("✅ Compra registrada:", purchaseId);
+
+// ----------------------------------------
+// LIMPIAR FORMULARIO
+// ----------------------------------------
+
+setSupplier("");
+
+setDocumentType("factura_afecta");
+
+setInvoiceNumber("");
+
+setObservations("");
+
+setDetails([]);
+
+setVariants([]);
+
+setVariantSummary(null);
+
+setDetail({
+
+    product_id: "",
+
+    variant_id: "",
+
+    quantity: 1,
+
+    unit_cost: 0
+
+});
+
+// ----------------------------------------
+// AVISAR AL HISTORIAL
+// ----------------------------------------
+
+window.dispatchEvent(
+    new CustomEvent("purchase:created")
+);
+
+alert(
+    "Compra registrada correctamente"
+);
 
         }
 
