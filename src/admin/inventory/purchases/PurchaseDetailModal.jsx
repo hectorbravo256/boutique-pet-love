@@ -819,7 +819,7 @@ export default function PurchaseDetailModal({
                                                         item.size === undefined ||
                                                         item.size === ""
                                                             ? "-"
-                                                            : `Talla ${item.size}`}
+                                                            : `${item.size}`}
 
                                                     </span>
 
