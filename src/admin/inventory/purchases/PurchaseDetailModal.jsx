@@ -67,15 +67,11 @@ export default function PurchaseDetailModal({
     purchase,
     onClose,
 }) {
-
     const [details, setDetails] = useState([]);
-
     const [loading, setLoading] = useState(false);
-
     const [error, setError] = useState("");
 
     useEffect(() => {
-
         if (!open || !purchase?.id) {
             setDetails([]);
             setError("");
@@ -83,19 +79,16 @@ export default function PurchaseDetailModal({
         }
 
         loadDetails();
-
     }, [open, purchase?.id]);
 
     async function loadDetails() {
-
         try {
-
             setLoading(true);
             setError("");
 
-            // -----------------------------------------
+            // =========================================
             // 1. Obtener detalles de la compra
-            // -----------------------------------------
+            // =========================================
 
             const {
                 data: detailData,
@@ -122,9 +115,9 @@ export default function PurchaseDetailModal({
 
             const rawDetails = detailData || [];
 
-            // -----------------------------------------
+            // =========================================
             // 2. Obtener IDs de productos
-            // -----------------------------------------
+            // =========================================
 
             const productIds = [
                 ...new Set(
@@ -134,9 +127,9 @@ export default function PurchaseDetailModal({
                 ),
             ];
 
-            // -----------------------------------------
+            // =========================================
             // 3. Obtener IDs de variantes
-            // -----------------------------------------
+            // =========================================
 
             const variantIds = [
                 ...new Set(
@@ -146,14 +139,13 @@ export default function PurchaseDetailModal({
                 ),
             ];
 
-            // -----------------------------------------
+            // =========================================
             // 4. Obtener productos
-            // -----------------------------------------
+            // =========================================
 
             let products = [];
 
             if (productIds.length > 0) {
-
                 const {
                     data,
                     error,
@@ -172,14 +164,13 @@ export default function PurchaseDetailModal({
                 products = data || [];
             }
 
-            // -----------------------------------------
+            // =========================================
             // 5. Obtener variantes
-            // -----------------------------------------
+            // =========================================
 
             let variants = [];
 
             if (variantIds.length > 0) {
-
                 const {
                     data,
                     error,
@@ -198,9 +189,9 @@ export default function PurchaseDetailModal({
                 variants = data || [];
             }
 
-            // -----------------------------------------
+            // =========================================
             // 6. Crear mapas
-            // -----------------------------------------
+            // =========================================
 
             const productMap = new Map(
                 products.map((product) => [
@@ -216,13 +207,12 @@ export default function PurchaseDetailModal({
                 ])
             );
 
-            // -----------------------------------------
+            // =========================================
             // 7. Combinar información
-            // -----------------------------------------
+            // =========================================
 
             const completeDetails = rawDetails.map(
                 (item) => {
-
                     const product =
                         productMap.get(item.product_id);
 
@@ -230,7 +220,6 @@ export default function PurchaseDetailModal({
                         variantMap.get(item.variant_id);
 
                     return {
-
                         ...item,
 
                         productName:
@@ -240,16 +229,13 @@ export default function PurchaseDetailModal({
                         size:
                             variant?.size ||
                             "-",
-
                     };
-
                 }
             );
 
             setDetails(completeDetails);
 
         } catch (err) {
-
             console.error(
                 "Error cargando detalle de compra:",
                 err
@@ -261,11 +247,8 @@ export default function PurchaseDetailModal({
             );
 
         } finally {
-
             setLoading(false);
-
         }
-
     }
 
     if (!open || !purchase) {
@@ -279,7 +262,6 @@ export default function PurchaseDetailModal({
     );
 
     return (
-
         <div
             className="
                 fixed
@@ -289,21 +271,21 @@ export default function PurchaseDetailModal({
                 items-center
                 justify-center
                 bg-black/50
-                p-4
+                p-3
+                sm:p-4
             "
             onMouseDown={(event) => {
-
                 if (event.target === event.currentTarget) {
                     onClose?.();
                 }
-
             }}
         >
 
             <div
                 className="
                     flex
-                    max-h-[90vh]
+                    h-[92vh]
+                    max-h-[92vh]
                     w-full
                     max-w-6xl
                     flex-col
@@ -318,63 +300,66 @@ export default function PurchaseDetailModal({
                 {/* HEADER */}
                 {/* ================================= */}
 
-                <div className="
-                    flex
-                    items-center
-                    justify-between
-                    border-b
-                    border-slate-200
-                    px-6
-                    py-5
-                ">
+                <div
+                    className="
+                        flex
+                        shrink-0
+                        items-center
+                        justify-between
+                        border-b
+                        border-slate-200
+                        px-5
+                        py-4
+                        sm:px-6
+                        sm:py-5
+                    "
+                >
 
-                    <div>
+                    <div className="
+                        flex
+                        items-center
+                        gap-3
+                    ">
 
-                        <div className="
-                            flex
-                            items-center
-                            gap-3
-                        ">
-
-                            <div className="
+                        <div
+                            className="
                                 flex
                                 h-11
                                 w-11
+                                shrink-0
                                 items-center
                                 justify-center
                                 rounded-xl
                                 bg-pink-50
                                 text-pink-600
-                            ">
+                            "
+                        >
+                            <Package size={22} />
+                        </div>
 
-                                <Package size={22} />
+                        <div>
 
-                            </div>
-
-                            <div>
-
-                                <h2 className="
-                                    text-2xl
+                            <h2
+                                className="
+                                    text-xl
                                     font-black
                                     text-slate-900
-                                ">
+                                    sm:text-2xl
+                                "
+                            >
+                                Detalle de compra
+                            </h2>
 
-                                    Detalle de compra
-
-                                </h2>
-
-                                <p className="
+                            <p
+                                className="
                                     text-sm
                                     text-slate-500
-                                ">
-
-                                    {formatPurchaseNumber(
-                                        purchase.purchase_number
-                                    )}
-
-                                </p>
-
-                            </div>
+                                "
+                            >
+                                {formatPurchaseNumber(
+                                    purchase.purchase_number
+                                )}
+                            </p>
 
                         </div>
 
@@ -387,6 +372,7 @@ export default function PurchaseDetailModal({
                             flex
                             h-10
                             w-10
+                            shrink-0
                             items-center
                             justify-center
                             rounded-xl
@@ -397,9 +383,7 @@ export default function PurchaseDetailModal({
                         "
                         aria-label="Cerrar"
                     >
-
                         <X size={22} />
-
                     </button>
 
                 </div>
@@ -408,169 +392,183 @@ export default function PurchaseDetailModal({
                 {/* INFORMACIÓN GENERAL */}
                 {/* ================================= */}
 
-                <div className="
-                    grid
-                    grid-cols-1
-                    gap-3
-                    border-b
-                    border-slate-200
-                    bg-slate-50
-                    px-6
-                    py-5
-                    md:grid-cols-4
-                ">
+                <div
+                    className="
+                        grid
+                        shrink-0
+                        grid-cols-1
+                        gap-3
+                        border-b
+                        border-slate-200
+                        bg-slate-50
+                        px-5
+                        py-4
+                        sm:px-6
+                        md:grid-cols-4
+                    "
+                >
 
-                    <div className="
-                        rounded-xl
-                        bg-white
-                        p-4
-                        shadow-sm
-                    ">
+                    {/* COMPRA */}
 
-                        <div className="
-                            mb-1
-                            flex
-                            items-center
-                            gap-2
-                            text-xs
-                            font-semibold
-                            text-slate-500
-                        ">
+                    <div
+                        className="
+                            rounded-xl
+                            bg-white
+                            p-3
+                            shadow-sm
+                        "
+                    >
 
+                        <div
+                            className="
+                                mb-1
+                                flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                            "
+                        >
                             <Hash size={14} />
-
                             Compra
-
                         </div>
 
-                        <div className="
-                            font-black
-                            text-pink-600
-                        ">
-
+                        <div
+                            className="
+                                font-black
+                                text-pink-600
+                            "
+                        >
                             {formatPurchaseNumber(
                                 purchase.purchase_number
                             )}
-
                         </div>
 
                     </div>
 
-                    <div className="
-                        rounded-xl
-                        bg-white
-                        p-4
-                        shadow-sm
-                    ">
+                    {/* FECHA */}
 
-                        <div className="
-                            mb-1
-                            flex
-                            items-center
-                            gap-2
-                            text-xs
-                            font-semibold
-                            text-slate-500
-                        ">
+                    <div
+                        className="
+                            rounded-xl
+                            bg-white
+                            p-3
+                            shadow-sm
+                        "
+                    >
 
+                        <div
+                            className="
+                                mb-1
+                                flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                            "
+                        >
                             <CalendarDays size={14} />
-
                             Fecha
-
                         </div>
 
-                        <div className="
-                            font-bold
-                            text-slate-800
-                        ">
-
+                        <div
+                            className="
+                                font-bold
+                                text-slate-800
+                            "
+                        >
                             {formatDate(
                                 purchase.purchase_date
                             )}
-
                         </div>
 
                     </div>
 
-                    <div className="
-                        rounded-xl
-                        bg-white
-                        p-4
-                        shadow-sm
-                    ">
+                    {/* PROVEEDOR */}
 
-                        <div className="
-                            mb-1
-                            flex
-                            items-center
-                            gap-2
-                            text-xs
-                            font-semibold
-                            text-slate-500
-                        ">
+                    <div
+                        className="
+                            rounded-xl
+                            bg-white
+                            p-3
+                            shadow-sm
+                        "
+                    >
 
+                        <div
+                            className="
+                                mb-1
+                                flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                            "
+                        >
                             <User size={14} />
-
                             Proveedor
-
                         </div>
 
-                        <div className="
-                            font-bold
-                            text-slate-800
-                        ">
-
+                        <div
+                            className="
+                                font-bold
+                                text-slate-800
+                            "
+                        >
                             {purchase.supplier || "-"}
-
                         </div>
 
                     </div>
 
-                    <div className="
-                        rounded-xl
-                        bg-white
-                        p-4
-                        shadow-sm
-                    ">
+                    {/* DOCUMENTO */}
 
-                        <div className="
-                            mb-1
-                            flex
-                            items-center
-                            gap-2
-                            text-xs
-                            font-semibold
-                            text-slate-500
-                        ">
+                    <div
+                        className="
+                            rounded-xl
+                            bg-white
+                            p-3
+                            shadow-sm
+                        "
+                    >
 
+                        <div
+                            className="
+                                mb-1
+                                flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-semibold
+                                text-slate-500
+                            "
+                        >
                             <FileText size={14} />
-
                             Documento
-
                         </div>
 
-                        <div className="
-                            font-bold
-                            text-slate-800
-                        ">
-
+                        <div
+                            className="
+                                font-bold
+                                text-slate-800
+                            "
+                        >
                             {getDocumentLabel(
                                 purchase.document_type
                             )}
-
                         </div>
 
                         {purchase.invoice_number && (
-
-                            <div className="
-                                text-xs
-                                text-slate-500
-                            ">
-
+                            <div
+                                className="
+                                    text-xs
+                                    text-slate-500
+                                "
+                            >
                                 Nº {purchase.invoice_number}
-
                             </div>
-
                         )}
 
                     </div>
@@ -578,30 +576,40 @@ export default function PurchaseDetailModal({
                 </div>
 
                 {/* ================================= */}
-                {/* CONTENIDO */}
+                {/* ÁREA PRINCIPAL CON SCROLL */}
                 {/* ================================= */}
 
-                <div className="
-                    flex-1
-                    overflow-y-auto
-                    p-6
-                ">
+                <div
+                    className="
+                        min-h-0
+                        flex-1
+                        overflow-y-auto
+                        bg-white
+                        px-5
+                        py-5
+                        sm:px-6
+                    "
+                >
 
                     {loading ? (
 
-                        <div className="
-                            flex
-                            min-h-[250px]
-                            items-center
-                            justify-center
-                        ">
-
-                            <div className="
+                        <div
+                            className="
                                 flex
+                                min-h-[250px]
                                 items-center
-                                gap-3
-                                text-slate-500
-                            ">
+                                justify-center
+                            "
+                        >
+
+                            <div
+                                className="
+                                    flex
+                                    items-center
+                                    gap-3
+                                    text-slate-500
+                                "
+                            >
 
                                 <RefreshCw
                                     size={20}
@@ -616,37 +624,39 @@ export default function PurchaseDetailModal({
 
                     ) : error ? (
 
-                        <div className="
-                            rounded-xl
-                            border
-                            border-red-200
-                            bg-red-50
-                            px-4
-                            py-4
-                            text-sm
-                            font-medium
-                            text-red-700
-                        ">
-
+                        <div
+                            className="
+                                rounded-xl
+                                border
+                                border-red-200
+                                bg-red-50
+                                px-4
+                                py-4
+                                text-sm
+                                font-medium
+                                text-red-700
+                            "
+                        >
                             {error}
-
                         </div>
 
                     ) : details.length === 0 ? (
 
-                        <div className="
-                            flex
-                            min-h-[250px]
-                            flex-col
-                            items-center
-                            justify-center
-                            rounded-2xl
-                            border
-                            border-dashed
-                            border-slate-300
-                            bg-slate-50
-                            text-center
-                        ">
+                        <div
+                            className="
+                                flex
+                                min-h-[250px]
+                                flex-col
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                border
+                                border-dashed
+                                border-slate-300
+                                bg-slate-50
+                                text-center
+                            "
+                        >
 
                             <Package
                                 size={34}
@@ -656,420 +666,458 @@ export default function PurchaseDetailModal({
                                 "
                             />
 
-                            <p className="
-                                font-semibold
-                                text-slate-600
-                            ">
-
-                                Esta compra no tiene detalles registrados.
-
+                            <p
+                                className="
+                                    font-semibold
+                                    text-slate-600
+                                "
+                            >
+                                Esta compra no tiene
+                                detalles registrados.
                             </p>
 
                         </div>
 
                     ) : (
 
-                        <div className="
-                            overflow-x-auto
-                            rounded-2xl
-                            border
-                            border-slate-200
-                        ">
-                            <div className="max-h-[360px] overflow-y-auto">
+                        <>
+                            {/* ================================= */}
+                            {/* TABLA DE PRODUCTOS */}
+                            {/* ================================= */}
 
-                            <table className="
-                                w-full
-                                min-w-[750px]
-                                border-collapse
-                            ">
+                            <div
+                                className="
+                                    overflow-x-auto
+                                    rounded-2xl
+                                    border
+                                    border-slate-200
+                                "
+                            >
 
-                                <thead className="sticky top-0 z-10 bg-slate-50">
+                                <table
+                                    className="
+                                        w-full
+                                        min-w-[750px]
+                                        border-collapse
+                                    "
+                                >
 
-                                    <tr className="
-                                        bg-slate-50
-                                        text-left
-                                    ">
+                                    <thead
+                                        className="
+                                            sticky
+                                            top-0
+                                            z-10
+                                            bg-slate-50
+                                        "
+                                    >
 
-                                        <th className="
-                                            px-4
-                                            py-4
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-500
+                                        <tr className="
+                                            bg-slate-50
+                                            text-left
                                         ">
 
-                                            Producto
-
-                                        </th>
-
-                                        <th className="
-                                            px-4
-                                            py-4
-                                            text-center
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-500
-                                        ">
-
-                                            Talla
-
-                                        </th>
-
-                                        <th className="
-                                            px-4
-                                            py-4
-                                            text-center
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-500
-                                        ">
-
-                                            Cantidad
-
-                                        </th>
-
-                                        <th className="
-                                            px-4
-                                            py-4
-                                            text-right
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-500
-                                        ">
-
-                                            Costo unitario
-
-                                        </th>
-
-                                        <th className="
-                                            px-4
-                                            py-4
-                                            text-right
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wide
-                                            text-slate-500
-                                        ">
-
-                                            Subtotal
-
-                                        </th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-                                    {details.map(
-                                        (item) => (
-
-                                            <tr
-                                                key={item.id}
+                                            <th
                                                 className="
-                                                    border-t
-                                                    border-slate-100
+                                                    px-4
+                                                    py-3
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-500
                                                 "
                                             >
+                                                Producto
+                                            </th>
 
-                                                <td className="
+                                            <th
+                                                className="
                                                     px-4
-                                                    py-4
-                                                ">
-
-                                                    <div className="
-                                                        font-bold
-                                                        text-slate-800
-                                                    ">
-
-                                                        {
-                                                            item.productName
-                                                        }
-
-                                                    </div>
-
-                                                </td>
-
-                                                <td className="
-                                                    px-4
-                                                    py-4
+                                                    py-3
                                                     text-center
-                                                ">
-
-                                                    <span className="
-                                                        inline-flex
-                                                        rounded-full
-                                                        bg-pink-50
-                                                        px-3
-                                                        py-1
-                                                        text-xs
-                                                        font-bold
-                                                        text-pink-600
-                                                    ">
-
-                                                        {item.size === null ||
-                                                        item.size === undefined ||
-                                                        item.size === ""
-                                                            ? "-"
-                                                            : `${item.size}`}
-
-                                                    </span>
-
-                                                </td>
-
-                                                <td className="
-                                                    px-4
-                                                    py-4
-                                                    text-center
-                                                    font-bold
-                                                    text-slate-800
-                                                ">
-
-                                                    {Number(
-                                                        item.quantity || 0
-                                                    )}
-
-                                                </td>
-
-                                                <td className="
-                                                    px-4
-                                                    py-4
-                                                    text-right
-                                                    font-medium
-                                                    text-slate-700
-                                                ">
-
-                                                    {formatCurrency(
-                                                        item.unit_cost
-                                                    )}
-
-                                                </td>
-
-                                                <td className="
-                                                    px-4
-                                                    py-4
-                                                    text-right
+                                                    text-xs
                                                     font-black
-                                                    text-slate-900
-                                                ">
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-500
+                                                "
+                                            >
+                                                Talla
+                                            </th>
 
-                                                    {formatCurrency(
-                                                        item.subtotal
-                                                    )}
+                                            <th
+                                                className="
+                                                    px-4
+                                                    py-3
+                                                    text-center
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-500
+                                                "
+                                            >
+                                                Cantidad
+                                            </th>
 
-                                                </td>
+                                            <th
+                                                className="
+                                                    px-4
+                                                    py-3
+                                                    text-right
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-500
+                                                "
+                                            >
+                                                Costo unitario
+                                            </th>
 
-                                            </tr>
+                                            <th
+                                                className="
+                                                    px-4
+                                                    py-3
+                                                    text-right
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-slate-500
+                                                "
+                                            >
+                                                Subtotal
+                                            </th>
 
-                                        )
-                                    )}
+                                        </tr>
 
-                                </tbody>
+                                    </thead>
 
-                            </table>
+                                    <tbody>
+
+                                        {details.map(
+                                            (item) => (
+
+                                                <tr
+                                                    key={item.id}
+                                                    className="
+                                                        border-t
+                                                        border-slate-100
+                                                        transition
+                                                        hover:bg-slate-50
+                                                    "
+                                                >
+
+                                                    <td
+                                                        className="
+                                                            px-4
+                                                            py-3
+                                                        "
+                                                    >
+                                                        <div
+                                                            className="
+                                                                font-bold
+                                                                text-slate-800
+                                                            "
+                                                        >
+                                                            {
+                                                                item.productName
+                                                            }
+                                                        </div>
+                                                    </td>
+
+                                                    <td
+                                                        className="
+                                                            px-4
+                                                            py-3
+                                                            text-center
+                                                        "
+                                                    >
+
+                                                        <span
+                                                            className="
+                                                                inline-flex
+                                                                rounded-full
+                                                                bg-pink-50
+                                                                px-3
+                                                                py-1
+                                                                text-xs
+                                                                font-bold
+                                                                text-pink-600
+                                                            "
+                                                        >
+                                                            {
+                                                                item.size === null ||
+                                                                item.size === undefined ||
+                                                                item.size === ""
+                                                                    ? "-"
+                                                                    : `${item.size}`
+                                                            }
+                                                        </span>
+
+                                                    </td>
+
+                                                    <td
+                                                        className="
+                                                            px-4
+                                                            py-3
+                                                            text-center
+                                                            font-bold
+                                                            text-slate-800
+                                                        "
+                                                    >
+                                                        {Number(
+                                                            item.quantity || 0
+                                                        )}
+                                                    </td>
+
+                                                    <td
+                                                        className="
+                                                            px-4
+                                                            py-3
+                                                            text-right
+                                                            font-medium
+                                                            text-slate-700
+                                                        "
+                                                    >
+                                                        {formatCurrency(
+                                                            item.unit_cost
+                                                        )}
+                                                    </td>
+
+                                                    <td
+                                                        className="
+                                                            px-4
+                                                            py-3
+                                                            text-right
+                                                            font-black
+                                                            text-slate-900
+                                                        "
+                                                    >
+                                                        {formatCurrency(
+                                                            item.subtotal
+                                                        )}
+                                                    </td>
+
+                                                </tr>
+
+                                            )
+                                        )}
+
+                                    </tbody>
+
+                                </table>
 
                             </div>
 
-                        </div>
+                            {/* ================================= */}
+                            {/* OBSERVACIONES COMPACTAS */}
+                            {/* ================================= */}
+
+                            {purchase.notes &&
+                                purchase.notes.trim() !== "" && (
+
+                                    <div
+                                        className="
+                                            mt-4
+                                            rounded-xl
+                                            border
+                                            border-slate-200
+                                            bg-slate-50
+                                            px-4
+                                            py-3
+                                        "
+                                    >
+
+                                        <div
+                                            className="
+                                                mb-1
+                                                text-[11px]
+                                                font-black
+                                                uppercase
+                                                tracking-wide
+                                                text-slate-500
+                                            "
+                                        >
+                                            Observaciones
+                                        </div>
+
+                                        <p
+                                            className="
+                                                max-h-[60px]
+                                                overflow-y-auto
+                                                whitespace-pre-wrap
+                                                text-sm
+                                                leading-5
+                                                text-slate-700
+                                            "
+                                        >
+                                            {purchase.notes}
+                                        </p>
+
+                                    </div>
+
+                                )}
+
+                        </>
 
                     )}
 
                 </div>
 
-{/* ================================= */}
-{/* OBSERVACIONES */}
-{/* ================================= */}
-
-{purchase.notes && purchase.notes.trim() !== "" && (
-
-    <div className="
-        border-t
-        border-slate-200
-        bg-slate-50
-        px-6
-        py-5
-    ">
-
-        <div className="
-            rounded-2xl
-            border
-            border-slate-200
-            bg-white
-            p-4
-        ">
-
-            <div className="
-                mb-2
-                text-xs
-                font-black
-                uppercase
-                tracking-wide
-                text-slate-500
-            ">
-
-                Observaciones
-
-            </div>
-
-            <p className="
-                whitespace-pre-wrap
-                text-sm
-                leading-6
-                text-slate-700
-            ">
-
-                {purchase.notes}
-
-            </p>
-
-        </div>
-
-    </div>
-
-)}
-
                 {/* ================================= */}
-                {/* FOOTER */}
+                {/* FOOTER FIJO */}
                 {/* ================================= */}
 
-                <div className="
-                    border-t
-                    border-slate-200
-                    bg-white
-                    px-6
-                    py-5
-                ">
+                <div
+                    className="
+                        shrink-0
+                        border-t
+                        border-slate-200
+                        bg-white
+                        px-5
+                        py-4
+                        sm:px-6
+                    "
+                >
 
-                    <div className="
-                        flex
-                        flex-col
-                        gap-5
-                        md:flex-row
-                        md:items-end
-                        md:justify-between
-                    ">
+                    <div
+                        className="
+                            flex
+                            flex-col
+                            gap-4
+                            md:flex-row
+                            md:items-end
+                            md:justify-between
+                        "
+                    >
 
-                        <div className="
-                            text-sm
-                            text-slate-500
-                        ">
+                        {/* CONTADORES */}
+
+                        <div
+                            className="
+                                text-sm
+                                text-slate-500
+                            "
+                        >
 
                             <div>
-
                                 <span className="font-semibold">
                                     Productos:
                                 </span>{" "}
-
                                 {details.length}
-
                             </div>
 
                             <div>
-
                                 <span className="font-semibold">
                                     Unidades:
                                 </span>{" "}
-
                                 {totalUnits}
-
                             </div>
 
                         </div>
 
-                        <div className="
-                            min-w-[280px]
-                            space-y-2
-                        ">
+                        {/* TOTALES */}
 
-                            <div className="
-                                flex
-                                justify-between
-                                text-sm
-                                text-slate-500
-                            ">
+                        <div
+                            className="
+                                w-full
+                                md:min-w-[280px]
+                                md:w-auto
+                            "
+                        >
+
+                            <div
+                                className="
+                                    flex
+                                    justify-between
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
 
                                 <span>
                                     Subtotal
                                 </span>
 
-                                <span className="
-                                    font-semibold
-                                    text-slate-800
-                                ">
-
+                                <span
+                                    className="
+                                        font-semibold
+                                        text-slate-800
+                                    "
+                                >
                                     {formatCurrency(
                                         purchase.subtotal
                                     )}
-
                                 </span>
 
                             </div>
 
-                            <div className="
-                                flex
-                                justify-between
-                                text-sm
-                                text-slate-500
-                            ">
+                            <div
+                                className="
+                                    mt-1
+                                    flex
+                                    justify-between
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
 
                                 <span>
                                     IVA
                                 </span>
 
-                                <span className="
-                                    font-semibold
-                                    text-slate-800
-                                ">
-
+                                <span
+                                    className="
+                                        font-semibold
+                                        text-slate-800
+                                    "
+                                >
                                     {formatCurrency(
                                         purchase.iva
                                     )}
-
                                 </span>
 
                             </div>
 
-                            <div className="
-                                border-t
-                                border-slate-200
-                                pt-3
-                            ">
+                            <div
+                                className="
+                                    mt-2
+                                    border-t
+                                    border-slate-200
+                                    pt-2
+                                "
+                            >
 
-                                <div className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                ">
+                                <div
+                                    className="
+                                        flex
+                                        items-center
+                                        justify-between
+                                    "
+                                >
 
-                                    <span className="
-                                        text-lg
-                                        font-black
-                                        text-slate-900
-                                    ">
-
+                                    <span
+                                        className="
+                                            text-lg
+                                            font-black
+                                            text-slate-900
+                                        "
+                                    >
                                         TOTAL
-
                                     </span>
 
-                                    <span className="
-                                        text-2xl
-                                        font-black
-                                        text-pink-600
-                                    ">
-
+                                    <span
+                                        className="
+                                            text-2xl
+                                            font-black
+                                            text-pink-600
+                                        "
+                                    >
                                         {formatCurrency(
                                             purchase.total
                                         )}
-
                                     </span>
 
                                 </div>
@@ -1085,7 +1133,5 @@ export default function PurchaseDetailModal({
             </div>
 
         </div>
-
     );
-
 }
