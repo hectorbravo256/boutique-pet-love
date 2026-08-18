@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Eye, History, Package, RefreshCw } from "lucide-react";
 import { supabase } from "../../../supabaseClient";
+import PurchaseDetailModal from "./PurchaseDetailModal";
 
 function formatPurchaseNumber(number) {
     if (number === null || number === undefined) {
@@ -60,6 +61,9 @@ export default function PurchaseHistory({ onViewDetail }) {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [selectedPurchase, setSelectedPurchase] = useState(null);
+    const [detailModalOpen, setDetailModalOpen] = useState(false);
 
     async function loadPurchases() {
 
@@ -651,19 +655,12 @@ export default function PurchaseHistory({ onViewDetail }) {
 
                                                         <button
                                                             type="button"
-                                                            onClick={() => {
+    onClick={() => {
 
-                                                                if (
-                                                                    onViewDetail
-                                                                ) {
+    setSelectedPurchase(purchase);
+    setDetailModalOpen(true);
 
-                                                                    onViewDetail(
-                                                                        purchase
-                                                                    );
-
-                                                                }
-
-                                                            }}
+}}
                                                             className="
                                                                 inline-flex
                                                                 items-center
@@ -958,6 +955,21 @@ export default function PurchaseHistory({ onViewDetail }) {
             </div>
 
         </section>
+
+        <PurchaseDetailModal
+
+            open={detailModalOpen}
+
+            purchase={selectedPurchase}
+
+            onClose={() => {
+
+                setDetailModalOpen(false);
+                setSelectedPurchase(null);
+
+            }}
+
+        />
 
     );
 
