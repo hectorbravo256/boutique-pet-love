@@ -90,7 +90,8 @@ export default function PurchaseHistory() {
                     subtotal,
                     iva,
                     total,
-                    purchase_date
+                    purchase_date,
+                    notes
                 `)
                 .order("purchase_number", {
                     ascending: false
