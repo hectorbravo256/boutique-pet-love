@@ -675,6 +675,7 @@ export default function PurchaseDetailModal({
                             border
                             border-slate-200
                         ">
+                            <div className="max-h-[360px] overflow-y-auto">
 
                             <table className="
                                 w-full
@@ -682,7 +683,7 @@ export default function PurchaseDetailModal({
                                 border-collapse
                             ">
 
-                                <thead>
+                                <thead className="sticky top-0 z-10 bg-slate-50">
 
                                     <tr className="
                                         bg-slate-50
@@ -875,6 +876,8 @@ export default function PurchaseDetailModal({
                                 </tbody>
 
                             </table>
+
+                            </div>
 
                         </div>
 
