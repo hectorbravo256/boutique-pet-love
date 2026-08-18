@@ -54,7 +54,7 @@ function getDocumentLabel(documentType) {
     }
 }
 
-export default function PurchaseHistory({ onViewDetail }) {
+export default function PurchaseHistory() {
 
     const [purchases, setPurchases] = useState([]);
     const [details, setDetails] = useState([]);
@@ -212,6 +212,8 @@ export default function PurchaseHistory({ onViewDetail }) {
     );
 
     return (
+
+        <>
 
         <section className="mt-8">
 
@@ -970,7 +972,8 @@ export default function PurchaseHistory({ onViewDetail }) {
             }}
 
         />
-
+</>
+    
     );
 
 }
