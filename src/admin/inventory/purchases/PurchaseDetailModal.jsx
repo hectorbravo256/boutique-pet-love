@@ -885,6 +885,58 @@ export default function PurchaseDetailModal({
 
                 </div>
 
+{/* ================================= */}
+{/* OBSERVACIONES */}
+{/* ================================= */}
+
+{purchase.notes && purchase.notes.trim() !== "" && (
+
+    <div className="
+        border-t
+        border-slate-200
+        bg-slate-50
+        px-6
+        py-5
+    ">
+
+        <div className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-4
+        ">
+
+            <div className="
+                mb-2
+                text-xs
+                font-black
+                uppercase
+                tracking-wide
+                text-slate-500
+            ">
+
+                Observaciones
+
+            </div>
+
+            <p className="
+                whitespace-pre-wrap
+                text-sm
+                leading-6
+                text-slate-700
+            ">
+
+                {purchase.notes}
+
+            </p>
+
+        </div>
+
+    </div>
+
+)}
+
                 {/* ================================= */}
                 {/* FOOTER */}
                 {/* ================================= */}
