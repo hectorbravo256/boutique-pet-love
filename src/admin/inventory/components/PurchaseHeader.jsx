@@ -109,7 +109,7 @@ export default function PurchaseHeader({
             <option value="boleta">
                 Boleta
             </option>
-            <option value="Otro">
+            <option value="otro">
                 Otro Tipo Comprobante
             </option>
         </select>
