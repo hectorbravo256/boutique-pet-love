@@ -443,7 +443,7 @@ if (ordersLoading) {
 
     summary={summary}
 
-    onInventory={() => navigate("/admin/inventario")}
+    onInventory={() => navigate("/admin/inventario/master")}
 
     onOrders={() => navigate("/admin/ventas")}
 
