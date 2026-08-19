@@ -1,734 +1,1478 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import {
+    useEffect,
+    useMemo,
+    useState
+} from "react";
 
-const MEDIOS_PAGO = [
-  { value: "efectivo", label: "💵 Efectivo" },
-  { value: "debito", label: "💳 Débito" },
-  { value: "credito", label: "💳 Crédito" },
-  { value: "transferencia", label: "🏦 Transferencia" },
-];
-
-const TIPOS_VENTA = [
-  { value: "presencial", label: "🏪 Venta presencial" },
-  { value: "whatsapp", label: "📱 Venta WhatsApp" },
-];
+import { supabase } from "../../supabaseClient";
+import AdminCard from "../components/AdminCard";
 
 export default function VentasExternas() {
-  const [tipoVenta, setTipoVenta] = useState("presencial");
-  const [medioPago, setMedioPago] = useState("transferencia");
 
-  const [productos, setProductos] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
-  const [carrito, setCarrito] = useState([]);
+    const [productos, setProductos] = useState([]);
+    const [ventas, setVentas] = useState([]);
 
-  const [cliente, setCliente] = useState({
-    nombre: "",
-    rut: "",
-    correo: "",
-    telefono: "",
-    observacion: "",
-  });
+    const [loading, setLoading] = useState(true);
+    const [guardando, setGuardando] = useState(false);
 
-  const [cargandoProductos, setCargandoProductos] = useState(true);
-  const [guardando, setGuardando] = useState(false);
-  const [mensaje, setMensaje] = useState(null);
+    const [tipoVenta, setTipoVenta] =
+        useState("presencial");
 
-  // ------------------------------------------------------------
-  // CARGAR PRODUCTOS Y VARIANTES
-  // ------------------------------------------------------------
-  useEffect(() => {
-    cargarProductos();
-  }, []);
+    const [medioPago, setMedioPago] =
+        useState("efectivo");
 
-  async function cargarProductos() {
-    try {
-      setCargandoProductos(true);
-
-      const { data, error } = await supabase
-        .from("product_variants")
-        .select(`
-          id,
-          product_id,
-          size,
-          price,
-          stock,
-          products (
-            id,
-            name
-          )
-        `)
-        .order("product_id", { ascending: true });
-
-      if (error) throw error;
-
-      setProductos(data || []);
-    } catch (error) {
-      console.error("Error cargando productos:", error);
-
-      setMensaje({
-        tipo: "error",
-        texto: "No fue posible cargar los productos.",
-      });
-    } finally {
-      setCargandoProductos(false);
-    }
-  }
-
-  // ------------------------------------------------------------
-  // PRODUCTOS FILTRADOS
-  // ------------------------------------------------------------
-  const productosFiltrados = useMemo(() => {
-    const texto = busqueda.trim().toLowerCase();
-
-    if (!texto) return [];
-
-    return productos
-      .filter((item) => {
-        const nombre = item.products?.name?.toLowerCase() || "";
-        const talla = item.size?.toLowerCase() || "";
-
-        return (
-          nombre.includes(texto) ||
-          talla.includes(texto)
-        );
-      })
-      .slice(0, 20);
-  }, [productos, busqueda]);
-
-  // ------------------------------------------------------------
-  // AGREGAR AL CARRITO
-  // ------------------------------------------------------------
-  function agregarProducto(producto) {
-    if (producto.stock <= 0) {
-      setMensaje({
-        tipo: "error",
-        texto: `No hay stock disponible para ${producto.products?.name} - ${producto.size}.`,
-      });
-      return;
-    }
-
-    setCarrito((actual) => {
-      const existente = actual.find(
-        (item) => item.variant_id === producto.id
-      );
-
-      if (existente) {
-        if (existente.cantidad >= producto.stock) {
-          setMensaje({
-            tipo: "error",
-            texto: `Stock máximo disponible: ${producto.stock}.`,
-          });
-
-          return actual;
-        }
-
-        return actual.map((item) =>
-          item.variant_id === producto.id
-            ? {
-                ...item,
-                cantidad: item.cantidad + 1,
-              }
-            : item
-        );
-      }
-
-      return [
-        ...actual,
-        {
-          variant_id: producto.id,
-          product_id: producto.product_id,
-          producto: producto.products?.name || "Producto",
-          talla: producto.size || "",
-          precio: Number(producto.price || 0),
-          cantidad: 1,
-          stock: Number(producto.stock || 0),
-        },
-      ];
-    });
-
-    setBusqueda("");
-    setMensaje(null);
-  }
-
-  // ------------------------------------------------------------
-  // CAMBIAR CANTIDAD
-  // ------------------------------------------------------------
-  function cambiarCantidad(variantId, cantidad) {
-    const nuevaCantidad = Number(cantidad);
-
-    if (nuevaCantidad < 1) return;
-
-    setCarrito((actual) =>
-      actual.map((item) => {
-        if (item.variant_id !== variantId) return item;
-
-        if (nuevaCantidad > item.stock) {
-          setMensaje({
-            tipo: "error",
-            texto: `Stock máximo disponible para ${item.producto} ${item.talla}: ${item.stock}.`,
-          });
-
-          return item;
-        }
-
-        return {
-          ...item,
-          cantidad: nuevaCantidad,
-        };
-      })
-    );
-  }
-
-  // ------------------------------------------------------------
-  // ELIMINAR PRODUCTO
-  // ------------------------------------------------------------
-  function eliminarProducto(variantId) {
-    setCarrito((actual) =>
-      actual.filter((item) => item.variant_id !== variantId)
-    );
-  }
-
-  // ------------------------------------------------------------
-  // TOTAL
-  // ------------------------------------------------------------
-  const total = useMemo(() => {
-    return carrito.reduce(
-      (suma, item) => suma + item.precio * item.cantidad,
-      0
-    );
-  }, [carrito]);
-
-  function formatoPrecio(valor) {
-    return new Intl.NumberFormat("es-CL", {
-      style: "currency",
-      currency: "CLP",
-      maximumFractionDigits: 0,
-    }).format(valor);
-  }
-
-  function actualizarCliente(campo, valor) {
-    setCliente((actual) => ({
-      ...actual,
-      [campo]: valor,
-    }));
-  }
-
-  // ------------------------------------------------------------
-  // REGISTRAR VENTA
-  // ------------------------------------------------------------
-  async function registrarVenta() {
-    if (carrito.length === 0) {
-      setMensaje({
-        tipo: "error",
-        texto: "Debes agregar al menos un producto.",
-      });
-      return;
-    }
-
-    setGuardando(true);
-    setMensaje(null);
-
-    try {
-      const items = carrito.map((item) => ({
-        variant_id: item.variant_id,
-        cantidad: item.cantidad,
-        precio: item.precio,
-      }));
-
-      const { data, error } = await supabase.rpc(
-        "registrar_venta_externa",
-        {
-          p_tipo_venta: tipoVenta,
-          p_nombre: cliente.nombre,
-          p_rut: cliente.rut,
-          p_correo: cliente.correo,
-          p_telefono: cliente.telefono,
-          p_observacion: cliente.observacion,
-          p_items: items,
-          p_medio_pago: medioPago,
-          p_vendedor: "Administrador",
-        }
-      );
-
-      if (error) throw error;
-
-      const resultado = data?.[0];
-
-      setMensaje({
-        tipo: "success",
-        texto: `Venta Nº ${resultado?.numero_venta || ""} registrada correctamente.`,
-      });
-
-      setCarrito([]);
-
-      setCliente({
+    const [cliente, setCliente] = useState({
         nombre: "",
         rut: "",
         correo: "",
         telefono: "",
-        observacion: "",
-      });
+        observacion: ""
+    });
 
-      await cargarProductos();
-    } catch (error) {
-      console.error("Error registrando venta:", error);
+    const [productoSeleccionado, setProductoSeleccionado] =
+        useState("");
 
-      setMensaje({
-        tipo: "error",
-        texto:
-          error?.message ||
-          "No fue posible registrar la venta.",
-      });
-    } finally {
-      setGuardando(false);
+    const [varianteSeleccionada, setVarianteSeleccionada] =
+        useState("");
+
+    const [cantidad, setCantidad] =
+        useState(1);
+
+    const [items, setItems] =
+        useState([]);
+
+    const [mensaje, setMensaje] =
+        useState("");
+
+    const [error, setError] =
+        useState("");
+
+
+    /* =====================================================
+       CARGAR PRODUCTOS
+    ===================================================== */
+
+    useEffect(() => {
+
+        cargarProductos();
+        cargarVentas();
+
+    }, []);
+
+
+    const cargarProductos = async () => {
+
+        const { data, error } =
+            await supabase
+                .from("products")
+                .select(`
+                    id,
+                    name,
+                    active,
+                    product_variants (
+                        id,
+                        size,
+                        price,
+                        stock
+                    )
+                `)
+                .eq("active", true)
+                .order("name");
+
+        if (error) {
+
+            console.error(error);
+
+            setError(
+                "No fue posible cargar los productos."
+            );
+
+            return;
+
+        }
+
+        setProductos(data || []);
+
+        setLoading(false);
+
+    };
+
+
+    /* =====================================================
+       CARGAR VENTAS EXTERNAS
+    ===================================================== */
+
+    const cargarVentas = async () => {
+
+        const { data, error } =
+            await supabase
+                .from("orders")
+                .select(`
+                    id,
+                    numero_venta,
+                    created_at,
+                    nombre,
+                    tipo_venta,
+                    medio_pago,
+                    estado_pago,
+                    estado,
+                    total,
+                    vendedor
+                `)
+                .in(
+                    "tipo_venta",
+                    [
+                        "presencial",
+                        "whatsapp"
+                    ]
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(20);
+
+        if (error) {
+
+            console.error(error);
+
+            return;
+
+        }
+
+        setVentas(data || []);
+
+    };
+
+
+    /* =====================================================
+       PRODUCTO SELECCIONADO
+    ===================================================== */
+
+    const productoActual =
+        productos.find(
+            p =>
+                String(p.id) ===
+                String(productoSeleccionado)
+        );
+
+
+    const variantesDisponibles =
+        productoActual?.product_variants || [];
+
+
+    /* =====================================================
+       VARIANTE ACTUAL
+    ===================================================== */
+
+    const varianteActual =
+        variantesDisponibles.find(
+            v =>
+                String(v.id) ===
+                String(varianteSeleccionada)
+        );
+
+
+    /* =====================================================
+       TOTAL
+    ===================================================== */
+
+    const total =
+        useMemo(
+            () =>
+                items.reduce(
+                    (sum, item) =>
+                        sum +
+                        (
+                            Number(item.price) *
+                            Number(item.quantity)
+                        ),
+                    0
+                ),
+            [items]
+        );
+
+
+    /* =====================================================
+       AGREGAR PRODUCTO
+    ===================================================== */
+
+    const agregarProducto = () => {
+
+        setError("");
+
+        if (!productoActual) {
+
+            setError(
+                "Selecciona un producto."
+            );
+
+            return;
+
+        }
+
+        if (!varianteActual) {
+
+            setError(
+                "Selecciona una talla."
+            );
+
+            return;
+
+        }
+
+        const qty =
+            Number(cantidad);
+
+
+        if (
+            !Number.isInteger(qty) ||
+            qty <= 0
+        ) {
+
+            setError(
+                "La cantidad debe ser mayor que cero."
+            );
+
+            return;
+
+        }
+
+
+        /* Stock considerando lo que ya está
+           agregado al carrito */
+
+        const cantidadEnCarrito =
+            items
+                .filter(
+                    item =>
+                        Number(item.variant_id) ===
+                        Number(varianteActual.id)
+                )
+                .reduce(
+                    (sum, item) =>
+                        sum +
+                        Number(item.quantity),
+                    0
+                );
+
+
+        if (
+            cantidadEnCarrito + qty >
+            Number(varianteActual.stock || 0)
+        ) {
+
+            setError(
+                `Stock insuficiente. Disponible: ${varianteActual.stock}.`
+            );
+
+            return;
+
+        }
+
+
+        const existente =
+            items.find(
+                item =>
+                    Number(item.variant_id) ===
+                    Number(varianteActual.id)
+            );
+
+
+        if (existente) {
+
+            setItems(
+                items.map(item =>
+                    Number(item.variant_id) ===
+                    Number(varianteActual.id)
+                        ? {
+                            ...item,
+                            quantity:
+                                Number(item.quantity) +
+                                qty
+                        }
+                        : item
+                )
+            );
+
+        } else {
+
+            setItems([
+                ...items,
+                {
+                    variant_id:
+                        varianteActual.id,
+
+                    product_id:
+                        productoActual.id,
+
+                    name:
+                        productoActual.name,
+
+                    size:
+                        varianteActual.size,
+
+                    price:
+                        Number(varianteActual.price),
+
+                    quantity:
+                        qty
+                }
+            ]);
+
+        }
+
+
+        setProductoSeleccionado("");
+        setVarianteSeleccionada("");
+        setCantidad(1);
+
+    };
+
+
+    /* =====================================================
+       ELIMINAR PRODUCTO
+    ===================================================== */
+
+    const eliminarItem = (variantId) => {
+
+        setItems(
+            items.filter(
+                item =>
+                    Number(item.variant_id) !==
+                    Number(variantId)
+            )
+        );
+
+    };
+
+
+    /* =====================================================
+       REGISTRAR VENTA
+    ===================================================== */
+
+    const registrarVenta = async () => {
+
+        setError("");
+        setMensaje("");
+
+        if (items.length === 0) {
+
+            setError(
+                "Agrega al menos un producto."
+            );
+
+            return;
+
+        }
+
+
+        setGuardando(true);
+
+
+        try {
+
+            const payloadItems =
+                items.map(item => ({
+                    variant_id:
+                        Number(item.variant_id),
+
+                    quantity:
+                        Number(item.quantity)
+                }));
+
+
+            const {
+                data,
+                error
+            } =
+                await supabase.rpc(
+                    "registrar_venta_externa",
+                    {
+                        p_tipo_venta:
+                            tipoVenta,
+
+                        p_nombre:
+                            cliente.nombre,
+
+                        p_rut:
+                            cliente.rut,
+
+                        p_correo:
+                            cliente.correo,
+
+                        p_telefono:
+                            cliente.telefono,
+
+                        p_observacion:
+                            cliente.observacion,
+
+                        p_items:
+                            payloadItems,
+
+                        p_medio_pago:
+                            medioPago,
+
+                        p_vendedor:
+                            "Administrador"
+                    }
+                );
+
+
+            if (error) {
+
+                console.error(error);
+
+                throw error;
+
+            }
+
+
+            const resultado =
+                data?.[0];
+
+
+            setMensaje(
+                `Venta #${resultado.numero_venta} registrada correctamente.`
+            );
+
+
+            /* Limpiar formulario */
+
+            setCliente({
+                nombre: "",
+                rut: "",
+                correo: "",
+                telefono: "",
+                observacion: ""
+            });
+
+            setItems([]);
+
+            setProductoSeleccionado("");
+            setVarianteSeleccionada("");
+            setCantidad(1);
+
+
+            /* Actualizar productos
+               para reflejar nuevo stock */
+
+            await cargarProductos();
+
+            await cargarVentas();
+
+        } catch (err) {
+
+            console.error(err);
+
+            setError(
+                err.message ||
+                "No fue posible registrar la venta."
+            );
+
+        } finally {
+
+            setGuardando(false);
+
+        }
+
+    };
+
+
+    /* =====================================================
+       FORMATO MONEDA
+    ===================================================== */
+
+    const moneda = (valor) =>
+        `$${Number(valor || 0).toLocaleString("es-CL")}`;
+
+
+    /* =====================================================
+       LOADING
+    ===================================================== */
+
+    if (loading) {
+
+        return (
+
+            <div className="max-w-[1500px] mx-auto p-8">
+
+                <AdminCard>
+
+                    <p className="text-slate-500">
+                        Cargando ventas...
+                    </p>
+
+                </AdminCard>
+
+            </div>
+
+        );
+
     }
-  }
 
-  return (
-    <div className="min-h-screen bg-[#fff8fc] p-6">
 
-      {/* ENCABEZADO */}
-      <div className="mb-6 rounded-3xl bg-gradient-to-r from-pink-500 to-purple-600 p-8 text-white shadow-lg">
+    return (
 
-        <div className="text-xs font-bold uppercase tracking-[0.35em] opacity-90">
-          BOUTIQUE PET LOVE ERP
-        </div>
+        <div className="
+            max-w-[1500px]
+            mx-auto
+            p-4
+            md:p-8
+        ">
 
-        <h1 className="mt-2 text-4xl font-black">
-          🛒 Ventas externas
-        </h1>
 
-        <p className="mt-2 text-white/90">
-          Registra ventas presenciales y ventas realizadas por WhatsApp.
-        </p>
-      </div>
+            {/* =================================================
+                HEADER
+            ================================================= */}
 
-      {/* MENSAJE */}
-      {mensaje && (
-        <div
-          className={`mb-6 rounded-2xl border p-4 font-semibold ${
-            mensaje.tipo === "success"
-              ? "border-green-200 bg-green-50 text-green-700"
-              : "border-red-200 bg-red-50 text-red-700"
-          }`}
-        >
-          {mensaje.tipo === "success" ? "✅ " : "⚠️ "}
-          {mensaje.texto}
-        </div>
-      )}
+            <div className="
+                mb-8
+                rounded-[30px]
+                bg-gradient-to-r
+                from-pink-500
+                to-purple-600
+                text-white
+                p-8
+                shadow-xl
+            ">
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-
-        {/* ======================================================
-            COLUMNA PRINCIPAL
-        ====================================================== */}
-        <div className="space-y-6 xl:col-span-2">
-
-          {/* TIPO DE VENTA */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <h2 className="mb-4 text-xl font-black text-slate-900">
-              Tipo de venta
-            </h2>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
-              {TIPOS_VENTA.map((tipo) => (
-                <button
-                  key={tipo.value}
-                  type="button"
-                  onClick={() => setTipoVenta(tipo.value)}
-                  className={`rounded-2xl border-2 p-5 text-left transition ${
-                    tipoVenta === tipo.value
-                      ? "border-pink-500 bg-pink-50"
-                      : "border-slate-200 hover:border-pink-300"
-                  }`}
-                >
-                  <div className="text-lg font-black">
-                    {tipo.label}
-                  </div>
-
-                  <div className="mt-1 text-sm text-slate-500">
-                    {tipo.value === "presencial"
-                      ? "Venta realizada directamente al cliente."
-                      : "Venta coordinada por WhatsApp."}
-                  </div>
-                </button>
-              ))}
-
-            </div>
-          </section>
-
-          {/* BUSCAR PRODUCTO */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <h2 className="mb-4 text-xl font-black text-slate-900">
-              Agregar productos
-            </h2>
-
-            <div className="relative">
-
-              <input
-                type="text"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="🔎 Buscar producto o talla..."
-                className="w-full rounded-2xl border border-slate-200 px-5 py-4 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
-              />
-
-              {busqueda && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl">
-
-                  {cargandoProductos ? (
-                    <div className="p-5 text-center text-slate-500">
-                      Cargando productos...
-                    </div>
-                  ) : productosFiltrados.length === 0 ? (
-                    <div className="p-5 text-center text-slate-500">
-                      No se encontraron productos.
-                    </div>
-                  ) : (
-                    productosFiltrados.map((producto) => (
-                      <button
-                        key={producto.id}
-                        type="button"
-                        onClick={() => agregarProducto(producto)}
-                        disabled={producto.stock <= 0}
-                        className={`flex w-full items-center justify-between border-b border-slate-100 p-4 text-left transition last:border-b-0 ${
-                          producto.stock <= 0
-                            ? "cursor-not-allowed bg-slate-50 opacity-50"
-                            : "hover:bg-pink-50"
-                        }`}
-                      >
-
-                        <div>
-                          <div className="font-bold text-slate-900">
-                            {producto.products?.name}
-                          </div>
-
-                          <div className="text-sm text-slate-500">
-                            {producto.size}
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-
-                          <div className="font-black text-pink-600">
-                            {formatoPrecio(producto.price)}
-                          </div>
-
-                          <div
-                            className={`text-xs font-bold ${
-                              producto.stock > 0
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            Stock: {producto.stock}
-                          </div>
-
-                        </div>
-
-                      </button>
-                    ))
-                  )}
-
-                </div>
-              )}
-
-            </div>
-          </section>
-
-          {/* CARRITO */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <div className="mb-5 flex items-center justify-between">
-
-              <h2 className="text-xl font-black text-slate-900">
-                Productos de la venta
-              </h2>
-
-              <span className="rounded-full bg-pink-100 px-4 py-2 text-sm font-bold text-pink-600">
-                {carrito.length} producto(s)
-              </span>
-
-            </div>
-
-            {carrito.length === 0 ? (
-
-              <div className="rounded-2xl border-2 border-dashed border-slate-200 p-10 text-center">
-
-                <div className="text-5xl">
-                  🛒
-                </div>
-
-                <p className="mt-3 font-semibold text-slate-500">
-                  Aún no has agregado productos.
+                <p className="
+                    text-xs
+                    uppercase
+                    tracking-[0.3em]
+                    font-bold
+                    text-pink-100
+                ">
+                    Boutique Pet Love ERP
                 </p>
 
-                <p className="mt-1 text-sm text-slate-400">
-                  Busca un producto arriba para comenzar.
+                <h1 className="
+                    text-4xl
+                    md:text-5xl
+                    font-black
+                    mt-2
+                ">
+                    🛒 Ventas externas
+                </h1>
+
+                <p className="
+                    mt-3
+                    text-white/90
+                    text-lg
+                ">
+                    Registra ventas presenciales y ventas
+                    realizadas por WhatsApp.
                 </p>
 
-              </div>
+            </div>
 
-            ) : (
 
-              <div className="space-y-3">
+            {/* =================================================
+                MENSAJES
+            ================================================= */}
 
-                {carrito.map((item) => (
+            {mensaje && (
 
-                  <div
-                    key={item.variant_id}
-                    className="flex flex-col gap-4 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
+                <div className="
+                    mb-6
+                    rounded-2xl
+                    bg-emerald-50
+                    border
+                    border-emerald-200
+                    text-emerald-700
+                    p-4
+                    font-bold
+                ">
 
-                    <div className="flex-1">
+                    ✅ {mensaje}
 
-                      <div className="font-black text-slate-900">
-                        {item.producto}
-                      </div>
-
-                      <div className="text-sm text-slate-500">
-                        {item.talla}
-                      </div>
-
-                      <div className="mt-1 text-sm font-semibold text-pink-600">
-                        {formatoPrecio(item.precio)}
-                      </div>
-
-                    </div>
-
-                    <div className="flex items-center gap-3">
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          cambiarCantidad(
-                            item.variant_id,
-                            item.cantidad - 1
-                          )
-                        }
-                        disabled={item.cantidad <= 1}
-                        className="h-9 w-9 rounded-xl bg-slate-100 font-black disabled:opacity-40"
-                      >
-                        −
-                      </button>
-
-                      <input
-                        type="number"
-                        min="1"
-                        max={item.stock}
-                        value={item.cantidad}
-                        onChange={(e) =>
-                          cambiarCantidad(
-                            item.variant_id,
-                            e.target.value
-                          )
-                        }
-                        className="w-16 rounded-xl border border-slate-200 px-2 py-2 text-center font-bold"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          cambiarCantidad(
-                            item.variant_id,
-                            item.cantidad + 1
-                          )
-                        }
-                        disabled={item.cantidad >= item.stock}
-                        className="h-9 w-9 rounded-xl bg-slate-100 font-black disabled:opacity-40"
-                      >
-                        +
-                      </button>
-
-                    </div>
-
-                    <div className="w-28 text-right">
-
-                      <div className="font-black text-slate-900">
-                        {formatoPrecio(
-                          item.precio * item.cantidad
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          eliminarProducto(item.variant_id)
-                        }
-                        className="mt-1 text-xs font-bold text-red-500 hover:text-red-700"
-                      >
-                        Eliminar
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                ))}
-
-              </div>
+                </div>
 
             )}
 
-          </section>
+
+            {error && (
+
+                <div className="
+                    mb-6
+                    rounded-2xl
+                    bg-red-50
+                    border
+                    border-red-200
+                    text-red-700
+                    p-4
+                    font-bold
+                ">
+
+                    ⚠️ {error}
+
+                </div>
+
+            )}
+
+
+            <div className="
+                grid
+                xl:grid-cols-[1.3fr_0.7fr]
+                gap-6
+            ">
+
+
+                {/* =================================================
+                    FORMULARIO
+                ================================================= */}
+
+                <AdminCard>
+
+                    <div className="
+                        flex
+                        justify-between
+                        items-center
+                        mb-6
+                    ">
+
+                        <div>
+
+                            <p className="
+                                text-xs
+                                uppercase
+                                tracking-[0.2em]
+                                text-pink-500
+                                font-bold
+                            ">
+                                Nueva venta
+                            </p>
+
+                            <h2 className="
+                                text-2xl
+                                font-black
+                                mt-1
+                            ">
+                                Registrar venta
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* TIPO DE VENTA */}
+
+                    <div className="mb-6">
+
+                        <label className="
+                            block
+                            text-sm
+                            font-bold
+                            text-slate-600
+                            mb-2
+                        ">
+                            Canal de venta
+                        </label>
+
+                        <div className="
+                            grid
+                            grid-cols-2
+                            gap-3
+                        ">
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setTipoVenta(
+                                        "presencial"
+                                    )
+                                }
+                                className={`
+                                    p-4
+                                    rounded-2xl
+                                    border
+                                    font-bold
+                                    transition
+                                    ${
+                                        tipoVenta ===
+                                        "presencial"
+                                            ? `
+                                                bg-pink-500
+                                                text-white
+                                                border-pink-500
+                                            `
+                                            : `
+                                                bg-white
+                                                text-slate-600
+                                                border-slate-200
+                                            `
+                                    }
+                                `}
+                            >
+                                🏪 Presencial
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setTipoVenta(
+                                        "whatsapp"
+                                    )
+                                }
+                                className={`
+                                    p-4
+                                    rounded-2xl
+                                    border
+                                    font-bold
+                                    transition
+                                    ${
+                                        tipoVenta ===
+                                        "whatsapp"
+                                            ? `
+                                                bg-green-500
+                                                text-white
+                                                border-green-500
+                                            `
+                                            : `
+                                                bg-white
+                                                text-slate-600
+                                                border-slate-200
+                                            `
+                                    }
+                                `}
+                            >
+                                💬 WhatsApp
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* CLIENTE */}
+
+                    <div className="
+                        grid
+                        md:grid-cols-2
+                        gap-4
+                        mb-6
+                    ">
+
+                        <input
+                            value={cliente.nombre}
+                            onChange={e =>
+                                setCliente({
+                                    ...cliente,
+                                    nombre:
+                                        e.target.value
+                                })
+                            }
+                            placeholder="Nombre del cliente"
+                            className="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                p-3
+                                outline-none
+                                focus:ring-2
+                                focus:ring-pink-300
+                            "
+                        />
+
+                        <input
+                            value={cliente.rut}
+                            onChange={e =>
+                                setCliente({
+                                    ...cliente,
+                                    rut:
+                                        e.target.value
+                                })
+                            }
+                            placeholder="RUT"
+                            className="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                p-3
+                                outline-none
+                                focus:ring-2
+                                focus:ring-pink-300
+                            "
+                        />
+
+                        <input
+                            value={cliente.correo}
+                            onChange={e =>
+                                setCliente({
+                                    ...cliente,
+                                    correo:
+                                        e.target.value
+                                })
+                            }
+                            placeholder="Correo"
+                            type="email"
+                            className="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                p-3
+                                outline-none
+                                focus:ring-2
+                                focus:ring-pink-300
+                            "
+                        />
+
+                        <input
+                            value={cliente.telefono}
+                            onChange={e =>
+                                setCliente({
+                                    ...cliente,
+                                    telefono:
+                                        e.target.value
+                                })
+                            }
+                            placeholder="Teléfono"
+                            className="
+                                border
+                                border-slate-200
+                                rounded-xl
+                                p-3
+                                outline-none
+                                focus:ring-2
+                                focus:ring-pink-300
+                            "
+                        />
+
+                    </div>
+
+
+                    {/* PRODUCTO */}
+
+                    <div className="
+                        grid
+                        md:grid-cols-3
+                        gap-4
+                        items-end
+                        mb-6
+                    ">
+
+                        <div>
+
+                            <label className="
+                                block
+                                text-sm
+                                font-bold
+                                text-slate-600
+                                mb-2
+                            ">
+                                Producto
+                            </label>
+
+                            <select
+                                value={
+                                    productoSeleccionado
+                                }
+                                onChange={e => {
+
+                                    setProductoSeleccionado(
+                                        e.target.value
+                                    );
+
+                                    setVarianteSeleccionada(
+                                        ""
+                                    );
+
+                                }}
+                                className="
+                                    w-full
+                                    border
+                                    border-slate-200
+                                    rounded-xl
+                                    p-3
+                                    bg-white
+                                "
+                            >
+
+                                <option value="">
+                                    Seleccionar producto
+                                </option>
+
+                                {productos.map(
+                                    producto => (
+
+                                        <option
+                                            key={
+                                                producto.id
+                                            }
+                                            value={
+                                                producto.id
+                                            }
+                                        >
+                                            {
+                                                producto.name
+                                            }
+                                        </option>
+
+                                    )
+                                )}
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label className="
+                                block
+                                text-sm
+                                font-bold
+                                text-slate-600
+                                mb-2
+                            ">
+                                Talla
+                            </label>
+
+                            <select
+                                value={
+                                    varianteSeleccionada
+                                }
+                                onChange={e =>
+                                    setVarianteSeleccionada(
+                                        e.target.value
+                                    )
+                                }
+                                disabled={
+                                    !productoSeleccionado
+                                }
+                                className="
+                                    w-full
+                                    border
+                                    border-slate-200
+                                    rounded-xl
+                                    p-3
+                                    bg-white
+                                    disabled:bg-slate-100
+                                "
+                            >
+
+                                <option value="">
+                                    Seleccionar talla
+                                </option>
+
+                                {variantesDisponibles.map(
+                                    variante => (
+
+                                        <option
+                                            key={
+                                                variante.id
+                                            }
+                                            value={
+                                                variante.id
+                                            }
+                                            disabled={
+                                                Number(
+                                                    variante.stock
+                                                ) <= 0
+                                            }
+                                        >
+                                            {variante.size}
+                                            {" — "}
+                                            {
+                                                moneda(
+                                                    variante.price
+                                                )
+                                            }
+                                            {" — Stock: "}
+                                            {
+                                                variante.stock
+                                            }
+                                        </option>
+
+                                    )
+                                )}
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label className="
+                                block
+                                text-sm
+                                font-bold
+                                text-slate-600
+                                mb-2
+                            ">
+                                Cantidad
+                            </label>
+
+                            <div className="
+                                flex
+                                gap-2
+                            ">
+
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max={
+                                        varianteActual?.stock ||
+                                        1
+                                    }
+                                    value={
+                                        cantidad
+                                    }
+                                    onChange={e =>
+                                        setCantidad(
+                                            e.target.value
+                                        )
+                                    }
+                                    className="
+                                        w-full
+                                        border
+                                        border-slate-200
+                                        rounded-xl
+                                        p-3
+                                    "
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        agregarProducto
+                                    }
+                                    className="
+                                        px-5
+                                        rounded-xl
+                                        bg-slate-900
+                                        text-white
+                                        font-bold
+                                        hover:bg-slate-700
+                                    "
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* DETALLE DE VENTA */}
+
+                    <div className="
+                        border
+                        border-slate-200
+                        rounded-2xl
+                        overflow-hidden
+                        mb-6
+                    ">
+
+                        <div className="
+                            bg-slate-50
+                            px-4
+                            py-3
+                            font-bold
+                            text-slate-600
+                        ">
+                            Detalle de la venta
+                        </div>
+
+
+                        {items.length === 0 ? (
+
+                            <div className="
+                                p-6
+                                text-center
+                                text-slate-400
+                            ">
+                                No hay productos agregados.
+                            </div>
+
+                        ) : (
+
+                            <div>
+
+                                {items.map(
+                                    item => (
+
+                                        <div
+                                            key={
+                                                item.variant_id
+                                            }
+                                            className="
+                                                flex
+                                                items-center
+                                                justify-between
+                                                gap-4
+                                                p-4
+                                                border-t
+                                            "
+                                        >
+
+                                            <div>
+
+                                                <div className="
+                                                    font-bold
+                                                ">
+                                                    {
+                                                        item.name
+                                                    }
+                                                </div>
+
+                                                <div className="
+                                                    text-sm
+                                                    text-slate-500
+                                                ">
+                                                    {
+                                                        item.size
+                                                    }
+                                                    {" × "}
+                                                    {
+                                                        item.quantity
+                                                    }
+                                                </div>
+
+                                            </div>
+
+
+                                            <div className="
+                                                flex
+                                                items-center
+                                                gap-4
+                                            ">
+
+                                                <strong>
+                                                    {
+                                                        moneda(
+                                                            item.price *
+                                                            item.quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        eliminarItem(
+                                                            item.variant_id
+                                                        )
+                                                    }
+                                                    className="
+                                                        text-red-500
+                                                        font-bold
+                                                    "
+                                                >
+                                                    ✕
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    )
+                                )}
+
+                            </div>
+
+                        )}
+
+                    </div>
+
+
+                    {/* OBSERVACIÓN */}
+
+                    <textarea
+                        value={
+                            cliente.observacion
+                        }
+                        onChange={e =>
+                            setCliente({
+                                ...cliente,
+                                observacion:
+                                    e.target.value
+                            })
+                        }
+                        placeholder="Observaciones"
+                        rows={3}
+                        className="
+                            w-full
+                            border
+                            border-slate-200
+                            rounded-xl
+                            p-3
+                            mb-6
+                        "
+                    />
+
+
+                    {/* MEDIO DE PAGO */}
+
+                    <div className="mb-6">
+
+                        <label className="
+                            block
+                            text-sm
+                            font-bold
+                            text-slate-600
+                            mb-2
+                        ">
+                            Medio de pago
+                        </label>
+
+                        <select
+                            value={medioPago}
+                            onChange={e =>
+                                setMedioPago(
+                                    e.target.value
+                                )
+                            }
+                            className="
+                                w-full
+                                border
+                                border-slate-200
+                                rounded-xl
+                                p-3
+                                bg-white
+                            "
+                        >
+
+                            <option value="efectivo">
+                                💵 Efectivo
+                            </option>
+
+                            <option value="transferencia">
+                                🏦 Transferencia
+                            </option>
+
+                            <option value="debito">
+                                💳 Débito
+                            </option>
+
+                            <option value="credito">
+                                💳 Crédito
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        disabled={
+                            guardando ||
+                            items.length === 0
+                        }
+                        onClick={
+                            registrarVenta
+                        }
+                        className="
+                            w-full
+                            py-4
+                            rounded-2xl
+                            bg-gradient-to-r
+                            from-pink-500
+                            to-purple-600
+                            text-white
+                            font-black
+                            text-lg
+                            shadow-lg
+                            hover:scale-[1.01]
+                            transition
+                            disabled:opacity-50
+                            disabled:cursor-not-allowed
+                        "
+                    >
+
+                        {guardando
+                            ? "Registrando..."
+                            : "💰 Registrar venta"}
+
+                    </button>
+
+                </AdminCard>
+
+
+                {/* =================================================
+                    RESUMEN
+                ================================================= */}
+
+                <div className="space-y-6">
+
+
+                    <AdminCard>
+
+                        <p className="
+                            text-xs
+                            uppercase
+                            tracking-[0.2em]
+                            text-slate-400
+                            font-bold
+                        ">
+                            Resumen
+                        </p>
+
+                        <div className="
+                            mt-4
+                            flex
+                            justify-between
+                            items-end
+                        ">
+
+                            <span className="
+                                text-slate-500
+                            ">
+                                Total venta
+                            </span>
+
+                            <strong className="
+                                text-4xl
+                                font-black
+                                text-slate-900
+                            ">
+                                {
+                                    moneda(total)
+                                }
+                            </strong>
+
+                        </div>
+
+                        <div className="
+                            mt-4
+                            text-sm
+                            text-slate-500
+                        ">
+
+                            {items.length} producto(s)
+
+                        </div>
+
+                    </AdminCard>
+
+
+                    <AdminCard>
+
+                        <div className="
+                            flex
+                            justify-between
+                            items-center
+                            mb-4
+                        ">
+
+                            <h2 className="
+                                text-xl
+                                font-black
+                            ">
+                                Últimas ventas
+                            </h2>
+
+                        </div>
+
+
+                        <div className="
+                            space-y-3
+                        ">
+
+                            {ventas.length === 0 ? (
+
+                                <p className="
+                                    text-slate-400
+                                ">
+                                    No hay ventas externas.
+                                </p>
+
+                            ) : (
+
+                                ventas.map(
+                                    venta => (
+
+                                        <div
+                                            key={
+                                                venta.id
+                                            }
+                                            className="
+                                                border-b
+                                                border-slate-100
+                                                pb-3
+                                            "
+                                        >
+
+                                            <div className="
+                                                flex
+                                                justify-between
+                                            ">
+
+                                                <div>
+
+                                                    <strong>
+                                                        Venta #
+                                                        {
+                                                            venta.numero_venta
+                                                        }
+                                                    </strong>
+
+                                                    <div className="
+                                                        text-sm
+                                                        text-slate-500
+                                                    ">
+                                                        {
+                                                            venta.nombre
+                                                        }
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div className="
+                                                    text-right
+                                                ">
+
+                                                    <strong>
+                                                        {
+                                                            moneda(
+                                                                venta.total
+                                                            )
+                                                        }
+                                                    </strong>
+
+                                                    <div className="
+                                                        text-xs
+                                                        text-slate-400
+                                                    ">
+                                                        {
+                                                            venta.tipo_venta ===
+                                                            "whatsapp"
+                                                                ? "💬 WhatsApp"
+                                                                : "🏪 Presencial"
+                                                        }
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    )
+                                )
+
+                            )}
+
+                        </div>
+
+                    </AdminCard>
+
+                </div>
+
+            </div>
 
         </div>
 
-        {/* ======================================================
-            COLUMNA DERECHA
-        ====================================================== */}
-        <div className="space-y-6">
+    );
 
-          {/* CLIENTE */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <h2 className="mb-5 text-xl font-black text-slate-900">
-              👤 Datos del cliente
-            </h2>
-
-            <div className="space-y-4">
-
-              <input
-                type="text"
-                value={cliente.nombre}
-                onChange={(e) =>
-                  actualizarCliente("nombre", e.target.value)
-                }
-                placeholder="Nombre del cliente"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-pink-500"
-              />
-
-              <input
-                type="text"
-                value={cliente.rut}
-                onChange={(e) =>
-                  actualizarCliente("rut", e.target.value)
-                }
-                placeholder="RUT"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-pink-500"
-              />
-
-              <input
-                type="email"
-                value={cliente.correo}
-                onChange={(e) =>
-                  actualizarCliente("correo", e.target.value)
-                }
-                placeholder="Correo electrónico"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-pink-500"
-              />
-
-              <input
-                type="text"
-                value={cliente.telefono}
-                onChange={(e) =>
-                  actualizarCliente("telefono", e.target.value)
-                }
-                placeholder="Teléfono / WhatsApp"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-pink-500"
-              />
-
-              <textarea
-                value={cliente.observacion}
-                onChange={(e) =>
-                  actualizarCliente("observacion", e.target.value)
-                }
-                placeholder="Observación..."
-                rows={3}
-                className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-pink-500"
-              />
-
-            </div>
-
-          </section>
-
-          {/* MEDIO DE PAGO */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <h2 className="mb-4 text-xl font-black text-slate-900">
-              💳 Medio de pago
-            </h2>
-
-            <div className="space-y-2">
-
-              {MEDIOS_PAGO.map((medio) => (
-
-                <button
-                  key={medio.value}
-                  type="button"
-                  onClick={() => setMedioPago(medio.value)}
-                  className={`w-full rounded-2xl border-2 p-4 text-left font-bold transition ${
-                    medioPago === medio.value
-                      ? "border-pink-500 bg-pink-50 text-pink-700"
-                      : "border-slate-200 text-slate-700 hover:border-pink-300"
-                  }`}
-                >
-                  {medio.label}
-                </button>
-
-              ))}
-
-            </div>
-
-          </section>
-
-          {/* RESUMEN */}
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-
-            <h2 className="mb-5 text-xl font-black text-slate-900">
-              🧾 Resumen
-            </h2>
-
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-
-              <span className="text-slate-500">
-                Productos
-              </span>
-
-              <span className="font-bold">
-                {carrito.reduce(
-                  (suma, item) => suma + item.cantidad,
-                  0
-                )}
-              </span>
-
-            </div>
-
-            <div className="mt-4 flex items-center justify-between">
-
-              <span className="text-lg font-bold text-slate-700">
-                TOTAL
-              </span>
-
-              <span className="text-3xl font-black text-pink-600">
-                {formatoPrecio(total)}
-              </span>
-
-            </div>
-
-            <button
-              type="button"
-              onClick={registrarVenta}
-              disabled={
-                guardando ||
-                carrito.length === 0
-              }
-              className="mt-6 w-full rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 px-5 py-4 font-black text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {guardando
-                ? "Registrando venta..."
-                : "✅ Registrar venta"}
-            </button>
-
-          </section>
-
-        </div>
-
-      </div>
-
-    </div>
-  );
 }
