@@ -170,7 +170,7 @@ actualizarProducto(
 
 <option
   key={cat.id}
-  value={cat.name}
+  value={cat.slug}
 >
   {cat.name}
 </option>
