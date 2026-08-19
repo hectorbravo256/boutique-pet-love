@@ -276,7 +276,7 @@ useEffect(() => {
     🏠 Inicio
   </button>
 
-  {/* COLECCIONES */}
+{/* CATEGORÍAS */}
 	<div className="border-t border-pink-100 pt-6">
   <div>
 
@@ -287,56 +287,41 @@ useEffect(() => {
       text-gray-400
       mb-3
     ">
-      Colecciones
+      Categorías
     </h3>
 
     <div className="flex flex-col gap-3">
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/new");
-          setMenuOpen(false);
-        }}
+{categories.map(category => (
 
-        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
-      >
-        🆕 Nueva colección
-      </button>
+  <button
+    key={category.id}
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/best-seller");
-          setMenuOpen(false);
-        }}
+    onClick={() => {
 
-        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
-      >
-        🔥 Best Sellers
-      </button>
+      navigate(
+        `/categoria/${category.slug}`
+      );
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/luxury");
-          setMenuOpen(false);
-        }}
+      setMenuOpen(false);
 
-        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
-      >
-        👑 Luxury
-      </button>
+    }}
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/exclusive");
-          setMenuOpen(false);
-        }}
+    className="
+      text-left
+      text-pink-500
+      hover:text-pink-700
+      hover:translate-x-1
+      transition-all
+      duration-300
+    "
+  >
+    ✨ {category.name}
+  </button>
 
-        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
-      >
-        💎 Exclusivos
-      </button>
+))}
 
-    </div>
+</div>
 
   </div>
 </div>
@@ -401,8 +386,8 @@ useEffect(() => {
 
   </div>
 </div>
-	
-  {/* CATEGORÍAS */}
+
+	  {/* COLECCIONES */}
 	<div className="border-t border-pink-100 pt-6">
   <div>
 
@@ -413,44 +398,61 @@ useEffect(() => {
       text-gray-400
       mb-3
     ">
-      Categorías
+      Colecciones
     </h3>
 
     <div className="flex flex-col gap-3">
 
-{categories.map(category => (
+      <button
+        onClick={() => {
+          navigate("/coleccion/new");
+          setMenuOpen(false);
+        }}
 
-  <button
-    key={category.id}
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
+      >
+        🆕 Nueva colección
+      </button>
 
-    onClick={() => {
+      <button
+        onClick={() => {
+          navigate("/coleccion/best-seller");
+          setMenuOpen(false);
+        }}
 
-      navigate(
-        `/categoria/${category.slug}`
-      );
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
+      >
+        🔥 Best Sellers
+      </button>
 
-      setMenuOpen(false);
+      <button
+        onClick={() => {
+          navigate("/coleccion/luxury");
+          setMenuOpen(false);
+        }}
 
-    }}
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
+      >
+        👑 Luxury
+      </button>
 
-    className="
-      text-left
-      text-pink-500
-      hover:text-pink-700
-      hover:translate-x-1
-      transition-all
-      duration-300
-    "
-  >
-    ✨ {category.name}
-  </button>
+      <button
+        onClick={() => {
+          navigate("/coleccion/exclusive");
+          setMenuOpen(false);
+        }}
 
-))}
+        className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
+      >
+        💎 Exclusivos
+      </button>
 
-</div>
+    </div>
 
   </div>
 </div>
+	
+  
 
   {/* CONTACTO */}
   <button
