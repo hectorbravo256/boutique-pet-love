@@ -136,7 +136,10 @@ useEffect(() => {
         product_images (*),
         product_variants (*)
       `)
-      .eq("category", categoryData.name)
+      .in("category", [
+  categoryData.slug,
+  categoryData.name
+])
       .eq("active", true)
       .order("sort_order", {
         foreignTable: "product_images",
