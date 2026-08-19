@@ -447,7 +447,7 @@ if (ordersLoading) {
 
     onOrders={() => navigate("/admin/ventas")}
 
-    onPurchase={() => navigate("/admin/crear")}
+    onPurchase={() => navigate("/admin/crear/compras")}
 
 />
 
