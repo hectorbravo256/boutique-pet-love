@@ -14,6 +14,7 @@ export default function VentasExternas() {
 
     const [loading, setLoading] = useState(true);
     const [guardando, setGuardando] = useState(false);
+    const [actualizando, setActualizando] = useState(false);
 
     const [tipoVenta, setTipoVenta] =
         useState("presencial");
@@ -47,9 +48,21 @@ export default function VentasExternas() {
     const [error, setError] =
         useState("");
 
+    const [busqueda, setBusqueda] =
+        useState("");
+
+    const [filtroCanal, setFiltroCanal] =
+        useState("todos");
+
+    const [filtroPago, setFiltroPago] =
+        useState("todos");
+
+    const [ventaSeleccionada, setVentaSeleccionada] =
+        useState(null);
+
 
     /* =====================================================
-       CARGAR PRODUCTOS
+       CARGAR INFORMACIÓN
     ===================================================== */
 
     useEffect(() => {
@@ -59,6 +72,10 @@ export default function VentasExternas() {
 
     }, []);
 
+
+    /* =====================================================
+       CARGAR PRODUCTOS
+    ===================================================== */
 
     const cargarProductos = async () => {
 
@@ -92,14 +109,13 @@ export default function VentasExternas() {
         }
 
         setProductos(data || []);
-
         setLoading(false);
 
     };
 
 
     /* =====================================================
-       CARGAR VENTAS EXTERNAS
+       CARGAR HISTORIAL DE VENTAS EXTERNAS
     ===================================================== */
 
     const cargarVentas = async () => {
@@ -112,12 +128,17 @@ export default function VentasExternas() {
                     numero_venta,
                     created_at,
                     nombre,
+                    rut,
+                    correo,
+                    telefono,
                     tipo_venta,
                     medio_pago,
                     estado_pago,
                     estado,
                     total,
-                    vendedor
+                    vendedor,
+                    observacion,
+                    items
                 `)
                 .in(
                     "tipo_venta",
@@ -131,18 +152,37 @@ export default function VentasExternas() {
                     {
                         ascending: false
                     }
-                )
-                .limit(20);
+                );
 
         if (error) {
 
             console.error(error);
+
+            setError(
+                "No fue posible cargar el historial de ventas."
+            );
 
             return;
 
         }
 
         setVentas(data || []);
+
+    };
+
+
+    /* =====================================================
+       ACTUALIZAR HISTORIAL
+    ===================================================== */
+
+    const actualizarHistorial = async () => {
+
+        setActualizando(true);
+        setError("");
+
+        await cargarVentas();
+
+        setActualizando(false);
 
     };
 
@@ -374,14 +414,15 @@ export default function VentasExternas() {
 
         try {
 
-const payloadItems =
-    items.map(item => ({
-        variant_id:
-            Number(item.variant_id),
+            const payloadItems =
+                items.map(item => ({
+                    variant_id:
+                        Number(item.variant_id),
 
-        cantidad:
-            Number(item.quantity)
-    }));
+                    quantity:
+                        Number(item.quantity)
+                }));
+
 
             const {
                 data,
@@ -455,11 +496,9 @@ const payloadItems =
             setCantidad(1);
 
 
-            /* Actualizar productos
-               para reflejar nuevo stock */
+            /* Actualizar stock e historial */
 
             await cargarProductos();
-
             await cargarVentas();
 
         } catch (err) {
@@ -489,6 +528,209 @@ const payloadItems =
 
 
     /* =====================================================
+       FORMATO FECHA
+    ===================================================== */
+
+    const fechaVenta = (fecha) => {
+
+        if (!fecha) return "-";
+
+        return new Date(fecha).toLocaleString(
+            "es-CL",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    };
+
+
+    /* =====================================================
+       ETIQUETA CANAL
+    ===================================================== */
+
+    const etiquetaCanal = (tipo) => {
+
+        if (tipo === "whatsapp") {
+            return "💬 WhatsApp";
+        }
+
+        return "🏪 Presencial";
+
+    };
+
+
+    /* =====================================================
+       ETIQUETA MEDIO DE PAGO
+    ===================================================== */
+
+    const etiquetaPago = (medio) => {
+
+        switch (medio) {
+
+            case "efectivo":
+                return "💵 Efectivo";
+
+            case "transferencia":
+                return "🏦 Transferencia";
+
+            case "debito":
+                return "💳 Débito";
+
+            case "credito":
+                return "💳 Crédito";
+
+            case "mercado_pago":
+                return "🟢 Mercado Pago";
+
+            default:
+                return medio || "-";
+
+        }
+
+    };
+
+
+    /* =====================================================
+       FILTRAR HISTORIAL
+    ===================================================== */
+
+    const ventasFiltradas =
+        useMemo(
+            () => {
+
+                const texto =
+                    busqueda
+                        .trim()
+                        .toLowerCase();
+
+                return ventas.filter(
+                    venta => {
+
+                        const coincideBusqueda =
+                            !texto ||
+                            String(
+                                venta.numero_venta || ""
+                            )
+                                .toLowerCase()
+                                .includes(texto) ||
+
+                            String(
+                                venta.nombre || ""
+                            )
+                                .toLowerCase()
+                                .includes(texto) ||
+
+                            String(
+                                venta.rut || ""
+                            )
+                                .toLowerCase()
+                                .includes(texto) ||
+
+                            String(
+                                venta.correo || ""
+                            )
+                                .toLowerCase()
+                                .includes(texto) ||
+
+                            String(
+                                venta.telefono || ""
+                            )
+                                .toLowerCase()
+                                .includes(texto);
+
+
+                        const coincideCanal =
+                            filtroCanal === "todos" ||
+                            venta.tipo_venta ===
+                                filtroCanal;
+
+
+                        const coincidePago =
+                            filtroPago === "todos" ||
+                            venta.medio_pago ===
+                                filtroPago;
+
+
+                        return (
+                            coincideBusqueda &&
+                            coincideCanal &&
+                            coincidePago
+                        );
+
+                    }
+                );
+
+            },
+            [
+                ventas,
+                busqueda,
+                filtroCanal,
+                filtroPago
+            ]
+        );
+
+
+    /* =====================================================
+       ESTADÍSTICAS
+    ===================================================== */
+
+    const estadisticas =
+        useMemo(
+            () => {
+
+                const total =
+                    ventas.reduce(
+                        (sum, venta) =>
+                            sum +
+                            Number(
+                                venta.total || 0
+                            ),
+                        0
+                    );
+
+
+                const presencial =
+                    ventas.filter(
+                        venta =>
+                            venta.tipo_venta ===
+                            "presencial"
+                    );
+
+
+                const whatsapp =
+                    ventas.filter(
+                        venta =>
+                            venta.tipo_venta ===
+                            "whatsapp"
+                    );
+
+
+                return {
+
+                    cantidad:
+                        ventas.length,
+
+                    total,
+
+                    presencial:
+                        presencial.length,
+
+                    whatsapp:
+                        whatsapp.length
+
+                };
+
+            },
+            [ventas]
+        );
+
+
+    /* =====================================================
        LOADING
     ===================================================== */
 
@@ -496,12 +738,20 @@ const payloadItems =
 
         return (
 
-            <div className="max-w-[1500px] mx-auto p-8">
+            <div className="
+                max-w-[1500px]
+                mx-auto
+                p-8
+            ">
 
                 <AdminCard>
 
-                    <p className="text-slate-500">
+                    <p className="
+                        text-slate-500
+                    ">
+
                         Cargando ventas...
+
                     </p>
 
                 </AdminCard>
@@ -545,7 +795,9 @@ const payloadItems =
                     font-bold
                     text-pink-100
                 ">
+
                     Boutique Pet Love ERP
+
                 </p>
 
                 <h1 className="
@@ -554,7 +806,9 @@ const payloadItems =
                     font-black
                     mt-2
                 ">
+
                     🛒 Ventas externas
+
                 </h1>
 
                 <p className="
@@ -562,8 +816,10 @@ const payloadItems =
                     text-white/90
                     text-lg
                 ">
+
                     Registra ventas presenciales y ventas
                     realizadas por WhatsApp.
+
                 </p>
 
             </div>
@@ -613,10 +869,15 @@ const payloadItems =
             )}
 
 
+            {/* =================================================
+                NUEVA VENTA
+            ================================================= */}
+
             <div className="
                 grid
                 xl:grid-cols-[1.3fr_0.7fr]
                 gap-6
+                mb-10
             ">
 
 
@@ -642,7 +903,9 @@ const payloadItems =
                                 text-pink-500
                                 font-bold
                             ">
+
                                 Nueva venta
+
                             </p>
 
                             <h2 className="
@@ -650,7 +913,9 @@ const payloadItems =
                                 font-black
                                 mt-1
                             ">
+
                                 Registrar venta
+
                             </h2>
 
                         </div>
@@ -669,7 +934,9 @@ const payloadItems =
                             text-slate-600
                             mb-2
                         ">
+
                             Canal de venta
+
                         </label>
 
                         <div className="
@@ -691,6 +958,7 @@ const payloadItems =
                                     border
                                     font-bold
                                     transition
+
                                     ${
                                         tipoVenta ===
                                         "presencial"
@@ -707,7 +975,9 @@ const payloadItems =
                                     }
                                 `}
                             >
+
                                 🏪 Presencial
+
                             </button>
 
 
@@ -724,6 +994,7 @@ const payloadItems =
                                     border
                                     font-bold
                                     transition
+
                                     ${
                                         tipoVenta ===
                                         "whatsapp"
@@ -740,7 +1011,9 @@ const payloadItems =
                                     }
                                 `}
                             >
+
                                 💬 WhatsApp
+
                             </button>
 
                         </div>
@@ -758,7 +1031,9 @@ const payloadItems =
                     ">
 
                         <input
-                            value={cliente.nombre}
+                            value={
+                                cliente.nombre
+                            }
                             onChange={e =>
                                 setCliente({
                                     ...cliente,
@@ -766,7 +1041,9 @@ const payloadItems =
                                         e.target.value
                                 })
                             }
-                            placeholder="Nombre del cliente"
+                            placeholder="
+                                Nombre del cliente
+                            "
                             className="
                                 border
                                 border-slate-200
@@ -778,8 +1055,11 @@ const payloadItems =
                             "
                         />
 
+
                         <input
-                            value={cliente.rut}
+                            value={
+                                cliente.rut
+                            }
                             onChange={e =>
                                 setCliente({
                                     ...cliente,
@@ -799,8 +1079,11 @@ const payloadItems =
                             "
                         />
 
+
                         <input
-                            value={cliente.correo}
+                            value={
+                                cliente.correo
+                            }
                             onChange={e =>
                                 setCliente({
                                     ...cliente,
@@ -821,8 +1104,11 @@ const payloadItems =
                             "
                         />
 
+
                         <input
-                            value={cliente.telefono}
+                            value={
+                                cliente.telefono
+                            }
                             onChange={e =>
                                 setCliente({
                                     ...cliente,
@@ -864,7 +1150,9 @@ const payloadItems =
                                 text-slate-600
                                 mb-2
                             ">
+
                                 Producto
+
                             </label>
 
                             <select
@@ -893,7 +1181,9 @@ const payloadItems =
                             >
 
                                 <option value="">
+
                                     Seleccionar producto
+
                                 </option>
 
                                 {productos.map(
@@ -907,9 +1197,11 @@ const payloadItems =
                                                 producto.id
                                             }
                                         >
+
                                             {
                                                 producto.name
                                             }
+
                                         </option>
 
                                     )
@@ -929,7 +1221,9 @@ const payloadItems =
                                 text-slate-600
                                 mb-2
                             ">
+
                                 Talla
+
                             </label>
 
                             <select
@@ -956,7 +1250,9 @@ const payloadItems =
                             >
 
                                 <option value="">
+
                                     Seleccionar talla
+
                                 </option>
 
                                 {variantesDisponibles.map(
@@ -975,6 +1271,7 @@ const payloadItems =
                                                 ) <= 0
                                             }
                                         >
+
                                             {variante.size}
                                             {" — "}
                                             {
@@ -986,6 +1283,7 @@ const payloadItems =
                                             {
                                                 variante.stock
                                             }
+
                                         </option>
 
                                     )
@@ -1005,7 +1303,9 @@ const payloadItems =
                                 text-slate-600
                                 mb-2
                             ">
+
                                 Cantidad
+
                             </label>
 
                             <div className="
@@ -1051,7 +1351,9 @@ const payloadItems =
                                         hover:bg-slate-700
                                     "
                                 >
+
                                     +
+
                                 </button>
 
                             </div>
@@ -1078,7 +1380,9 @@ const payloadItems =
                             font-bold
                             text-slate-600
                         ">
+
                             Detalle de la venta
+
                         </div>
 
 
@@ -1089,7 +1393,9 @@ const payloadItems =
                                 text-center
                                 text-slate-400
                             ">
+
                                 No hay productos agregados.
+
                             </div>
 
                         ) : (
@@ -1118,22 +1424,28 @@ const payloadItems =
                                                 <div className="
                                                     font-bold
                                                 ">
+
                                                     {
                                                         item.name
                                                     }
+
                                                 </div>
 
                                                 <div className="
                                                     text-sm
                                                     text-slate-500
                                                 ">
+
                                                     {
                                                         item.size
                                                     }
+
                                                     {" × "}
+
                                                     {
                                                         item.quantity
                                                     }
+
                                                 </div>
 
                                             </div>
@@ -1146,13 +1458,20 @@ const payloadItems =
                                             ">
 
                                                 <strong>
+
                                                     {
                                                         moneda(
-                                                            item.price *
-                                                            item.quantity
+                                                            Number(
+                                                                item.price
+                                                            ) *
+                                                            Number(
+                                                                item.quantity
+                                                            )
                                                         )
                                                     }
+
                                                 </strong>
+
 
                                                 <button
                                                     type="button"
@@ -1166,7 +1485,9 @@ const payloadItems =
                                                         font-bold
                                                     "
                                                 >
+
                                                     ✕
+
                                                 </button>
 
                                             </div>
@@ -1220,11 +1541,15 @@ const payloadItems =
                             text-slate-600
                             mb-2
                         ">
+
                             Medio de pago
+
                         </label>
 
                         <select
-                            value={medioPago}
+                            value={
+                                medioPago
+                            }
                             onChange={e =>
                                 setMedioPago(
                                     e.target.value
@@ -1241,19 +1566,27 @@ const payloadItems =
                         >
 
                             <option value="efectivo">
+
                                 💵 Efectivo
+
                             </option>
 
                             <option value="transferencia">
+
                                 🏦 Transferencia
+
                             </option>
 
                             <option value="debito">
+
                                 💳 Débito
+
                             </option>
 
                             <option value="credito">
+
                                 💳 Crédito
+
                             </option>
 
                         </select>
@@ -1301,7 +1634,9 @@ const payloadItems =
                     RESUMEN
                 ================================================= */}
 
-                <div className="space-y-6">
+                <div className="
+                    space-y-6
+                ">
 
 
                     <AdminCard>
@@ -1313,8 +1648,11 @@ const payloadItems =
                             text-slate-400
                             font-bold
                         ">
+
                             Resumen
+
                         </p>
+
 
                         <div className="
                             mt-4
@@ -1326,20 +1664,26 @@ const payloadItems =
                             <span className="
                                 text-slate-500
                             ">
+
                                 Total venta
+
                             </span>
+
 
                             <strong className="
                                 text-4xl
                                 font-black
                                 text-slate-900
                             ">
+
                                 {
                                     moneda(total)
                                 }
+
                             </strong>
 
                         </div>
+
 
                         <div className="
                             mt-4
@@ -1356,111 +1700,152 @@ const payloadItems =
 
                     <AdminCard>
 
-                        <div className="
-                            flex
-                            justify-between
-                            items-center
-                            mb-4
+                        <p className="
+                            text-xs
+                            uppercase
+                            tracking-[0.2em]
+                            text-slate-400
+                            font-bold
                         ">
 
-                            <h2 className="
-                                text-xl
-                                font-black
+                            Ventas externas
+
+                        </p>
+
+
+                        <div className="
+                            grid
+                            grid-cols-2
+                            gap-3
+                            mt-5
+                        ">
+
+                            <div className="
+                                rounded-2xl
+                                bg-slate-50
+                                p-4
                             ">
-                                Últimas ventas
-                            </h2>
 
-                        </div>
-
-
-                        <div className="
-                            space-y-3
-                        ">
-
-                            {ventas.length === 0 ? (
-
-                                <p className="
+                                <div className="
+                                    text-xs
+                                    font-bold
                                     text-slate-400
                                 ">
-                                    No hay ventas externas.
-                                </p>
 
-                            ) : (
+                                    Total
 
-                                ventas.map(
-                                    venta => (
+                                </div>
 
-                                        <div
-                                            key={
-                                                venta.id
-                                            }
-                                            className="
-                                                border-b
-                                                border-slate-100
-                                                pb-3
-                                            "
-                                        >
+                                <div className="
+                                    text-2xl
+                                    font-black
+                                    mt-1
+                                ">
 
-                                            <div className="
-                                                flex
-                                                justify-between
-                                            ">
+                                    {
+                                        estadisticas.cantidad
+                                    }
 
-                                                <div>
+                                </div>
 
-                                                    <strong>
-                                                        Venta #
-                                                        {
-                                                            venta.numero_venta
-                                                        }
-                                                    </strong>
-
-                                                    <div className="
-                                                        text-sm
-                                                        text-slate-500
-                                                    ">
-                                                        {
-                                                            venta.nombre
-                                                        }
-                                                    </div>
-
-                                                </div>
+                            </div>
 
 
-                                                <div className="
-                                                    text-right
-                                                ">
+                            <div className="
+                                rounded-2xl
+                                bg-slate-50
+                                p-4
+                            ">
 
-                                                    <strong>
-                                                        {
-                                                            moneda(
-                                                                venta.total
-                                                            )
-                                                        }
-                                                    </strong>
+                                <div className="
+                                    text-xs
+                                    font-bold
+                                    text-slate-400
+                                ">
 
-                                                    <div className="
-                                                        text-xs
-                                                        text-slate-400
-                                                    ">
-                                                        {
-                                                            venta.tipo_venta ===
-                                                            "whatsapp"
-                                                                ? "💬 WhatsApp"
-                                                                : "🏪 Presencial"
-                                                        }
-                                                    </div>
+                                    Vendido
 
-                                                </div>
+                                </div>
 
-                                            </div>
+                                <div className="
+                                    text-xl
+                                    font-black
+                                    mt-1
+                                ">
 
-                                        </div>
+                                    {
+                                        moneda(
+                                            estadisticas.total
+                                        )
+                                    }
 
-                                    )
-                                )
+                                </div>
 
-                            )}
+                            </div>
+
+
+                            <div className="
+                                rounded-2xl
+                                bg-blue-50
+                                p-4
+                            ">
+
+                                <div className="
+                                    text-xs
+                                    font-bold
+                                    text-blue-500
+                                ">
+
+                                    Presenciales
+
+                                </div>
+
+                                <div className="
+                                    text-2xl
+                                    font-black
+                                    mt-1
+                                    text-blue-700
+                                ">
+
+                                    {
+                                        estadisticas.presencial
+                                    }
+
+                                </div>
+
+                            </div>
+
+
+                            <div className="
+                                rounded-2xl
+                                bg-green-50
+                                p-4
+                            ">
+
+                                <div className="
+                                    text-xs
+                                    font-bold
+                                    text-green-500
+                                ">
+
+                                    WhatsApp
+
+                                </div>
+
+                                <div className="
+                                    text-2xl
+                                    font-black
+                                    mt-1
+                                    text-green-700
+                                ">
+
+                                    {
+                                        estadisticas.whatsapp
+                                    }
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -1469,6 +1854,1369 @@ const payloadItems =
                 </div>
 
             </div>
+
+
+            {/* =================================================
+                HISTORIAL
+            ================================================= */}
+
+            <AdminCard>
+
+                <div className="
+                    flex
+                    flex-col
+                    gap-4
+                    lg:flex-row
+                    lg:items-center
+                    lg:justify-between
+                    mb-6
+                ">
+
+                    <div>
+
+                        <p className="
+                            text-xs
+                            uppercase
+                            tracking-[0.2em]
+                            text-pink-500
+                            font-bold
+                        ">
+
+                            Control de ventas
+
+                        </p>
+
+                        <h2 className="
+                            text-3xl
+                            font-black
+                            text-slate-900
+                            mt-1
+                        ">
+
+                            📋 Historial de ventas externas
+
+                        </h2>
+
+                        <p className="
+                            text-sm
+                            text-slate-500
+                            mt-2
+                        ">
+
+                            Ventas realizadas presencialmente
+                            o mediante WhatsApp.
+
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onClick={
+                            actualizarHistorial
+                        }
+                        disabled={
+                            actualizando
+                        }
+                        className="
+                            px-5
+                            py-3
+                            rounded-xl
+                            bg-slate-900
+                            text-white
+                            font-bold
+                            hover:bg-slate-700
+                            disabled:opacity-50
+                        "
+                    >
+
+                        {actualizando
+                            ? "Actualizando..."
+                            : "🔄 Actualizar"}
+
+                    </button>
+
+                </div>
+
+
+                {/* FILTROS */}
+
+                <div className="
+                    grid
+                    grid-cols-1
+                    lg:grid-cols-[1fr_220px_220px]
+                    gap-4
+                    mb-6
+                ">
+
+                    <input
+                        value={
+                            busqueda
+                        }
+                        onChange={e =>
+                            setBusqueda(
+                                e.target.value
+                            )
+                        }
+                        placeholder="
+                            Buscar por cliente, RUT,
+                            teléfono o número de venta...
+                        "
+                        className="
+                            border
+                            border-slate-200
+                            rounded-xl
+                            p-3
+                            outline-none
+                            focus:ring-2
+                            focus:ring-pink-300
+                        "
+                    />
+
+
+                    <select
+                        value={
+                            filtroCanal
+                        }
+                        onChange={e =>
+                            setFiltroCanal(
+                                e.target.value
+                            )
+                        }
+                        className="
+                            border
+                            border-slate-200
+                            rounded-xl
+                            p-3
+                            bg-white
+                        "
+                    >
+
+                        <option value="todos">
+
+                            Todos los canales
+
+                        </option>
+
+                        <option value="presencial">
+
+                            🏪 Presencial
+
+                        </option>
+
+                        <option value="whatsapp">
+
+                            💬 WhatsApp
+
+                        </option>
+
+                    </select>
+
+
+                    <select
+                        value={
+                            filtroPago
+                        }
+                        onChange={e =>
+                            setFiltroPago(
+                                e.target.value
+                            )
+                        }
+                        className="
+                            border
+                            border-slate-200
+                            rounded-xl
+                            p-3
+                            bg-white
+                        "
+                    >
+
+                        <option value="todos">
+
+                            Todos los pagos
+
+                        </option>
+
+                        <option value="efectivo">
+
+                            💵 Efectivo
+
+                        </option>
+
+                        <option value="transferencia">
+
+                            🏦 Transferencia
+
+                        </option>
+
+                        <option value="debito">
+
+                            💳 Débito
+
+                        </option>
+
+                        <option value="credito">
+
+                            💳 Crédito
+
+                        </option>
+
+                        <option value="mercado_pago">
+
+                            🟢 Mercado Pago
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                {/* TABLA */}
+
+                <div className="
+                    overflow-x-auto
+                    rounded-2xl
+                    border
+                    border-slate-200
+                ">
+
+                    <table className="
+                        w-full
+                        min-w-[1050px]
+                    ">
+
+                        <thead>
+
+                            <tr className="
+                                bg-slate-50
+                                border-b
+                                border-slate-200
+                            ">
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Venta
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Fecha
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Cliente
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Canal
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Pago
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-left
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Estado
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-right
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Total
+
+                                </th>
+
+                                <th className="
+                                    px-4
+                                    py-4
+                                    text-center
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-slate-500
+                                ">
+
+                                    Detalle
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {ventasFiltradas.length === 0 ? (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="8"
+                                        className="
+                                            px-6
+                                            py-12
+                                            text-center
+                                            text-slate-400
+                                        "
+                                    >
+
+                                        No hay ventas que coincidan
+                                        con los filtros.
+
+                                    </td>
+
+                                </tr>
+
+                            ) : (
+
+                                ventasFiltradas.map(
+                                    venta => (
+
+                                        <tr
+                                            key={
+                                                venta.id
+                                            }
+                                            className="
+                                                border-b
+                                                border-slate-100
+                                                hover:bg-pink-50/30
+                                            "
+                                        >
+
+                                            {/* VENTA */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                            ">
+
+                                                <span className="
+                                                    font-black
+                                                    text-pink-600
+                                                ">
+
+                                                    #
+
+                                                    {
+                                                        venta.numero_venta
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+
+                                            {/* FECHA */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                                whitespace-nowrap
+                                                text-sm
+                                                text-slate-600
+                                            ">
+
+                                                {
+                                                    fechaVenta(
+                                                        venta.created_at
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            {/* CLIENTE */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                            ">
+
+                                                <div className="
+                                                    font-bold
+                                                    text-slate-800
+                                                ">
+
+                                                    {
+                                                        venta.nombre ||
+                                                        "Sin nombre"
+                                                    }
+
+                                                </div>
+
+                                                {venta.rut && (
+
+                                                    <div className="
+                                                        text-xs
+                                                        text-slate-400
+                                                        mt-1
+                                                    ">
+
+                                                        RUT:{" "}
+                                                        {
+                                                            venta.rut
+                                                        }
+
+                                                    </div>
+
+                                                )}
+
+                                            </td>
+
+
+                                            {/* CANAL */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                            ">
+
+                                                <span className={`
+                                                    inline-flex
+                                                    rounded-full
+                                                    px-3
+                                                    py-1
+                                                    text-xs
+                                                    font-black
+
+                                                    ${
+                                                        venta.tipo_venta ===
+                                                        "whatsapp"
+                                                            ? `
+                                                                bg-green-100
+                                                                text-green-700
+                                                            `
+                                                            : `
+                                                                bg-blue-100
+                                                                text-blue-700
+                                                            `
+                                                    }
+                                                `}>
+
+                                                    {
+                                                        etiquetaCanal(
+                                                            venta.tipo_venta
+                                                        )
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+
+                                            {/* PAGO */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                                text-sm
+                                                font-semibold
+                                                text-slate-600
+                                            ">
+
+                                                {
+                                                    etiquetaPago(
+                                                        venta.medio_pago
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            {/* ESTADO */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                            ">
+
+                                                <span className="
+                                                    inline-flex
+                                                    rounded-full
+                                                    bg-emerald-100
+                                                    px-3
+                                                    py-1
+                                                    text-xs
+                                                    font-black
+                                                    text-emerald-700
+                                                ">
+
+                                                    {
+                                                        venta.estado_pago ===
+                                                        "pagado"
+                                                            ? "Pagado"
+                                                            : venta.estado_pago ||
+                                                              venta.estado ||
+                                                              "-"
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+
+                                            {/* TOTAL */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                                text-right
+                                                whitespace-nowrap
+                                            ">
+
+                                                <strong className="
+                                                    text-slate-900
+                                                ">
+
+                                                    {
+                                                        moneda(
+                                                            venta.total
+                                                        )
+                                                    }
+
+                                                </strong>
+
+                                            </td>
+
+
+                                            {/* DETALLE */}
+
+                                            <td className="
+                                                px-4
+                                                py-4
+                                                text-center
+                                            ">
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setVentaSeleccionada(
+                                                            venta
+                                                        )
+                                                    }
+                                                    className="
+                                                        rounded-xl
+                                                        bg-slate-100
+                                                        px-4
+                                                        py-2
+                                                        text-sm
+                                                        font-bold
+                                                        text-slate-700
+                                                        hover:bg-pink-100
+                                                        hover:text-pink-600
+                                                    "
+                                                >
+
+                                                    👁 Ver
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    )
+                                )
+
+                            )}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {/* RESUMEN FILTRADO */}
+
+                <div className="
+                    mt-4
+                    flex
+                    flex-col
+                    gap-2
+                    sm:flex-row
+                    sm:justify-between
+                    text-sm
+                    text-slate-500
+                ">
+
+                    <span>
+
+                        Mostrando{" "}
+                        <strong className="
+                            text-slate-800
+                        ">
+
+                            {
+                                ventasFiltradas.length
+                            }
+
+                        </strong>{" "}
+                        de{" "}
+                        <strong className="
+                            text-slate-800
+                        ">
+
+                            {
+                                ventas.length
+                            }
+
+                        </strong>{" "}
+                        ventas
+
+                    </span>
+
+
+                    <span>
+
+                        Total filtrado:{" "}
+
+                        <strong className="
+                            text-slate-900
+                        ">
+
+                            {
+                                moneda(
+                                    ventasFiltradas.reduce(
+                                        (sum, venta) =>
+                                            sum +
+                                            Number(
+                                                venta.total ||
+                                                0
+                                            ),
+                                        0
+                                    )
+                                )
+                            }
+
+                        </strong>
+
+                    </span>
+
+                </div>
+
+            </AdminCard>
+
+
+            {/* =================================================
+                MODAL DETALLE
+            ================================================= */}
+
+            {ventaSeleccionada && (
+
+                <div className="
+                    fixed
+                    inset-0
+                    z-50
+                    flex
+                    items-center
+                    justify-center
+                    bg-slate-950/50
+                    p-4
+                ">
+
+                    <div className="
+                        max-h-[90vh]
+                        w-full
+                        max-w-3xl
+                        overflow-y-auto
+                        rounded-3xl
+                        bg-white
+                        shadow-2xl
+                    ">
+
+                        {/* CABECERA */}
+
+                        <div className="
+                            flex
+                            items-center
+                            justify-between
+                            border-b
+                            border-slate-200
+                            px-6
+                            py-5
+                        ">
+
+                            <div>
+
+                                <p className="
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    font-black
+                                    text-pink-500
+                                ">
+
+                                    Detalle de venta
+
+                                </p>
+
+                                <h2 className="
+                                    text-2xl
+                                    font-black
+                                    text-slate-900
+                                    mt-1
+                                ">
+
+                                    Venta #
+                                    {
+                                        ventaSeleccionada.numero_venta
+                                    }
+
+                                </h2>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setVentaSeleccionada(
+                                        null
+                                    )
+                                }
+                                className="
+                                    h-10
+                                    w-10
+                                    rounded-xl
+                                    bg-slate-100
+                                    font-bold
+                                    text-slate-500
+                                    hover:bg-red-50
+                                    hover:text-red-500
+                                "
+                            >
+
+                                ✕
+
+                            </button>
+
+                        </div>
+
+
+                        <div className="p-6">
+
+                            {/* DATOS PRINCIPALES */}
+
+                            <div className="
+                                grid
+                                grid-cols-1
+                                md:grid-cols-2
+                                gap-4
+                            ">
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-4
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-slate-400
+                                    ">
+
+                                        Cliente
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        font-bold
+                                        text-slate-800
+                                    ">
+
+                                        {
+                                            ventaSeleccionada.nombre ||
+                                            "Sin nombre"
+                                        }
+
+                                    </p>
+
+                                </div>
+
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-4
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-slate-400
+                                    ">
+
+                                        Fecha
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        font-bold
+                                        text-slate-800
+                                    ">
+
+                                        {
+                                            fechaVenta(
+                                                ventaSeleccionada.created_at
+                                            )
+                                        }
+
+                                    </p>
+
+                                </div>
+
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-4
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-slate-400
+                                    ">
+
+                                        Canal
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        font-bold
+                                        text-slate-800
+                                    ">
+
+                                        {
+                                            etiquetaCanal(
+                                                ventaSeleccionada.tipo_venta
+                                            )
+                                        }
+
+                                    </p>
+
+                                </div>
+
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-4
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-slate-400
+                                    ">
+
+                                        Medio de pago
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        font-bold
+                                        text-slate-800
+                                    ">
+
+                                        {
+                                            etiquetaPago(
+                                                ventaSeleccionada.medio_pago
+                                            )
+                                        }
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            {/* DATOS CLIENTE */}
+
+                            {(ventaSeleccionada.rut ||
+                                ventaSeleccionada.correo ||
+                                ventaSeleccionada.telefono) && (
+
+                                <div className="
+                                    mt-5
+                                    rounded-2xl
+                                    border
+                                    border-slate-200
+                                    p-5
+                                ">
+
+                                    <h3 className="
+                                        font-black
+                                        text-slate-900
+                                    ">
+
+                                        Datos del cliente
+
+                                    </h3>
+
+
+                                    <div className="
+                                        grid
+                                        grid-cols-1
+                                        md:grid-cols-3
+                                        gap-4
+                                        mt-4
+                                    ">
+
+                                        <div>
+
+                                            <p className="
+                                                text-xs
+                                                font-bold
+                                                text-slate-400
+                                            ">
+
+                                                RUT
+
+                                            </p>
+
+                                            <p className="
+                                                mt-1
+                                                text-sm
+                                                font-semibold
+                                                text-slate-700
+                                            ">
+
+                                                {
+                                                    ventaSeleccionada.rut ||
+                                                    "-"
+                                                }
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <p className="
+                                                text-xs
+                                                font-bold
+                                                text-slate-400
+                                            ">
+
+                                                Correo
+
+                                            </p>
+
+                                            <p className="
+                                                mt-1
+                                                text-sm
+                                                font-semibold
+                                                text-slate-700
+                                                break-all
+                                            ">
+
+                                                {
+                                                    ventaSeleccionada.correo ||
+                                                    "-"
+                                                }
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <p className="
+                                                text-xs
+                                                font-bold
+                                                text-slate-400
+                                            ">
+
+                                                Teléfono
+
+                                            </p>
+
+                                            <p className="
+                                                mt-1
+                                                text-sm
+                                                font-semibold
+                                                text-slate-700
+                                            ">
+
+                                                {
+                                                    ventaSeleccionada.telefono ||
+                                                    "-"
+                                                }
+
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            )}
+
+
+                            {/* PRODUCTOS */}
+
+                            <div className="
+                                mt-5
+                                rounded-2xl
+                                border
+                                border-slate-200
+                                overflow-hidden
+                            ">
+
+                                <div className="
+                                    bg-slate-50
+                                    px-5
+                                    py-4
+                                    font-black
+                                    text-slate-800
+                                ">
+
+                                    Productos vendidos
+
+                                </div>
+
+
+                                {Array.isArray(
+                                    ventaSeleccionada.items
+                                ) &&
+                                ventaSeleccionada.items.length >
+                                    0 ? (
+
+                                    ventaSeleccionada.items.map(
+                                        (item, index) => {
+
+                                            const itemCantidad =
+                                                Number(
+                                                    item.quantity ??
+                                                    item.cantidad ??
+                                                    item.qty ??
+                                                    0
+                                                );
+
+                                            const itemPrecio =
+                                                Number(
+                                                    item.price ??
+                                                    item.precio ??
+                                                    0
+                                                );
+
+                                            const nombre =
+                                                item.name ??
+                                                item.product_name ??
+                                                item.nombre ??
+                                                item.producto ??
+                                                "Producto";
+
+                                            const talla =
+                                                item.size ??
+                                                item.talla ??
+                                                "-";
+
+                                            return (
+
+                                                <div
+                                                    key={
+                                                        index
+                                                    }
+                                                    className="
+                                                        flex
+                                                        items-center
+                                                        justify-between
+                                                        gap-4
+                                                        border-t
+                                                        border-slate-100
+                                                        px-5
+                                                        py-4
+                                                    "
+                                                >
+
+                                                    <div>
+
+                                                        <div className="
+                                                            font-bold
+                                                            text-slate-800
+                                                        ">
+
+                                                            {
+                                                                nombre
+                                                            }
+
+                                                        </div>
+
+                                                        <div className="
+                                                            mt-1
+                                                            text-sm
+                                                            text-slate-500
+                                                        ">
+
+                                                            Talla:{" "}
+                                                            {
+                                                                talla
+                                                            }
+
+                                                            {" · "}
+
+                                                            Cantidad:{" "}
+                                                            {
+                                                                itemCantidad
+                                                            }
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <strong className="
+                                                        whitespace-nowrap
+                                                        text-slate-900
+                                                    ">
+
+                                                        {
+                                                            moneda(
+                                                                itemPrecio *
+                                                                itemCantidad
+                                                            )
+                                                        }
+
+                                                    </strong>
+
+                                                </div>
+
+                                            );
+
+                                        }
+                                    )
+
+                                ) : (
+
+                                    <div className="
+                                        p-6
+                                        text-center
+                                        text-slate-400
+                                    ">
+
+                                        No hay detalle de productos
+                                        disponible.
+
+                                    </div>
+
+                                )}
+
+                            </div>
+
+
+                            {/* VENDEDOR */}
+
+                            <div className="
+                                mt-5
+                                grid
+                                grid-cols-1
+                                md:grid-cols-2
+                                gap-4
+                            ">
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-4
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-slate-400
+                                    ">
+
+                                        Vendedor
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        font-bold
+                                        text-slate-800
+                                    ">
+
+                                        {
+                                            ventaSeleccionada.vendedor ||
+                                            "-"
+                                        }
+
+                                    </p>
+
+                                </div>
+
+
+                                <div className="
+                                    rounded-2xl
+                                    bg-slate-900
+                                    p-4
+                                    text-white
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        font-bold
+                                        text-white/60
+                                    ">
+
+                                        Total venta
+
+                                    </p>
+
+                                    <p className="
+                                        mt-1
+                                        text-2xl
+                                        font-black
+                                    ">
+
+                                        {
+                                            moneda(
+                                                ventaSeleccionada.total
+                                            )
+                                        }
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            {/* OBSERVACIONES */}
+
+                            {ventaSeleccionada.observacion && (
+
+                                <div className="
+                                    mt-5
+                                    rounded-2xl
+                                    bg-slate-50
+                                    p-5
+                                ">
+
+                                    <p className="
+                                        text-xs
+                                        uppercase
+                                        tracking-wider
+                                        font-black
+                                        text-slate-400
+                                    ">
+
+                                        Observaciones
+
+                                    </p>
+
+                                    <p className="
+                                        mt-2
+                                        whitespace-pre-wrap
+                                        text-sm
+                                        text-slate-700
+                                    ">
+
+                                        {
+                                            ventaSeleccionada.observacion
+                                        }
+
+                                    </p>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
 
         </div>
 
