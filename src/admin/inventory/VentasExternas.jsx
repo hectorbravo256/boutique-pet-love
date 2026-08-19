@@ -374,15 +374,14 @@ export default function VentasExternas() {
 
         try {
 
-            const payloadItems =
-                items.map(item => ({
-                    variant_id:
-                        Number(item.variant_id),
+const payloadItems =
+    items.map(item => ({
+        variant_id:
+            Number(item.variant_id),
 
-                    quantity:
-                        Number(item.quantity)
-                }));
-
+        cantidad:
+            Number(item.quantity)
+    }));
 
             const {
                 data,
