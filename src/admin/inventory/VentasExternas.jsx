@@ -518,6 +518,722 @@ export default function VentasExternas() {
 
     };
 
+    /* =====================================================
+   IMPRIMIR COMPROBANTE
+===================================================== */
+
+const imprimirComprobante = (venta) => {
+
+    if (!venta) return;
+
+    const itemsVenta =
+        Array.isArray(venta.items)
+            ? venta.items
+            : [];
+
+    const monedaPrint = (valor) =>
+        `$${Number(valor || 0).toLocaleString("es-CL")}`;
+
+    const fechaPrint = venta.created_at
+        ? new Date(
+            venta.created_at
+        ).toLocaleString(
+            "es-CL",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        )
+        : "-";
+
+    const canal =
+        venta.tipo_venta === "whatsapp"
+            ? "WhatsApp"
+            : "Presencial";
+
+    const medioPago = (() => {
+
+        switch (venta.medio_pago) {
+
+            case "efectivo":
+                return "Efectivo";
+
+            case "transferencia":
+                return "Transferencia";
+
+            case "debito":
+                return "Débito";
+
+            case "credito":
+                return "Crédito";
+
+            case "mercado_pago":
+                return "Mercado Pago";
+
+            default:
+                return venta.medio_pago || "-";
+
+        }
+
+    })();
+
+
+    const productosHTML =
+        itemsVenta.length > 0
+            ? itemsVenta.map(item => {
+
+                const cantidad =
+                    Number(
+                        item.quantity ??
+                        item.cantidad ??
+                        item.qty ??
+                        0
+                    );
+
+                const precio =
+                    Number(
+                        item.price ??
+                        item.precio ??
+                        0
+                    );
+
+                const nombre =
+                    item.name ??
+                    item.product_name ??
+                    item.nombre ??
+                    item.producto ??
+                    "Producto";
+
+                const talla =
+                    item.size ??
+                    item.talla ??
+                    "-";
+
+                const subtotal =
+                    cantidad * precio;
+
+                return `
+                    <tr>
+                        <td class="producto">
+                            <strong>${nombre}</strong>
+                            <span>Talla: ${talla}</span>
+                        </td>
+
+                        <td class="cantidad">
+                            ${cantidad}
+                        </td>
+
+                        <td class="precio">
+                            ${monedaPrint(precio)}
+                        </td>
+
+                        <td class="subtotal">
+                            ${monedaPrint(subtotal)}
+                        </td>
+                    </tr>
+                `;
+
+            }).join("")
+            : `
+                <tr>
+                    <td colspan="4">
+                        No hay productos registrados.
+                    </td>
+                </tr>
+            `;
+
+
+    const ventana =
+        window.open(
+            "",
+            "_blank",
+            "width=450,height=800"
+        );
+
+
+    if (!ventana) {
+
+        alert(
+            "El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para este sitio."
+        );
+
+        return;
+
+    }
+
+
+    ventana.document.write(`
+        <!DOCTYPE html>
+
+        <html lang="es">
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <title>
+                Venta #${venta.numero_venta}
+            </title>
+
+            <style>
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+
+                    margin: 0;
+
+                    padding: 20px;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    color: #111827;
+
+                    background: white;
+
+                }
+
+                .comprobante {
+
+                    width: 100%;
+
+                    max-width: 380px;
+
+                    margin: 0 auto;
+
+                }
+
+                .logo {
+
+                    text-align: center;
+
+                    margin-bottom: 8px;
+
+                }
+
+                .logo-title {
+
+                    font-size: 22px;
+
+                    font-weight: 900;
+
+                    letter-spacing: 1px;
+
+                }
+
+                .logo-subtitle {
+
+                    font-size: 10px;
+
+                    letter-spacing: 2px;
+
+                    color: #64748b;
+
+                    margin-top: 3px;
+
+                }
+
+                .titulo {
+
+                    text-align: center;
+
+                    margin-top: 18px;
+
+                    font-size: 18px;
+
+                    font-weight: 900;
+
+                }
+
+                .numero {
+
+                    text-align: center;
+
+                    margin-top: 4px;
+
+                    font-size: 15px;
+
+                    font-weight: 700;
+
+                }
+
+                .linea {
+
+                    border-top:
+                        1px dashed #94a3b8;
+
+                    margin:
+                        16px 0;
+
+                }
+
+                .datos {
+
+                    display: grid;
+
+                    grid-template-columns:
+                        1fr 1fr;
+
+                    gap: 10px;
+
+                    font-size: 12px;
+
+                }
+
+                .dato {
+
+                    padding: 8px;
+
+                    background: #f8fafc;
+
+                    border-radius: 8px;
+
+                }
+
+                .dato-label {
+
+                    display: block;
+
+                    font-size: 9px;
+
+                    text-transform: uppercase;
+
+                    color: #64748b;
+
+                    margin-bottom: 3px;
+
+                    font-weight: 700;
+
+                }
+
+                .dato-valor {
+
+                    font-weight: 700;
+
+                }
+
+                table {
+
+                    width: 100%;
+
+                    border-collapse: collapse;
+
+                    margin-top: 12px;
+
+                    font-size: 11px;
+
+                }
+
+                th {
+
+                    text-align: left;
+
+                    border-bottom:
+                        1px solid #cbd5e1;
+
+                    padding:
+                        7px 3px;
+
+                    font-size: 9px;
+
+                    text-transform:
+                        uppercase;
+
+                    color: #64748b;
+
+                }
+
+                td {
+
+                    padding:
+                        9px 3px;
+
+                    border-bottom:
+                        1px solid #e2e8f0;
+
+                    vertical-align:
+                        top;
+
+                }
+
+                .producto {
+
+                    width: 45%;
+
+                }
+
+                .producto strong {
+
+                    display: block;
+
+                }
+
+                .producto span {
+
+                    display: block;
+
+                    color: #64748b;
+
+                    font-size: 10px;
+
+                    margin-top: 3px;
+
+                }
+
+                .cantidad {
+
+                    text-align: center;
+
+                    width: 12%;
+
+                }
+
+                .precio,
+                .subtotal {
+
+                    text-align: right;
+
+                    white-space: nowrap;
+
+                }
+
+                .total {
+
+                    display: flex;
+
+                    justify-content:
+                        space-between;
+
+                    align-items: center;
+
+                    margin-top: 18px;
+
+                    padding-top: 14px;
+
+                    border-top:
+                        2px solid #111827;
+
+                    font-size: 18px;
+
+                    font-weight: 900;
+
+                }
+
+                .observaciones {
+
+                    margin-top: 18px;
+
+                    padding: 10px;
+
+                    background: #f8fafc;
+
+                    border-radius: 8px;
+
+                    font-size: 11px;
+
+                }
+
+                .observaciones strong {
+
+                    display: block;
+
+                    font-size: 9px;
+
+                    text-transform:
+                        uppercase;
+
+                    color: #64748b;
+
+                    margin-bottom: 5px;
+
+                }
+
+                .footer {
+
+                    text-align: center;
+
+                    margin-top: 25px;
+
+                    padding-top: 15px;
+
+                    border-top:
+                        1px dashed #94a3b8;
+
+                    font-size: 10px;
+
+                    color: #64748b;
+
+                    line-height: 1.5;
+
+                }
+
+                @media print {
+
+                    body {
+
+                        padding: 0;
+
+                    }
+
+                    .comprobante {
+
+                        max-width: 100%;
+
+                    }
+
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            <div class="comprobante">
+
+                <div class="logo">
+
+                    <div class="logo-title">
+                        🐾 BOUTIQUE PET LOVE
+                    </div>
+
+                    <div class="logo-subtitle">
+                        TIENDA PARA MASCOTAS
+                    </div>
+
+                </div>
+
+
+                <div class="titulo">
+                    COMPROBANTE DE VENTA
+                </div>
+
+                <div class="numero">
+                    Venta #${venta.numero_venta}
+                </div>
+
+
+                <div class="linea"></div>
+
+
+                <div class="datos">
+
+                    <div class="dato">
+
+                        <span class="dato-label">
+                            Fecha
+                        </span>
+
+                        <span class="dato-valor">
+                            ${fechaPrint}
+                        </span>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span class="dato-label">
+                            Canal
+                        </span>
+
+                        <span class="dato-valor">
+                            ${canal}
+                        </span>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span class="dato-label">
+                            Cliente
+                        </span>
+
+                        <span class="dato-valor">
+                            ${venta.nombre || "-"}
+                        </span>
+
+                    </div>
+
+
+                    <div class="dato">
+
+                        <span class="dato-label">
+                            Medio de pago
+                        </span>
+
+                        <span class="dato-valor">
+                            ${medioPago}
+                        </span>
+
+                    </div>
+
+                    ${
+                        venta.rut
+                            ? `
+                                <div class="dato">
+
+                                    <span class="dato-label">
+                                        RUT
+                                    </span>
+
+                                    <span class="dato-valor">
+                                        ${venta.rut}
+                                    </span>
+
+                                </div>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        venta.telefono
+                            ? `
+                                <div class="dato">
+
+                                    <span class="dato-label">
+                                        Teléfono
+                                    </span>
+
+                                    <span class="dato-valor">
+                                        ${venta.telefono}
+                                    </span>
+
+                                </div>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+
+                <div class="linea"></div>
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Producto
+                            </th>
+
+                            <th>
+                                Cant.
+                            </th>
+
+                            <th>
+                                Precio
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${productosHTML}
+
+                    </tbody>
+
+                </table>
+
+
+                <div class="total">
+
+                    <span>
+                        TOTAL
+                    </span>
+
+                    <span>
+                        ${monedaPrint(venta.total)}
+                    </span>
+
+                </div>
+
+
+                ${
+                    venta.observacion
+                        ? `
+                            <div class="observaciones">
+
+                                <strong>
+                                    Observaciones
+                                </strong>
+
+                                ${venta.observacion}
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                <div class="footer">
+
+                    <strong>
+                        Boutique Pet Love
+                    </strong>
+
+                    <br>
+
+                    Gracias por tu compra 🐾
+
+                    <br>
+
+                    boutique-petlove.cl
+
+                    <br><br>
+
+                    Vendedor:
+                    ${venta.vendedor || "Administrador"}
+
+                </div>
+
+            </div>
+
+
+            <script>
+
+                window.onload = function() {
+
+                    window.focus();
+
+                    window.print();
+
+                };
+
+                window.onafterprint = function() {
+
+                    window.close();
+
+                };
+
+            </script>
+
+        </body>
+
+        </html>
+    `);
+
+    ventana.document.close();
+
+};
 
     /* =====================================================
        FORMATO MONEDA
