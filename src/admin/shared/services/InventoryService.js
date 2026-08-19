@@ -68,13 +68,14 @@ const InventoryService = {
 
             );
 
-        const stockCritico =
+const stockCritico =
+    (variants || []).filter(
+        item => {
+            const stock = Number(item.stock || 0);
 
-            (variants || []).filter(
-
-                item => Number(item.stock) <= 3
-
-            ).length;
+            return stock > 0 && stock <= 3;
+        }
+    ).length;
 
         return {
 
