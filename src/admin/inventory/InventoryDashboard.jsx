@@ -1,7 +1,7 @@
 import useInventoryDashboard from "../shared/hooks/useInventoryDashboard";
 
 import InventoryKPIs from "./dashboard/components/InventoryKPIs";
-import InventoryRecentMovements from "./dashboard/components/InventoryRecentMovements";
+
 
 export default function InventoryDashboard() {
 
