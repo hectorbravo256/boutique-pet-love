@@ -3714,6 +3714,13 @@ const imprimirComprobante = (venta) => {
                                                 item.size ??
                                                 item.talla ??
                                                 "-";
+                                            const imprimirComprobante = () => {
+
+                                                if (!ventaSeleccionada) return;
+
+                                                    window.print();
+
+                                                        };
 
                                             return (
 
