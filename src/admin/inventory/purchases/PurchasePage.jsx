@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import PageHeader from "../../shared/ui/PageHeader";
 
-import PurchaseDashboard from "./PurchaseDashboard";
+
 import PurchaseForm from "../PurchaseForm";
 import PurchaseHistory from "./PurchaseHistory";
 
@@ -31,11 +31,6 @@ export default function PurchasePage() {
                 subtitle="Recepción de mercadería y actualización de stock."
             />
 
-            <div className="mt-6 mb-6">
-
-</div>
-
-            <PurchaseDashboard />
 
             <div className="mt-8">
 
