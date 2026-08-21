@@ -1,7 +1,6 @@
 import InventoryDashboard from "./inventory/InventoryDashboard";
 import InventoryHome from "./inventory/InventoryHome";
 
-import Button from "./shared/ui/Button";
 import PageHeader from "./shared/ui/PageHeader";
 
 export default function AdminInventario() {
