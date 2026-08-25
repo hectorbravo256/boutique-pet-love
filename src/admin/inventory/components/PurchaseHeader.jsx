@@ -16,16 +16,6 @@ export default function PurchaseHeader({
     return (
         <div>
 
-            {/* TÍTULO DE LA SECCIÓN */}
-            <div className="mb-6">
-                <h2 className="text-2xl font-black text-slate-900">
-                    Registrar compra
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                    Ingresa los datos de la compra y agrega los productos recibidos.
-                </p>
-            </div>
 
             {/* DATOS PRINCIPALES */}
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
