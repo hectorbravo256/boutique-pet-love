@@ -227,79 +227,82 @@ export default function PurchaseHistory() {
                 overflow-hidden
             ">
 
-                {/* ---------------------------------- */}
-                {/* ENCABEZADO */}
-                {/* ---------------------------------- */}
+{/* ---------------------------------- */}
+{/* ACCIONES */}
+{/* ---------------------------------- */}
 
-                <div className="
-                    flex
-                    flex-col
-                    gap-4
-                    border-b
-                    border-slate-200
-                    px-6
-                    py-5
-                    sm:flex-row
-                    sm:items-center
-                    sm:justify-between
-                ">
+<div className="
+    flex
+    items-center
+    justify-end
+    gap-3
+    border-b
+    border-slate-200
+    px-6
+    py-4
+">
 
-                    <div>
+    <div className="
+        rounded-2xl
+        bg-pink-50
+        px-5
+        py-3
+        text-center
+    ">
 
-                        <div className="
-                            flex
-                            items-center
-                            gap-3
-                        ">
+        <div className="
+            text-xs
+            font-medium
+            text-slate-500
+        ">
+            Compras
+        </div>
 
-                            <div className="
-                                flex
-                                h-11
-                                w-11
-                                items-center
-                                justify-center
-                                rounded-xl
-                                bg-pink-50
-                                text-pink-500
-                            ">
+        <div className="
+            text-2xl
+            font-black
+            text-pink-600
+        ">
+            {totalPurchases}
+        </div>
 
-                                <History size={22} />
+    </div>
 
-                            </div>
+    <button
+        type="button"
+        onClick={loadPurchases}
+        disabled={loading}
+        title="Actualizar historial"
+        className="
+            flex
+            h-11
+            w-11
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-slate-200
+            bg-white
+            text-slate-500
+            transition
+            hover:bg-slate-50
+            hover:text-pink-600
+            disabled:opacity-50
+        "
+    >
 
-                            <div>
+        <RefreshCw
+            size={18}
+            className={
+                loading
+                    ? "animate-spin"
+                    : ""
+            }
+        />
 
-                                <h2 className="
-                                    text-2xl
-                                    font-black
-                                    text-slate-900
-                                ">
+    </button>
 
-                                    Historial de Compras
-
-                                </h2>
-
-                                <p className="
-                                    text-sm
-                                    text-slate-500
-                                ">
-
-                                    Registro de las compras realizadas
-                                    y su información tributaria.
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="
-                        flex
-                        items-center
-                        gap-3
-                    ">
+</div>
 
                         <div className="
                             rounded-2xl
