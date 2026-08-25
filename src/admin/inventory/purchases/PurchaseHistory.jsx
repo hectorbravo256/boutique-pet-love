@@ -212,10 +212,8 @@ export default function PurchaseHistory() {
     items-center
     justify-end
     gap-3
-    border-b
-    border-slate-200
-    px-6
-    py-3
+    px-5
+    py-2
 ">
 
     <div className="
@@ -288,7 +286,7 @@ export default function PurchaseHistory() {
                     {/* CONTENIDO */}
                     {/* ---------------------------------- */}
 
-                    <div className="p-5">
+                    <div className="px-5 pb-5 pt-2">
                         {error && (
                             <div className="
                                 mb-4
