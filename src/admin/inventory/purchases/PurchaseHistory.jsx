@@ -203,76 +203,86 @@ export default function PurchaseHistory() {
                     shadow-sm
                     overflow-hidden
                 ">
-                    {/* ---------------------------------- */}
-                    {/* ACCIONES */}
-                    {/* ---------------------------------- */}
+{/* ---------------------------------- */}
+{/* ACCIONES */}
+{/* ---------------------------------- */}
 
-                    <div className="
-                        flex
-                        items-center
-                        justify-end
-                        gap-3
-                        border-b
-                        border-slate-200
-                        px-6
-                        py-4
-                    ">
-                        <div className="
-                            rounded-2xl
-                            bg-pink-50
-                            px-5
-                            py-3
-                            text-center
-                        ">
-                            <div className="
-                                text-xs
-                                font-medium
-                                text-slate-500
-                            ">
-                                Compras
-                            </div>
+<div className="
+    flex
+    items-center
+    justify-end
+    gap-3
+    border-b
+    border-slate-200
+    px-6
+    py-3
+">
 
-                            <div className="
-                                text-2xl
-                                font-black
-                                text-pink-600
-                            ">
-                                {totalPurchases}
-                            </div>
-                        </div>
+    <div className="
+        flex
+        items-center
+        gap-2
+        rounded-xl
+        bg-pink-50
+        px-3
+        py-2
+    ">
 
-                        <button
-                            type="button"
-                            onClick={loadPurchases}
-                            disabled={loading}
-                            title="Actualizar historial"
-                            className="
-                                flex
-                                h-11
-                                w-11
-                                items-center
-                                justify-center
-                                rounded-xl
-                                border
-                                border-slate-200
-                                bg-white
-                                text-slate-500
-                                transition
-                                hover:bg-slate-50
-                                hover:text-pink-600
-                                disabled:opacity-50
-                            "
-                        >
-                            <RefreshCw
-                                size={18}
-                                className={
-                                    loading
-                                        ? "animate-spin"
-                                        : ""
-                                }
-                            />
-                        </button>
-                    </div>
+        <span className="
+            text-sm
+            font-bold
+            text-pink-600
+        ">
+            {totalPurchases}
+        </span>
+
+        <span className="
+            text-sm
+            font-medium
+            text-slate-500
+        ">
+            {totalPurchases === 1
+                ? "compra"
+                : "compras"}
+        </span>
+
+    </div>
+
+    <button
+        type="button"
+        onClick={loadPurchases}
+        disabled={loading}
+        title="Actualizar historial"
+        className="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-slate-200
+            bg-white
+            text-slate-500
+            transition
+            hover:border-pink-200
+            hover:bg-pink-50
+            hover:text-pink-600
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+        "
+    >
+        <RefreshCw
+            size={17}
+            className={
+                loading
+                    ? "animate-spin"
+                    : ""
+            }
+        />
+    </button>
+
+</div>
 
                     {/* ---------------------------------- */}
                     {/* CONTENIDO */}
