@@ -304,13 +304,7 @@ export default function PurchaseHistory() {
 
 </div>
 
-                        <div className="
-                            rounded-2xl
-                            bg-pink-50
-                            px-5
-                            py-3
-                            text-center
-                        ">
+
 
                             <div className="
                                 text-xs
