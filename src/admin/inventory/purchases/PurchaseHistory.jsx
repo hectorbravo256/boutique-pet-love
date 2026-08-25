@@ -365,368 +365,367 @@ export default function PurchaseHistory() {
                             </div>
                         ) : (
                             <>
-                                {/* -------------------------------- */}
-                                {/* TABLA */}
-                                {/* -------------------------------- */}
+{/* -------------------------------- */}
+{/* TABLA */}
+{/* -------------------------------- */}
 
-                                <div className="overflow-x-auto">
-                                    <table className="
-                                        w-full
-                                        min-w-[1000px]
-                                        border-collapse
-                                    ">
-                                        <thead>
-                                            <tr className="
-                                                border-b
-                                                border-slate-200
-                                                text-left
-                                            ">
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-center
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Detalle
-                                                </th>
+<div className="overflow-x-auto">
+    <table className="
+        w-full
+        min-w-[950px]
+        border-collapse
+    ">
+        <thead>
+            <tr className="
+                border-b
+                border-slate-200
+                bg-slate-50/70
+            ">
+                <th className="
+                    w-[70px]
+                    px-3
+                    py-3
+                    text-center
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Ver
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-left
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Compra
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-left
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Compra
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-left
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Fecha
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-left
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Fecha
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-left
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Proveedor
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-left
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Proveedor
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-left
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Documento
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-left
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Documento
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-center
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Productos
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-center
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Productos
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-center
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Variantes
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-center
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Variantes
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-center
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Unidades
-                                                </th>
+                <th className="
+                    px-3
+                    py-3
+                    text-center
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Unidades
+                </th>
 
-                                                <th className="
-                                                    px-3
-                                                    py-4
-                                                    text-right
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-slate-500
-                                                ">
-                                                    Total
-                                                </th>
-                                            </tr>
-                                        </thead>
+                <th className="
+                    px-3
+                    py-3
+                    text-right
+                    text-[11px]
+                    font-black
+                    uppercase
+                    tracking-wider
+                    text-slate-400
+                ">
+                    Total
+                </th>
+            </tr>
+        </thead>
 
-                                        <tbody>
-                                            {purchaseRows.map(
-                                                (purchase) => (
-                                                    <tr
-                                                        key={purchase.id}
-                                                        className="
-                                                            border-b
-                                                            border-slate-100
-                                                            transition
-                                                            hover:bg-pink-50/30
-                                                        "
-                                                    >
-                                                        {/* DETALLE */}
+        <tbody>
+            {purchaseRows.map((purchase) => (
+                <tr
+                    key={purchase.id}
+                    className="
+                        group
+                        border-b
+                        border-slate-100
+                        transition
+                        duration-150
+                        hover:bg-pink-50/40
+                    "
+                >
+                    {/* VER */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-center
-                                                        ">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setSelectedPurchase(
-                                                                        purchase
-                                                                    );
-                                                                    setDetailModalOpen(
-                                                                        true
-                                                                    );
-                                                                }}
-                                                                className="
-                                                                    inline-flex
-                                                                    items-center
-                                                                    gap-2
-                                                                    rounded-lg
-                                                                    border
-                                                                    border-slate-200
-                                                                    bg-white
-                                                                    px-3
-                                                                    py-2
-                                                                    text-xs
-                                                                    font-bold
-                                                                    text-slate-600
-                                                                    shadow-sm
-                                                                    transition
-                                                                    hover:border-pink-300
-                                                                    hover:bg-pink-50
-                                                                    hover:text-pink-600
-                                                                "
-                                                            >
-                                                                <Eye size={15} />
-                                                                Ver
-                                                            </button>
-                                                        </td>
+                    <td className="
+                        px-3
+                        py-3
+                        text-center
+                    ">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setSelectedPurchase(purchase);
+                                setDetailModalOpen(true);
+                            }}
+                            title="Ver detalle de compra"
+                            className="
+                                inline-flex
+                                h-9
+                                w-9
+                                items-center
+                                justify-center
+                                rounded-xl
+                                border
+                                border-slate-200
+                                bg-white
+                                text-slate-400
+                                shadow-sm
+                                transition
+                                hover:border-pink-200
+                                hover:bg-pink-50
+                                hover:text-pink-600
+                                group-hover:border-pink-200
+                            "
+                        >
+                            <Eye size={16} />
+                        </button>
+                    </td>
 
-                                                        {/* COMPRA */}
+                    {/* COMPRA */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                        ">
-                                                            <span className="
-                                                                whitespace-nowrap
-                                                                font-black
-                                                                text-pink-600
-                                                            ">
-                                                                {formatPurchaseNumber(
-                                                                    purchase.purchase_number
-                                                                )}
-                                                            </span>
-                                                        </td>
+                    <td className="
+                        px-3
+                        py-3
+                    ">
+                        <span className="
+                            whitespace-nowrap
+                            text-sm
+                            font-black
+                            text-pink-600
+                        ">
+                            {formatPurchaseNumber(
+                                purchase.purchase_number
+                            )}
+                        </span>
+                    </td>
 
-                                                        {/* FECHA */}
+                    {/* FECHA */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-sm
-                                                            font-medium
-                                                            text-slate-600
-                                                        ">
-                                                            {formatDate(
-                                                                purchase.purchase_date
-                                                            )}
-                                                        </td>
+                    <td className="
+                        whitespace-nowrap
+                        px-3
+                        py-3
+                    ">
+                        <span className="
+                            text-sm
+                            font-medium
+                            text-slate-600
+                        ">
+                            {formatDate(
+                                purchase.purchase_date
+                            )}
+                        </span>
+                    </td>
 
-                                                        {/* PROVEEDOR */}
+                    {/* PROVEEDOR */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                        ">
-                                                            <span className="
-                                                                font-bold
-                                                                text-slate-800
-                                                            ">
-                                                                {purchase.supplier ||
-                                                                    "-"}
-                                                            </span>
-                                                        </td>
+                    <td className="
+                        max-w-[220px]
+                        px-3
+                        py-3
+                    ">
+                        <span className="
+                            block
+                            truncate
+                            text-sm
+                            font-bold
+                            text-slate-800
+                        ">
+                            {purchase.supplier || "-"}
+                        </span>
+                    </td>
 
-                                                        {/* DOCUMENTO */}
+                    {/* DOCUMENTO */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                        ">
-                                                            <div className="
-                                                                flex
-                                                                flex-col
-                                                                gap-1
-                                                            ">
-                                                                <span className="
-                                                                    whitespace-nowrap
-                                                                    text-sm
-                                                                    font-semibold
-                                                                    text-slate-700
-                                                                ">
-                                                                    {getDocumentLabel(
-                                                                        purchase.document_type
-                                                                    )}
-                                                                </span>
+                    <td className="
+                        px-3
+                        py-3
+                    ">
+                        <div className="
+                            flex
+                            flex-col
+                            gap-0.5
+                        ">
+                            <span className="
+                                whitespace-nowrap
+                                text-sm
+                                font-semibold
+                                text-slate-700
+                            ">
+                                {getDocumentLabel(
+                                    purchase.document_type
+                                )}
+                            </span>
 
-                                                                {purchase.invoice_number && (
-                                                                    <span className="
-                                                                        text-xs
-                                                                        text-slate-400
-                                                                    ">
-                                                                        Nº{" "}
-                                                                        {
-                                                                            purchase.invoice_number
-                                                                        }
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
+                            {purchase.invoice_number && (
+                                <span className="
+                                    text-xs
+                                    font-medium
+                                    text-slate-400
+                                ">
+                                    Nº {purchase.invoice_number}
+                                </span>
+                            )}
+                        </div>
+                    </td>
 
-                                                        {/* PRODUCTOS */}
+                    {/* PRODUCTOS */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-center
-                                                        ">
-                                                            <span className="
-                                                                inline-flex
-                                                                min-w-[32px]
-                                                                items-center
-                                                                justify-center
-                                                                rounded-lg
-                                                                bg-slate-100
-                                                                px-2
-                                                                py-1
-                                                                font-bold
-                                                                text-slate-700
-                                                            ">
-                                                                {
-                                                                    purchase.productCount
-                                                                }
-                                                            </span>
-                                                        </td>
+                    <td className="
+                        px-3
+                        py-3
+                        text-center
+                    ">
+                        <span className="
+                            inline-flex
+                            min-w-[34px]
+                            items-center
+                            justify-center
+                            rounded-lg
+                            bg-slate-100
+                            px-2
+                            py-1
+                            text-xs
+                            font-black
+                            text-slate-700
+                        ">
+                            {purchase.productCount}
+                        </span>
+                    </td>
 
-                                                        {/* VARIANTES */}
+                    {/* VARIANTES */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-center
-                                                        ">
-                                                            <span className="
-                                                                inline-flex
-                                                                min-w-[32px]
-                                                                items-center
-                                                                justify-center
-                                                                rounded-lg
-                                                                bg-slate-100
-                                                                px-2
-                                                                py-1
-                                                                font-bold
-                                                                text-slate-700
-                                                            ">
-                                                                {
-                                                                    purchase.variantCount
-                                                                }
-                                                            </span>
-                                                        </td>
+                    <td className="
+                        px-3
+                        py-3
+                        text-center
+                    ">
+                        <span className="
+                            inline-flex
+                            min-w-[34px]
+                            items-center
+                            justify-center
+                            rounded-lg
+                            bg-slate-100
+                            px-2
+                            py-1
+                            text-xs
+                            font-black
+                            text-slate-700
+                        ">
+                            {purchase.variantCount}
+                        </span>
+                    </td>
 
-                                                        {/* UNIDADES */}
+                    {/* UNIDADES */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-center
-                                                        ">
-                                                            <span className="
-                                                                font-bold
-                                                                text-slate-800
-                                                            ">
-                                                                {
-                                                                    purchase.unitCount
-                                                                }
-                                                            </span>
-                                                        </td>
+                    <td className="
+                        px-3
+                        py-3
+                        text-center
+                    ">
+                        <span className="
+                            text-sm
+                            font-bold
+                            text-slate-700
+                        ">
+                            {purchase.unitCount}
+                        </span>
+                    </td>
 
-                                                        {/* TOTAL */}
+                    {/* TOTAL */}
 
-                                                        <td className="
-                                                            px-3
-                                                            py-4
-                                                            text-right
-                                                        ">
-                                                            <span className="
-                                                                whitespace-nowrap
-                                                                text-base
-                                                                font-black
-                                                                text-slate-900
-                                                            ">
-                                                                {formatCurrency(
-                                                                    purchase.total
-                                                                )}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
+                    <td className="
+                        whitespace-nowrap
+                        px-3
+                        py-3
+                        text-right
+                    ">
+                        <span className="
+                            text-sm
+                            font-black
+                            text-slate-900
+                        ">
+                            {formatCurrency(
+                                purchase.total
+                            )}
+                        </span>
+                    </td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
+</div>
 
                                 {/* -------------------------------- */}
                                 {/* PIE */}
