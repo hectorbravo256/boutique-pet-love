@@ -339,8 +339,9 @@ export default function AdminLayout() {
       </aside>
 
       {/* CONTENT */}
-      <main className="
+       <main className="
         flex-1
+        min-w-0
 
         md:ml-[280px]
 
@@ -351,7 +352,9 @@ export default function AdminLayout() {
         md:p-8
       ">
 
-        <div className="
+       <div className="
+          w-full
+          min-w-0
           max-w-[1600px]
           mx-auto
         ">
