@@ -57,14 +57,15 @@ export default function AdminLayout() {
 
   return (
 
-    <div className="
-      min-h-screen
-      bg-gradient-to-b
-      from-[#fff7fb]
-      via-white
-      to-[#fdf2f8]
-      flex
-    ">
+<div className="
+  min-h-screen
+  bg-gradient-to-b
+  from-[#fff7fb]
+  via-white
+  to-[#fdf2f8]
+  flex
+  md:pl-[280px]
+">
 
       {/* MOBILE TOPBAR */}
       <div className="
@@ -342,8 +343,6 @@ export default function AdminLayout() {
        <main className="
         flex-1
         min-w-0
-
-        md:ml-[280px]
 
         pt-[92px]
         md:pt-8
