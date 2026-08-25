@@ -369,12 +369,24 @@ export default function PurchaseHistory() {
 {/* TABLA */}
 {/* -------------------------------- */}
 
-<div className="overflow-x-auto">
-    <table className="
-        w-full
-        min-w-[950px]
-        border-collapse
-    ">
+<div className="w-full overflow-hidden">
+<table className="
+    w-full
+    min-w-0
+    table-fixed
+    border-collapse
+">
+    <colgroup>
+    <col className="w-[7%]" />
+    <col className="w-[12%]" />
+    <col className="w-[10%]" />
+    <col className="w-[13%]" />
+    <col className="w-[18%]" />
+    <col className="w-[10%]" />
+    <col className="w-[10%]" />
+    <col className="w-[9%]" />
+    <col className="w-[11%]" />
+</colgroup>
         <thead>
             <tr className="
                 border-b
@@ -558,11 +570,12 @@ export default function PurchaseHistory() {
                         py-3
                     ">
                         <span className="
-                            whitespace-nowrap
-                            text-sm
-                            font-black
-                            text-pink-600
-                        ">
+    block
+    truncate
+    text-[11px]
+    font-black
+    text-pink-600
+">
                             {formatPurchaseNumber(
                                 purchase.purchase_number
                             )}
@@ -572,15 +585,15 @@ export default function PurchaseHistory() {
                     {/* FECHA */}
 
                     <td className="
-                        whitespace-nowrap
-                        px-3
-                        py-3
-                    ">
+    px-2
+    py-3
+">
                         <span className="
-                            text-sm
-                            font-medium
-                            text-slate-600
-                        ">
+    whitespace-nowrap
+    text-[11px]
+    font-medium
+    text-slate-600
+">
                             {formatDate(
                                 purchase.purchase_date
                             )}
@@ -617,15 +630,17 @@ export default function PurchaseHistory() {
                             gap-0.5
                         ">
                             <span className="
-                                whitespace-nowrap
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                            ">
-                                {getDocumentLabel(
-                                    purchase.document_type
-                                )}
-                            </span>
+    block
+    break-words
+    text-[11px]
+    font-semibold
+    leading-tight
+    text-slate-700
+">
+    {getDocumentLabel(
+        purchase.document_type
+    )}
+</span>
 
                             {purchase.invoice_number && (
                                 <span className="
@@ -706,16 +721,16 @@ export default function PurchaseHistory() {
                     {/* TOTAL */}
 
                     <td className="
-                        whitespace-nowrap
-                        px-3
-                        py-3
-                        text-right
-                    ">
+    whitespace-nowrap
+    px-2
+    py-3
+    text-right
+">
                         <span className="
-                            text-sm
-                            font-black
-                            text-slate-900
-                        ">
+    text-[11px]
+    font-black
+    text-slate-900
+">
                             {formatCurrency(
                                 purchase.total
                             )}
