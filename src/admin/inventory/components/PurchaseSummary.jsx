@@ -1,5 +1,3 @@
-import AdminCard from "../../components/AdminCard";
-
 export default function PurchaseSummary({
     details,
     documentType
@@ -61,13 +59,23 @@ export default function PurchaseSummary({
     //---------------------------------------
 
     return (
-        <AdminCard>
+        <div>
 
-            <h2 className="text-2xl font-black mb-8">
-                Resumen de la compra
-            </h2>
+            {/* ENCABEZADO */}
 
-            <div className="space-y-5">
+            <div className="mb-6">
+                <h2 className="text-2xl font-black text-slate-900">
+                    Resumen de la compra
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500">
+                    Revisa los valores antes de registrar la compra.
+                </p>
+            </div>
+
+            {/* RESUMEN */}
+
+            <div className="space-y-4">
 
                 <Row
                     label="Productos"
@@ -93,11 +101,28 @@ export default function PurchaseSummary({
                     value={money(iva)}
                 />
 
-                <hr />
+                <div className="my-5 border-t border-slate-200" />
 
-                <div className="flex justify-between items-center">
+                {/* TOTAL */}
 
-                    <span className="text-xl font-black">
+                <div
+                    className="
+                        flex
+                        flex-col
+                        gap-2
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
+                        rounded-2xl
+                        bg-pink-50
+                        border
+                        border-pink-100
+                        px-5
+                        py-4
+                    "
+                >
+
+                    <span className="text-lg font-black text-slate-900">
                         TOTAL
                     </span>
 
@@ -109,7 +134,7 @@ export default function PurchaseSummary({
 
             </div>
 
-        </AdminCard>
+        </div>
     );
 }
 
@@ -119,13 +144,13 @@ function Row({
 }) {
 
     return (
-        <div className="flex justify-between">
+        <div className="flex items-center justify-between gap-4">
 
-            <span className="text-slate-500">
+            <span className="text-sm font-medium text-slate-500">
                 {label}
             </span>
 
-            <span className="font-bold">
+            <span className="font-bold text-slate-900">
                 {value}
             </span>
 
