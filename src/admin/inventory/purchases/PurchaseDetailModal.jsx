@@ -282,19 +282,19 @@ export default function PurchaseDetailModal({
         >
 
             <div
-                className="
-                    flex
-                    h-[92vh]
-                    max-h-[92vh]
-                    w-full
-                    max-w-6xl
-                    flex-col
-                    overflow-hidden
-                    rounded-3xl
-                    bg-white
-                    shadow-2xl
-                "
-            >
+    className="
+        flex
+        h-auto
+        max-h-[92vh]
+        w-full
+        max-w-6xl
+        flex-col
+        overflow-hidden
+        rounded-3xl
+        bg-white
+        shadow-2xl
+    "
+>
 
                 {/* ================================= */}
                 {/* HEADER */}
