@@ -213,7 +213,7 @@ export default function PurchaseHistory() {
     justify-end
     gap-3
     px-5
-    py-2
+    py-1
 ">
 
     <div className="
