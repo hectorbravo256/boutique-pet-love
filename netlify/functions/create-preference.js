@@ -60,7 +60,15 @@ export const handler = async (event) => {
         metadata: {
           order_data: JSON.stringify({
             items: body.items.map((item) => ({
+              // id mantiene compatibilidad con el formato anterior.
               id: item.id,
+
+              // El id del carrito corresponde realmente a la variante.
+              variant_id: item.id,
+
+              // Producto padre.
+              product_id: item.product_id,
+
               name: item.name,
               size: item.size,
               qty: item.qty || 1,
