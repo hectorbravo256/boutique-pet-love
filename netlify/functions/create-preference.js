@@ -15,71 +15,80 @@ export const handler = async (event) => {
       };
     }
 
-  
-const items = body.items.map((item) => ({
-  title: item.name,
-  unit_price: Number(item.price),
-  quantity: item.qty || 1,
-  currency_id: "CLP",
-}));
+    const items = body.items.map((item) => ({
+      title: item.name,
+      unit_price: Number(item.price),
+      quantity: item.qty || 1,
+      currency_id: "CLP",
+    }));
 
+    // Regiones con costo de envío de $3.500
+    const regionesConEnvio = [
+      "Región Metropolitana de Santiago",
+      "Región de Valparaíso",
+      "Región del Libertador General Bernardo O'Higgins",
+    ];
 
-// ✅ AQUÍ PEGAS ESTO
-const regionesConEnvio = [
-  "Región Metropolitana de Santiago",
-  "Región de Valparaíso",
-  "Región del Libertador General Bernardo O'Higgins",
-];
+    // Un único cálculo de envío para Mercado Pago y metadata.order_data.
+    const shipping = regionesConEnvio.includes(body.formData?.region)
+      ? 3500
+      : 0;
 
-if (regionesConEnvio.includes(body.formData.region)) {
-  items.push({
-    title: "Costo de envío",
-    unit_price: 3500,
-    quantity: 1,
-    currency_id: "CLP",
-  });
-}
+    if (shipping > 0) {
+      items.push({
+        title: "Costo de envío",
+        unit_price: shipping,
+        quantity: 1,
+        currency_id: "CLP",
+      });
+    }
 
-  const preference = new Preference(client);
+    const productsTotal = body.items.reduce(
+      (acc, i) => acc + Number(i.price) * (i.qty || 1),
+      0
+    );
 
-    const total = body.items.reduce(
-  (acc, i) => acc + i.price * (i.qty || 1),
-  0
-);
+    // Total real de la venta: productos + envío.
+    const total = productsTotal + shipping;
 
-const response = await preference.create({
-  body: {
-    items: items,
+    const preference = new Preference(client);
 
-metadata: {
-  order_data: JSON.stringify({
-    items: body.items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      size: item.size,
-      qty: item.qty || 1,
-      price: item.price,
-    })),
+    const response = await preference.create({
+      body: {
+        items,
 
-    form_data: body.formData,
+        metadata: {
+          order_data: JSON.stringify({
+            items: body.items.map((item) => ({
+              id: item.id,
+              name: item.name,
+              size: item.size,
+              qty: item.qty || 1,
+              price: item.price,
+            })),
 
-    total,
-  }),
-},
+            form_data: body.formData,
 
-notification_url:
-"https://boutiquepetlove.cl/.netlify/functions/webhook",
+            // Costo de envío explícito.
+            shipping,
 
-back_urls: {
-  success: "https://boutiquepetlove.cl/success",
-  failure: "https://boutiquepetlove.cl/failure",
-  pending: "https://boutiquepetlove.cl/pending",
-},
+            // Productos + envío.
+            total,
+          }),
+        },
 
-    auto_return: "approved",
+        notification_url:
+          "https://boutiquepetlove.cl/.netlify/functions/webhook",
 
-  },
-});
+        back_urls: {
+          success: "https://boutiquepetlove.cl/success",
+          failure: "https://boutiquepetlove.cl/failure",
+          pending: "https://boutiquepetlove.cl/pending",
+        },
+
+        auto_return: "approved",
+      },
+    });
 
     return {
       statusCode: 200,
