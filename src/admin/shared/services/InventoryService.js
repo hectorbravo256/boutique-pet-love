@@ -95,7 +95,7 @@ const stockCritico =
     // MOVIMIENTOS
     //---------------------------------------------------------
 
-    async getMovements(limit = 15) {
+    async getMovements(limit = 50) {
 
         const { data, error } = await ApiClient.db
 
