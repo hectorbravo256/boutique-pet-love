@@ -35,7 +35,7 @@ const getTipoVentaLabel = (tipoVenta) => {
     }
 
     if (value === "whatsapp") {
-    return "WhatsApp";
+    return "RRSS";
 }
 
     if (value === "presencial" || value === "tienda") {
@@ -63,7 +63,7 @@ const getMedioPagoLabel = (medioPago) => {
     }
 
     if (value === "debito") {
-    return "Débito";
+    return "POS TUU";
 }
 
     return medioPago;
@@ -175,7 +175,7 @@ export default function Reportes() {
                         >
                             <option value="todos">Todas</option>
                             <option value="online">Online</option>
-                            <option value="whatsapp">WhatsApp</option>
+                            <option value="whatsapp">RRSS</option>
                             <option value="presencial">Presencial</option>
                         </select>
                     </div>
@@ -202,7 +202,7 @@ export default function Reportes() {
                             <option value="mercado_pago">Mercado Pago</option>
                             <option value="transferencia">Transferencia</option>
                             <option value="efectivo">Efectivo</option>
-                            <option value="debito">Débito</option>
+                            <option value="debito">POS TUU</option>
                         </select>
                     </div>
 
