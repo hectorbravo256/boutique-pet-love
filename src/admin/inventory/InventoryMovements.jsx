@@ -1,5 +1,5 @@
 import React from "react";
-import { useInventoryMovements } from "../../hooks/useInventoryMovements";
+import useInventoryMovements from "../shared/hooks/useInventoryMovements";
 
 export default function InventoryMovements() {
   const { movimientos, loading, error, reload } = useInventoryMovements();
