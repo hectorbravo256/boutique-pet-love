@@ -44,6 +44,11 @@ export default function AdminLayout() {
       path: "/admin/ventas"
     },
     {
+  label: "Reportes",
+  icon: "📈",
+  path: "/admin/reportes"
+},
+    {
       label: "Categorías",
       icon: "🗂",
       path: "/admin/categorias"
