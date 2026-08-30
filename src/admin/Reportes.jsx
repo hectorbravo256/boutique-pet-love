@@ -34,6 +34,10 @@ const getTipoVentaLabel = (tipoVenta) => {
         return "Online";
     }
 
+    if (value === "whatsapp") {
+    return "WhatsApp";
+}
+
     if (value === "presencial" || value === "tienda") {
         return "Presencial";
     }
@@ -57,6 +61,10 @@ const getMedioPagoLabel = (medioPago) => {
     if (value.includes("efect")) {
         return "Efectivo";
     }
+
+    if (value === "debito") {
+    return "Débito";
+}
 
     return medioPago;
 };
