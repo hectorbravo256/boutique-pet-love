@@ -167,6 +167,7 @@ export default function Reportes() {
                         >
                             <option value="todos">Todas</option>
                             <option value="online">Online</option>
+                            <option value="whatsapp">WhatsApp</option>
                             <option value="presencial">Presencial</option>
                         </select>
                     </div>
@@ -193,6 +194,7 @@ export default function Reportes() {
                             <option value="mercado_pago">Mercado Pago</option>
                             <option value="transferencia">Transferencia</option>
                             <option value="efectivo">Efectivo</option>
+                            <option value="debito">Débito</option>
                         </select>
                     </div>
 
