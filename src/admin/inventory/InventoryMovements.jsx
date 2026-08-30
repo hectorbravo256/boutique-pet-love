@@ -76,11 +76,12 @@ export default function InventoryMovements() {
             <thead>
               <tr className="border-b bg-gray-50 text-left">
                 <th className="px-4 py-3">Fecha</th>
+                <th className="px-4 py-3">Producto</th>
                 <th className="px-4 py-3">Tipo</th>
                 <th className="px-4 py-3">Cantidad</th>
-                <th className="px-4 py-3">Stock anterior</th>
-                <th className="px-4 py-3">Stock posterior</th>
+                <th className="px-4 py-3">Stock</th>
                 <th className="px-4 py-3">Referencia</th>
+                <th className="px-4 py-3">Detalle</th>
               </tr>
             </thead>
 
@@ -93,30 +94,72 @@ export default function InventoryMovements() {
                   <td className="px-4 py-3">
                     {new Date(m.created_at).toLocaleString("es-CL")}
                   </td>
+                  
+                  <td className="px-4 py-3">
+  <div className="font-semibold">
+    {m.products?.name || "Producto desconocido"}
+  </div>
+
+  {m.product_variants?.size && (
+    <div className="text-sm text-gray-500">
+      {m.product_variants.size}
+    </div>
+  )}
+</td>
 
                   <td className="px-4 py-3">
-                    {m.movement_type || "—"}
-                  </td>
+  {m.movement_type === "PURCHASE" ? (
+    <span className="font-semibold text-green-600">
+      🟢 Entrada
+    </span>
+  ) : m.movement_type === "SALE" ? (
+    <span className="font-semibold text-red-600">
+      🔴 Salida
+    </span>
+  ) : (
+    <span>{m.movement_type || "—"}</span>
+  )}
+</td>
 
                   <td className="px-4 py-3 font-semibold">
-                    {m.quantity ?? 0}
+                    <span
+  className={
+    m.movement_type === "SALE"
+      ? "font-semibold text-red-600"
+      : "font-semibold text-green-600"
+  }
+>
+  {m.movement_type === "SALE" ? "-" : "+"}
+  {m.quantity ?? 0}
+</span>
                   </td>
 
-                  <td className="px-4 py-3">
-                    {m.stock_before ?? "—"}
-                  </td>
+<td className="px-4 py-3 font-semibold">
+  {m.stock_before ?? "—"} → {m.stock_after ?? "—"}
+</td>
 
-                  <td className="px-4 py-3">
-                    {m.stock_after ?? "—"}
-                  </td>
+<td className="px-4 py-3">
+  <div className="font-medium">
+    {m.document_number
+      ? `Doc. ${m.document_number}`
+      : "Sin documento"}
+  </div>
 
-                  <td className="px-4 py-3">
-                    {m.document_number ||
-                      m.order_id ||
-                      m.purchase_id ||
-                      m.sale_id ||
-                      "—"}
-                  </td>
+  {m.order_id && (
+    <div className="text-sm text-gray-500">
+      Orden #{m.order_id}
+    </div>
+  )}
+
+  {m.payment_method && (
+    <div className="text-xs text-gray-400">
+      {m.payment_method}
+    </div>
+  )}
+</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+  {m.notes || "—"}
+</td>
                 </tr>
               ))}
             </tbody>
