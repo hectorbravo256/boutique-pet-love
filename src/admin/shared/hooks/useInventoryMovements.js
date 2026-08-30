@@ -5,27 +5,27 @@ export default function useInventoryMovements() {
 
     const [movimientos, setMovimientos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     async function reload() {
 
-        try {
+try {
+  setLoading(true);
+  setError(null);
 
-            setLoading(true);
+  const data = await InventoryService.getMovements();
 
-            const data =
-                await InventoryService.getMovements();
+  setMovimientos(data || []);
+} catch (err) {
+  console.error("Error cargando movimientos:", err);
 
-            setMovimientos(data);
-
-        } catch (error) {
-
-            console.error(error);
-
-        } finally {
-
-            setLoading(false);
-
-        }
+  setMovimientos([]);
+  setError(
+    err?.message || "Error al cargar los movimientos."
+  );
+} finally {
+  setLoading(false);
+}
 
     }
 
@@ -35,14 +35,11 @@ export default function useInventoryMovements() {
 
     }, []);
 
-    return {
-
-        movimientos,
-
-        loading,
-
-        reload
-
-    };
+return {
+  movimientos,
+  loading,
+  error,
+  reload,
+};
 
 }
