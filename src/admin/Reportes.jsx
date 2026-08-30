@@ -84,6 +84,33 @@ export default function Reportes() {
         reload
     } = useReportes();
 
+    const summaryByTipoVenta = sales.reduce((acc, sale) => {
+        const tipo = getTipoVentaLabel(sale.tipo_venta);
+
+        if (!acc[tipo]) {
+            acc[tipo] = {
+                tipo,
+                cantidad: 0,
+                total: 0
+            };
+        }
+
+        acc[tipo].cantidad += 1;
+        acc[tipo].total += Number(sale.total || 0);
+
+        return acc;
+    }, {});
+
+    const tipoVentaOrder = [
+        "Online",
+        "RRSS",
+        "Presencial"
+    ];
+
+    const resumenTipos = tipoVentaOrder
+        .map((tipo) => summaryByTipoVenta[tipo])
+        .filter(Boolean);
+
     return (
         <div className="space-y-6">
 
@@ -282,6 +309,82 @@ export default function Reportes() {
 
             </section>
 
+                        {/* RESUMEN POR TIPO DE VENTA */}
+            <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+
+                <div className="border-b border-gray-200 px-5 py-4">
+                    <h2 className="text-base font-semibold text-gray-900">
+                        Resumen por tipo de venta
+                    </h2>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        Distribución de las ventas según su canal de origen.
+                    </p>
+                </div>
+
+                {resumenTipos.length === 0 ? (
+
+                    <div className="px-5 py-8 text-center text-sm text-gray-500">
+                        No existen ventas para mostrar.
+                    </div>
+
+                ) : (
+
+                    <div className="overflow-x-auto">
+
+                        <table className="min-w-full divide-y divide-gray-200">
+
+                            <thead className="bg-gray-50">
+
+                                <tr>
+
+                                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Tipo de venta
+                                    </th>
+
+                                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Ventas
+                                    </th>
+
+                                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Total
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody className="divide-y divide-gray-200 bg-white">
+
+                                {resumenTipos.map((item) => (
+
+                                    <tr key={item.tipo}>
+
+                                        <td className="px-5 py-3 text-sm font-medium text-gray-900">
+                                            {item.tipo}
+                                        </td>
+
+                                        <td className="px-5 py-3 text-right text-sm text-gray-600">
+                                            {item.cantidad}
+                                        </td>
+
+                                        <td className="px-5 py-3 text-right text-sm font-semibold text-gray-900">
+                                            {formatCurrency(item.total)}
+                                        </td>
+
+                                    </tr>
+
+                                ))}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                )}
+
+            </section>
 
             {/* TABLA */}
             <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
