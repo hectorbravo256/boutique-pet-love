@@ -1247,7 +1247,7 @@ const payloadItems =
                                 `}
                             >
 
-                                💬 WhatsApp
+                                📱 RRSS
 
                             </button>
 
@@ -1814,13 +1814,7 @@ const payloadItems =
 
                             <option value="debito">
 
-                                💳 Débito
-
-                            </option>
-
-                            <option value="credito">
-
-                                💳 Crédito
+                                💳 POS TUU
 
                             </option>
 
@@ -2242,7 +2236,7 @@ const payloadItems =
 
                         <option value="whatsapp">
 
-                            💬 WhatsApp
+                            📱 RRSS
 
                         </option>
 
@@ -2287,15 +2281,10 @@ const payloadItems =
 
                         <option value="debito">
 
-                            💳 Débito
+                            💳 POS TUU
 
                         </option>
 
-                        <option value="credito">
-
-                            💳 Crédito
-
-                        </option>
 
                         <option value="mercado_pago">
 
