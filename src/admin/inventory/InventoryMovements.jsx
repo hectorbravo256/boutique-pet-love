@@ -1,101 +1,128 @@
-import AdminCard from "../components/AdminCard";
-import useInventoryMovements from "@/admin/shared/hooks/useInventoryMovements";
+import React from "react";
+import { useInventoryMovements } from "../../hooks/useInventoryMovements";
 
 export default function InventoryMovements() {
+  const { movimientos, loading, error, reload } = useInventoryMovements();
 
-const {
-
-    movimientos,
-
-    loading
-
-} = useInventoryMovements();
-
-   if (loading) {
-
+  if (loading) {
     return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">
+          Movimientos de inventario
+        </h1>
 
-        <AdminCard>
-
-            Cargando movimientos...
-
-        </AdminCard>
-
+        <div className="text-gray-500">
+          Cargando movimientos...
+        </div>
+      </div>
     );
+  }
 
-}
-
+  if (error) {
     return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">
+          Movimientos de inventario
+        </h1>
 
-        <AdminCard>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <p className="font-semibold">
+            No se pudieron cargar los movimientos.
+          </p>
 
-            <h2 className="text-2xl font-black mb-6">
+          <p className="text-sm mt-1">
+            {error}
+          </p>
 
-                Últimos movimientos
-
-            </h2>
-
-            <table className="w-full">
-
-                <thead>
-
-                    <tr className="text-left text-slate-500">
-
-                        <th>Fecha</th>
-
-                        <th>Tipo</th>
-
-                        <th>Producto</th>
-
-                        <th>Talla</th>
-
-                        <th>Cantidad</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {movimientos.map(m => (
-
-                        <tr
-                            key={m.id}
-                            className="border-t"
-                        >
-
-                            <td>
-
-                                {new Date(
-                                    m.created_at
-                                ).toLocaleDateString("es-CL")}
-
-                            </td>
-
-                            <td>{m.type}</td>
-
-                            <td>{m.products?.name}</td>
-
-                            <td>{m.product_variants?.size}</td>
-
-                            <td>
-
-                                {m.quantity > 0
-                                    ? `+${m.quantity}`
-                                    : m.quantity}
-
-                            </td>
-
-                        </tr>
-
-                    ))}
-
-                </tbody>
-
-            </table>
-
-        </AdminCard>
-
+          <button
+            onClick={reload}
+            className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-white"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
     );
+  }
 
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">
+            Movimientos de inventario
+          </h1>
+
+          <p className="text-gray-500 mt-1">
+            Entradas, salidas y ajustes de inventario.
+          </p>
+        </div>
+
+        <button
+          onClick={reload}
+          className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+        >
+          Actualizar
+        </button>
+      </div>
+
+      {movimientos.length === 0 ? (
+        <div className="rounded-xl border bg-white p-8 text-center text-gray-500">
+          No hay movimientos registrados.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border bg-white">
+          <table className="min-w-full">
+            <thead>
+              <tr className="border-b bg-gray-50 text-left">
+                <th className="px-4 py-3">Fecha</th>
+                <th className="px-4 py-3">Tipo</th>
+                <th className="px-4 py-3">Cantidad</th>
+                <th className="px-4 py-3">Stock anterior</th>
+                <th className="px-4 py-3">Stock posterior</th>
+                <th className="px-4 py-3">Referencia</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {movimientos.map((m) => (
+                <tr
+                  key={m.id}
+                  className="border-b last:border-b-0"
+                >
+                  <td className="px-4 py-3">
+                    {new Date(m.created_at).toLocaleString("es-CL")}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {m.movement_type || "—"}
+                  </td>
+
+                  <td className="px-4 py-3 font-semibold">
+                    {m.quantity ?? 0}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {m.stock_before ?? "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {m.stock_after ?? "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {m.document_number ||
+                      m.order_id ||
+                      m.purchase_id ||
+                      m.sale_id ||
+                      "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
