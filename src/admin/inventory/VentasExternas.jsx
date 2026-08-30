@@ -549,15 +549,14 @@ const payloadItems =
 
         const canal =
             venta.tipo_venta === "whatsapp"
-                ? "WhatsApp"
+                ? "RRSS"
                 : "Presencial";
 
         const medioPago = (() => {
             switch (venta.medio_pago) {
                 case "efectivo": return "Efectivo";
                 case "transferencia": return "Transferencia";
-                case "debito": return "Débito";
-                case "credito": return "Crédito";
+                case "debito": return "POS TUU";
                 case "mercado_pago": return "Mercado Pago";
                 default: return venta.medio_pago || "-";
             }
@@ -795,7 +794,7 @@ const payloadItems =
     const etiquetaCanal = (tipo) => {
 
         if (tipo === "whatsapp") {
-            return "💬 WhatsApp";
+            return "💬 RRSS";
         }
 
         return "🏪 Presencial";
@@ -818,10 +817,7 @@ const payloadItems =
                 return "🏦 Transferencia";
 
             case "debito":
-                return "💳 Débito";
-
-            case "credito":
-                return "💳 Crédito";
+                return "💳 POS TUU";
 
             case "mercado_pago":
                 return "🟢 Mercado Pago";
