@@ -6,6 +6,10 @@ import {
 
 import { supabase } from "../../supabaseClient";
 import AdminCard from "../components/AdminCard";
+import {
+    formatearFechaHoraChile,
+    formatearFechaChile
+} from "../utils/fechaChile";
 
 export default function VentasExternas() {
 
@@ -538,14 +542,7 @@ const payloadItems =
             `$${Number(valor || 0).toLocaleString("es-CL")}`;
 
 const fechaPrint = venta.created_at
-    ? new Date(venta.created_at).toLocaleString("es-CL", {
-        timeZone: "America/Santiago",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    })
+    ? formatearFechaHoraChile(venta.created_at)
     : "-";
 
         const canal =
@@ -771,21 +768,7 @@ const fechaPrint = venta.created_at
     ===================================================== */
 
 const fechaVenta = (fecha) => {
-
-    if (!fecha) return "-";
-
-    return new Date(fecha).toLocaleString(
-        "es-CL",
-        {
-            timeZone: "America/Santiago",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-
+    return formatearFechaHoraChile(fecha);
 };
 
 
