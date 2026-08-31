@@ -53,7 +53,7 @@ const getTipoVentaLabel = (tipoVenta) => {
         return "Online";
     }
 
-    if (value === "whatsapp") {
+    if (value === "rrss") {
     return "RRSS";
 }
 
@@ -249,7 +249,7 @@ export default function Reportes() {
                         >
                             <option value="todos">Todas</option>
                             <option value="online">Online</option>
-                            <option value="whatsapp">RRSS</option>
+                            <option value="rrss">RRSS</option>
                             <option value="presencial">Presencial</option>
                         </select>
                     </div>
