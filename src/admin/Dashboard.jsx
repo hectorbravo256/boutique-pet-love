@@ -23,6 +23,34 @@ from "./components/DashboardSkeleton";
 
 import useDashboard from "@/admin/shared/hooks/useDashboard";
 import DashboardOperations from "./dashboard/components/DashboardOperations";
+import {
+  formatearFechaChile
+} from "./utils/fechaChile";
+
+const obtenerPartesFechaChile = (fecha) => {
+  if (!fecha) return null;
+
+  const date = new Date(fecha);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Santiago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+
+  return partes.reduce((acc, parte) => {
+    if (parte.type !== "literal") {
+      acc[parte.type] = parte.value;
+    }
+
+    return acc;
+  }, {});
+};
 
 
 export default function Dashboard() {
