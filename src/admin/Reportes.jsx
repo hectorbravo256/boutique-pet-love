@@ -18,11 +18,12 @@ const formatDate = (value) => {
         return "-";
     }
 
-    return new Intl.DateTimeFormat("es-CL", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-    }).format(date);
+return new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+}).format(date);
 };
 
 const getTipoVentaLabel = (tipoVenta) => {
