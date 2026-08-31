@@ -1,5 +1,6 @@
 import React from "react";
 import useReportes from "./shared/hooks/useReportes";
+import { formatearFechaChile } from "./utils/fechaChile";
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-CL", {
@@ -10,20 +11,7 @@ const formatCurrency = (value) => {
 };
 
 const formatDate = (value) => {
-    if (!value) return "-";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-        return "-";
-    }
-
-return new Intl.DateTimeFormat("es-CL", {
-    timeZone: "America/Santiago",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-}).format(date);
+    return formatearFechaChile(value);
 };
 
 const getTipoVentaLabel = (tipoVenta) => {
