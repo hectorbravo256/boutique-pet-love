@@ -283,20 +283,6 @@ const subtotalProductos =
 const total =
     subtotalProductos + costoEnvio;
 
-    const total =
-        useMemo(
-            () =>
-                items.reduce(
-                    (sum, item) =>
-                        sum +
-                        (
-                            Number(item.price) *
-                            Number(item.quantity)
-                        ),
-                    0
-                ),
-            [items]
-        );
 
 
     /* =====================================================
