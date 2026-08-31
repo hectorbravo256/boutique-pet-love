@@ -1039,7 +1039,7 @@ const fechaVenta = (fecha) => {
                     );
 
 
-                const whatsapp =
+                const rrss =
                     ventas.filter(
                         venta =>
                             venta.tipo_venta ===
@@ -1057,8 +1057,8 @@ const fechaVenta = (fecha) => {
                     presencial:
                         presencial.length,
 
-                    whatsapp:
-                        whatsapp.length
+                    rrss:
+                        rrss.length
 
                 };
 
@@ -1155,7 +1155,7 @@ const fechaVenta = (fecha) => {
                 ">
 
                     Registra ventas presenciales y ventas
-                    realizadas por WhatsApp.
+                    realizadas por RRSS.
 
                 </p>
 
