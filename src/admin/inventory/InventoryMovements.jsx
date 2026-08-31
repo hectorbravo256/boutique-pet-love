@@ -1,5 +1,6 @@
 import React from "react";
 import useInventoryMovements from "../shared/hooks/useInventoryMovements";
+import { formatearFechaHoraChile } from "../utils/fechaChile";
 
 export default function InventoryMovements() {
   const { movimientos, loading, error, reload } = useInventoryMovements();
@@ -92,7 +93,7 @@ export default function InventoryMovements() {
                   className="border-b last:border-b-0"
                 >
                   <td className="px-4 py-3">
-                    {new Date(m.created_at).toLocaleString("es-CL")}
+                    {formatearFechaHoraChile(m.created_at)}
                   </td>
                   
                   <td className="px-4 py-3">
