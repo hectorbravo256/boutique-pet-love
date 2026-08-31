@@ -1321,8 +1321,8 @@ const fechaVenta = (fecha) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    setTipoVenta(
-                                        "whatsapp"
+                                setTipoVenta(
+                                    "rrss"
                                     )
                                 }
                                 className={`
