@@ -895,9 +895,9 @@ const fechaVenta = (fecha) => {
 
     const etiquetaCanal = (tipo) => {
 
-        if (tipo === "whatsapp") {
-            return "💬 RRSS";
-        }
+        if (tipo === "rrss") {
+    return "📱 RRSS";
+}
 
         return "🏪 Presencial";
 
@@ -1043,7 +1043,7 @@ const fechaVenta = (fecha) => {
                     ventas.filter(
                         venta =>
                             venta.tipo_venta ===
-                            "whatsapp"
+                            "rrss"
                     );
 
 
@@ -1334,7 +1334,7 @@ const fechaVenta = (fecha) => {
 
                                     ${
                                         tipoVenta ===
-                                        "whatsapp"
+                                        "rrss"
                                             ? `
                                                 bg-green-500
                                                 text-white
@@ -2518,7 +2518,7 @@ const fechaVenta = (fecha) => {
 
                         </option>
 
-                        <option value="whatsapp">
+                        <option value="rrss">
 
                             📱 RRSS
 
@@ -2865,7 +2865,7 @@ const fechaVenta = (fecha) => {
 
                                                     ${
                                                         venta.tipo_venta ===
-                                                        "whatsapp"
+                                                        "rrss"
                                                             ? `
                                                                 bg-green-100
                                                                 text-green-700
