@@ -918,7 +918,7 @@ const fechaVenta = (fecha) => {
             case "transferencia":
                 return "🏦 Transferencia";
 
-            case "debito":
+            case "POS TUU":
                 return "💳 POS TUU";
 
             case "mercado_pago":
@@ -2096,7 +2096,7 @@ const fechaVenta = (fecha) => {
 
                             </option>
 
-                            <option value="debito">
+                            <option value="POS TUU">
 
                                 💳 POS TUU
 
@@ -2563,7 +2563,7 @@ const fechaVenta = (fecha) => {
 
                         </option>
 
-                        <option value="debito">
+                        <option value="POS TUU">
 
                             💳 POS TUU
 
