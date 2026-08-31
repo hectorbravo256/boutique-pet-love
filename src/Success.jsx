@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
+import { formatearFechaHoraChile } from "./admin/utils/fechaChile";
 
 export default function Success() {
   const [order, setOrder] = useState(null);
@@ -133,7 +134,10 @@ const code = localStorage.getItem("couponUsed");
         {/* INFO CLIENTE */}
         <div style={{ fontSize: 14, marginBottom: 15 }}>
           <p><strong>N° Orden:</strong> {numeroOrden}</p>
-          <p><strong>Fecha:</strong> {new Date(order.date).toLocaleString()}</p>
+          <p>
+  <strong>Fecha:</strong>{" "}
+  {formatearFechaHoraChile(order.date)}
+</p>
           <p><strong>Cliente:</strong> {order.formData.nombre}</p>
           <p><strong>Correo:</strong> {order.formData.correo}</p>
         </div>
