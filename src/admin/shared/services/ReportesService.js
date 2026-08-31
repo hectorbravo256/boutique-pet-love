@@ -16,10 +16,18 @@ class ReportesService {
                 query = query.gte("fecha_venta", from);
             }
 
-            // Filtro por fecha final
-            if (to) {
-                query = query.lte("fecha_venta", to);
-            }
+// Filtro por fecha final
+// Se usa el día siguiente como límite exclusivo
+// para incluir todas las ventas del día seleccionado.
+if (to) {
+    const nextDay = new Date(`${to}T00:00:00Z`);
+    nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+
+    query = query.lt(
+        "fecha_venta",
+        nextDay.toISOString().slice(0, 10)
+    );
+}
 
             // Filtro por tipo de venta
             if (tipoVenta && tipoVenta !== "todos") {
