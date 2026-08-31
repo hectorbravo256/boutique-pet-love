@@ -10,8 +10,38 @@ const formatCurrency = (value) => {
     }).format(Number(value || 0));
 };
 
+const normalizarFechaUTC = (fecha) => {
+
+    if (!fecha) {
+        return null;
+    }
+
+    const fechaTexto = String(fecha);
+
+    /*
+     * Si ya contiene zona horaria, no modificar.
+     */
+    if (
+        fechaTexto.endsWith("Z") ||
+        /[+-]\d{2}:\d{2}$/.test(fechaTexto)
+    ) {
+        return fechaTexto;
+    }
+
+    /*
+     * fecha_venta proviene de orders y representa UTC.
+     * Se agrega Z para que JavaScript lo interprete correctamente.
+     */
+    return `${fechaTexto}Z`;
+};
+
+
 const formatDate = (value) => {
-    return formatearFechaChile(value);
+
+    const fechaUTC =
+        normalizarFechaUTC(value);
+
+    return formatearFechaChile(fechaUTC);
 };
 
 const getTipoVentaLabel = (tipoVenta) => {
