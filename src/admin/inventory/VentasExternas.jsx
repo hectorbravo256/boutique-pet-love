@@ -2353,7 +2353,7 @@ const fechaVenta = (fecha) => {
                                 ">
 
                                     {
-                                        estadisticas.RRHH
+                                        estadisticas.rrhh
                                     }
 
                                 </div>
