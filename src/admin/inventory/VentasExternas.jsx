@@ -26,13 +26,20 @@ export default function VentasExternas() {
     const [medioPago, setMedioPago] =
         useState("efectivo");
 
-    const [cliente, setCliente] = useState({
-        nombre: "",
-        rut: "",
-        correo: "",
-        telefono: "",
-        observacion: ""
-    });
+const [cliente, setCliente] = useState({
+    nombre: "",
+    rut: "",
+    correo: "",
+    telefono: "",
+    observacion: ""
+});
+
+const [despacho, setDespacho] = useState({
+    direccion: "",
+    comuna: "",
+    region: "",
+    empresa_envio: ""
+});
 
     const [productoSeleccionado, setProductoSeleccionado] =
         useState("");
@@ -144,13 +151,13 @@ export default function VentasExternas() {
                     observacion,
                     items
                 `)
-                .in(
-                    "tipo_venta",
-                    [
-                        "presencial",
-                        "whatsapp"
-                    ]
-                )
+.in(
+    "tipo_venta",
+    [
+        "presencial",
+        "rrss"
+    ]
+)
                 .order(
                     "created_at",
                     {
@@ -219,9 +226,62 @@ export default function VentasExternas() {
         );
 
 
-    /* =====================================================
-       TOTAL
-    ===================================================== */
+/* =====================================================
+   DESPACHO
+===================================================== */
+
+const regionesPaket = [
+    "Región Metropolitana de Santiago",
+    "Valparaíso",
+    "Libertador General Bernardo O'Higgins"
+];
+
+const esVentaRRSS = tipoVenta === "rrss";
+
+const esRegionPaket =
+    esVentaRRSS &&
+    regionesPaket.includes(despacho.region);
+
+const empresaEnvio =
+    !esVentaRRSS
+        ? ""
+        : esRegionPaket
+            ? "paket"
+            : despacho.empresa_envio;
+
+const envioPorPagar =
+    esVentaRRSS && !esRegionPaket;
+
+const costoEnvio =
+    esRegionPaket ? 3500 : 0;
+
+
+/* =====================================================
+   SUBTOTAL PRODUCTOS
+===================================================== */
+
+const subtotalProductos =
+    useMemo(
+        () =>
+            items.reduce(
+                (sum, item) =>
+                    sum +
+                    (
+                        Number(item.price) *
+                        Number(item.quantity)
+                    ),
+                0
+            ),
+        [items]
+    );
+
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+const total =
+    subtotalProductos + costoEnvio;
 
     const total =
         useMemo(
@@ -460,7 +520,37 @@ const payloadItems =
                             medioPago,
 
                         p_vendedor:
-                            "Administrador"
+    "Administrador",
+
+p_direccion:
+    esVentaRRSS
+        ? despacho.direccion
+        : null,
+
+p_comuna:
+    esVentaRRSS
+        ? despacho.comuna
+        : null,
+
+p_region:
+    esVentaRRSS
+        ? despacho.region
+        : null,
+
+p_empresa_envio:
+    esVentaRRSS
+        ? empresaEnvio
+        : null,
+
+p_costo_envio:
+    esVentaRRSS
+        ? costoEnvio
+        : 0,
+
+p_envio_por_pagar:
+    esVentaRRSS
+        ? envioPorPagar
+        : false
                     }
                 );
 
@@ -492,6 +582,12 @@ const payloadItems =
                 telefono: "",
                 observacion: ""
             });
+            setDespacho({
+    direccion: "",
+    comuna: "",
+    region: "",
+    empresa_envio: ""
+});
 
             setItems([]);
 
@@ -546,15 +642,15 @@ const fechaPrint = venta.created_at
     : "-";
 
         const canal =
-            venta.tipo_venta === "whatsapp"
-                ? "RRSS"
-                : "Presencial";
+    venta.tipo_venta === "rrss"
+        ? "RRSS"
+        : "Presencial";
 
         const medioPago = (() => {
             switch (venta.medio_pago) {
                 case "efectivo": return "Efectivo";
                 case "transferencia": return "Transferencia";
-                case "debito": return "POS TUU";
+                case "pos_tuu": return "POS TUU";
                 case "mercado_pago": return "Mercado Pago";
                 default: return venta.medio_pago || "-";
             }
@@ -1384,6 +1480,188 @@ const fechaVenta = (fecha) => {
                         />
 
                     </div>
+
+                    {tipoVenta === "rrss" && (
+    <div className="space-y-4">
+
+        <div>
+            <label>Dirección de envío</label>
+
+            <input
+                type="text"
+                value={despacho.direccion}
+                onChange={(e) =>
+                    setDespacho({
+                        ...despacho,
+                        direccion: e.target.value
+                    })
+                }
+                placeholder="Ej: Av. Providencia 1234"
+            />
+        </div>
+
+        <div>
+            <label>Comuna</label>
+
+            <input
+                type="text"
+                value={despacho.comuna}
+                onChange={(e) =>
+                    setDespacho({
+                        ...despacho,
+                        comuna: e.target.value
+                    })
+                }
+                placeholder="Ej: Providencia"
+            />
+        </div>
+
+        <div>
+            <label>Región</label>
+
+            <select
+                value={despacho.region}
+                onChange={(e) =>
+                    setDespacho({
+                        ...despacho,
+                        region: e.target.value,
+                        empresa_envio: ""
+                    })
+                }
+            >
+                <option value="">
+                    Seleccionar región
+                </option>
+
+                <option value="Región de Arica y Parinacota">
+                    Arica y Parinacota
+                </option>
+
+                <option value="Región de Tarapacá">
+                    Tarapacá
+                </option>
+
+                <option value="Región de Antofagasta">
+                    Antofagasta
+                </option>
+
+                <option value="Región de Atacama">
+                    Atacama
+                </option>
+
+                <option value="Región de Coquimbo">
+                    Coquimbo
+                </option>
+
+                <option value="Valparaíso">
+                    Valparaíso
+                </option>
+
+                <option value="Región Metropolitana de Santiago">
+                    Metropolitana de Santiago
+                </option>
+
+                <option value="Libertador General Bernardo O'Higgins">
+                    Libertador General Bernardo O'Higgins
+                </option>
+
+                <option value="Región del Maule">
+                    Maule
+                </option>
+
+                <option value="Región de Ñuble">
+                    Ñuble
+                </option>
+
+                <option value="Región del Biobío">
+                    Biobío
+                </option>
+
+                <option value="Región de La Araucanía">
+                    La Araucanía
+                </option>
+
+                <option value="Región de Los Ríos">
+                    Los Ríos
+                </option>
+
+                <option value="Región de Los Lagos">
+                    Los Lagos
+                </option>
+
+                <option value="Región de Aysén del General Carlos Ibáñez del Campo">
+                    Aysén
+                </option>
+
+                <option value="Región de Magallanes y de la Antártica Chilena">
+                    Magallanes
+                </option>
+            </select>
+        </div>
+
+        {despacho.region &&
+            !esRegionPaket && (
+                <div>
+                    <label>Empresa de envío</label>
+
+                    <select
+                        value={despacho.empresa_envio}
+                        onChange={(e) =>
+                            setDespacho({
+                                ...despacho,
+                                empresa_envio:
+                                    e.target.value
+                            })
+                        }
+                    >
+                        <option value="">
+                            Seleccionar empresa
+                        </option>
+
+                        <option value="starken">
+                            STARKEN
+                        </option>
+
+                        <option value="bluexpress">
+                            BLUEXPRESS
+                        </option>
+                    </select>
+                </div>
+            )}
+
+        {despacho.region && (
+            <div>
+                {esRegionPaket ? (
+                    <>
+                        <p>
+                            Empresa de envío: <strong>PAKET</strong>
+                        </p>
+
+                        <p>
+                            Costo de envío: <strong>$3.500</strong>
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <p>
+                            Empresa de envío:{" "}
+                            <strong>
+                                {despacho.empresa_envio
+                                    ? despacho.empresa_envio.toUpperCase()
+                                    : "Pendiente de selección"}
+                            </strong>
+                        </p>
+
+                        <p>
+                            <strong>Envío por pagar</strong>
+                        </p>
+                    </>
+                )}
+            </div>
+        )}
+
+    </div>
+)}
 
 
                     {/* PRODUCTO */}
