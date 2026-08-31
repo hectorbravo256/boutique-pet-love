@@ -537,15 +537,16 @@ const payloadItems =
         const monedaPrint = (valor) =>
             `$${Number(valor || 0).toLocaleString("es-CL")}`;
 
-        const fechaPrint = venta.created_at
-            ? new Date(venta.created_at).toLocaleString("es-CL", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            })
-            : "-";
+const fechaPrint = venta.created_at
+    ? new Date(venta.created_at).toLocaleString("es-CL", {
+        timeZone: "America/Santiago",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    })
+    : "-";
 
         const canal =
             venta.tipo_venta === "whatsapp"
@@ -769,22 +770,23 @@ const payloadItems =
        FORMATO FECHA
     ===================================================== */
 
-    const fechaVenta = (fecha) => {
+const fechaVenta = (fecha) => {
 
-        if (!fecha) return "-";
+    if (!fecha) return "-";
 
-        return new Date(fecha).toLocaleString(
-            "es-CL",
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
+    return new Date(fecha).toLocaleString(
+        "es-CL",
+        {
+            timeZone: "America/Santiago",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
 
-    };
+};
 
 
     /* =====================================================
