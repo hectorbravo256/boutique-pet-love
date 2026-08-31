@@ -2341,7 +2341,7 @@ const fechaVenta = (fecha) => {
                                     text-green-500
                                 ">
 
-                                    RRHH
+                                    RRSS
 
                                 </div>
 
@@ -2353,7 +2353,7 @@ const fechaVenta = (fecha) => {
                                 ">
 
                                     {
-                                        estadisticas.rrhh
+                                        estadisticas.rrss
                                     }
 
                                 </div>
@@ -2417,7 +2417,7 @@ const fechaVenta = (fecha) => {
                         ">
 
                             Ventas realizadas presencialmente
-                            o mediante RRHH.
+                            o mediante RRSS.
 
                         </p>
 
