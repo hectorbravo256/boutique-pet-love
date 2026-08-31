@@ -2341,7 +2341,7 @@ const fechaVenta = (fecha) => {
                                     text-green-500
                                 ">
 
-                                    WhatsApp
+                                    RRHH
 
                                 </div>
 
@@ -2353,7 +2353,7 @@ const fechaVenta = (fecha) => {
                                 ">
 
                                     {
-                                        estadisticas.whatsapp
+                                        estadisticas.RRHH
                                     }
 
                                 </div>
@@ -2417,7 +2417,7 @@ const fechaVenta = (fecha) => {
                         ">
 
                             Ventas realizadas presencialmente
-                            o mediante WhatsApp.
+                            o mediante RRHH.
 
                         </p>
 
