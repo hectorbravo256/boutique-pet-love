@@ -1,4 +1,3 @@
-jsx
 import {
   useEffect,
   useMemo,
