@@ -1,4 +1,4 @@
-```jsx
+jsx
 import {
   useEffect,
   useMemo,
@@ -1979,4 +1979,3 @@ function FiltroBtn({
   );
 
 }
-```
