@@ -826,7 +826,7 @@ export default function Ventas() {
         >
           📦 Marcar enviado
         </button>
-
+)}
         <button
   onClick={() => setVentaCambio(o)}
   className="
@@ -848,8 +848,6 @@ export default function Ventas() {
   ↔️ Gestionar cambio
 </button>
 </div>
-      )
-    }
 
   </div>
 
