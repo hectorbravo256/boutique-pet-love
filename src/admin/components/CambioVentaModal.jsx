@@ -210,13 +210,15 @@ export default function CambioVentaModal({
                 ↔️ Cambio de producto
               </h2>
 
-              <p className="
-                mt-2
-                text-sm
-                text-pink-100
-              ">
-                Venta #{venta.numero_venta || venta.id}
-              </p>
+             <p
+  className="
+    mt-2
+    text-sm
+    text-pink-100
+  "
+>
+  Venta #{venta.numero_venta || venta.id}
+</p>
             </div>
 
             <button
