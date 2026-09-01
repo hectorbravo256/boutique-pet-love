@@ -786,48 +786,37 @@ export default function Ventas() {
 }
     </div>
 
-    {
-      (
-        o.estado ||
-        "pendiente"
-      ) === "pendiente"
-
-      && (
-<div>
-        <button
-          onClick={() =>
-            cambiarEstado(
-              o.id
-            )
-          }
-
-          className="
-            mt-6
-
-            w-full
-
-            rounded-2xl
-
-            bg-gradient-to-r
-            from-emerald-500
-            to-green-500
-
-            py-3
-
-            font-bold
-            text-white
-
-            hover:scale-[1.02]
-            hover:opacity-90
-
-            transition-all
-            duration-300
-          "
-        >
-          📦 Marcar enviado
-        </button>
+    {/* MARCAR ENVIADO */}
+{(
+  o.estado ||
+  "pendiente"
+) === "pendiente" && (
+  <button
+    onClick={() =>
+      cambiarEstado(o.id)
+    }
+    className="
+      mt-6
+      w-full
+      rounded-2xl
+      bg-gradient-to-r
+      from-emerald-500
+      to-green-500
+      py-3
+      font-bold
+      text-white
+      hover:scale-[1.02]
+      hover:opacity-90
+      transition-all
+      duration-300
+    "
+  >
+    📦 Marcar enviado
+  </button>
 )}
-        <button
+
+{/* GESTIONAR CAMBIO */}
+<button
   onClick={() => setVentaCambio(o)}
   className="
     mt-3
