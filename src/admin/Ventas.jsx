@@ -12,6 +12,9 @@ from "./components/AdminCard";
 import AdminInput
 from "./components/AdminInput";
 
+import CambioVentaModal
+from "./components/CambioVentaModal";
+
 export default function Ventas() {
 
   const [orders, setOrders] =
@@ -26,6 +29,9 @@ export default function Ventas() {
   const [busquedaDebounce,
     setBusquedaDebounce] =
       useState("");
+
+  const [ventaCambio, setVentaCambio] =
+  useState(null);
 
   // 🔄 cargar pedidos
   useEffect(() => {
@@ -821,6 +827,27 @@ export default function Ventas() {
           📦 Marcar enviado
         </button>
 
+        <button
+  onClick={() => setVentaCambio(o)}
+  className="
+    mt-3
+    w-full
+    rounded-2xl
+    bg-gradient-to-r
+    from-pink-500
+    to-purple-600
+    py-3
+    font-bold
+    text-white
+    hover:scale-[1.02]
+    hover:opacity-90
+    transition-all
+    duration-300
+  "
+>
+  ↔️ Gestionar cambio
+</button>
+
       )
     }
 
@@ -950,6 +977,32 @@ function Info({
       ">
         {value}
       </div>
+
+      {ventaCambio && (
+  <CambioVentaModal
+    venta={ventaCambio}
+    onClose={() => setVentaCambio(null)}
+    onSuccess={() => {
+      setVentaCambio(null);
+
+      fetch("/.netlify/functions/get-orders")
+        .then((res) => res.json())
+        .then((data) => {
+          setOrders(
+            Array.isArray(data)
+              ? data
+              : []
+          );
+        })
+        .catch((err) => {
+          console.error(
+            "Error actualizando ventas:",
+            err
+          );
+        });
+    }}
+  />
+)}
 
     </div>
 
