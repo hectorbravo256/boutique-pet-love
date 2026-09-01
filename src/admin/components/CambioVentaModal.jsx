@@ -60,6 +60,29 @@ export default function CambioVentaModal({
     );
   }, [variantes, reemplazo]);
 
+  const variantesVenta = useMemo(() => {
+  if (!venta?.items || !Array.isArray(venta.items)) {
+    return [];
+  }
+
+  return venta.items
+    .map((item) => {
+      const varianteId =
+        item.variant_id ??
+        item.product_variant_id ??
+        item.variantId;
+
+      if (!varianteId) {
+        return null;
+      }
+
+      return variantes.find(
+        (v) => String(v.id) === String(varianteId)
+      );
+    })
+    .filter(Boolean);
+}, [venta, variantes]);
+
   const diferencia = useMemo(() => {
     const precioDevuelto = Number(
       varianteDevuelta?.price || 0
@@ -445,7 +468,7 @@ export default function CambioVentaModal({
                     Seleccionar producto / talla
                   </option>
 
-                  {variantes.map((variante) => (
+                  {variantesVenta.map((variante) => (
                     <option
                       key={variante.id}
                       value={variante.id}
