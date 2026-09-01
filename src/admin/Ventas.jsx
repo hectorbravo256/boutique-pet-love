@@ -1,5 +1,7 @@
+```jsx
 import {
   useEffect,
+  useMemo,
   useState
 } from "react";
 
@@ -15,12 +17,16 @@ from "./components/AdminInput";
 import CambioVentaModal
 from "./components/CambioVentaModal";
 
+
 export default function Ventas() {
 
   const [orders, setOrders] =
     useState([]);
 
   const [filtro, setFiltro] =
+    useState("todos");
+
+  const [filtroDespacho, setFiltroDespacho] =
     useState("todos");
 
   const [busqueda, setBusqueda] =
@@ -31,59 +37,69 @@ export default function Ventas() {
       useState("");
 
   const [ventaCambio, setVentaCambio] =
-  useState(null);
+    useState(null);
 
-  // 🔄 cargar pedidos
+
+  // ============================================================
+  // CARGAR PEDIDOS
+  // ============================================================
+
   useEffect(() => {
 
-    fetch(
-      "/.netlify/functions/get-orders"
-    )
+    cargarPedidos();
 
-      .then(async (res) => {
+  }, []);
 
-        if (!res.ok) {
 
-          console.error(
-            "Error Netlify:",
-            res.status
-          );
+  const cargarPedidos = async () => {
 
-          setOrders([]);
+    try {
 
-          return [];
+      const res =
+        await fetch(
+          "/.netlify/functions/get-orders"
+        );
 
-        }
-
-        const data =
-          await res.json();
-
-        return Array.isArray(data)
-          ? data
-          : [];
-
-      })
-
-      .then((data) => {
-
-        setOrders(data);
-
-      })
-
-      .catch((err) => {
+      if (!res.ok) {
 
         console.error(
-          "Error cargando pedidos:",
-          err
+          "Error Netlify:",
+          res.status
         );
 
         setOrders([]);
 
-      });
+        return;
 
-  }, []);
+      }
 
-  // ⏳ debounce
+      const data =
+        await res.json();
+
+      setOrders(
+        Array.isArray(data)
+          ? data
+          : []
+      );
+
+    } catch (err) {
+
+      console.error(
+        "Error cargando pedidos:",
+        err
+      );
+
+      setOrders([]);
+
+    }
+
+  };
+
+
+  // ============================================================
+  // DEBOUNCE
+  // ============================================================
+
   useEffect(() => {
 
     const timeout =
@@ -100,92 +116,347 @@ export default function Ventas() {
 
   }, [busqueda]);
 
-  // 🔥 cambiar estado
+
+  // ============================================================
+  // CAMBIAR ESTADO
+  // ============================================================
+
   const cambiarEstado =
     async (id) => {
 
-      const resPedido =
-        await fetch(
-          "/.netlify/functions/get-orders"
-        );
+      try {
 
-      const pedidos =
-        await resPedido.json();
+        const resPedido =
+          await fetch(
+            "/.netlify/functions/get-orders"
+          );
 
-      const pedido =
-        (
-          Array.isArray(pedidos)
-            ? pedidos
-            : []
-        ).find(p => p.id === id);
+        const pedidos =
+          await resPedido.json();
 
-      if (!pedido) {
+        const pedido =
+          (
+            Array.isArray(pedidos)
+              ? pedidos
+              : []
+          ).find(
+            p => p.id === id
+          );
 
-        alert(
-          "Pedido no encontrado"
-        );
+        if (!pedido) {
 
-        return;
+          alert(
+            "Pedido no encontrado"
+          );
 
-      }
+          return;
 
-      if (
-        pedido.estado === "enviado"
-      ) {
-
-        alert(
-          "Ya fue enviado"
-        );
-
-        return;
-
-      }
-
-
-
-      // 📦 actualizar estado
-      await fetch(
-        "/.netlify/functions/update-order",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            id,
-            estado: "enviado",
-          }),
         }
-      );
 
-      // 🔄 actualizar UI
-      setOrders(prev =>
+        if (
+          pedido.estado ===
+          "enviado"
+        ) {
 
-        (
-          Array.isArray(prev)
-            ? prev
-            : []
-        ).map(o =>
+          alert(
+            "Ya fue enviado"
+          );
 
-          o.id === id
+          return;
 
-            ? {
-                ...o,
-                estado: "enviado"
-              }
+        }
 
-            : o
 
-        )
+        const response =
+          await fetch(
+            "/.netlify/functions/update-order",
+            {
+              method: "POST",
 
-      );
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                id,
+                estado: "enviado",
+              }),
+            }
+          );
+
+
+        if (!response.ok) {
+
+          alert(
+            "No fue posible actualizar el estado."
+          );
+
+          return;
+
+        }
+
+
+        setOrders(prev =>
+
+          (
+            Array.isArray(prev)
+              ? prev
+              : []
+          ).map(o =>
+
+            o.id === id
+
+              ? {
+                  ...o,
+                  estado: "enviado"
+                }
+
+              : o
+
+          )
+
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Error cambiando estado:",
+          err
+        );
+
+        alert(
+          "Ocurrió un error al actualizar el pedido."
+        );
+
+      }
 
     };
 
-  // 📊 métricas
+
+  // ============================================================
+  // IDENTIFICAR TIPO DE DESPACHO
+  // ============================================================
+
+  const obtenerDespacho = (orden) => {
+
+    const observacion =
+      String(
+        orden?.observacion || ""
+      ).toLowerCase();
+
+    const tipoVenta =
+      String(
+        orden?.tipo_venta || ""
+      ).toLowerCase();
+
+
+    /*
+     * Solo aplicamos la regla automática
+     * de $3.500 para ventas ONLINE.
+     */
+
+    const esOnline =
+      tipoVenta === "online";
+
+
+    /*
+     * Calcular subtotal real de productos.
+     *
+     * items contiene:
+     * price
+     * qty
+     */
+
+    const subtotalProductos =
+      Array.isArray(orden?.items)
+
+        ? orden.items.reduce(
+            (total, item) => {
+
+              const precio =
+                Number(
+                  item?.price || 0
+                );
+
+              const cantidad =
+                Number(
+                  item?.qty || 1
+                );
+
+              return total +
+                (precio * cantidad);
+
+            },
+            0
+          )
+
+        : 0;
+
+
+    const totalVenta =
+      Number(
+        orden?.total || 0
+      );
+
+
+    const despachoCalculado =
+      totalVenta -
+      subtotalProductos;
+
+
+    /*
+     * PAKET:
+     *
+     * Venta online
+     * +
+     * exactamente $3.500 adicionales
+     */
+
+    if (
+      esOnline &&
+      Math.abs(
+        despachoCalculado - 3500
+      ) < 1
+    ) {
+
+      return {
+        tipo: "paket",
+        nombre: "PAKET",
+        icono: "📦",
+        clase:
+          "bg-pink-100 text-pink-700"
+      };
+
+    }
+
+
+    /*
+     * Si la observación menciona PAKET,
+     * también lo identificamos.
+     *
+     * Esto ayuda con ventas RRSS
+     * que hayan sido registradas manualmente.
+     */
+
+    if (
+      observacion.includes("paket")
+    ) {
+
+      return {
+        tipo: "paket",
+        nombre: "PAKET",
+        icono: "📦",
+        clase:
+          "bg-pink-100 text-pink-700"
+      };
+
+    }
+
+
+    /*
+     * BLUEXPRESS
+     */
+
+    if (
+      observacion.includes(
+        "bluexpress"
+      )
+    ) {
+
+      return {
+        tipo: "bluexpress",
+        nombre: "BLUEXPRESS",
+        icono: "🚚",
+        clase:
+          "bg-blue-100 text-blue-700"
+      };
+
+    }
+
+
+    /*
+     * STARKEN
+     */
+
+    if (
+      observacion.includes(
+        "starken"
+      )
+    ) {
+
+      return {
+        tipo: "starken",
+        nombre: "STARKEN",
+        icono: "🚚",
+        clase:
+          "bg-orange-100 text-orange-700"
+      };
+
+    }
+
+
+    /*
+     * Si es una venta online y no existe
+     * cargo de despacho, queda como
+     * envío por pagar.
+     */
+
+    if (
+      esOnline &&
+      Math.abs(
+        despachoCalculado
+      ) < 1
+    ) {
+
+      return {
+        tipo: "por_pagar",
+        nombre: "POR PAGAR",
+        icono: "💳",
+        clase:
+          "bg-slate-100 text-slate-700"
+      };
+
+    }
+
+
+    /*
+     * También consideramos explícitamente
+     * expresiones como "por pagar".
+     */
+
+    if (
+      observacion.includes(
+        "por pagar"
+      )
+    ) {
+
+      return {
+        tipo: "por_pagar",
+        nombre: "POR PAGAR",
+        icono: "💳",
+        clase:
+          "bg-slate-100 text-slate-700"
+      };
+
+    }
+
+
+    return {
+      tipo: "sin_despacho",
+      nombre: "SIN DESPACHO",
+      icono: "—",
+      clase:
+        "bg-gray-100 text-gray-600"
+    };
+
+  };
+
+
+  // ============================================================
+  // MÉTRICAS
+  // ============================================================
+
   const totalVentas =
     (
       Array.isArray(orders)
@@ -194,16 +465,22 @@ export default function Ventas() {
     ).reduce(
       (acc, o) =>
         acc +
-(Number.isFinite(Number(o.total))
-  ? Number(o.total)
-  : 0),
+        (
+          Number.isFinite(
+            Number(o.total)
+          )
+            ? Number(o.total)
+            : 0
+        ),
       0
     );
+
 
   const totalPedidos =
     Array.isArray(orders)
       ? orders.length
       : 0;
+
 
   const pendientes =
     (
@@ -212,8 +489,10 @@ export default function Ventas() {
         : []
     ).filter(
       o =>
-        o.estado === "pendiente"
+        o.estado ===
+        "pendiente"
     ).length;
+
 
   const enviados =
     (
@@ -222,22 +501,65 @@ export default function Ventas() {
         : []
     ).filter(
       o =>
-        o.estado === "enviado"
+        o.estado ===
+        "enviado"
     ).length;
 
-  // 🔍 resaltar
+
+  // ============================================================
+  // MÉTRICAS DESPACHO
+  // ============================================================
+
+  const cantidadPakets =
+    orders.filter(
+      o =>
+        obtenerDespacho(o).tipo ===
+        "paket"
+    ).length;
+
+
+  const cantidadStarken =
+    orders.filter(
+      o =>
+        obtenerDespacho(o).tipo ===
+        "starken"
+    ).length;
+
+
+  const cantidadBluexpress =
+    orders.filter(
+      o =>
+        obtenerDespacho(o).tipo ===
+        "bluexpress"
+    ).length;
+
+
+  const cantidadPorPagar =
+    orders.filter(
+      o =>
+        obtenerDespacho(o).tipo ===
+        "por_pagar"
+    ).length;
+
+
+  // ============================================================
+  // RESALTAR BÚSQUEDA
+  // ============================================================
+
   const resaltar = (texto) => {
 
     if (!busquedaDebounce)
       return texto;
 
     const partes =
-      String(texto || "").split(
-        new RegExp(
-          `(${busquedaDebounce})`,
-          "gi"
-        )
-      );
+      String(texto || "")
+        .split(
+          new RegExp(
+            `(${busquedaDebounce})`,
+            "gi"
+          )
+        );
+
 
     return partes.map(
       (parte, i) =>
@@ -268,105 +590,217 @@ export default function Ventas() {
 
   };
 
-  // 📅 ordenar
+
+  // ============================================================
+  // PEDIDOS ORDENADOS
+  // ============================================================
+
   const pedidosOrdenados =
+    useMemo(
 
-    [
-      ...(Array.isArray(orders)
-        ? orders
-        : [])
-    ]
+      () =>
 
-      .sort(
-        (a, b) =>
-          new Date(b.created_at)
-          -
-          new Date(a.created_at)
-      );
+        [
+          ...(
+            Array.isArray(orders)
+              ? orders
+              : []
+          )
+        ].sort(
+          (a, b) =>
+            new Date(
+              b.created_at
+            ) -
+            new Date(
+              a.created_at
+            )
+        ),
+
+      [orders]
+
+    );
+
+
+  // ============================================================
+  // FILTRADO
+  // ============================================================
+
+  const pedidosFiltrados =
+    pedidosOrdenados
+
+      // ESTADO
+      .filter(o =>
+
+        filtro === "todos"
+
+          ? true
+
+          : o.estado ===
+            filtro
+
+      )
+
+      // DESPACHO
+      .filter(o => {
+
+        if (
+          filtroDespacho ===
+          "todos"
+        ) {
+
+          return true;
+
+        }
+
+        return (
+          obtenerDespacho(o).tipo
+          ===
+          filtroDespacho
+        );
+
+      })
+
+      // BÚSQUEDA
+      .filter(o => {
+
+        const texto = `
+
+          ${o.numero_venta || ""}
+
+          ${o.nombre || ""}
+
+          ${o.correo || ""}
+
+          ${o.rut || ""}
+
+          ${o.comuna || ""}
+
+          ${o.observacion || ""}
+
+          ${
+            Array.isArray(o.items)
+              ? o.items
+                  .map(
+                    i =>
+                      `${i.name || ""}
+                       ${i.size || ""}
+                       ${i.variant_id || ""}`
+                  )
+                  .join(" ")
+              : ""
+          }
+
+        `.toLowerCase();
+
+
+        return texto.includes(
+          busquedaDebounce
+            .toLowerCase()
+        );
+
+      });
+
+
+  // ============================================================
+  // RETURN
+  // ============================================================
 
   return (
 
-<div className="
-  min-h-screen
+    <div className="
+      min-h-screen
 
-  p-4
-  md:p-8
+      p-4
+      md:p-8
 
-  bg-gradient-to-b
-  from-[#fff7fb]
-  via-white
-  to-[#fdf2f8]
-">
-
-{/* HEADER PREMIUM */}
-<div className="
-  relative
-  overflow-hidden
-
-  rounded-[32px]
-
-  p-6
-  md:p-8
-
-  mb-8
-
-  bg-gradient-to-br
-  from-pink-500
-  via-fuchsia-500
-  to-purple-600
-
-  text-white
-
-  shadow-[0_20px_60px_rgba(168,85,247,0.35)]
-">
-
-  <div className="
-    absolute
-    inset-0
-
-    opacity-10
-
-    bg-[radial-gradient(circle_at_top_right,white,transparent_40%)]
-  " />
-
-  <div className="relative z-10">
-
-    <p className="
-      uppercase
-      tracking-[0.35em]
-      text-xs
-      font-bold
-      text-pink-100
+      bg-gradient-to-b
+      from-[#fff7fb]
+      via-white
+      to-[#fdf2f8]
     ">
-      Panel administrativo
-    </p>
 
-    <h1 className="
-      text-4xl
-      md:text-5xl
-      font-black
-      mt-3
-    ">
-      📦 Ventas y pedidos
-    </h1>
 
-    <p className="
-      mt-4
-      text-pink-100
-      max-w-2xl
-      text-sm
-      md:text-base
-    ">
-      Gestiona pedidos, clientes,
-      estados de envío y métricas
-      de ventas en tiempo real.
-    </p>
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
 
-  </div>
+      <div className="
+        relative
+        overflow-hidden
 
-</div>
+        rounded-[32px]
 
-      {/* MÉTRICAS */}
+        p-6
+        md:p-8
+
+        mb-8
+
+        bg-gradient-to-br
+        from-pink-500
+        via-fuchsia-500
+        to-purple-600
+
+        text-white
+
+        shadow-[0_20px_60px_rgba(168,85,247,0.35)]
+      ">
+
+        <div className="
+          absolute
+          inset-0
+
+          opacity-10
+
+          bg-[radial-gradient(circle_at_top_right,white,transparent_40%)]
+        " />
+
+        <div className="
+          relative
+          z-10
+        ">
+
+          <p className="
+            uppercase
+            tracking-[0.35em]
+            text-xs
+            font-bold
+            text-pink-100
+          ">
+            Panel administrativo
+          </p>
+
+
+          <h1 className="
+            text-4xl
+            md:text-5xl
+            font-black
+            mt-3
+          ">
+            📦 Ventas y pedidos
+          </h1>
+
+
+          <p className="
+            mt-4
+            text-pink-100
+            max-w-2xl
+            text-sm
+            md:text-base
+          ">
+            Gestiona pedidos, clientes,
+            estados de envío, transportistas
+            y métricas de ventas en tiempo real.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
+          MÉTRICAS
+      ====================================================== */}
+
       <div className="
         grid
         grid-cols-1
@@ -378,18 +812,25 @@ export default function Ventas() {
 
         <StatCard
           title="💰 Ventas"
-          value={`$${totalVentas.toLocaleString("es-CL")}`}
+          value={
+            `$${totalVentas.toLocaleString(
+              "es-CL"
+            )}`
+          }
         />
+
 
         <StatCard
           title="📦 Pedidos"
           value={totalPedidos}
         />
 
+
         <StatCard
           title="⏳ Pendientes"
           value={pendientes}
         />
+
 
         <StatCard
           title="✅ Enviados"
@@ -398,16 +839,26 @@ export default function Ventas() {
 
       </div>
 
-      {/* FILTROS */}
+
+      {/* ======================================================
+          FILTROS
+      ====================================================== */}
+
       <AdminCard className="mb-6">
 
         <div className="
           grid
-          gap-4
+          gap-5
         ">
 
+
+          {/* BÚSQUEDA */}
+
           <AdminInput
-            placeholder="🔍 Buscar cliente, correo, RUT o comuna..."
+            placeholder="
+              🔍 Buscar N.º venta, cliente,
+              correo, RUT, comuna o producto...
+            "
 
             value={busqueda}
 
@@ -418,52 +869,178 @@ export default function Ventas() {
             }
           />
 
-          {/* BOTONES */}
-          <div className="
-            flex
-            flex-wrap
-            gap-3
-          ">
 
-            <FiltroBtn
-              active={
-                filtro === "todos"
-              }
+          {/* ESTADO */}
 
-              onClick={() =>
-                setFiltro("todos")
-              }
-            >
-              Todos ({totalPedidos})
-            </FiltroBtn>
+          <div>
 
-            <FiltroBtn
-              active={
-                filtro === "pendiente"
-              }
+            <div className="
+              text-xs
+              uppercase
+              tracking-wider
+              font-black
+              text-slate-500
+              mb-3
+            ">
+              Estado
+            </div>
 
-              onClick={() =>
-                setFiltro(
-                  "pendiente"
-                )
-              }
-            >
-              Pendientes ({pendientes})
-            </FiltroBtn>
 
-            <FiltroBtn
-              active={
-                filtro === "enviado"
-              }
+            <div className="
+              flex
+              flex-wrap
+              gap-3
+            ">
 
-              onClick={() =>
-                setFiltro(
-                  "enviado"
-                )
-              }
-            >
-              Enviados ({enviados})
-            </FiltroBtn>
+              <FiltroBtn
+                active={
+                  filtro === "todos"
+                }
+
+                onClick={() =>
+                  setFiltro("todos")
+                }
+              >
+                Todos ({totalPedidos})
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtro === "pendiente"
+                }
+
+                onClick={() =>
+                  setFiltro(
+                    "pendiente"
+                  )
+                }
+              >
+                ⏳ Pendientes ({pendientes})
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtro === "enviado"
+                }
+
+                onClick={() =>
+                  setFiltro(
+                    "enviado"
+                  )
+                }
+              >
+                ✅ Enviados ({enviados})
+              </FiltroBtn>
+
+            </div>
+
+          </div>
+
+
+          {/* DESPACHO */}
+
+          <div>
+
+            <div className="
+              text-xs
+              uppercase
+              tracking-wider
+              font-black
+              text-slate-500
+              mb-3
+            ">
+              Transportista / despacho
+            </div>
+
+
+            <div className="
+              flex
+              flex-wrap
+              gap-3
+            ">
+
+              <FiltroBtn
+                active={
+                  filtroDespacho ===
+                  "todos"
+                }
+
+                onClick={() =>
+                  setFiltroDespacho(
+                    "todos"
+                  )
+                }
+              >
+                Todos
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtroDespacho ===
+                  "paket"
+                }
+
+                onClick={() =>
+                  setFiltroDespacho(
+                    "paket"
+                  )
+                }
+              >
+                📦 PAKET ({cantidadPakets})
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtroDespacho ===
+                  "starken"
+                }
+
+                onClick={() =>
+                  setFiltroDespacho(
+                    "starken"
+                  )
+                }
+              >
+                🚚 STARKEN ({cantidadStarken})
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtroDespacho ===
+                  "bluexpress"
+                }
+
+                onClick={() =>
+                  setFiltroDespacho(
+                    "bluexpress"
+                  )
+                }
+              >
+                🚚 BLUEXPRESS ({cantidadBluexpress})
+              </FiltroBtn>
+
+
+              <FiltroBtn
+                active={
+                  filtroDespacho ===
+                  "por_pagar"
+                }
+
+                onClick={() =>
+                  setFiltroDespacho(
+                    "por_pagar"
+                  )
+                }
+              >
+                💳 Por pagar ({cantidadPorPagar})
+              </FiltroBtn>
+
+            </div>
 
           </div>
 
@@ -471,51 +1048,76 @@ export default function Ventas() {
 
       </AdminCard>
 
-      {/* LISTADO */}
+
+      {/* ======================================================
+          LISTADO
+      ====================================================== */}
+
       <div className="
         grid
         gap-5
       ">
 
-        {pedidosOrdenados
 
-          .filter(o =>
+        {pedidosFiltrados.length === 0 && (
 
-            filtro === "todos"
-              ? true
-              : o.estado === filtro
+          <AdminCard>
 
-          )
+            <div className="
+              py-12
+              text-center
+            ">
 
-          .filter(o => {
+              <div className="
+                text-5xl
+                mb-4
+              ">
+                🔎
+              </div>
 
-            const texto = `
-              ${o.nombre}
-              ${o.correo}
-              ${o.rut}
-              ${o.comuna}
-            `.toLowerCase();
+              <div className="
+                text-xl
+                font-black
+                text-slate-800
+              ">
+                No encontramos ventas
+              </div>
 
-            return texto.includes(
-              busquedaDebounce
-                .toLowerCase()
-            );
+              <div className="
+                mt-2
+                text-slate-500
+              ">
+                Prueba cambiando los filtros
+                o la búsqueda.
+              </div>
 
-          })
+            </div>
 
-          .map(o => (
+          </AdminCard>
+
+        )}
+
+
+        {pedidosFiltrados.map(o => {
+
+          const despacho =
+            obtenerDespacho(o);
+
+
+          return (
 
             <AdminCard
-  key={o.id}
+              key={o.id}
 
-  className="
-    hover:-translate-y-1
-    hover:shadow-[0_20px_60px_rgba(15,23,42,0.10)]
+              className="
+                hover:-translate-y-1
+                hover:shadow-[0_20px_60px_rgba(15,23,42,0.10)]
 
-    transition-all
-    duration-300
-  "
->
+                transition-all
+                duration-300
+              "
+            >
+
 
               <div className="
                 flex
@@ -526,10 +1128,17 @@ export default function Ventas() {
                 gap-6
               ">
 
-                {/* INFO */}
+
+                {/* ==================================================
+                    INFORMACIÓN
+                ================================================== */}
+
                 <div className="
                   flex-1
                 ">
+
+
+                  {/* CABECERA VENTA */}
 
                   <div className="
                     flex
@@ -539,24 +1148,41 @@ export default function Ventas() {
                     mb-5
                   ">
 
+
                     <div className="
-                      text-xl
+                      px-4
+                      py-2
+
+                      rounded-2xl
+
+                      bg-slate-900
+                      text-white
+
+                      text-lg
                       font-black
-                      text-slate-900
+
+                      shadow-sm
                     ">
+
+                      VENTA #
+
                       {
-                        Array.isArray(o.items)
-  ? o.items?.[0]?.name
-  : "Pedido"
+                        o.numero_venta ||
+                        o.id
                       }
+
                     </div>
 
+
                     <span className={`
+
                       px-3
                       py-1
 
                       rounded-full
+
                       shadow-sm
+
                       uppercase
                       tracking-wide
 
@@ -577,6 +1203,7 @@ export default function Ventas() {
                             text-emerald-600
                           `
                       }
+
                     `}>
 
                       {
@@ -586,7 +1213,35 @@ export default function Ventas() {
 
                     </span>
 
+
+                    {/* DESPACHO */}
+
+                    <span className={`
+
+                      px-3
+                      py-1
+
+                      rounded-full
+
+                      shadow-sm
+
+                      text-sm
+                      font-black
+
+                      ${despacho.clase}
+
+                    `}>
+
+                      {despacho.icono}
+                      {" "}
+                      {despacho.nombre}
+
+                    </span>
+
                   </div>
+
+
+                  {/* CLIENTE */}
 
                   <div className="
                     grid
@@ -596,42 +1251,87 @@ export default function Ventas() {
 
                     <Info
                       label="Nombre"
-                      value={resaltar(o.nombre)}
+                      value={
+                        resaltar(
+                          o.nombre
+                        )
+                      }
                     />
+
+
+                    <Info
+                      label="N.º de venta"
+                      value={
+                        o.numero_venta ||
+                        o.id
+                      }
+                    />
+
 
                     <Info
                       label="RUT"
-                      value={resaltar(o.rut)}
+                      value={
+                        resaltar(
+                          o.rut
+                        )
+                      }
                     />
+
 
                     <Info
                       label="Correo"
-                      value={resaltar(o.correo)}
+                      value={
+                        resaltar(
+                          o.correo
+                        )
+                      }
                     />
+
 
                     <Info
                       label="Teléfono"
-                      value={resaltar(o.telefono)}
+                      value={
+                        resaltar(
+                          o.telefono
+                        )
+                      }
                     />
+
 
                     <Info
                       label="Dirección"
-                      value={resaltar(o.direccion)}
+                      value={
+                        resaltar(
+                          o.direccion
+                        )
+                      }
                     />
+
 
                     <Info
                       label="Comuna"
-                      value={resaltar(o.comuna)}
+                      value={
+                        resaltar(
+                          o.comuna
+                        )
+                      }
                     />
+
 
                     <Info
                       label="Región"
-                      value={resaltar(o.region)}
+                      value={
+                        resaltar(
+                          o.region
+                        )
+                      }
                     />
 
                   </div>
 
-                  {/* OBS */}
+
+                  {/* OBSERVACIÓN */}
+
                   <div className="
                     mt-5
                   ">
@@ -644,19 +1344,24 @@ export default function Ventas() {
                       Observación
                     </div>
 
+
                     <div className="
                       mt-2
                       text-slate-800
                     ">
+
                       {
-                        o.observacion
-                          || "Sin observaciones"
+                        o.observacion ||
+                        "Sin observaciones"
                       }
+
                     </div>
 
                   </div>
 
+
                   {/* PRODUCTOS */}
+
                   <div className="
                     mt-6
                   ">
@@ -670,14 +1375,17 @@ export default function Ventas() {
                       Productos
                     </div>
 
+
                     <div className="
-                      flex
-                      flex-wrap
+                      grid
                       gap-3
                     ">
 
+
                       {
-                        Array.isArray(o.items)
+                        Array.isArray(
+                          o.items
+                        )
                         &&
                         o.items.length
 
@@ -688,6 +1396,13 @@ export default function Ventas() {
                                 key={idx}
 
                                 className="
+                                  flex
+                                  flex-col
+                                  sm:flex-row
+                                  sm:items-center
+                                  sm:justify-between
+                                  gap-2
+
                                   bg-gradient-to-r
                                   from-pink-50
                                   to-purple-50
@@ -696,23 +1411,132 @@ export default function Ventas() {
                                   border-pink-100
 
                                   px-4
-                                  py-2
+                                  py-3
 
                                   rounded-2xl
-
-                                  text-sm
-                                  font-semibold
                                 "
                               >
-                                {i.name} x{i.qty || 1}
+
+
+                                <div>
+
+                                  <div className="
+                                    font-black
+                                    text-slate-900
+                                  ">
+
+                                    {
+                                      i.name ||
+                                      "Producto"
+                                    }
+
+                                  </div>
+
+
+                                  <div className="
+                                    mt-1
+                                    flex
+                                    flex-wrap
+                                    items-center
+                                    gap-2
+                                    text-sm
+                                    text-slate-600
+                                  ">
+
+                                    <span className="
+                                      rounded-full
+                                      bg-white
+                                      border
+                                      border-pink-200
+                                      px-3
+                                      py-1
+                                      font-bold
+                                    ">
+
+                                      📏
+
+                                      {" "}
+
+                                      {
+                                        i.size ||
+                                        "Sin talla"
+                                      }
+
+                                    </span>
+
+
+                                    <span>
+
+                                      ×
+
+                                      {
+                                        i.qty ||
+                                        1
+                                      }
+
+                                    </span>
+
+
+                                    {
+                                      i.variant_id && (
+
+                                        <span className="
+                                          text-xs
+                                          text-slate-400
+                                        ">
+
+                                          Variante #
+
+                                          {
+                                            i.variant_id
+                                          }
+
+                                        </span>
+
+                                      )
+                                    }
+
+                                  </div>
+
+                                </div>
+
+
+                                <div className="
+                                  text-sm
+                                  font-black
+                                  text-slate-700
+                                ">
+
+                                  $
+                                  {
+                                    Number(
+                                      i.price ||
+                                      0
+                                    ).toLocaleString(
+                                      "es-CL"
+                                    )
+                                  }
+
+                                </div>
+
                               </div>
 
                             ))
 
                           : (
-                            <div>
+
+                            <div className="
+                              rounded-2xl
+                              bg-slate-50
+                              border
+                              border-slate-200
+                              px-4
+                              py-3
+                              text-slate-500
+                            ">
                               Sin productos
                             </div>
+
                           )
                       }
 
@@ -722,135 +1546,241 @@ export default function Ventas() {
 
                 </div>
 
-                {/* TOTAL */}
+
+                {/* ==================================================
+                    TOTAL
+                ================================================== */}
+
                 <div className="
                   xl:w-[240px]
                 ">
 
-<div className="
-  relative
-  overflow-hidden
 
-  rounded-[28px]
+                  <div className="
+                    relative
+                    overflow-hidden
 
-  p-6
+                    rounded-[28px]
 
-  bg-gradient-to-br
-  from-slate-900
-  to-slate-800
+                    p-6
 
-  text-white
+                    bg-gradient-to-br
+                    from-slate-900
+                    to-slate-800
 
-  shadow-[0_15px_50px_rgba(15,23,42,0.25)]
-">
+                    text-white
 
-  <div className="
-    absolute
-    -top-16
-    -right-16
+                    shadow-[0_15px_50px_rgba(15,23,42,0.25)]
+                  ">
 
-    w-40
-    h-40
 
-    rounded-full
-    shadow-sm
-    uppercase
-    tracking-wide
+                    <div className="
+                      absolute
+                      -top-16
+                      -right-16
 
-    bg-pink-500/20
-  " />
+                      w-40
+                      h-40
 
-  <div className="relative z-10">
+                      rounded-full
 
-    <div className="
-      text-sm
-      font-bold
-      text-slate-300
-    ">
-      Total
-    </div>
+                      bg-pink-500/20
+                    " />
 
-    <div className="
-      mt-4
 
-      text-4xl
-      font-black
-    ">
-      $
-      {
-  Number(
-    o.total || 0
-  ).toLocaleString(
-    "es-CL"
-  )
-}
-    </div>
+                    <div className="
+                      relative
+                      z-10
+                    ">
 
-    {/* MARCAR ENVIADO */}
-{(
-  o.estado ||
-  "pendiente"
-) === "pendiente" && (
-  <button
-    onClick={() =>
-      cambiarEstado(o.id)
-    }
-    className="
-      mt-6
-      w-full
-      rounded-2xl
-      bg-gradient-to-r
-      from-emerald-500
-      to-green-500
-      py-3
-      font-bold
-      text-white
-      hover:scale-[1.02]
-      hover:opacity-90
-      transition-all
-      duration-300
-    "
-  >
-    📦 Marcar enviado
-  </button>
-)}
 
-{/* GESTIONAR CAMBIO */}
-<button
-  onClick={() => setVentaCambio(o)}
-  className="
-    mt-3
-    w-full
-    rounded-2xl
-    bg-gradient-to-r
-    from-pink-500
-    to-purple-600
-    py-3
-    font-bold
-    text-white
-    hover:scale-[1.02]
-    hover:opacity-90
-    transition-all
-    duration-300
-  "
->
-  ↔️ Gestionar cambio
-</button>
-</div>
+                      <div className="
+                        text-sm
+                        font-bold
+                        text-slate-300
+                      ">
+                        Total
+                      </div>
 
-  </div>
 
-</div>
+                      <div className="
+                        mt-4
+
+                        text-4xl
+                        font-black
+                      ">
+
+                        $
+
+                        {
+                          Number(
+                            o.total || 0
+                          ).toLocaleString(
+                            "es-CL"
+                          )
+                        }
+
+                      </div>
+
+
+                      {/* DESPACHO */}
+
+                      <div className="
+                        mt-4
+                        rounded-2xl
+                        bg-white/10
+                        px-4
+                        py-3
+                      ">
+
+                        <div className="
+                          text-xs
+                          uppercase
+                          tracking-wide
+                          text-slate-300
+                        ">
+                          Despacho
+                        </div>
+
+
+                        <div className="
+                          mt-1
+                          font-black
+                        ">
+
+                          {despacho.icono}
+                          {" "}
+                          {despacho.nombre}
+
+                        </div>
+
+                      </div>
+
+
+                      {/* MARCAR ENVIADO */}
+
+                      {
+                        (
+                          o.estado ||
+                          "pendiente"
+                        ) ===
+                        "pendiente"
+                        && (
+
+                          <button
+                            onClick={() =>
+                              cambiarEstado(
+                                o.id
+                              )
+                            }
+
+                            className="
+                              mt-6
+
+                              w-full
+
+                              rounded-2xl
+
+                              bg-gradient-to-r
+                              from-emerald-500
+                              to-green-500
+
+                              py-3
+
+                              font-bold
+                              text-white
+
+                              hover:scale-[1.02]
+                              hover:opacity-90
+
+                              transition-all
+                              duration-300
+                            "
+                          >
+                            📦 Marcar enviado
+                          </button>
+
+                        )
+                      }
+
+
+                      {/* GESTIONAR CAMBIO */}
+
+                      <button
+                        onClick={() =>
+                          setVentaCambio(o)
+                        }
+
+                        className="
+                          mt-3
+
+                          w-full
+
+                          rounded-2xl
+
+                          bg-gradient-to-r
+                          from-pink-500
+                          to-purple-600
+
+                          py-3
+
+                          font-bold
+                          text-white
+
+                          hover:scale-[1.02]
+                          hover:opacity-90
+
+                          transition-all
+                          duration-300
+                        "
+                      >
+                        ↔️ Gestionar cambio
+                      </button>
+
+
+                    </div>
+
+                  </div>
+
+                </div>
 
               </div>
 
-            </div>
+            </AdminCard>
 
-          </AdminCard>
+          );
 
-        ))}
+        })}
 
       </div>
+
+
+      {/* ========================================================
+          MODAL DE CAMBIO
+      ======================================================== */}
+
+      {
+        ventaCambio && (
+
+          <CambioVentaModal
+            venta={ventaCambio}
+
+            onClose={() =>
+              setVentaCambio(null)
+            }
+
+            onSuccess={() => {
+
+              setVentaCambio(null);
+
+              cargarPedidos();
+
+            }}
+          />
+
+        )
+      }
+
 
     </div>
 
@@ -858,7 +1788,11 @@ export default function Ventas() {
 
 }
 
-// 🔥 METRICS
+
+// ============================================================
+// STAT CARD
+// ============================================================
+
 function StatCard({
   title,
   value
@@ -889,6 +1823,7 @@ function StatCard({
       duration-300
     ">
 
+
       <div className="
         absolute
         -top-10
@@ -898,9 +1833,6 @@ function StatCard({
         h-32
 
         rounded-full
-        shadow-sm
-        uppercase
-        tracking-wide
 
         bg-gradient-to-br
         from-pink-100
@@ -909,7 +1841,12 @@ function StatCard({
         opacity-60
       " />
 
-      <div className="relative z-10">
+
+      <div className="
+        relative
+        z-10
+      ">
+
 
         <div className="
           text-sm
@@ -918,6 +1855,7 @@ function StatCard({
         ">
           {title}
         </div>
+
 
         <div className="
           mt-4
@@ -940,7 +1878,11 @@ function StatCard({
 
 }
 
-// 🔥 INFO
+
+// ============================================================
+// INFO
+// ============================================================
+
 function Info({
   label,
   value
@@ -958,6 +1900,7 @@ function Info({
         {label}
       </div>
 
+
       <div className="
         mt-1
         text-slate-900
@@ -965,39 +1908,17 @@ function Info({
         {value}
       </div>
 
-      {ventaCambio && (
-  <CambioVentaModal
-    venta={ventaCambio}
-    onClose={() => setVentaCambio(null)}
-    onSuccess={() => {
-      setVentaCambio(null);
-
-      fetch("/.netlify/functions/get-orders")
-        .then((res) => res.json())
-        .then((data) => {
-          setOrders(
-            Array.isArray(data)
-              ? data
-              : []
-          );
-        })
-        .catch((err) => {
-          console.error(
-            "Error actualizando ventas:",
-            err
-          );
-        });
-    }}
-  />
-)}
-
     </div>
 
   );
 
 }
 
-// 🔥 FILTRO
+
+// ============================================================
+// FILTRO
+// ============================================================
+
 function FiltroBtn({
   children,
   active,
@@ -1010,13 +1931,13 @@ function FiltroBtn({
       {...props}
 
       className={`
+
         px-5
         py-2.5
 
         rounded-full
+
         shadow-sm
-        uppercase
-        tracking-wide
 
         font-bold
 
@@ -1041,11 +1962,13 @@ function FiltroBtn({
 
               border
               border-pink-100
+
               text-slate-700
 
               hover:bg-slate-200
             `
         }
+
       `}
     >
 
@@ -1056,3 +1979,4 @@ function FiltroBtn({
   );
 
 }
+```
