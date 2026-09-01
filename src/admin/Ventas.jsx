@@ -793,7 +793,7 @@ export default function Ventas() {
       ) === "pendiente"
 
       && (
-
+<div>
         <button
           onClick={() =>
             cambiarEstado(
@@ -847,7 +847,7 @@ export default function Ventas() {
 >
   ↔️ Gestionar cambio
 </button>
-
+</div>
       )
     }
 
