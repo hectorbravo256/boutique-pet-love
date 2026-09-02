@@ -35,7 +35,13 @@ const discountPercent =
 const mensajeEnvio = formData.region
   ? aplicaEnvio
     ? "Envío $3.500 por PAKET"
-    : "Envío por pagar (Starken / Blue Express)"
+    : formData.empresa_envio
+      ? `Envío por pagar — ${
+          formData.empresa_envio === "starken"
+            ? "STARKEN"
+            : "BLUEXPRESS"
+        }`
+      : "Selecciona una empresa de envío"
   : "Selecciona tu región";
 
 	const subtotal = safeCart.reduce((acc, item) => {
@@ -98,6 +104,20 @@ const validarFormulario = () => {
   if (!formData.region) {
     nuevosErrores.region = "Selecciona una región";
   }
+const regionesConEnvio = [
+  "Región Metropolitana de Santiago",
+  "Región de Valparaíso",
+  "Región del Libertador General Bernardo O'Higgins",
+];
+
+const requiereEmpresaEnvio =
+  formData.region &&
+  !regionesConEnvio.includes(formData.region);
+
+if (requiereEmpresaEnvio && !formData.empresa_envio) {
+  nuevosErrores.empresa_envio =
+    "Selecciona una empresa de envío";
+}
 
   if (!formData.correo?.includes("@")) {
     nuevosErrores.correo = "Correo inválido";
@@ -537,14 +557,18 @@ window.innerWidth >= 768
 
           <select
            	value={formData.region || ""}
-  		onChange={(e) =>
-    		setFormData({ ...formData, region: e.target.value })
-  		}
+onChange={(e) =>
+  setFormData({
+    ...formData,
+    region: e.target.value,
+    empresa_envio: ""
+  })
+}
   		className={`w-full p-2 rounded border ${errors.region ? "border-red-500 bg-red-50" : "border-gray-300"}`}
 		>
-            <option value="">Selecciona Región</option>
-            	<option>Región de Arica y Parinacota</option>
-  	    	<option>Región de Tarapacá</option>
+        <option value="">Selecciona Región</option>
+        <option>Región de Arica y Parinacota</option>
+  	    <option>Región de Tarapacá</option>
   		<option>Región de Antofagasta</option>
   		<option>Región de Atacama</option>
   		<option>Región de Coquimbo</option>
@@ -565,6 +589,58 @@ window.innerWidth >= 768
   <p className="text-red-500 text-xs">
     {errors.region}
   </p>
+)}
+	{/* 🚚 EMPRESA DE ENVÍO POR PAGAR */}
+{formData.region &&
+  ![
+    "Región Metropolitana de Santiago",
+    "Región de Valparaíso",
+    "Región del Libertador General Bernardo O'Higgins",
+  ].includes(formData.region) && (
+    <div className="mt-2">
+
+      <label className="block text-sm font-semibold text-gray-700 mb-1">
+        Empresa de envío
+      </label>
+
+      <select
+        value={formData.empresa_envio || ""}
+        onChange={(e) =>
+          setFormData({
+            ...formData,
+            empresa_envio: e.target.value,
+          })
+        }
+        className={`w-full p-2 rounded border ${
+          errors.empresa_envio
+            ? "border-red-500 bg-red-50"
+            : "border-gray-300"
+        }`}
+      >
+        <option value="">
+          Selecciona empresa de envío
+        </option>
+
+        <option value="starken">
+          STARKEN
+        </option>
+
+        <option value="bluexpress">
+          BLUEXPRESS
+        </option>
+      </select>
+
+      <p className="text-xs text-gray-500 mt-1">
+        El envío será pagado por el destinatario.
+      </p>
+
+      {errors.empresa_envio && (
+        <p className="text-red-500 text-xs mt-1">
+          {errors.empresa_envio}
+        </p>
+      )}
+
+    </div>
 )}
 
 	   <input
