@@ -601,9 +601,13 @@ export default function Reportes() {
                                             {getMedioPagoLabel(sale.medio_pago)}
                                         </td>
 
-                                        <td className="whitespace-nowrap px-5 py-3 text-right text-sm font-semibold text-gray-900">
-                                            {formatCurrency(sale.total)}
-                                        </td>
+<td className="whitespace-nowrap px-5 py-3 text-right text-sm font-semibold text-gray-900">
+    {formatCurrency(
+        sale.total_cobrado ??
+        sale.total ??
+        0
+    )}
+</td>
 
                                     </tr>
 
