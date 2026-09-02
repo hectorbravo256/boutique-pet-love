@@ -35,6 +35,12 @@ export default function Ventas() {
     setBusquedaDebounce] =
       useState("");
 
+  const [fechaDesde, setFechaDesde] =
+    useState("");
+
+  const [fechaHasta, setFechaHasta] =
+    useState("");
+
   const [ventaCambio, setVentaCambio] =
     useState(null);
 
@@ -123,6 +129,49 @@ export default function Ventas() {
       clearTimeout(timeout);
 
   }, [busqueda]);
+
+
+  // ============================================================
+  // FORMATO FECHA Y HORA
+  // ============================================================
+
+  const formatearFechaHora = (valor) => {
+
+    if (!valor) {
+      return "Fecha no disponible";
+    }
+
+    const fecha = new Date(valor);
+
+    if (Number.isNaN(fecha.getTime())) {
+      return "Fecha no disponible";
+    }
+
+    return new Intl.DateTimeFormat(
+      "es-CL",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }
+    ).format(fecha);
+
+  };
+
+
+  // ============================================================
+  // LIMPIAR FILTRO DE FECHAS
+  // ============================================================
+
+  const limpiarFiltroFechas = () => {
+
+    setFechaDesde("");
+    setFechaHasta("");
+
+  };
 
 
   // ============================================================
@@ -392,73 +441,73 @@ export default function Ventas() {
       ).toLowerCase();
 
 
-const esOnline =
-  tipoVenta === "online";
+    const esOnline =
+      tipoVenta === "online";
 
-const esRRSS =
-  tipoVenta === "rrss";
+    const esRRSS =
+      tipoVenta === "rrss";
 
-const empresaEnvio =
-  String(
-    orden?.empresa_envio || ""
-  ).toLowerCase().trim();
+    const empresaEnvio =
+      String(
+        orden?.empresa_envio || ""
+      ).toLowerCase().trim();
 
-const envioPorPagar =
-  orden?.envio_por_pagar === true;
+    const envioPorPagar =
+      orden?.envio_por_pagar === true;
 
     // ============================================================
-// RRSS — EMPRESA DE ENVÍO REGISTRADA
-// ============================================================
+    // EMPRESA DE ENVÍO REGISTRADA
+    // ============================================================
 
-if (
-  (esRRSS || esOnline) &&
-  empresaEnvio === "paket" &&
-  !envioPorPagar
-) {
+    if (
+      (esRRSS || esOnline) &&
+      empresaEnvio === "paket" &&
+      !envioPorPagar
+    ) {
 
-  return {
-    tipo: "paket",
-    nombre: "PAKET",
-    icono: "📦",
-    clase:
-      "bg-pink-100 text-pink-700"
-  };
+      return {
+        tipo: "paket",
+        nombre: "PAKET",
+        icono: "📦",
+        clase:
+          "bg-pink-100 text-pink-700"
+      };
 
-}
-
-
-if (
-  (esRRSS || esOnline) &&
-  envioPorPagar &&
-  empresaEnvio === "starken"
-) {
-
-  return {
-    tipo: "starken",
-    nombre: "STARKEN",
-    icono: "🚚",
-    clase:
-      "bg-orange-100 text-orange-700"
-  };
-
-}
+    }
 
 
-if (
-  (esRRSS || esOnline) &&
-  envioPorPagar &&
-  empresaEnvio === "bluexpress"
-) {
-  
-  return {
-    tipo: "bluexpress",
-    nombre: "BLUEXPRESS",
-    icono: "🚚",
-    clase:
-      "bg-blue-100 text-blue-700"
-  };
+    if (
+      (esRRSS || esOnline) &&
+      envioPorPagar &&
+      empresaEnvio === "starken"
+    ) {
 
-}
+      return {
+        tipo: "starken",
+        nombre: "STARKEN",
+        icono: "🚚",
+        clase:
+          "bg-orange-100 text-orange-700"
+      };
+
+    }
+
+
+    if (
+      (esRRSS || esOnline) &&
+      envioPorPagar &&
+      empresaEnvio === "bluexpress"
+    ) {
+
+      return {
+        tipo: "bluexpress",
+        nombre: "BLUEXPRESS",
+        icono: "🚚",
+        clase:
+          "bg-blue-100 text-blue-700"
+      };
+
+    }
 
 
     const subtotalProductos =
@@ -792,6 +841,57 @@ if (
   const pedidosFiltrados =
     pedidosOrdenados
 
+      .filter(o => {
+
+        if (!fechaDesde && !fechaHasta) {
+          return true;
+        }
+
+        const fechaPedido =
+          new Date(o.created_at);
+
+        if (
+          Number.isNaN(
+            fechaPedido.getTime()
+          )
+        ) {
+          return false;
+        }
+
+        if (fechaDesde) {
+
+          const inicio =
+            new Date(
+              `${fechaDesde}T00:00:00`
+            );
+
+          if (
+            fechaPedido < inicio
+          ) {
+            return false;
+          }
+
+        }
+
+        if (fechaHasta) {
+
+          const fin =
+            new Date(
+              `${fechaHasta}T23:59:59.999`
+            );
+
+          if (
+            fechaPedido > fin
+          ) {
+            return false;
+          }
+
+        }
+
+        return true;
+
+      })
+
       .filter(o =>
 
         filtro === "todos"
@@ -1005,6 +1105,140 @@ if (
               )
             }
           />
+
+
+          <div>
+
+            <div className="
+              text-xs
+              uppercase
+              tracking-wider
+              font-black
+              text-slate-500
+              mb-3
+            ">
+              Fecha
+            </div>
+
+
+            <div className="
+              grid
+              grid-cols-1
+              md:grid-cols-[1fr_1fr_auto]
+              gap-3
+              items-end
+            ">
+
+              <div>
+
+                <label className="
+                  block
+                  text-sm
+                  font-bold
+                  text-slate-500
+                  mb-2
+                ">
+                  Desde
+                </label>
+
+                <input
+                  type="date"
+                  value={fechaDesde}
+                  max={fechaHasta || undefined}
+                  onChange={(e) =>
+                    setFechaDesde(
+                      e.target.value
+                    )
+                  }
+                  className="
+                    w-full
+                    rounded-2xl
+                    border
+                    border-pink-100
+                    bg-white
+                    px-4
+                    py-3
+                    text-slate-700
+                    font-semibold
+                    shadow-sm
+                    outline-none
+                    focus:ring-2
+                    focus:ring-pink-400
+                  "
+                />
+
+              </div>
+
+
+              <div>
+
+                <label className="
+                  block
+                  text-sm
+                  font-bold
+                  text-slate-500
+                  mb-2
+                ">
+                  Hasta
+                </label>
+
+                <input
+                  type="date"
+                  value={fechaHasta}
+                  min={fechaDesde || undefined}
+                  onChange={(e) =>
+                    setFechaHasta(
+                      e.target.value
+                    )
+                  }
+                  className="
+                    w-full
+                    rounded-2xl
+                    border
+                    border-pink-100
+                    bg-white
+                    px-4
+                    py-3
+                    text-slate-700
+                    font-semibold
+                    shadow-sm
+                    outline-none
+                    focus:ring-2
+                    focus:ring-pink-400
+                  "
+                />
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={limpiarFiltroFechas}
+                disabled={
+                  !fechaDesde &&
+                  !fechaHasta
+                }
+                className="
+                  rounded-2xl
+                  bg-slate-100
+                  border
+                  border-slate-200
+                  px-5
+                  py-3
+                  font-bold
+                  text-slate-700
+                  hover:bg-slate-200
+                  disabled:opacity-40
+                  disabled:cursor-not-allowed
+                  transition-all
+                "
+              >
+                ✕ Limpiar fechas
+              </button>
+
+            </div>
+
+          </div>
 
 
           <div>
@@ -1311,7 +1545,6 @@ if (
 
 
                     <span className={`
-
                       px-3
                       py-1
                       rounded-full
@@ -1320,22 +1553,18 @@ if (
                       tracking-wide
                       text-sm
                       font-bold
-
                       ${
                         o.estado ===
                         "pendiente"
-
                           ? `
                             bg-orange-100
                             text-orange-600
                           `
-
                           : `
                             bg-emerald-100
                             text-emerald-600
                           `
                       }
-
                     `}>
 
                       {
@@ -1347,22 +1576,44 @@ if (
 
 
                     <span className={`
-
                       px-3
                       py-1
                       rounded-full
                       shadow-sm
                       text-sm
                       font-black
-
                       ${despacho.clase}
-
                     `}>
 
                       {despacho.icono}
                       {" "}
                       {despacho.nombre}
 
+                    </span>
+
+                  </div>
+
+
+                  <div className="
+                    mb-5
+                    flex
+                    items-center
+                    gap-2
+                    text-sm
+                    font-semibold
+                    text-slate-500
+                  ">
+
+                    <span>
+                      📅
+                    </span>
+
+                    <span>
+                      {
+                        formatearFechaHora(
+                          o.created_at
+                        )
+                      }
                     </span>
 
                   </div>
@@ -2105,10 +2356,8 @@ if (
 
               </div>
 
-                </div>
+            </AdminCard>
 
-           </AdminCard>
-            
           );
 
         })}
@@ -2274,7 +2523,6 @@ function FiltroBtn({
       {...props}
 
       className={`
-
         px-5
         py-2.5
         rounded-full
@@ -2314,3 +2562,4 @@ function FiltroBtn({
   );
 
 }
+      
