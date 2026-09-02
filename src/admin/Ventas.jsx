@@ -456,23 +456,33 @@ export default function Ventas() {
   // MÉTRICAS
   // ============================================================
 
-  const totalVentas =
-    (
-      Array.isArray(orders)
-        ? orders
-        : []
-    ).reduce(
-      (acc, o) =>
-        acc +
+const totalVentas =
+  (
+    Array.isArray(orders)
+      ? orders
+      : []
+  ).reduce(
+    (acc, o) => {
+
+      const totalCobrado =
+        Number(
+          o.total_cobrado ??
+          o.total ??
+          0
+        );
+
+      return acc +
         (
           Number.isFinite(
-            Number(o.total)
+            totalCobrado
           )
-            ? Number(o.total)
+            ? totalCobrado
             : 0
-        ),
-      0
-    );
+        );
+
+    },
+    0
+  );
 
 
   const totalPedidos =
@@ -1507,14 +1517,15 @@ export default function Ventas() {
                                 ">
 
                                   $
-                                  {
-                                    Number(
-                                      i.price ||
-                                      0
-                                    ).toLocaleString(
-                                      "es-CL"
-                                    )
-                                  }
+{
+  Number(
+    o.total_cobrado ??
+    o.total ??
+    0
+  ).toLocaleString(
+    "es-CL"
+  )
+}
 
                                 </div>
 
@@ -1621,6 +1632,102 @@ export default function Ventas() {
 
                       </div>
 
+                      {/* DETALLE COBRO ADICIONAL POR CAMBIO */}
+
+{
+  Number(
+    o.adicional_cambio || 0
+  ) > 0 && (
+
+    <div className="
+      mt-4
+      rounded-2xl
+      bg-pink-500/10
+      border
+      border-pink-400/20
+      px-4
+      py-3
+    ">
+
+      <div className="
+        text-xs
+        uppercase
+        tracking-wide
+        text-slate-300
+      ">
+        Venta original
+      </div>
+
+      <div className="
+        mt-1
+        font-bold
+      ">
+        $
+        {
+          Number(
+            o.total || 0
+          ).toLocaleString(
+            "es-CL"
+          )
+        }
+      </div>
+
+
+      <div className="
+        mt-3
+        text-xs
+        uppercase
+        tracking-wide
+        text-pink-300
+      ">
+        🔄 Adicional cambio
+      </div>
+
+      <div className="
+        mt-1
+        text-lg
+        font-black
+        text-pink-300
+      ">
+        +$
+        {
+          Number(
+            o.adicional_cambio || 0
+          ).toLocaleString(
+            "es-CL"
+          )
+        }
+      </div>
+
+
+      <div className="
+        mt-3
+        text-xs
+        font-bold
+        text-slate-300
+      ">
+
+        {
+          String(
+            o.estado_pago_cambio || ""
+          ).toLowerCase() === "paid"
+
+            ? "💳 Pagado"
+            : "⏳ Pendiente de pago"
+        }
+
+        {
+          o.medio_pago_cambio
+            ? ` · ${o.medio_pago_cambio}`
+            : ""
+        }
+
+      </div>
+
+    </div>
+
+  )
+}
 
                       {/* DESPACHO */}
 
