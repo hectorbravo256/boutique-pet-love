@@ -115,7 +115,11 @@ export default function Reportes() {
         }
 
         acc[tipo].cantidad += 1;
-        acc[tipo].total += Number(sale.total || 0);
+        acc[tipo].total += Number(
+    sale.total_cobrado ??
+    sale.total ??
+    0
+);
 
         return acc;
     }, {});
@@ -142,7 +146,11 @@ export default function Reportes() {
         }
 
         acc[medio].cantidad += 1;
-        acc[medio].total += Number(sale.total || 0);
+        acc[medio].total += Number(
+    sale.total_cobrado ??
+    sale.total ??
+    0
+);
 
         return acc;
     }, {});
