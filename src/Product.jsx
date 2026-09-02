@@ -813,16 +813,6 @@ const precioFinal = precioBase * cantidad;
 </div>
         )}
 
-        {/* MENSAJE PEDIDO */}
-        {isOutOfStock && (
-          <p style={{
-            marginTop: 10,
-            color: "#ef4444",
-            fontWeight: "bold"
-          }}>
-            ⚠️ Producto a Pedido - Solicitar por WhatsApp
-          </p>
-        )}
 
         {/* TALLAS */}
         <div style={{ marginTop: 25 }}>
