@@ -38,6 +38,15 @@ export default function Ventas() {
   const [ventaCambio, setVentaCambio] =
     useState(null);
 
+  const [pagoCambio, setPagoCambio] =
+    useState(null);
+
+  const [medioPagoCambio, setMedioPagoCambio] =
+    useState("");
+
+  const [procesandoPago, setProcesandoPago] =
+    useState(false);
+
 
   // ============================================================
   // CARGAR PEDIDOS
@@ -234,6 +243,139 @@ export default function Ventas() {
 
 
   // ============================================================
+  // REGISTRAR PAGO ADICIONAL DEL CAMBIO
+  // ============================================================
+
+  const registrarPagoCambio =
+    async () => {
+
+      if (!pagoCambio?.cambio_id) {
+
+        alert(
+          "No se encontró el cambio asociado a esta venta."
+        );
+
+        return;
+
+      }
+
+      if (!medioPagoCambio) {
+
+        alert(
+          "Selecciona el medio de pago."
+        );
+
+        return;
+
+      }
+
+      try {
+
+        setProcesandoPago(true);
+
+        const {
+          data,
+          error
+        } = await supabase.rpc(
+          "marcar_pago_cambio",
+          {
+            p_exchange_id:
+              pagoCambio.cambio_id,
+
+            p_payment_method:
+              medioPagoCambio
+          }
+        );
+
+        if (error) {
+
+          console.error(
+            "Error registrando pago:",
+            error
+          );
+
+          alert(
+            error.message ||
+            "No fue posible registrar el pago."
+          );
+
+          return;
+
+        }
+
+        const exchange =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+        setOrders(prev =>
+
+          (
+            Array.isArray(prev)
+              ? prev
+              : []
+          ).map(o =>
+
+            o.id === pagoCambio.id
+
+              ? {
+                  ...o,
+
+                  adicional_cambio:
+                    Number(
+                      o.adicional_cambio || 0
+                    ),
+
+                  estado_pago_cambio:
+                    "paid",
+
+                  medio_pago_cambio:
+                    exchange?.payment_method ||
+                    medioPagoCambio,
+
+                  total_cobrado:
+                    Number(
+                      o.total || 0
+                    ) +
+                    Number(
+                      o.adicional_cambio || 0
+                    )
+                }
+
+              : o
+
+          )
+
+        );
+
+        setPagoCambio(null);
+        setMedioPagoCambio("");
+
+        alert(
+          "Pago de la diferencia registrado correctamente."
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Error registrando pago del cambio:",
+          err
+        );
+
+        alert(
+          "Ocurrió un error al registrar el pago."
+        );
+
+      } finally {
+
+        setProcesandoPago(false);
+
+      }
+
+    };
+
+
+  // ============================================================
   // IDENTIFICAR TIPO DE DESPACHO
   // ============================================================
 
@@ -250,22 +392,9 @@ export default function Ventas() {
       ).toLowerCase();
 
 
-    /*
-     * Solo aplicamos la regla automática
-     * de $3.500 para ventas ONLINE.
-     */
-
     const esOnline =
       tipoVenta === "online";
 
-
-    /*
-     * Calcular subtotal real de productos.
-     *
-     * items contiene:
-     * price
-     * qty
-     */
 
     const subtotalProductos =
       Array.isArray(orden?.items)
@@ -304,14 +433,6 @@ export default function Ventas() {
       subtotalProductos;
 
 
-    /*
-     * PAKET:
-     *
-     * Venta online
-     * +
-     * exactamente $3.500 adicionales
-     */
-
     if (
       esOnline &&
       Math.abs(
@@ -330,14 +451,6 @@ export default function Ventas() {
     }
 
 
-    /*
-     * Si la observación menciona PAKET,
-     * también lo identificamos.
-     *
-     * Esto ayuda con ventas RRSS
-     * que hayan sido registradas manualmente.
-     */
-
     if (
       observacion.includes("paket")
     ) {
@@ -352,10 +465,6 @@ export default function Ventas() {
 
     }
 
-
-    /*
-     * BLUEXPRESS
-     */
 
     if (
       observacion.includes(
@@ -374,10 +483,6 @@ export default function Ventas() {
     }
 
 
-    /*
-     * STARKEN
-     */
-
     if (
       observacion.includes(
         "starken"
@@ -394,12 +499,6 @@ export default function Ventas() {
 
     }
 
-
-    /*
-     * Si es una venta online y no existe
-     * cargo de despacho, queda como
-     * envío por pagar.
-     */
 
     if (
       esOnline &&
@@ -418,11 +517,6 @@ export default function Ventas() {
 
     }
 
-
-    /*
-     * También consideramos explícitamente
-     * expresiones como "por pagar".
-     */
 
     if (
       observacion.includes(
@@ -456,33 +550,33 @@ export default function Ventas() {
   // MÉTRICAS
   // ============================================================
 
-const totalVentas =
-  (
-    Array.isArray(orders)
-      ? orders
-      : []
-  ).reduce(
-    (acc, o) => {
+  const totalVentas =
+    (
+      Array.isArray(orders)
+        ? orders
+        : []
+    ).reduce(
+      (acc, o) => {
 
-      const totalCobrado =
-        Number(
-          o.total_cobrado ??
-          o.total ??
-          0
-        );
+        const totalCobrado =
+          Number(
+            o.total_cobrado ??
+            o.total ??
+            0
+          );
 
-      return acc +
-        (
-          Number.isFinite(
-            totalCobrado
-          )
-            ? totalCobrado
-            : 0
-        );
+        return acc +
+          (
+            Number.isFinite(
+              totalCobrado
+            )
+              ? totalCobrado
+              : 0
+          );
 
-    },
-    0
-  );
+      },
+      0
+    );
 
 
   const totalPedidos =
@@ -514,10 +608,6 @@ const totalVentas =
         "enviado"
     ).length;
 
-
-  // ============================================================
-  // MÉTRICAS DESPACHO
-  // ============================================================
 
   const cantidadPakets =
     orders.filter(
@@ -637,7 +727,6 @@ const totalVentas =
   const pedidosFiltrados =
     pedidosOrdenados
 
-      // ESTADO
       .filter(o =>
 
         filtro === "todos"
@@ -649,7 +738,6 @@ const totalVentas =
 
       )
 
-      // DESPACHO
       .filter(o => {
 
         if (
@@ -669,7 +757,6 @@ const totalVentas =
 
       })
 
-      // BÚSQUEDA
       .filter(o => {
 
         const texto = `
@@ -718,10 +805,8 @@ const totalVentas =
 
     <div className="
       min-h-screen
-
       p-4
       md:p-8
-
       bg-gradient-to-b
       from-[#fff7fb]
       via-white
@@ -729,37 +814,25 @@ const totalVentas =
     ">
 
 
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
-
       <div className="
         relative
         overflow-hidden
-
         rounded-[32px]
-
         p-6
         md:p-8
-
         mb-8
-
         bg-gradient-to-br
         from-pink-500
         via-fuchsia-500
         to-purple-600
-
         text-white
-
         shadow-[0_20px_60px_rgba(168,85,247,0.35)]
       ">
 
         <div className="
           absolute
           inset-0
-
           opacity-10
-
           bg-[radial-gradient(circle_at_top_right,white,transparent_40%)]
         " />
 
@@ -806,10 +879,6 @@ const totalVentas =
       </div>
 
 
-      {/* ======================================================
-          MÉTRICAS
-      ====================================================== */}
-
       <div className="
         grid
         grid-cols-1
@@ -849,10 +918,6 @@ const totalVentas =
       </div>
 
 
-      {/* ======================================================
-          FILTROS
-      ====================================================== */}
-
       <AdminCard className="mb-6">
 
         <div className="
@@ -860,8 +925,6 @@ const totalVentas =
           gap-5
         ">
 
-
-          {/* BÚSQUEDA */}
 
           <AdminInput
             placeholder="
@@ -878,8 +941,6 @@ const totalVentas =
             }
           />
 
-
-          {/* ESTADO */}
 
           <div>
 
@@ -947,8 +1008,6 @@ const totalVentas =
 
           </div>
 
-
-          {/* DESPACHO */}
 
           <div>
 
@@ -1058,10 +1117,6 @@ const totalVentas =
       </AdminCard>
 
 
-      {/* ======================================================
-          LISTADO
-      ====================================================== */}
-
       <div className="
         grid
         gap-5
@@ -1112,6 +1167,24 @@ const totalVentas =
           const despacho =
             obtenerDespacho(o);
 
+          const cambioPendiente =
+            Number(
+              o.adicional_cambio || 0
+            ) > 0 &&
+            String(
+              o.estado_pago_cambio || ""
+            ).toLowerCase() ===
+            "pending";
+
+          const cambioPagado =
+            Number(
+              o.adicional_cambio || 0
+            ) > 0 &&
+            String(
+              o.estado_pago_cambio || ""
+            ).toLowerCase() ===
+            "paid";
+
 
           return (
 
@@ -1121,7 +1194,6 @@ const totalVentas =
               className="
                 hover:-translate-y-1
                 hover:shadow-[0_20px_60px_rgba(15,23,42,0.10)]
-
                 transition-all
                 duration-300
               "
@@ -1138,16 +1210,10 @@ const totalVentas =
               ">
 
 
-                {/* ==================================================
-                    INFORMACIÓN
-                ================================================== */}
-
                 <div className="
                   flex-1
                 ">
 
-
-                  {/* CABECERA VENTA */}
 
                   <div className="
                     flex
@@ -1161,15 +1227,11 @@ const totalVentas =
                     <div className="
                       px-4
                       py-2
-
                       rounded-2xl
-
                       bg-slate-900
                       text-white
-
                       text-lg
                       font-black
-
                       shadow-sm
                     ">
 
@@ -1187,14 +1249,10 @@ const totalVentas =
 
                       px-3
                       py-1
-
                       rounded-full
-
                       shadow-sm
-
                       uppercase
                       tracking-wide
-
                       text-sm
                       font-bold
 
@@ -1223,17 +1281,12 @@ const totalVentas =
                     </span>
 
 
-                    {/* DESPACHO */}
-
                     <span className={`
 
                       px-3
                       py-1
-
                       rounded-full
-
                       shadow-sm
-
                       text-sm
                       font-black
 
@@ -1249,8 +1302,6 @@ const totalVentas =
 
                   </div>
 
-
-                  {/* CLIENTE */}
 
                   <div className="
                     grid
@@ -1339,8 +1390,6 @@ const totalVentas =
                   </div>
 
 
-                  {/* OBSERVACIÓN */}
-
                   <div className="
                     mt-5
                   ">
@@ -1368,8 +1417,6 @@ const totalVentas =
 
                   </div>
 
-
-                  {/* PRODUCTOS */}
 
                   <div className="
                     mt-6
@@ -1411,17 +1458,13 @@ const totalVentas =
                                   sm:items-center
                                   sm:justify-between
                                   gap-2
-
                                   bg-gradient-to-r
                                   from-pink-50
                                   to-purple-50
-
                                   border
                                   border-pink-100
-
                                   px-4
                                   py-3
-
                                   rounded-2xl
                                 "
                               >
@@ -1463,7 +1506,6 @@ const totalVentas =
                                     ">
 
                                       📏
-
                                       {" "}
 
                                       {
@@ -1517,15 +1559,13 @@ const totalVentas =
                                 ">
 
                                   $
-{
-  Number(
-    o.total_cobrado ??
-    o.total ??
-    0
-  ).toLocaleString(
-    "es-CL"
-  )
-}
+                                  {
+                                    Number(
+                                      i.price || 0
+                                    ).toLocaleString(
+                                      "es-CL"
+                                    )
+                                  }
 
                                 </div>
 
@@ -1557,10 +1597,6 @@ const totalVentas =
                 </div>
 
 
-                {/* ==================================================
-                    TOTAL
-                ================================================== */}
-
                 <div className="
                   xl:w-[240px]
                 ">
@@ -1569,17 +1605,12 @@ const totalVentas =
                   <div className="
                     relative
                     overflow-hidden
-
                     rounded-[28px]
-
                     p-6
-
                     bg-gradient-to-br
                     from-slate-900
                     to-slate-800
-
                     text-white
-
                     shadow-[0_15px_50px_rgba(15,23,42,0.25)]
                   ">
 
@@ -1588,12 +1619,9 @@ const totalVentas =
                       absolute
                       -top-16
                       -right-16
-
                       w-40
                       h-40
-
                       rounded-full
-
                       bg-pink-500/20
                     " />
 
@@ -1609,22 +1637,22 @@ const totalVentas =
                         font-bold
                         text-slate-300
                       ">
-                        Total
+                        Total cobrado
                       </div>
 
 
                       <div className="
                         mt-4
-
                         text-4xl
                         font-black
                       ">
 
                         $
-
                         {
                           Number(
-                            o.total || 0
+                            o.total_cobrado ??
+                            o.total ??
+                            0
                           ).toLocaleString(
                             "es-CL"
                           )
@@ -1632,219 +1660,379 @@ const totalVentas =
 
                       </div>
 
-                      {/* DETALLE COBRO ADICIONAL POR CAMBIO */}
 
-{
-  Number(
-    o.adicional_cambio || 0
-  ) > 0 && (
+                      {
+                        Number(
+                          o.adicional_cambio || 0
+                        ) > 0 && (
 
-    <div className="
-      mt-4
-      rounded-2xl
-      bg-pink-500/10
-      border
-      border-pink-400/20
-      px-4
-      py-3
-    ">
+                        <div className="
+                          mt-4
+                          rounded-2xl
+                          bg-pink-500/10
+                          border
+                          border-pink-400/20
+                          px-4
+                          py-3
+                        ">
 
-      <div className="
-        text-xs
-        uppercase
-        tracking-wide
-        text-slate-300
-      ">
-        Venta original
-      </div>
+                          <div className="
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-slate-300
+                          ">
+                            Venta original
+                          </div>
 
-      <div className="
-        mt-1
-        font-bold
-      ">
-        $
-        {
-          Number(
-            o.total || 0
-          ).toLocaleString(
-            "es-CL"
-          )
-        }
-      </div>
-
-
-      <div className="
-        mt-3
-        text-xs
-        uppercase
-        tracking-wide
-        text-pink-300
-      ">
-        🔄 Adicional cambio
-      </div>
-
-      <div className="
-        mt-1
-        text-lg
-        font-black
-        text-pink-300
-      ">
-        +$
-        {
-          Number(
-            o.adicional_cambio || 0
-          ).toLocaleString(
-            "es-CL"
-          )
-        }
-      </div>
+                          <div className="
+                            mt-1
+                            font-bold
+                          ">
+                            $
+                            {
+                              Number(
+                                o.total || 0
+                              ).toLocaleString(
+                                "es-CL"
+                              )
+                            }
+                          </div>
 
 
-      <div className="
-        mt-3
-        text-xs
-        font-bold
-        text-slate-300
-      ">
+                          <div className="
+                            mt-3
+                            text-xs
+                            uppercase
+                            tracking-wide
+                            text-pink-300
+                          ">
+                            🔄 Adicional cambio
+                          </div>
 
-        {
-          String(
-            o.estado_pago_cambio || ""
-          ).toLowerCase() === "paid"
 
-            ? "💳 Pagado"
-            : "⏳ Pendiente de pago"
-        }
+                          <div className="
+                            mt-1
+                            text-lg
+                            font-black
+                            text-pink-300
+                          ">
+                            +$
+                            {
+                              Number(
+                                o.adicional_cambio || 0
+                              ).toLocaleString(
+                                "es-CL"
+                              )
+                            }
+                          </div>
 
-        {
-          o.medio_pago_cambio
-            ? ` · ${o.medio_pago_cambio}`
-            : ""
-        }
 
-      </div>
+                          <div className="
+                            mt-3
+                            text-xs
+                            font-bold
+                            text-slate-300
+                          ">
 
-    </div>
+                            {
+                              cambioPagado
+                                ? "💳 Pagado"
+                                : "⏳ Pendiente de pago"
+                            }
 
-  )
-}
+                            {
+                              o.medio_pago_cambio
+                                ? ` · ${o.medio_pago_cambio}`
+                                : ""
+                            }
 
-                      {/* DESPACHO */}
+                          </div>
+
+
+                          {
+                            cambioPendiente && (
+
+                              <>
+
+                                {
+                                  pagoCambio?.id ===
+                                  o.id ? (
+
+                                    <div className="
+                                      mt-4
+                                      rounded-xl
+                                      bg-white/10
+                                      p-3
+                                    ">
+
+                                      <label className="
+                                        block
+                                        text-xs
+                                        font-bold
+                                        text-slate-300
+                                        mb-2
+                                      ">
+                                        Medio de pago
+                                      </label>
+
+
+                                      <select
+                                        value={
+                                          medioPagoCambio
+                                        }
+
+                                        onChange={(e) =>
+                                          setMedioPagoCambio(
+                                            e.target.value
+                                          )
+                                        }
+
+                                        disabled={
+                                          procesandoPago
+                                        }
+
+                                        className="
+                                          w-full
+                                          rounded-xl
+                                          border
+                                          border-slate-600
+                                          bg-slate-800
+                                          px-3
+                                          py-2
+                                          text-sm
+                                          text-white
+                                          outline-none
+                                          focus:ring-2
+                                          focus:ring-pink-400
+                                        "
+                                      >
+
+                                        <option value="">
+                                          Seleccionar medio de pago
+                                        </option>
+
+                                        <option value="Transferencia">
+                                          Transferencia
+                                        </option>
+
+                                        <option value="Efectivo">
+                                          Efectivo
+                                        </option>
+
+                                        <option value="Débito">
+                                          Débito
+                                        </option>
+
+                                        <option value="Crédito">
+                                          Crédito
+                                        </option>
+
+                                      </select>
+
+
+                                      <div className="
+                                        grid
+                                        grid-cols-2
+                                        gap-2
+                                        mt-3
+                                      ">
+
+                                        <button
+                                          type="button"
+
+                                          onClick={() => {
+                                            setPagoCambio(null);
+                                            setMedioPagoCambio("");
+                                          }}
+
+                                          disabled={
+                                            procesandoPago
+                                          }
+
+                                          className="
+                                            rounded-xl
+                                            bg-white/10
+                                            py-2
+                                            text-sm
+                                            font-bold
+                                            text-slate-200
+                                            hover:bg-white/20
+                                          "
+                                        >
+                                          Cancelar
+                                        </button>
+
+
+                                        <button
+                                          type="button"
+
+                                          onClick={
+                                            registrarPagoCambio
+                                          }
+
+                                          disabled={
+                                            procesandoPago ||
+                                            !medioPagoCambio
+                                          }
+
+                                          className="
+                                            rounded-xl
+                                            bg-emerald-500
+                                            py-2
+                                            text-sm
+                                            font-bold
+                                            text-white
+                                            hover:bg-emerald-600
+                                            disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                          "
+                                        >
+                                          {
+                                            procesandoPago
+                                              ? "Guardando..."
+                                              : "Confirmar pago"
+                                          }
+                                        </button>
+
+                                      </div>
+
+                                    </div>
+
+                                  ) : (
+
+                                    <button
+                                      type="button"
+
+                                      onClick={() => {
+                                        setPagoCambio(o);
+                                        setMedioPagoCambio("");
+                                      }}
+
+                                      className="
+                                        mt-4
+                                        w-full
+                                        rounded-xl
+                                        bg-pink-500
+                                        py-2.5
+                                        text-sm
+                                        font-black
+                                        text-white
+                                        hover:bg-pink-600
+                                        transition-all
+                                      "
+                                    >
+                                      💳 Registrar pago
+                                    </button>
+
+                                  )
+                                }
+
+                              </>
+
+                            )
+                          }
+
+                        </div>
+
+                      )
+                    }
+
+
+                    <div className="
+                      mt-4
+                      rounded-2xl
+                      bg-white/10
+                      px-4
+                      py-3
+                    ">
 
                       <div className="
-                        mt-4
-                        rounded-2xl
-                        bg-white/10
-                        px-4
-                        py-3
+                        text-xs
+                        uppercase
+                        tracking-wide
+                        text-slate-300
                       ">
-
-                        <div className="
-                          text-xs
-                          uppercase
-                          tracking-wide
-                          text-slate-300
-                        ">
-                          Despacho
-                        </div>
-
-
-                        <div className="
-                          mt-1
-                          font-black
-                        ">
-
-                          {despacho.icono}
-                          {" "}
-                          {despacho.nombre}
-
-                        </div>
-
+                        Despacho
                       </div>
 
 
-                      {/* MARCAR ENVIADO */}
+                      <div className="
+                        mt-1
+                        font-black
+                      ">
 
-                      {
-                        (
-                          o.estado ||
-                          "pendiente"
-                        ) ===
-                        "pendiente"
-                        && (
+                        {despacho.icono}
+                        {" "}
+                        {despacho.nombre}
 
-                          <button
-                            onClick={() =>
-                              cambiarEstado(
-                                o.id
-                              )
-                            }
-
-                            className="
-                              mt-6
-
-                              w-full
-
-                              rounded-2xl
-
-                              bg-gradient-to-r
-                              from-emerald-500
-                              to-green-500
-
-                              py-3
-
-                              font-bold
-                              text-white
-
-                              hover:scale-[1.02]
-                              hover:opacity-90
-
-                              transition-all
-                              duration-300
-                            "
-                          >
-                            📦 Marcar enviado
-                          </button>
-
-                        )
-                      }
-
-
-                      {/* GESTIONAR CAMBIO */}
-
-                      <button
-                        onClick={() =>
-                          setVentaCambio(o)
-                        }
-
-                        className="
-                          mt-3
-
-                          w-full
-
-                          rounded-2xl
-
-                          bg-gradient-to-r
-                          from-pink-500
-                          to-purple-600
-
-                          py-3
-
-                          font-bold
-                          text-white
-
-                          hover:scale-[1.02]
-                          hover:opacity-90
-
-                          transition-all
-                          duration-300
-                        "
-                      >
-                        ↔️ Gestionar cambio
-                      </button>
-
+                      </div>
 
                     </div>
+
+
+                    {
+                      (
+                        o.estado ||
+                        "pendiente"
+                      ) ===
+                      "pendiente"
+                      && (
+
+                        <button
+                          onClick={() =>
+                            cambiarEstado(
+                              o.id
+                            )
+                          }
+
+                          className="
+                            mt-6
+                            w-full
+                            rounded-2xl
+                            bg-gradient-to-r
+                            from-emerald-500
+                            to-green-500
+                            py-3
+                            font-bold
+                            text-white
+                            hover:scale-[1.02]
+                            hover:opacity-90
+                            transition-all
+                            duration-300
+                          "
+                        >
+                          📦 Marcar enviado
+                        </button>
+
+                      )
+                    }
+
+
+                    <button
+                      onClick={() =>
+                        setVentaCambio(o)
+                      }
+
+                      className="
+                        mt-3
+                        w-full
+                        rounded-2xl
+                        bg-gradient-to-r
+                        from-pink-500
+                        to-purple-600
+                        py-3
+                        font-bold
+                        text-white
+                        hover:scale-[1.02]
+                        hover:opacity-90
+                        transition-all
+                        duration-300
+                      "
+                    >
+                      ↔️ Gestionar cambio
+                    </button>
+
 
                   </div>
 
@@ -1860,10 +2048,6 @@ const totalVentas =
 
       </div>
 
-
-      {/* ========================================================
-          MODAL DE CAMBIO
-      ======================================================== */}
 
       {
         ventaCambio && (
@@ -1909,22 +2093,15 @@ function StatCard({
     <div className="
       relative
       overflow-hidden
-
       rounded-[28px]
-
       p-6
-
       bg-white/80
       backdrop-blur-xl
-
       border
       border-white/60
-
       shadow-[0_10px_40px_rgba(15,23,42,0.08)]
-
       hover:-translate-y-1
       hover:shadow-[0_20px_60px_rgba(236,72,153,0.15)]
-
       transition-all
       duration-300
     ">
@@ -1934,16 +2111,12 @@ function StatCard({
         absolute
         -top-10
         -right-10
-
         w-32
         h-32
-
         rounded-full
-
         bg-gradient-to-br
         from-pink-100
         to-purple-100
-
         opacity-60
       " />
 
@@ -1965,12 +2138,9 @@ function StatCard({
 
         <div className="
           mt-4
-
           text-3xl
           md:text-4xl
-
           font-black
-
           text-slate-900
         ">
           {value}
@@ -2040,13 +2210,9 @@ function FiltroBtn({
 
         px-5
         py-2.5
-
         rounded-full
-
         shadow-sm
-
         font-bold
-
         transition-all
         duration-300
 
@@ -2057,7 +2223,6 @@ function FiltroBtn({
               bg-gradient-to-r
               from-pink-500
               to-purple-500
-
               text-white
             `
 
@@ -2065,12 +2230,9 @@ function FiltroBtn({
               bg-gradient-to-r
               from-pink-50
               to-purple-50
-
               border
               border-pink-100
-
               text-slate-700
-
               hover:bg-slate-200
             `
         }
