@@ -14,6 +14,7 @@ function CheckoutWrapper() {
   direccion: "",
   comuna: "",
   region: "",
+  empresa_envio: "",
   correo: "",
   telefono: "",
   observacion: "",
