@@ -411,7 +411,7 @@ const envioPorPagar =
 // ============================================================
 
 if (
-  esRRSS &&
+  (esRRSS || esOnline) &&
   empresaEnvio === "paket" &&
   !envioPorPagar
 ) {
@@ -428,7 +428,7 @@ if (
 
 
 if (
-  esRRSS &&
+  (esRRSS || esOnline) &&
   envioPorPagar &&
   empresaEnvio === "starken"
 ) {
@@ -445,11 +445,11 @@ if (
 
 
 if (
-  esRRSS &&
+  (esRRSS || esOnline) &&
   envioPorPagar &&
   empresaEnvio === "bluexpress"
 ) {
-
+  
   return {
     tipo: "bluexpress",
     nombre: "BLUEXPRESS",
