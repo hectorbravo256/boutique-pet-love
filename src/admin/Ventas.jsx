@@ -16,6 +16,8 @@ from "./components/AdminInput";
 import CambioVentaModal
 from "./components/CambioVentaModal";
 
+import { formatearFechaHoraChile } from "./utils/fechaChile";
+
 
 export default function Ventas() {
 
@@ -135,31 +137,9 @@ export default function Ventas() {
   // FORMATO FECHA Y HORA
   // ============================================================
 
-  const formatearFechaHora = (valor) => {
-
-    if (!valor) {
-      return "Fecha no disponible";
-    }
-
-    const fecha = new Date(valor);
-
-    if (Number.isNaN(fecha.getTime())) {
-      return "Fecha no disponible";
-    }
-
-    return new Intl.DateTimeFormat(
-      "es-CL",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }
-    ).format(fecha);
-
-  };
+const formatearFechaHora = (valor) => {
+  return formatearFechaHoraChile(valor);
+};
 
 
   // ============================================================
