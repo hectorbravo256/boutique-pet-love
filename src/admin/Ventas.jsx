@@ -392,8 +392,73 @@ export default function Ventas() {
       ).toLowerCase();
 
 
-    const esOnline =
-      tipoVenta === "online";
+const esOnline =
+  tipoVenta === "online";
+
+const esRRSS =
+  tipoVenta === "rrss";
+
+const empresaEnvio =
+  String(
+    orden?.empresa_envio || ""
+  ).toLowerCase().trim();
+
+const envioPorPagar =
+  orden?.envio_por_pagar === true;
+
+    // ============================================================
+// RRSS — EMPRESA DE ENVÍO REGISTRADA
+// ============================================================
+
+if (
+  esRRSS &&
+  empresaEnvio === "paket" &&
+  !envioPorPagar
+) {
+
+  return {
+    tipo: "paket",
+    nombre: "PAKET",
+    icono: "📦",
+    clase:
+      "bg-pink-100 text-pink-700"
+  };
+
+}
+
+
+if (
+  esRRSS &&
+  envioPorPagar &&
+  empresaEnvio === "starken"
+) {
+
+  return {
+    tipo: "starken",
+    nombre: "STARKEN",
+    icono: "🚚",
+    clase:
+      "bg-orange-100 text-orange-700"
+  };
+
+}
+
+
+if (
+  esRRSS &&
+  envioPorPagar &&
+  empresaEnvio === "bluexpress"
+) {
+
+  return {
+    tipo: "bluexpress",
+    nombre: "BLUEXPRESS",
+    icono: "🚚",
+    clase:
+      "bg-blue-100 text-blue-700"
+  };
+
+}
 
 
     const subtotalProductos =
