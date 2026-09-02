@@ -146,11 +146,15 @@ if (to) {
 
         const sales = await this.getSales(filters);
 
-        const totalSales = sales.reduce(
-            (sum, sale) =>
-                sum + Number(sale.total || 0),
+const totalSales = sales.reduce(
+    (sum, sale) =>
+        sum + Number(
+            sale.total_cobrado ??
+            sale.total ??
             0
-        );
+        ),
+    0
+);
 
         const totalOrders = sales.length;
 
