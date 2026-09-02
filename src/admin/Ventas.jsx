@@ -173,6 +173,58 @@ const formatearFechaHora = (valor) => {
   return formatearFechaHoraChile(fechaUTC);
 };
 
+  const obtenerFechaChile = (valor) => {
+
+  const fechaUTC =
+    normalizarFechaUTC(valor);
+
+  if (!fechaUTC) {
+    return null;
+  }
+
+  const fecha =
+    new Date(fechaUTC);
+
+  if (
+    Number.isNaN(
+      fecha.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  const partes =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone: "America/Santiago",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }
+    ).formatToParts(fecha);
+
+  const año =
+    partes.find(
+      parte => parte.type === "year"
+    )?.value;
+
+  const mes =
+    partes.find(
+      parte => parte.type === "month"
+    )?.value;
+
+  const dia =
+    partes.find(
+      parte => parte.type === "day"
+    )?.value;
+
+  if (!año || !mes || !dia) {
+    return null;
+  }
+
+  return `${año}-${mes}-${dia}`;
+};
 
   // ============================================================
   // LIMPIAR FILTRO DE FECHAS
@@ -853,56 +905,38 @@ const formatearFechaHora = (valor) => {
   const pedidosFiltrados =
     pedidosOrdenados
 
-      .filter(o => {
+.filter(o => {
 
-        if (!fechaDesde && !fechaHasta) {
-          return true;
-        }
+  if (!fechaDesde && !fechaHasta) {
+    return true;
+  }
 
-        const fechaPedido =
-          new Date(o.created_at);
+  const fechaPedidoChile =
+    obtenerFechaChile(
+      o.created_at
+    );
 
-        if (
-          Number.isNaN(
-            fechaPedido.getTime()
-          )
-        ) {
-          return false;
-        }
+  if (!fechaPedidoChile) {
+    return false;
+  }
 
-        if (fechaDesde) {
+  if (
+    fechaDesde &&
+    fechaPedidoChile < fechaDesde
+  ) {
+    return false;
+  }
 
-          const inicio =
-            new Date(
-              `${fechaDesde}T00:00:00`
-            );
+  if (
+    fechaHasta &&
+    fechaPedidoChile > fechaHasta
+  ) {
+    return false;
+  }
 
-          if (
-            fechaPedido < inicio
-          ) {
-            return false;
-          }
+  return true;
 
-        }
-
-        if (fechaHasta) {
-
-          const fin =
-            new Date(
-              `${fechaHasta}T23:59:59.999`
-            );
-
-          if (
-            fechaPedido > fin
-          ) {
-            return false;
-          }
-
-        }
-
-        return true;
-
-      })
+})
 
       .filter(o =>
 
