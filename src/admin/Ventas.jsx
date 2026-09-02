@@ -137,8 +137,40 @@ export default function Ventas() {
   // FORMATO FECHA Y HORA
   // ============================================================
 
+const normalizarFechaUTC = (fecha) => {
+
+  if (!fecha) {
+    return null;
+  }
+
+  const fechaTexto = String(fecha);
+
+  /*
+   * Si ya contiene zona horaria, no modificar.
+   */
+  if (
+    fechaTexto.endsWith("Z") ||
+    /[+-]\d{2}:\d{2}$/.test(fechaTexto)
+  ) {
+    return fechaTexto;
+  }
+
+  /*
+   * created_at proviene de orders y representa UTC.
+   * Se agrega Z para que JavaScript lo interprete
+   * correctamente como UTC antes de convertirlo
+   * a la hora local de Chile.
+   */
+  return `${fechaTexto}Z`;
+};
+
+
 const formatearFechaHora = (valor) => {
-  return formatearFechaHoraChile(valor);
+
+  const fechaUTC =
+    normalizarFechaUTC(valor);
+
+  return formatearFechaHoraChile(fechaUTC);
 };
 
 
