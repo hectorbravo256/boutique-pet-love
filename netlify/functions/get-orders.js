@@ -164,20 +164,24 @@ exports.handler = async () => {
         // COBRO ADICIONAL DEL CAMBIO
         // ========================================================
 
-        const adicionalCambio =
-          cambio &&
-          String(
-            cambio.payment_status || ""
-          ).toLowerCase() ===
-            "paid"
+const montoAdicionalCambio =
+  cambio
+    ? Number(
+        cambio.additional_payment || 0
+      )
+    : 0;
 
-            ? Number(
-                cambio.additional_payment ||
-                0
-              )
 
-            : 0;
+const adicionalCambioPagado =
+  cambio &&
+  String(
+    cambio.payment_status || ""
+  ).toLowerCase() ===
+    "paid"
 
+    ? montoAdicionalCambio
+
+    : 0;
 
         // ========================================================
         // TOTAL ORIGINAL
@@ -208,9 +212,9 @@ exports.handler = async () => {
         // adicional pagado por cambio
         // ========================================================
 
-        const totalCobrado =
-          totalOriginal +
-          adicionalCambio;
+const totalCobrado =
+  totalOriginal +
+  adicionalCambioPagado;
 
 
         // ========================================================
@@ -254,8 +258,8 @@ exports.handler = async () => {
           // COBRO ADICIONAL DEL CAMBIO
           // ======================================================
 
-          adicional_cambio:
-            adicionalCambio,
+adicional_cambio:
+  montoAdicionalCambio,
 
 
           // ======================================================
