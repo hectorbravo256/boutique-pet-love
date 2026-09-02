@@ -29,6 +29,14 @@ export default function CambioVentaModal({
   const [observacion, setObservacion] =
     useState("");
 
+  // NUEVO: estado del cobro adicional
+  const [estadoPago, setEstadoPago] =
+    useState("pending");
+
+  // NUEVO: medio de pago
+  const [medioPago, setMedioPago] =
+    useState("");
+
   const [cargando, setCargando] =
     useState(false);
 
@@ -383,6 +391,7 @@ export default function CambioVentaModal({
 
   const cantidadMaximaDevuelta =
     useMemo(() => {
+
       const variante =
         variantesVenta.find(
           (v) =>
@@ -390,12 +399,10 @@ export default function CambioVentaModal({
             String(devolver)
         );
 
-      return (
-        Number(
-          variante?.cantidadVendida ||
-            1
-        )
+      return Number(
+        variante?.cantidadVendida || 1
       );
+
     }, [
       variantesVenta,
       devolver,
@@ -411,14 +418,12 @@ export default function CambioVentaModal({
 
       const precioDevuelto =
         Number(
-          varianteDevuelta?.price ||
-            0
+          varianteDevuelta?.price || 0
         );
 
       const precioReemplazo =
         Number(
-          varianteReemplazo?.price ||
-            0
+          varianteReemplazo?.price || 0
         );
 
       return (
@@ -523,11 +528,12 @@ export default function CambioVentaModal({
         );
 
       setCantidadDevuelta(
-        Math.min(
-          1,
-          cantidad
-        )
+        1
       );
+
+      if (cantidad <= 0) {
+        setCantidadDevuelta(1);
+      }
     };
 
 
@@ -543,6 +549,10 @@ export default function CambioVentaModal({
       );
 
       setReemplazo("");
+
+      setCantidadReemplazo(
+        1
+      );
     };
 
 
@@ -617,10 +627,8 @@ export default function CambioVentaModal({
 
 
       if (
-        Number(cantidadDevuelta) <=
-          0 ||
-        Number(cantidadReemplazo) <=
-          0
+        Number(cantidadDevuelta) <= 0 ||
+        Number(cantidadReemplazo) <= 0
       ) {
 
         alert(
@@ -669,16 +677,13 @@ export default function CambioVentaModal({
 
       const stockDisponible =
         Number(
-          varianteReemplazo.stock ||
-            0
+          varianteReemplazo.stock || 0
         );
 
 
       if (
         stockDisponible <
-        Number(
-          cantidadReemplazo
-        )
+        Number(cantidadReemplazo)
       ) {
 
         alert(
@@ -693,6 +698,60 @@ export default function CambioVentaModal({
         return;
       }
 
+
+      // ========================================================
+      // VALIDAR COBRO ADICIONAL
+      // ========================================================
+
+      if (diferencia > 0) {
+
+        if (
+          estadoPago !== "pending" &&
+          estadoPago !== "paid"
+        ) {
+
+          alert(
+            "Selecciona el estado del cobro adicional."
+          );
+
+          return;
+        }
+
+
+        if (
+          estadoPago === "paid" &&
+          !medioPago
+        ) {
+
+          alert(
+            "Debes seleccionar el medio de pago para registrar el cobro como pagado."
+          );
+
+          return;
+        }
+
+      }
+
+
+      // ========================================================
+      // CONFIGURACIÓN DEL PAGO PARA SUPABASE
+      // ========================================================
+
+      const paymentStatus =
+        diferencia > 0
+          ? estadoPago
+          : "not_required";
+
+      const paymentMethod =
+        diferencia > 0 &&
+        estadoPago === "paid"
+          ? medioPago
+          : null;
+
+
+      // ========================================================
+      // MENSAJE DE CONFIRMACIÓN
+      // ========================================================
 
       let mensaje =
         "¿Confirmar cambio?\n\n";
@@ -740,12 +799,27 @@ export default function CambioVentaModal({
             diferencia
           )}\n`;
 
+        mensaje +=
+          `Estado del cobro: ${
+            estadoPago === "paid"
+              ? "PAGADO"
+              : "PENDIENTE"
+          }\n`;
+
+        if (
+          estadoPago === "paid"
+        ) {
+
+          mensaje +=
+            `Medio de pago: ${medioPago}\n`;
+        }
+
       } else if (
         diferencia < 0
       ) {
 
         mensaje +=
-          `Saldo a favor: $${formatoPrecio(
+          `Saldo a favor del cliente: $${formatoPrecio(
             Math.abs(
               diferencia
             )
@@ -755,6 +829,15 @@ export default function CambioVentaModal({
 
         mensaje +=
           "Sin diferencia de precio\n";
+      }
+
+
+      if (
+        observacion.trim()
+      ) {
+
+        mensaje +=
+          `\nObservación:\n${observacion.trim()}\n`;
       }
 
 
@@ -812,6 +895,13 @@ export default function CambioVentaModal({
 
               p_created_by:
                 "Panel administrativo",
+
+              // NUEVOS PARÁMETROS
+              p_payment_method:
+                paymentMethod,
+
+              p_payment_status:
+                paymentStatus,
             }
           );
 
@@ -904,6 +994,7 @@ export default function CambioVentaModal({
         backdrop-blur-sm
       "
     >
+
       <div
         className="
           w-full
@@ -916,7 +1007,9 @@ export default function CambioVentaModal({
         "
       >
 
-        {/* HEADER */}
+        {/* ======================================================
+            HEADER
+        ====================================================== */}
 
         <div
           className="
@@ -1009,7 +1102,9 @@ export default function CambioVentaModal({
         </div>
 
 
-        {/* CONTENIDO */}
+        {/* ======================================================
+            CONTENIDO
+        ====================================================== */}
 
         <div
           className="
@@ -1103,8 +1198,6 @@ export default function CambioVentaModal({
                 </div>
 
 
-                {/* PRODUCTO */}
-
                 <label
                   className="
                     mb-2
@@ -1167,8 +1260,6 @@ export default function CambioVentaModal({
                 </select>
 
 
-                {/* TALLA */}
-
                 {productoDevuelto && (
 
                   <div
@@ -1230,6 +1321,7 @@ export default function CambioVentaModal({
                               variante.id
                             }
                           >
+
                             {
                               variante.size ||
                               "Sin talla"
@@ -1261,8 +1353,6 @@ export default function CambioVentaModal({
 
                 )}
 
-
-                {/* CANTIDAD */}
 
                 <div
                   className="mt-4"
@@ -1298,6 +1388,14 @@ export default function CambioVentaModal({
                         Number(
                           e.target.value
                         );
+
+                      if (
+                        !Number.isFinite(
+                          valor
+                        )
+                      ) {
+                        return;
+                      }
 
                       setCantidadDevuelta(
                         Math.min(
@@ -1397,8 +1495,6 @@ export default function CambioVentaModal({
                 </div>
 
 
-                {/* PRODUCTO */}
-
                 <label
                   className="
                     mb-2
@@ -1460,8 +1556,6 @@ export default function CambioVentaModal({
 
                 </select>
 
-
-                {/* TALLA */}
 
                 {productoReemplazo && (
 
@@ -1559,8 +1653,6 @@ export default function CambioVentaModal({
                 )}
 
 
-                {/* CANTIDAD */}
-
                 <div
                   className="mt-4"
                 >
@@ -1586,16 +1678,29 @@ export default function CambioVentaModal({
                       cantidadReemplazo
                     }
 
-                    onChange={(e) =>
+                    onChange={(e) => {
+
+                      const valor =
+                        Number(
+                          e.target.value
+                        );
+
+                      if (
+                        !Number.isFinite(
+                          valor
+                        )
+                      ) {
+                        return;
+                      }
+
                       setCantidadReemplazo(
                         Math.max(
-                          Number(
-                            e.target.value
-                          ),
+                          valor,
                           1
                         )
-                      )
-                    }
+                      );
+
+                    }}
 
                     disabled={
                       cargando ||
@@ -1704,6 +1809,11 @@ export default function CambioVentaModal({
                     font-black
                   "
                 >
+                  {
+                    diferencia < 0
+                      ? "-"
+                      : ""
+                  }
                   $
                   {
                     formatoPrecio(
@@ -1734,6 +1844,225 @@ export default function CambioVentaModal({
                 </div>
 
               </div>
+
+
+              {/* ==================================================
+                  COBRO ADICIONAL
+              ================================================== */}
+
+              {diferencia > 0 && (
+
+                <div
+                  className="
+                    mb-6
+                    rounded-2xl
+                    border
+                    border-amber-200
+                    bg-amber-50
+                    p-5
+                  "
+                >
+
+                  <div
+                    className="
+                      mb-4
+                      text-sm
+                      font-black
+                      text-amber-700
+                    "
+                  >
+                    💳 COBRO ADICIONAL
+                  </div>
+
+
+                  <div
+                    className="
+                      mb-4
+                      rounded-xl
+                      bg-white
+                      p-4
+                    "
+                  >
+
+                    <div
+                      className="
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-wide
+                        text-slate-500
+                      "
+                    >
+                      Monto adicional
+                    </div>
+
+
+                    <div
+                      className="
+                        mt-1
+                        text-2xl
+                        font-black
+                        text-slate-900
+                      "
+                    >
+                      $
+                      {
+                        formatoPrecio(
+                          diferencia
+                        )
+                      }
+                    </div>
+
+                  </div>
+
+
+                  <label
+                    className="
+                      mb-2
+                      block
+                      text-sm
+                      font-bold
+                      text-slate-600
+                    "
+                  >
+                    Estado del cobro
+                  </label>
+
+
+                  <select
+                    value={
+                      estadoPago
+                    }
+
+                    onChange={(e) => {
+
+                      const valor =
+                        e.target.value;
+
+                      setEstadoPago(
+                        valor
+                      );
+
+                      if (
+                        valor !== "paid"
+                      ) {
+                        setMedioPago("");
+                      }
+
+                    }}
+
+                    disabled={cargando}
+
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-slate-300
+                      bg-white
+                      px-4
+                      py-3
+                      text-slate-900
+                      outline-none
+                      focus:ring-2
+                      focus:ring-pink-400
+                    "
+                  >
+
+                    <option value="pending">
+                      Pendiente de pago
+                    </option>
+
+                    <option value="paid">
+                      Pagado
+                    </option>
+
+                  </select>
+
+
+                  {estadoPago === "paid" && (
+
+                    <div
+                      className="mt-4"
+                    >
+
+                      <label
+                        className="
+                          mb-2
+                          block
+                          text-sm
+                          font-bold
+                          text-slate-600
+                        "
+                      >
+                        Medio de pago
+                      </label>
+
+
+                      <select
+                        value={
+                          medioPago
+                        }
+
+                        onChange={(e) =>
+                          setMedioPago(
+                            e.target.value
+                          )
+                        }
+
+                        disabled={cargando}
+
+                        className="
+                          w-full
+                          rounded-xl
+                          border
+                          border-slate-300
+                          bg-white
+                          px-4
+                          py-3
+                          text-slate-900
+                          outline-none
+                          focus:ring-2
+                          focus:ring-pink-400
+                        "
+                      >
+
+                        <option value="">
+                          Seleccionar medio de pago
+                        </option>
+
+                        <option value="Efectivo">
+                          Efectivo
+                        </option>
+
+                        <option value="Transferencia">
+                          Transferencia
+                        </option>
+
+                        <option value="Débito">
+                          Débito
+                        </option>
+
+                        <option value="Crédito">
+                          Crédito
+                        </option>
+
+                        <option value="Mercado Pago">
+                          Mercado Pago
+                        </option>
+
+                        <option value="Otro">
+                          Otro
+                        </option>
+
+                      </select>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              )}
 
 
               {/* ==================================================
