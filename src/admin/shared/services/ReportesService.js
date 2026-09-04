@@ -233,6 +233,42 @@ class ReportesService {
                 throw orderError;
             }
 
+            // -------------------------------------------------
+// INFORMACIÓN CONSOLIDADA DEL REPORTE
+// -------------------------------------------------
+
+const {
+    data: reportSale,
+    error: reportSaleError
+} = await ApiClient.db
+    .from("vw_reportes_ventas")
+    .select(`
+        order_id,
+        numero_venta,
+        fecha_venta,
+        tipo_venta,
+        medio_pago,
+        estado_pago,
+        estado,
+        total,
+        adicional_cambio,
+        estado_pago_cambio,
+        medio_pago_cambio,
+        total_cobrado,
+        exchange_id,
+        cambio_fecha
+    `)
+    .eq("order_id", orderId)
+    .single();
+
+
+if (reportSaleError) {
+    console.warn(
+        "ReportesService.getSaleDetail: no se pudo obtener el resumen financiero.",
+        reportSaleError
+    );
+}
+
 
             // -------------------------------------------------
             // CAMBIOS ASOCIADOS
@@ -260,10 +296,11 @@ class ReportesService {
             }
 
 
-            return {
-                order,
-                exchanges: exchanges ?? []
-            };
+return {
+    order,
+    reportSale: reportSale ?? null,
+    exchanges: exchanges ?? []
+};
 
         } catch (error) {
 
