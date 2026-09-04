@@ -2088,9 +2088,7 @@ export default function Reportes() {
 
                     </div>
 
-                </div>
 
-                   )}
 
         </div>,
 
