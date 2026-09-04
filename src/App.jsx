@@ -29,8 +29,9 @@ const InventoryMasterPage = lazy(() => import("./admin/inventory/master/Inventor
 const PurchasePage = lazy(() => import("./admin/inventory/purchases/PurchasePage"));
 const SuppliersPage = lazy(() => import("./admin/inventory/suppliers/SuppliersPage"));
 const VentasExternas = lazy(() => import("./admin/inventory/VentasExternas"));
-const InventoryMovements = lazy(() => import("./admin/inventory/InventoryMovements")
-);
+const InventoryMovements = lazy(() => import("./admin/inventory/InventoryMovements"));
+const RepairsPage = lazy(() => import("./admin/inventory/repairs/RepairsPage"));
+
 
 /* ================= PRODUCTOS ================= */
 
@@ -1327,6 +1328,14 @@ export default function App() {
   element={
     <Suspense fallback={<div>Cargando...</div>}>
       <InventoryMovements />
+    </Suspense>
+  }
+/>
+	<Route
+  path="/admin/inventario/reparaciones"
+  element={
+    <Suspense fallback={<div>Cargando...</div>}>
+      <RepairsPage />
     </Suspense>
   }
 />
