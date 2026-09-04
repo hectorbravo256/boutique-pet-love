@@ -535,13 +535,18 @@ export default function Reportes() {
     // ---------------------------------------------------------
 
     const order =
-        selectedSale?.order ||
-        null;
+    selectedSale?.order ||
+    null;
 
 
-    const exchanges =
-        selectedSale?.exchanges ||
-        [];
+const reportSale =
+    selectedSale?.reportSale ||
+    null;
+
+
+const exchanges =
+    selectedSale?.exchanges ||
+    [];
 
 
     const items =
@@ -549,54 +554,35 @@ export default function Reportes() {
             ? order.items
             : [];
 
-
-    const additionalPayment =
-        exchanges.reduce(
-            (sum, exchange) =>
-                sum +
-                Number(
-                    exchange?.additional_payment ||
-                    0
-                ),
-            0
-        );
+    const subtotalProductosCalculado =
+    items.reduce(
+        (sum, item) =>
+            sum +
+            getItemLineTotal(item),
+        0
+    );
 
 
-    const totalCharged =
-        Number(
-            order?.total || 0
-        ) +
-        exchanges.reduce(
-            (sum, exchange) => {
-
-                const status =
-                    String(
-                        exchange?.payment_status ||
-                        ""
-                    ).toLowerCase();
+const subtotalProductos =
+    order?.subtotal_productos !== null &&
+    order?.subtotal_productos !== undefined
+        ? Number(order.subtotal_productos)
+        : subtotalProductosCalculado;
 
 
-                if (
-                    status === "paid" ||
-                    status === "pagado"
-                ) {
-
-                    return (
-                        sum +
-                        Number(
-                            exchange?.additional_payment ||
-                            0
-                        )
-                    );
-
-                }
+const additionalPayment =
+    Number(
+        reportSale?.adicional_cambio ??
+        0
+    );
 
 
-                return sum;
-
-            },
-            0
-        );
+const totalCharged =
+    Number(
+        reportSale?.total_cobrado ??
+        order?.total ??
+        0
+    );
 
 
     return (
@@ -1848,13 +1834,87 @@ export default function Reportes() {
                                     CAMBIOS
                                 ================================================== */}
 
-                                {exchanges.length > 0 && (
+                                {(
+    exchanges.length > 0 ||
+    reportSale?.exchange_id
+) && (
 
                                     <section>
 
                                         <h3 className="mb-3 text-base font-semibold text-gray-900">
                                             Cambios asociados
                                         </h3>
+
+                                        {reportSale?.exchange_id && (
+
+    <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+            <div>
+
+                <p className="text-xs font-medium text-gray-500">
+                    Fecha del cambio
+                </p>
+
+                <p className="mt-1 text-sm font-semibold text-gray-900">
+                    {formatDate(
+                        reportSale.cambio_fecha
+                    )}
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p className="text-xs font-medium text-gray-500">
+                    Cobro adicional
+                </p>
+
+                <p className="mt-1 text-sm font-semibold text-gray-900">
+                    {formatCurrency(
+                        reportSale.adicional_cambio
+                    )}
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p className="text-xs font-medium text-gray-500">
+                    Estado del pago
+                </p>
+
+                <p className="mt-1 text-sm font-semibold text-gray-900">
+                    {getEstadoPagoLabel(
+                        reportSale.estado_pago_cambio
+                    )}
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p className="text-xs font-medium text-gray-500">
+                    Medio de pago
+                </p>
+
+                <p className="mt-1 text-sm font-semibold text-gray-900">
+                    {getMedioPagoLabel(
+                        reportSale.medio_pago_cambio
+                    )}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+)}
 
 
                                         <div className="space-y-3">
@@ -1993,7 +2053,7 @@ export default function Reportes() {
 
                                             <span className="text-sm font-semibold text-gray-900">
                                                 {formatCurrency(
-                                                    order.subtotal_productos
+                                                    subtotalProductos
                                                 )}
                                             </span>
 
