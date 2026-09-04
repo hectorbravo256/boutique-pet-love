@@ -2,6 +2,10 @@ import React, {
     useState
 } from "react";
 
+import {
+    createPortal
+} from "react-dom";
+
 import useReportes from "./shared/hooks/useReportes";
 
 import ReportesService
@@ -1283,24 +1287,26 @@ export default function Reportes() {
                 MODAL DETALLE DE VENTA
             ====================================================== */}
 
-            {selectedSale && order && (
+{selectedSale &&
+    order &&
+    createPortal(
 
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-                    onMouseDown={(event) => {
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
+            onMouseDown={(event) => {
 
-                        if (
-                            event.target === event.currentTarget
-                        ) {
+                if (
+                    event.target === event.currentTarget
+                ) {
 
-                            closeSaleDetail();
+                    closeSaleDetail();
 
-                        }
+                }
 
-                    }}
-                >
+            }}
+        >
 
-                    <div className="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+                    <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
                         {/* HEADER */}
 
@@ -1339,7 +1345,7 @@ export default function Reportes() {
 
                         {/* CONTENIDO */}
 
-                        <div className="overflow-y-auto p-6">
+                        <div className="min-h-0 overflow-y-auto p-6">
 
                             <div className="space-y-6">
 
@@ -2084,8 +2090,14 @@ export default function Reportes() {
 
                 </div>
 
-            )}
+                   )}
 
-        </div>
-    );
+        </div>,
+
+        document.body
+
+    )}
+
+</div>
+);
 }
