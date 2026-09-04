@@ -38,11 +38,11 @@ const modules = [
         color: "from-green-500 to-emerald-500",
     },
     {
-        title: "Reportes",
-        description: "Indicadores y análisis del inventario.",
-        icon: "📊",
-        to: "/admin/inventario/reportes",
-        color: "from-violet-500 to-purple-500",
+        title: "Reparaciones",
+        description: "Enviar prendas a reparación y controlar reingresos.",
+        icon: "🔧",
+        to: "/admin/inventario/reparaciones",
+        color: "from-amber-500 to-orange-600",
     },
 ];
 
