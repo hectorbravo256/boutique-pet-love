@@ -1408,7 +1408,6 @@ const selectedProductVariants = useMemo(() => {
                         )}
                       </div>
                     </div>
-                  </div>
                     )}
                 </div>
                 );
