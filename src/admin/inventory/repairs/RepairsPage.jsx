@@ -115,7 +115,7 @@ export default function RepairsPage() {
         status,
         created_at,
         sent_at,
-        returned_at,
+        completed_at,
         created_by,
         inventory_repair_items (
           id,
