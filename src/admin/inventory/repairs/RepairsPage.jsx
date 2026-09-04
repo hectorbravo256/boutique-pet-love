@@ -60,6 +60,7 @@ export default function RepairsPage() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("TODOS");
+  const [expandedRepairs, setExpandedRepairs] = useState({});
 
   useEffect(() => {
     cargarDatos();
@@ -799,6 +800,15 @@ const selectedProductVariants = useMemo(() => {
     };
   }
 
+  function alternarDetalleReparacion(
+  repairId
+) {
+  setExpandedRepairs((current) => ({
+    ...current,
+    [repairId]: !current[repairId],
+  }));
+}
+
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
@@ -1287,7 +1297,30 @@ const selectedProductVariants = useMemo(() => {
                       </div>
                     )}
 
-                    <div className="mt-5 rounded-xl border border-slate-200 overflow-hidden">
+                    <div className="mt-4">
+  <button
+    type="button"
+    onClick={() =>
+      alternarDetalleReparacion(
+        repair.id
+      )
+    }
+    className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-orange-600 transition"
+  >
+    <span className="text-base">
+      {expandedRepairs[repair.id]
+        ? "▾"
+        : "▸"}
+    </span>
+
+    {expandedRepairs[repair.id]
+      ? "Ocultar detalle"
+      : "Ver detalle"}
+  </button>
+</div>
+
+                    {expandedRepairs[repair.id] && (
+  <div className="mt-5 rounded-xl border border-slate-200 overflow-hidden">
                       <div className="bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-600">
                         Detalle de prendas
                       </div>
@@ -1333,10 +1366,7 @@ const selectedProductVariants = useMemo(() => {
                                     </div>
 
                                     <div className="text-xs text-slate-500 mt-1">
-                                      {item.variant
-                                        ?.size
-                                        ? `Talla ${item.variant.size}`
-                                        : "Sin talla"}
+                                      {item.variant?.size || "Sin talla"}
                                     </div>
                                   </div>
 
@@ -1379,6 +1409,8 @@ const selectedProductVariants = useMemo(() => {
                       </div>
                     </div>
                   </div>
+                    )}
+                </div>
                 );
               }
             )}
@@ -1489,11 +1521,10 @@ const selectedProductVariants = useMemo(() => {
                         value={variant.id}
                       >
                         {variant.size
-                          ? `Talla ${variant.size}`
-                          : "Sin talla"}{" "}
-                        — Stock:{" "}
-                        {variant.stock ||
-                          0}
+  ? variant.size
+  : "Sin talla"}{" "}
+— Stock:{" "}
+{variant.stock || 0}
                       </option>
                     )
                   )}
@@ -1512,8 +1543,8 @@ const selectedProductVariants = useMemo(() => {
                       <div className="text-sm font-semibold text-slate-800 mt-1">
                         {selectedProduct.name}
                         {selectedVariant.size
-                          ? ` — Talla ${selectedVariant.size}`
-                          : ""}
+                        ? ` — ${selectedVariant.size}`
+                        : ""}
                       </div>
                     </div>
 
