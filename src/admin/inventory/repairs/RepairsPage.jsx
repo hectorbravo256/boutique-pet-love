@@ -204,22 +204,26 @@ export default function RepairsPage() {
     );
   }, [products, selectedProductId]);
 
-  const selectedProductVariants = useMemo(() => {
-    if (!selectedProduct) return [];
+const selectedProductVariants = useMemo(() => {
+  if (!selectedProduct) return [];
 
-    return (selectedProduct.product_variants || [])
-      .slice()
-      .sort((a, b) =>
-        String(a.size || "").localeCompare(
-          String(b.size || ""),
-          "es",
-          {
-            numeric: true,
-            sensitivity: "base",
-          }
-        )
-      );
-  }, [selectedProduct]);
+  return (selectedProduct.product_variants || [])
+    .filter(
+      (variant) =>
+        Number(variant.stock || 0) > 0
+    )
+    .slice()
+    .sort((a, b) =>
+      String(a.size || "").localeCompare(
+        String(b.size || ""),
+        "es",
+        {
+          numeric: true,
+          sensitivity: "base",
+        }
+      )
+    );
+}, [selectedProduct]);
 
   const selectedVariant = useMemo(() => {
     if (!selectedVariantId) return null;
@@ -321,7 +325,7 @@ export default function RepairsPage() {
       setError(
         `${selectedProduct.name}${
           selectedVariant.size
-            ? ` — Talla ${selectedVariant.size}`
+            ? ` — ${selectedVariant.size}`
             : ""
         }: stock insuficiente. Disponible: ${stockDisponible}.`
       );
@@ -494,8 +498,8 @@ export default function RepairsPage() {
         setError(
           `${variant.product_name} ${
             variant.size
-              ? `— Talla ${variant.size}`
-              : ""
+            ? `— ${variant.size}`
+            : ""
           }: stock insuficiente. Disponible: ${
             variant.stock || 0
           }.`
