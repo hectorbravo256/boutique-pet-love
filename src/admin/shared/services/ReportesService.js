@@ -439,7 +439,6 @@ return {
                     estado_pago,
                     estado,
                     total,
-                    total_venta_original,
                     adicional_cambio,
                     estado_pago_cambio,
                     medio_pago_cambio,
