@@ -358,6 +358,247 @@ return {
         };
     }
 
+
+    /**
+     * Obtiene en bloque toda la información
+     * necesaria para exportar las ventas.
+     *
+     * Se utiliza una sola consulta por fuente
+     * en lugar de ejecutar getSaleDetail()
+     * individualmente para cada venta.
+     *
+     * NO modifica la lógica de ventas,
+     * cambios, pagos ni inventario.
+     */
+    async getSalesExportDetails(
+        orderIds = []
+    ) {
+
+        try {
+
+            const validOrderIds =
+                Array.from(
+                    new Set(
+                        orderIds
+                            .filter(Boolean)
+                            .map(
+                                (id) =>
+                                    String(id)
+                            )
+                    )
+                );
+
+
+            if (
+                validOrderIds.length === 0
+            ) {
+
+                return [];
+
+            }
+
+
+            // -------------------------------------------------
+            // ORDERS
+            // -------------------------------------------------
+
+            const {
+                data: orders,
+                error: ordersError
+            } = await ApiClient.db
+                .from("orders")
+                .select("*")
+                .in(
+                    "id",
+                    validOrderIds
+                );
+
+
+            if (ordersError) {
+
+                throw ordersError;
+
+            }
+
+
+            // -------------------------------------------------
+            // INFORMACIÓN FINANCIERA
+            // -------------------------------------------------
+
+            const {
+                data: reportSales,
+                error: reportSalesError
+            } = await ApiClient.db
+                .from("vw_reportes_ventas")
+                .select(`
+                    order_id,
+                    numero_venta,
+                    fecha_venta,
+                    tipo_venta,
+                    medio_pago,
+                    estado_pago,
+                    estado,
+                    total,
+                    total_venta_original,
+                    adicional_cambio,
+                    estado_pago_cambio,
+                    medio_pago_cambio,
+                    total_cobrado,
+                    exchange_id,
+                    cambio_fecha
+                `)
+                .in(
+                    "order_id",
+                    validOrderIds
+                );
+
+
+            if (reportSalesError) {
+
+                throw reportSalesError;
+
+            }
+
+
+            // -------------------------------------------------
+            // CAMBIOS
+            // -------------------------------------------------
+
+            const {
+                data: exchanges,
+                error: exchangesError
+            } = await ApiClient.db
+                .from("sale_exchanges")
+                .select("*")
+                .in(
+                    "order_id",
+                    validOrderIds
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+            if (exchangesError) {
+
+                console.warn(
+                    "ReportesService.getSalesExportDetails: no se pudieron obtener los cambios.",
+                    exchangesError
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // MAPAS PARA ARMAR EL RESULTADO
+            // -------------------------------------------------
+
+            const reportSalesByOrder =
+                new Map();
+
+
+            (reportSales ?? [])
+                .forEach(
+                    (reportSale) => {
+
+                        reportSalesByOrder.set(
+                            String(
+                                reportSale.order_id
+                            ),
+                            reportSale
+                        );
+
+                    }
+                );
+
+
+            const exchangesByOrder =
+                new Map();
+
+
+            (exchanges ?? [])
+                .forEach(
+                    (exchange) => {
+
+                        const key =
+                            String(
+                                exchange.order_id
+                            );
+
+
+                        if (
+                            !exchangesByOrder.has(
+                                key
+                            )
+                        ) {
+
+                            exchangesByOrder.set(
+                                key,
+                                []
+                            );
+
+                        }
+
+
+                        exchangesByOrder
+                            .get(key)
+                            .push(
+                                exchange
+                            );
+
+                    }
+                );
+
+
+            // -------------------------------------------------
+            // RESULTADO FINAL
+            // -------------------------------------------------
+
+            return (orders ?? [])
+                .map(
+                    (order) => {
+
+                        const key =
+                            String(
+                                order.id
+                            );
+
+
+                        return {
+
+                            order,
+
+                            reportSale:
+                                reportSalesByOrder
+                                    .get(key) ??
+                                null,
+
+                            exchanges:
+                                exchangesByOrder
+                                    .get(key) ??
+                                []
+
+                        };
+
+                    }
+                );
+
+        } catch (error) {
+
+            console.error(
+                "ReportesService.getSalesExportDetails:",
+                error
+            );
+
+            throw error;
+
+        }
+
+    }
+
 }
 
 
