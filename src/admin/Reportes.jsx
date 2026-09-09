@@ -538,8 +538,14 @@ export default function Reportes() {
                 err
             );
 
+            const mensaje =
+                err?.message ||
+                err?.details ||
+                err?.hint ||
+                "Error desconocido al generar el archivo.";
+
             setDetailError(
-                "No fue posible generar el archivo de exportación."
+                `No fue posible generar el archivo de exportación: ${mensaje}`
             );
 
         } finally {
