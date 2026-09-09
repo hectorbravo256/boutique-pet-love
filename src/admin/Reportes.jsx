@@ -11,6 +11,9 @@ import useReportes from "./shared/hooks/useReportes";
 import ReportesService
     from "./shared/services/ReportesService";
 
+import ReportesExportService
+    from "./shared/services/ReportesExportService";
+
 import {
     formatearFechaChile
 } from "./utils/fechaChile";
@@ -410,6 +413,143 @@ export default function Reportes() {
 
     };
 
+        // ---------------------------------------------------------
+    // EXPORTACIÓN DE REPORTES
+    // ---------------------------------------------------------
+
+    const [
+        exportLoading,
+        setExportLoading
+    ] = useState(false);
+
+
+    const handleExport = async (
+        format
+    ) => {
+
+        if (
+            exportLoading ||
+            !sales ||
+            sales.length === 0
+        ) {
+            return;
+        }
+
+
+        setExportLoading(true);
+
+
+        try {
+
+            const orderIds =
+                sales
+                    .map(
+                        (sale) =>
+                            sale?.order_id
+                    )
+                    .filter(Boolean);
+
+
+            const details =
+                await ReportesService
+                    .getSalesExportDetails(
+                        orderIds
+                    );
+
+
+            const summary = {
+
+                totalSales:
+                    sales.reduce(
+                        (
+                            total,
+                            sale
+                        ) =>
+                            total +
+                            Number(
+                                sale?.total_cobrado ??
+                                sale?.total ??
+                                0
+                            ),
+                        0
+                    ),
+
+                totalOrders:
+                    sales.length,
+
+                averageTicket:
+                    sales.length > 0
+                        ? sales.reduce(
+                            (
+                                total,
+                                sale
+                            ) =>
+                                total +
+                                Number(
+                                    sale?.total_cobrado ??
+                                    sale?.total ??
+                                    0
+                                ),
+                            0
+                        ) /
+                        sales.length
+                        : 0
+
+            };
+
+
+            const exportData = {
+
+                sales,
+
+                details,
+
+                summary,
+
+                filters
+
+            };
+
+
+            if (
+                format === "pdf"
+            ) {
+
+                ReportesExportService
+                    .exportPDF(
+                        exportData
+                    );
+
+            } else if (
+                format === "excel"
+            ) {
+
+                ReportesExportService
+                    .exportExcel(
+                        exportData
+                    );
+
+            }
+
+        } catch (err) {
+
+            console.error(
+                "Reportes.jsx - exportación:",
+                err
+            );
+
+            setDetailError(
+                "No fue posible generar el archivo de exportación."
+            );
+
+        } finally {
+
+            setExportLoading(false);
+
+        }
+
+    };
+
 
     // ---------------------------------------------------------
     // RESUMEN POR TIPO
@@ -601,6 +741,80 @@ const totalCharged =
                 <p className="mt-1 text-sm text-gray-500">
                     Análisis de ventas contabilizadas según estado de pago.
                 </p>
+
+            </div>
+
+            {/* =====================================================
+                EXPORTACIÓN
+            ====================================================== */}
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+
+                <div>
+
+                    <h2 className="text-sm font-semibold text-gray-900">
+                        Exportar reporte
+                    </h2>
+
+                    <p className="text-xs text-gray-500">
+                        Se exportarán las ventas que cumplen los filtros actuales.
+                    </p>
+
+                </div>
+
+
+                <div className="flex flex-wrap gap-2">
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            handleExport("pdf")
+                        }
+                        disabled={
+                            exportLoading ||
+                            loading ||
+                            sales.length === 0
+                        }
+                        className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+
+                        <span>
+                            📄
+                        </span>
+
+                        {exportLoading
+                            ? "Generando..."
+                            : "Exportar PDF"
+                        }
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            handleExport("excel")
+                        }
+                        disabled={
+                            exportLoading ||
+                            loading ||
+                            sales.length === 0
+                        }
+                        className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+
+                        <span>
+                            📊
+                        </span>
+
+                        {exportLoading
+                            ? "Generando..."
+                            : "Exportar Excel"
+                        }
+
+                    </button>
+
+                </div>
 
             </div>
 
