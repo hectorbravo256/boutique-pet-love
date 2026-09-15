@@ -7,6 +7,7 @@ import {
 import { supabase } from "../../supabaseClient";
 import AdminCard from "../components/AdminCard";
 import CanalVentaSelector from "./ventas-externas/components/CanalVentaSelector";
+import MedioPagoSelector from "./ventas-externas/components/MedioPagoSelector";
 import {
     formatearFechaHoraChile,
     formatearFechaChile
@@ -1962,60 +1963,10 @@ const fechaVenta = (fecha) => {
 
                     {/* MEDIO DE PAGO */}
 
-                    <div className="mb-6">
-
-                        <label className="
-                            block
-                            text-sm
-                            font-bold
-                            text-slate-600
-                            mb-2
-                        ">
-
-                            Medio de pago
-
-                        </label>
-
-                        <select
-                            value={
-                                medioPago
-                            }
-                            onChange={e =>
-                                setMedioPago(
-                                    e.target.value
-                                )
-                            }
-                            className="
-                                w-full
-                                border
-                                border-slate-200
-                                rounded-xl
-                                p-3
-                                bg-white
-                            "
-                        >
-
-                            <option value="efectivo">
-
-                                💵 Efectivo
-
-                            </option>
-
-                            <option value="transferencia">
-
-                                🏦 Transferencia
-
-                            </option>
-
-                            <option value="POS TUU">
-
-                                💳 POS TUU
-
-                            </option>
-
-                        </select>
-
-                    </div>
+<MedioPagoSelector
+    medioPago={medioPago}
+    setMedioPago={setMedioPago}
+/>
 
 
                     <button
