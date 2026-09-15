@@ -1447,7 +1447,8 @@ const fechaVenta = (fecha) => {
     envioPorPagar={envioPorPagar}
     moneda={moneda}
 />
-
+                
+</div>
 
             {/* =================================================
                 HISTORIAL
