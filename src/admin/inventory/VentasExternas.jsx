@@ -11,6 +11,7 @@ import ClienteForm from "./ventas-externas/components/ClienteForm";
 import MedioPagoSelector from "./ventas-externas/components/MedioPagoSelector";
 import ProductoSelector from "./ventas-externas/components/ProductoSelector";
 import DespachoRRSS from "./ventas-externas/components/DespachoRRSS";
+import ItemsVenta from "./ventas-externas/components/ItemsVenta";
 import {
     formatearFechaHoraChile,
     formatearFechaChile
@@ -1350,100 +1351,11 @@ const fechaVenta = (fecha) => {
 
                             <div>
 
-                                {items.map(
-                                    item => (
-
-                                        <div
-                                            key={
-                                                item.variant_id
-                                            }
-                                            className="
-                                                flex
-                                                items-center
-                                                justify-between
-                                                gap-4
-                                                p-4
-                                                border-t
-                                            "
-                                        >
-
-                                            <div>
-
-                                                <div className="
-                                                    font-bold
-                                                ">
-
-                                                    {
-                                                        item.name
-                                                    }
-
-                                                </div>
-
-                                                <div className="
-                                                    text-sm
-                                                    text-slate-500
-                                                ">
-
-                                                    {
-                                                        item.size
-                                                    }
-
-                                                    {" × "}
-
-                                                    {
-                                                        item.quantity
-                                                    }
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div className="
-                                                flex
-                                                items-center
-                                                gap-4
-                                            ">
-
-                                                <strong>
-
-                                                    {
-                                                        moneda(
-                                                            Number(
-                                                                item.price
-                                                            ) *
-                                                            Number(
-                                                                item.quantity
-                                                            )
-                                                        )
-                                                    }
-
-                                                </strong>
-
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        eliminarItem(
-                                                            item.variant_id
-                                                        )
-                                                    }
-                                                    className="
-                                                        text-red-500
-                                                        font-bold
-                                                    "
-                                                >
-
-                                                    ✕
-
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-
-                                    )
-                                )}
+<ItemsVenta
+    items={items}
+    eliminarItem={eliminarItem}
+    moneda={moneda}
+/>
 
                             </div>
 
