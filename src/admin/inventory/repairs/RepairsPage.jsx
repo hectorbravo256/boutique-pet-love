@@ -717,7 +717,7 @@ const selectedProductVariants = useMemo(() => {
 
       const payloadItems =
         validItems.map((item) => ({
-          repair_item_id: item.id,
+          item_id: Number(item.id),
           quantity: Number(
             item.quantity_to_return
           ),
