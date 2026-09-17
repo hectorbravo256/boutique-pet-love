@@ -92,8 +92,10 @@ const totalVentas =
         summary?.sales?.totalSales ?? 0
     );
 
-  const totalPedidos =
-    orders.length;
+const totalPedidos =
+    Number(
+        summary?.sales?.totalOrders ?? 0
+    );
 
   const pendientes =
     orders.filter(
@@ -220,10 +222,17 @@ const ticketPromedio =
 
             : "Sin fecha";
 
-        map[f] =
-          (map[f] || 0)
-          +
-          Number(o.total || 0);
+const montoVenta =
+    Number(
+        o.total_cobrado ??
+        o.total ??
+        0
+    );
+
+map[f] =
+    (map[f] || 0)
+    +
+    montoVenta;
 
       });
 
