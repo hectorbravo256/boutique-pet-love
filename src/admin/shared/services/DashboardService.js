@@ -2,181 +2,264 @@ import ApiClient from "../api/ApiClient";
 
 class DashboardService {
 
-async getSummary() {
+    async getSummary() {
 
-    try {
+        try {
 
-        const { data, error } =
-            await ApiClient.db
-                .from("vw_dashboard_summary")
-                .select("*")
-                .single();
+            // ---------------------------------------------------------
+            // DASHBOARD GENERAL
+            // ---------------------------------------------------------
 
-        if (error) throw error;
+            const { data, error } =
+                await ApiClient.db
+                    .from("vw_dashboard_summary")
+                    .select("*")
+                    .single();
 
-const alerts =
-    await this.getAlerts();
+            if (error) {
+                throw error;
+            }
 
-const {
-    data: shippingData,
-    error: shippingError
-} =
-    await ApiClient.db
-        .from("vw_dashboard_shipping")
-        .select("*")
-        .single();
+            // ---------------------------------------------------------
+            // ALERTAS
+            // ---------------------------------------------------------
 
-if (shippingError) {
-    throw shippingError;
-}
+            const alerts =
+                await this.getAlerts();
 
-return {
+            // ---------------------------------------------------------
+            // PAKET
+            // ---------------------------------------------------------
+            // PAKET es un módulo complementario del Dashboard.
+            //
+            // Un error en vw_dashboard_shipping NO debe impedir
+            // que ventas, inventario y compras continúen funcionando.
+            // ---------------------------------------------------------
 
-    inventory: {
+            let shipping = {
 
-        totalUnits:
-            data.inventory_units,
+                paketShipments: 0,
 
-        outOfStock:
-            data.out_of_stock,
+                paketCost: 0,
 
-        lowStock:
-            data.low_stock,
+                paketReimbursementPending: 0,
 
-        inventoryValue:
-            data.inventory_value
+                paketReimbursed: 0,
 
-    },
+                paketCostAbsorbed: 0,
 
-    sales: {
+                paketChargedToCustomers: 0
 
-        totalSales:
-            data.total_sales,
+            };
 
-        totalOrders:
-            data.total_orders,
+            const {
+                data: shippingData,
+                error: shippingError
+            } =
+                await ApiClient.db
+                    .from("vw_dashboard_shipping")
+                    .select("*")
+                    .single();
 
-        averageTicket:
-            data.average_ticket,
+            if (shippingError) {
 
-        salesMonth:
-            data.sales_month,
+                console.warn(
+                    "DashboardService.getSummary: no fue posible cargar las métricas PAKET. El Dashboard general continuará funcionando.",
+                    shippingError
+                );
 
-        salesToday:
-            data.sales_today
+            } else if (shippingData) {
 
-    },
+                shipping = {
 
-    purchases: {
+                    paketShipments:
+                        shippingData.paket_shipments ?? 0,
 
-        totalMonth:
-            data.purchases_month,
+                    paketCost:
+                        shippingData.paket_cost ?? 0,
 
-        countMonth:
-            data.purchases_count
+                    paketReimbursementPending:
+                        shippingData.paket_reimbursement_pending ?? 0,
 
-    },
+                    paketReimbursed:
+                        shippingData.paket_reimbursed ?? 0,
 
-    shipping: {
+                    paketCostAbsorbed:
+                        shippingData.paket_cost_absorbed ?? 0,
 
-        paketShipments:
-            shippingData.paket_shipments,
+                    paketChargedToCustomers:
+                        shippingData.paket_charged_to_customers ?? 0
 
-        paketCost:
-            shippingData.paket_cost,
+                };
 
-        paketReimbursementPending:
-            shippingData.paket_reimbursement_pending,
+            }
 
-        paketReimbursed:
-            shippingData.paket_reimbursed,
+            // ---------------------------------------------------------
+            // RESPUESTA DEL DASHBOARD
+            // ---------------------------------------------------------
 
-        paketCostAbsorbed:
-            shippingData.paket_cost_absorbed,
+            return {
 
-        paketChargedToCustomers:
-            shippingData.paket_charged_to_customers
+                inventory: {
 
-    },
+                    totalUnits:
+                        data.inventory_units,
 
-    alerts
+                    outOfStock:
+                        data.out_of_stock,
 
-};
+                    lowStock:
+                        data.low_stock,
 
-    } catch (error) {
+                    inventoryValue:
+                        data.inventory_value
 
-        console.error(error);
+                },
 
-return {
+                sales: {
 
-    inventory: {},
+                    totalSales:
+                        data.total_sales,
 
-    sales: {},
+                    totalOrders:
+                        data.total_orders,
 
-    purchases: {},
+                    averageTicket:
+                        data.average_ticket,
 
-    alerts: {
+                    salesMonth:
+                        data.sales_month,
 
-        outOfStock: 0,
+                    salesToday:
+                        data.sales_today
 
-        lowStock: 0,
+                },
 
-        alerts: []
+                purchases: {
+
+                    totalMonth:
+                        data.purchases_month,
+
+                    countMonth:
+                        data.purchases_count
+
+                },
+
+                shipping,
+
+                alerts
+
+            };
+
+        } catch (error) {
+
+            // ---------------------------------------------------------
+            // FALLBACK GENERAL
+            // ---------------------------------------------------------
+
+            console.error(
+                "DashboardService.getSummary:",
+                error
+            );
+
+            return {
+
+                inventory: {},
+
+                sales: {},
+
+                purchases: {},
+
+                // Mantener siempre la estructura de shipping
+                // para evitar errores en Dashboard.jsx.
+
+                shipping: {
+
+                    paketShipments: 0,
+
+                    paketCost: 0,
+
+                    paketReimbursementPending: 0,
+
+                    paketReimbursed: 0,
+
+                    paketCostAbsorbed: 0,
+
+                    paketChargedToCustomers: 0
+
+                },
+
+                alerts: {
+
+                    outOfStock: 0,
+
+                    lowStock: 0,
+
+                    alerts: []
+
+                }
+
+            };
+
+        }
 
     }
 
-};
-
-    }
-
-}
-
-
+    // =============================================================
+    // ALERTAS DEL DASHBOARD
+    // =============================================================
 
     async getAlerts() {
 
-    try {
+        try {
 
-        const { data, error } =
-            await ApiClient.db
-                .from("vw_dashboard_alerts")
-                .select("*");
+            const { data, error } =
+                await ApiClient.db
+                    .from("vw_dashboard_alerts")
+                    .select("*");
 
-        if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
-        return {
+            return {
 
-            outOfStock:
-                data.filter(
-                    a => a.alert_type === "OUT_OF_STOCK"
-                ).length,
+                outOfStock:
+                    data.filter(
+                        a =>
+                            a.alert_type === "OUT_OF_STOCK"
+                    ).length,
 
-            lowStock:
-                data.filter(
-                    a => a.alert_type === "LOW_STOCK"
-                ).length,
+                lowStock:
+                    data.filter(
+                        a =>
+                            a.alert_type === "LOW_STOCK"
+                    ).length,
 
-            alerts: data
+                alerts: data
 
-        };
+            };
 
-    } catch (error) {
+        } catch (error) {
 
-        console.error(error);
+            console.error(
+                "DashboardService.getAlerts:",
+                error
+            );
 
-        return {
+            return {
 
-            outOfStock: 0,
+                outOfStock: 0,
 
-            lowStock: 0,
+                lowStock: 0,
 
-            alerts: []
+                alerts: []
 
-        };
+            };
+
+        }
 
     }
-
-}
 
 }
 
