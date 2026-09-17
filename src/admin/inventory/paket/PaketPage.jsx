@@ -314,6 +314,47 @@ function ReembolsoModal({
                     </div>
 
                     {/* MEDIO DE PAGO */}
+                                        {/* INFORMACIÓN DEL GASTO */}
+                    {!esMasivo && expenses[0] && (
+                        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                            <p className="text-xs font-black uppercase tracking-wider text-slate-500 mb-3">
+                                Información del gasto
+                            </p>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-slate-500">
+                                        Pagado inicialmente por
+                                    </span>
+
+                                    <span className="text-sm font-black text-slate-800">
+                                        {expenses[0].paid_by || "—"}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-slate-500">
+                                        Tratamiento del envío
+                                    </span>
+
+                                    {Number(
+                                        expenses[0].order?.costo_envio || 0
+                                    ) === 0 ? (
+                                        <span className="text-sm font-black text-pink-600">
+                                            Absorbido por Boutique Pet Love
+                                        </span>
+                                    ) : (
+                                        <span className="text-sm font-black text-sky-600">
+                                            Cobrado al cliente{" "}
+                                            {FORMATO_MONEDA(
+                                                expenses[0].order?.costo_envio
+                                            )}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div>
                         <label
                             htmlFor="paket-payment-method"
@@ -423,15 +464,17 @@ function ReembolsoModal({
                             disabled={saving}
                             className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {saving
-                                ? "Procesando..."
-                                : esMasivo
-                                  ? `Confirmar ${expenses.length} reembolso${
-                                        expenses.length === 1
-                                            ? ""
-                                            : "s"
-                                    }`
-                                  : "Confirmar reembolso"}
+{saving
+    ? "Procesando..."
+    : esMasivo
+      ? `Confirmar ${expenses.length} reembolso${
+            expenses.length === 1
+                ? ""
+                : "s"
+        } por ${FORMATO_MONEDA(montoTotal)}`
+      : `Confirmar reembolso de ${FORMATO_MONEDA(
+            montoTotal
+        )}`}
                         </button>
                     </div>
                 </form>
@@ -826,11 +869,11 @@ export default function PaketPage() {
                         </div>
                     </div>
 
-                    <p className="text-slate-500 mt-3 max-w-2xl">
-                        Control de despachos PAKET,
-                        costos y reembolsos pagados
-                        inicialmente por la empresa.
-                    </p>
+<p className="text-slate-500 mt-3 max-w-2xl">
+    Control de despachos PAKET,
+    costos y reembolsos pagados
+    inicialmente por Aracelli.
+</p>
                 </div>
 
                 <button
@@ -910,32 +953,32 @@ export default function PaketPage() {
                     description="Registros de gastos PAKET"
                 />
 
-                <StatCard
-                    icon="💰"
-                    title="Costo total"
-                    value={FORMATO_MONEDA(
-                        resumen.costoTotal
-                    )}
-                    description="Total pagado a PAKET"
-                />
+<StatCard
+    icon="💰"
+    title="Costo total PAKET"
+    value={FORMATO_MONEDA(
+        resumen.costoTotal
+    )}
+    description="Total pagado a PAKET"
+/>
 
-                <StatCard
-                    icon="⏳"
-                    title="Pendiente de reembolso"
-                    value={FORMATO_MONEDA(
-                        resumen.pendienteReembolso
-                    )}
-                    description="Pagos pendientes de recuperar"
-                />
+<StatCard
+    icon="⏳"
+    title="Pendiente de reembolso"
+    value={FORMATO_MONEDA(
+        resumen.pendienteReembolso
+    )}
+    description="Monto pendiente de devolver a Aracelli"
+/>
 
-                <StatCard
-                    icon="✅"
-                    title="Reembolsado"
-                    value={FORMATO_MONEDA(
-                        resumen.reembolsado
-                    )}
-                    description="Monto ya recuperado"
-                />
+<StatCard
+    icon="✅"
+    title="Reembolsado"
+    value={FORMATO_MONEDA(
+        resumen.reembolsado
+    )}
+    description="Monto ya devuelto a Aracelli"
+/>
             </div>
 
             {/* =====================================================
@@ -950,13 +993,13 @@ export default function PaketPage() {
                         </div>
 
                         <div>
-                            <h2 className="font-black text-slate-900">
-                                Recuperación de fondos
-                            </h2>
+<h2 className="font-black text-slate-900">
+    Reembolsos a Aracelli
+</h2>
 
-                            <p className="text-sm text-slate-500">
-                                Estado de los pagos realizados
-                            </p>
+<p className="text-sm text-slate-500">
+    Estado de recuperación de los gastos PAKET
+</p>
                         </div>
                     </div>
 
@@ -1264,13 +1307,17 @@ export default function PaketPage() {
                                             Fecha
                                         </th>
 
-                                        <th className="text-right px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
-                                            Monto PAKET
-                                        </th>
+<th className="text-right px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+    Monto PAKET
+</th>
 
-                                        <th className="text-left px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
-                                            Pagado por
-                                        </th>
+<th className="text-left px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+    Envío
+</th>
+
+<th className="text-left px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
+    Pagado inicialmente por
+</th>
 
                                         <th className="text-left px-4 py-4 text-xs font-black uppercase tracking-wider text-slate-500">
                                             Estado
@@ -1387,11 +1434,39 @@ export default function PaketPage() {
                                                         </span>
                                                     </td>
 
-                                                    {/* PAGADO POR */}
-                                                    <td className="px-4 py-4 text-sm text-slate-600">
-                                                        {expense.paid_by ||
-                                                            "—"}
-                                                    </td>
+{/* ENVÍO */}
+<td className="px-4 py-4">
+    {Number(expense.order?.costo_envio || 0) === 0 ? (
+        <div>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-pink-100 text-pink-700 border border-pink-200 whitespace-nowrap">
+                Absorbido
+            </span>
+
+            <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">
+                Boutique Pet Love
+            </p>
+        </div>
+    ) : (
+        <div>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-sky-100 text-sky-700 border border-sky-200 whitespace-nowrap">
+                Cobrado al cliente
+            </span>
+
+            <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">
+                {FORMATO_MONEDA(
+                    expense.order?.costo_envio
+                )}
+            </p>
+        </div>
+    )}
+</td>
+
+{/* PAGADO INICIALMENTE POR */}
+<td className="px-4 py-4 text-sm text-slate-600">
+    <span className="font-semibold text-slate-700">
+        {expense.paid_by || "—"}
+    </span>
+</td>
 
                                                     {/* ESTADO */}
                                                     <td className="px-4 py-4">
