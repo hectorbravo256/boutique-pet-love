@@ -197,7 +197,7 @@ const PaketService = {
 
 
   // =========================================================
-  // REGISTRAR REEMBOLSO
+  // REGISTRAR REEMBOLSO INDIVIDUAL
   // =========================================================
 
   async marcarReembolso({
@@ -271,6 +271,195 @@ const PaketService = {
 
 
     return data;
+
+  },
+
+
+  // =========================================================
+  // REGISTRAR REEMBOLSOS MASIVOS
+  // =========================================================
+  //
+  // Procesa varios gastos PAKET desde una sola acción.
+  //
+  // IMPORTANTE:
+  // En esta etapa utiliza la RPC individual existente
+  // "marcar_reembolso_paket" para cada registro.
+  //
+  // Más adelante podemos reemplazar internamente esta
+  // implementación por una RPC masiva transaccional
+  // en Supabase sin modificar PaketPage.jsx.
+  //
+  // =========================================================
+
+  async marcarReembolsosMasivos({
+
+    ids,
+    paymentMethod,
+    notes
+
+  }) {
+
+
+    // -------------------------------------------------------
+    // VALIDAR IDS
+    // -------------------------------------------------------
+
+    if (
+      !Array.isArray(ids) ||
+      ids.length === 0
+    ) {
+
+      throw new Error(
+        "Debes seleccionar al menos un gasto PAKET."
+      );
+
+    }
+
+
+    // -------------------------------------------------------
+    // VALIDAR MEDIO DE PAGO
+    // -------------------------------------------------------
+
+    if (
+      !paymentMethod ||
+      !String(
+        paymentMethod
+      ).trim()
+    ) {
+
+      throw new Error(
+        "El medio de pago del reembolso es obligatorio."
+      );
+
+    }
+
+
+    // -------------------------------------------------------
+    // NORMALIZAR IDS
+    // -------------------------------------------------------
+
+    const idsUnicos = [
+      ...new Set(
+        ids.filter(Boolean)
+      )
+    ];
+
+
+    if (
+      idsUnicos.length === 0
+    ) {
+
+      throw new Error(
+        "No existen gastos PAKET válidos seleccionados."
+      );
+
+    }
+
+
+    const metodo =
+      String(
+        paymentMethod
+      ).trim();
+
+
+    const observacion =
+      notes
+        ? String(
+            notes
+          ).trim()
+        : null;
+
+
+    // -------------------------------------------------------
+    // PROCESAR REEMBOLSOS
+    // -------------------------------------------------------
+
+    const resultados =
+      await Promise.allSettled(
+
+        idsUnicos.map(
+          id =>
+            this.marcarReembolso({
+
+              id,
+
+              paymentMethod:
+                metodo,
+
+              notes:
+                observacion
+
+            })
+        )
+
+      );
+
+
+    // -------------------------------------------------------
+    // SEPARAR RESULTADOS
+    // -------------------------------------------------------
+
+    const exitosos =
+      resultados.filter(
+        resultado =>
+          resultado.status ===
+          "fulfilled"
+      );
+
+
+    const fallidos =
+      resultados.filter(
+        resultado =>
+          resultado.status ===
+          "rejected"
+      );
+
+
+    // -------------------------------------------------------
+    // CONSTRUIR RESPUESTA
+    // -------------------------------------------------------
+
+    const errores =
+      fallidos.map(
+        (resultado, index) => ({
+
+          id:
+            idsUnicos[
+              resultados.findIndex(
+                item =>
+                  item ===
+                  resultado
+              )
+            ],
+
+          error:
+            normalizarError(
+              resultado.reason
+            )
+
+        })
+      );
+
+
+    return {
+
+      total:
+        idsUnicos.length,
+
+      exitosos:
+        exitosos.length,
+
+      fallidos:
+        fallidos.length,
+
+      completado:
+        fallidos.length === 0,
+
+      resultados,
+
+      errores
+
+    };
 
   },
 
