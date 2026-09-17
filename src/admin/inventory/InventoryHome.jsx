@@ -44,6 +44,13 @@ const modules = [
         to: "/admin/inventario/reparaciones",
         color: "from-amber-500 to-orange-600",
     },
+    {
+        title: "PAKET",
+        description: "Gestión de despachos, costos y reembolsos.",
+        icon: "📦",
+        to: "/admin/inventario/paket",
+        color: "from-emerald-500 to-teal-500",
+    },
 ];
 
 export default function InventoryHome() {
