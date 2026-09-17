@@ -119,70 +119,68 @@ function ReembolsoModal({
         setError("");
         setResult(null);
 
-try {
-    let respuesta;
+        try {
+            let respuesta;
 
-    // =====================================================
-    // REEMBOLSO MASIVO
-    // =====================================================
+            // =====================================================
+            // REEMBOLSO MASIVO
+            // =====================================================
 
-    if (esMasivo) {
-        respuesta =
-            await PaketService.marcarReembolsosMasivos({
-                ids: expenses.map(
-                    (expense) => expense.id
-                ),
-                paymentMethod,
-                notes,
-            });
+            if (esMasivo) {
+                respuesta =
+                    await PaketService.marcarReembolsosMasivos({
+                        ids: expenses.map(
+                            (expense) => expense.id
+                        ),
+                        paymentMethod,
+                        notes,
+                    });
 
-        // Si todos fueron procesados correctamente
-        if (respuesta.completado) {
+                // Si todos fueron procesados correctamente
+                if (respuesta.completado) {
+                    await onSuccess();
+
+                    onClose();
+                    return;
+                }
+
+                // Hubo errores parciales
+                await onSuccess();
+
+                setResult({
+                    exitosos: respuesta.exitosos,
+                    fallidos: respuesta.fallidos,
+                });
+
+                if (respuesta.errores?.length > 0) {
+                    setError(
+                        respuesta.errores[0]?.error ||
+                            "Algunos reembolsos no pudieron registrarse."
+                    );
+                } else {
+                    setError(
+                        "Algunos reembolsos no pudieron registrarse."
+                    );
+                }
+
+                return;
+            }
+
+            // =====================================================
+            // REEMBOLSO INDIVIDUAL
+            // =====================================================
+
+            respuesta =
+                await PaketService.marcarReembolso({
+                    id: expenses[0].id,
+                    paymentMethod,
+                    notes,
+                });
+
             await onSuccess();
 
             onClose();
-            return;
-        }
-
-        // Hubo errores parciales
-        await onSuccess();
-
-        setResult({
-            exitosos: respuesta.exitosos,
-            fallidos: respuesta.fallidos,
-        });
-
-        if (respuesta.errores?.length > 0) {
-            setError(
-                respuesta.errores[0]?.error ||
-                    "Algunos reembolsos no pudieron registrarse."
-            );
-        } else {
-            setError(
-                "Algunos reembolsos no pudieron registrarse."
-            );
-        }
-
-        return;
-    }
-
-    // =====================================================
-    // REEMBOLSO INDIVIDUAL
-    // =====================================================
-
-    respuesta =
-        await PaketService.marcarReembolso({
-            id: expenses[0].id,
-            paymentMethod,
-            notes,
-        });
-
-    await onSuccess();
-
-    onClose();
-
-} catch (err) {
-
+        } catch (err) {
             console.error(
                 "Error registrando reembolso PAKET:",
                 err
