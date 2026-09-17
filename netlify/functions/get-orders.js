@@ -145,44 +145,107 @@ exports.handler = async () => {
 
 
         // ========================================================
-        // BUSCAR CAMBIO ASOCIADO A LA VENTA
-        // ========================================================
+// BUSCAR TODOS LOS CAMBIOS ASOCIADOS A LA VENTA
+// ========================================================
 
-        const cambio =
-          exchanges.find(
-            (e) =>
-              String(
-                e.order_id
-              ) ===
-              String(
-                o.id
-              )
-          );
+const cambios =
+  exchanges.filter(
+    (e) =>
+      String(
+        e.order_id
+      ) ===
+      String(
+        o.id
+      )
+  );
 
 
-        // ========================================================
-        // COBRO ADICIONAL DEL CAMBIO
-        // ========================================================
+// ========================================================
+// COBROS ADICIONALES DE TODOS LOS CAMBIOS
+// ========================================================
 
 const montoAdicionalCambio =
-  cambio
-    ? Number(
+  cambios.reduce(
+    (total, cambio) =>
+      total +
+      Number(
         cambio.additional_payment || 0
-      )
-    : 0;
+      ),
+    0
+  );
 
+
+// ========================================================
+// COBROS DE CAMBIOS YA PAGADOS
+// ========================================================
 
 const adicionalCambioPagado =
-  cambio &&
-  String(
-    cambio.payment_status || ""
-  ).toLowerCase() ===
-    "paid"
+  cambios.reduce(
+    (total, cambio) => {
 
-    ? montoAdicionalCambio
+      const estaPagado =
+        String(
+          cambio.payment_status || ""
+        ).toLowerCase() ===
+        "paid";
 
-    : 0;
+      return (
+        total +
+        (
+          estaPagado
+            ? Number(
+                cambio.additional_payment || 0
+              )
+            : 0
+        )
+      );
 
+    },
+    0
+  );
+
+
+// ========================================================
+// CAMBIOS PENDIENTES
+// ========================================================
+
+const cambiosPendientes =
+  cambios.filter(
+    (cambio) =>
+      String(
+        cambio.payment_status || ""
+      ).toLowerCase() ===
+      "pending" &&
+      Number(
+        cambio.additional_payment || 0
+      ) > 0
+  );
+
+
+// ========================================================
+// CAMBIO QUE SE MOSTRARÁ PARA REGISTRAR PAGO
+// ========================================================
+//
+// Tomamos el primer cambio pendiente.
+// Después de registrarlo como pagado,
+// get-orders volverá a seleccionar
+// automáticamente el siguiente pendiente.
+//
+
+const cambioPendiente =
+  cambiosPendientes[0] ||
+  null;
+
+
+// ========================================================
+// CAMBIO PRINCIPAL PARA COMPATIBILIDAD
+// ========================================================
+
+const cambio =
+  cambioPendiente ||
+  cambios[0] ||
+  null;
+        
         // ========================================================
         // TOTAL ORIGINAL
         // ========================================================
@@ -271,10 +334,12 @@ adicional_cambio:
             null,
 
 
-          estado_pago_cambio:
-            cambio?.payment_status ||
-            "not_required",
-
+estado_pago_cambio:
+  cambiosPendientes.length > 0
+    ? "pending"
+    : cambios.length > 0
+      ? "paid"
+      : "not_required",
 
           medio_pago_cambio:
             cambio?.payment_method ||
