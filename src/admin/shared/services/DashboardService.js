@@ -14,42 +14,88 @@ async getSummary() {
 
         if (error) throw error;
 
-        const alerts =
+const alerts =
     await this.getAlerts();
+
+const {
+    data: shippingData,
+    error: shippingError
+} =
+    await ApiClient.db
+        .from("vw_dashboard_shipping")
+        .select("*")
+        .single();
+
+if (shippingError) {
+    throw shippingError;
+}
 
 return {
 
     inventory: {
 
-        totalUnits: data.inventory_units,
+        totalUnits:
+            data.inventory_units,
 
-        outOfStock: data.out_of_stock,
+        outOfStock:
+            data.out_of_stock,
 
-        lowStock: data.low_stock,
+        lowStock:
+            data.low_stock,
 
-        inventoryValue: data.inventory_value
+        inventoryValue:
+            data.inventory_value
 
     },
 
     sales: {
 
-        totalSales: data.total_sales,
+        totalSales:
+            data.total_sales,
 
-        totalOrders: data.total_orders,
+        totalOrders:
+            data.total_orders,
 
-        averageTicket: data.average_ticket,
+        averageTicket:
+            data.average_ticket,
 
-        salesMonth: data.total_sales,
+        salesMonth:
+            data.sales_month,
 
-        salesToday: 0
+        salesToday:
+            data.sales_today
 
     },
 
     purchases: {
 
-        totalMonth: data.purchases_month,
+        totalMonth:
+            data.purchases_month,
 
-        countMonth: data.purchases_count
+        countMonth:
+            data.purchases_count
+
+    },
+
+    shipping: {
+
+        paketShipments:
+            shippingData.paket_shipments,
+
+        paketCost:
+            shippingData.paket_cost,
+
+        paketReimbursementPending:
+            shippingData.paket_reimbursement_pending,
+
+        paketReimbursed:
+            shippingData.paket_reimbursed,
+
+        paketCostAbsorbed:
+            shippingData.paket_cost_absorbed,
+
+        paketChargedToCustomers:
+            shippingData.paket_charged_to_customers
 
     },
 
