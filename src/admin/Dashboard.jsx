@@ -112,51 +112,7 @@ const ticketPromedio =
         summary?.sales?.averageTicket ?? 0
     );
 
-  const ventasHoy =
-    orders.filter(o => {
-
-      const fecha =
-        new Date(o.created_at)
-          .toLocaleDateString();
-
-      const hoy =
-        new Date()
-          .toLocaleDateString();
-
-      return fecha === hoy;
-
-    }).reduce(
-      (acc, o) =>
-        acc + Number(o.total || 0),
-      0
-    );
-
-  const ventasMes =
-    orders.filter(o => {
-
-      const fecha =
-        new Date(o.created_at);
-
-      const ahora =
-        new Date();
-
-      return (
-        fecha.getMonth()
-        ===
-        ahora.getMonth()
-
-        &&
-
-        fecha.getFullYear()
-        ===
-        ahora.getFullYear()
-      );
-
-    }).reduce(
-      (acc, o) =>
-        acc + Number(o.total || 0),
-      0
-    );
+  
 
   const topProductos =
     Object.values(
