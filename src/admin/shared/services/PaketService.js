@@ -370,96 +370,76 @@ const PaketService = {
         : null;
 
 
-    // -------------------------------------------------------
-    // PROCESAR REEMBOLSOS
-    // -------------------------------------------------------
+// -------------------------------------------------------
+// PROCESAR REEMBOLSOS MASIVOS
+// -------------------------------------------------------
 
-    const resultados =
-      await Promise.allSettled(
+const {
+  data,
+  error
+} = await supabase.rpc(
 
-        idsUnicos.map(
-          id =>
-            this.marcarReembolso({
+  "marcar_reembolsos_paket_masivos",
 
-              id,
+  {
 
-              paymentMethod:
-                metodo,
+    p_shipping_expense_ids:
+      idsUnicos,
 
-              notes:
-                observacion
+    p_payment_method:
+      metodo,
 
-            })
-        )
+    p_notes:
+      observacion
 
-      );
+  }
 
-
-    // -------------------------------------------------------
-    // SEPARAR RESULTADOS
-    // -------------------------------------------------------
-
-    const exitosos =
-      resultados.filter(
-        resultado =>
-          resultado.status ===
-          "fulfilled"
-      );
+);
 
 
-    const fallidos =
-      resultados.filter(
-        resultado =>
-          resultado.status ===
-          "rejected"
-      );
+// -------------------------------------------------------
+// MANEJAR ERROR
+// -------------------------------------------------------
+
+if (error) {
+
+  throw new Error(
+    normalizarError(error)
+  );
+
+}
 
 
-    // -------------------------------------------------------
-    // CONSTRUIR RESPUESTA
-    // -------------------------------------------------------
+// -------------------------------------------------------
+// CONSTRUIR RESPUESTA
+// -------------------------------------------------------
 
-    const errores =
-      fallidos.map(
-        (resultado, index) => ({
-
-          id:
-            idsUnicos[
-              resultados.findIndex(
-                item =>
-                  item ===
-                  resultado
-              )
-            ],
-
-          error:
-            normalizarError(
-              resultado.reason
-            )
-
-        })
-      );
+const resultados =
+  Array.isArray(data)
+    ? data
+    : [];
 
 
-    return {
+return {
 
-      total:
-        idsUnicos.length,
+  total:
+    idsUnicos.length,
 
-      exitosos:
-        exitosos.length,
+  exitosos:
+    resultados.length,
 
-      fallidos:
-        fallidos.length,
+  fallidos:
+    0,
 
-      completado:
-        fallidos.length === 0,
+  completado:
+    true,
 
-      resultados,
+  resultados,
 
-      errores
+  errores:
+    []
 
-    };
+};
 
   },
 
