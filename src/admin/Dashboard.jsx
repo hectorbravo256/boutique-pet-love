@@ -671,11 +671,11 @@ if (ordersLoading) {
                   ">
                     $
                     {
-                      Number(
-                        order.total || 0
-                      ).toLocaleString(
-                        "es-CL"
-                      )
+Number(
+  order.total_cobrado ?? order.total ?? 0
+).toLocaleString(
+  "es-CL"
+)
                     }
                   </div>
 
