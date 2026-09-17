@@ -119,55 +119,81 @@ function ReembolsoModal({
         setError("");
         setResult(null);
 
-        try {
-            /*
-             * Procesamos todos los gastos desde un solo botón.
-             *
-             * Se utiliza la RPC individual existente para cada gasto.
-             * En una siguiente etapa podremos reemplazar esto por una
-             * RPC masiva transaccional de Supabase.
-             */
-            const resultados = await Promise.allSettled(
-                expenses.map((expense) =>
-                    PaketService.marcarReembolso({
-                        id: expense.id,
-                        paymentMethod,
-                        notes,
-                    })
-                )
-            );
+try {
+    let respuesta;
 
-            const exitosos = resultados.filter(
-                (resultado) =>
-                    resultado.status === "fulfilled"
-            );
+    // =====================================================
+    // REEMBOLSO MASIVO
+    // =====================================================
 
-            const fallidos = resultados.filter(
-                (resultado) =>
-                    resultado.status === "rejected"
-            );
-
-            if (fallidos.length === 0) {
-                await onSuccess();
-
-                onClose();
-                return;
-            }
-
-            await onSuccess();
-
-            setResult({
-                exitosos: exitosos.length,
-                fallidos: fallidos.length,
+    if (esMasivo) {
+        respuesta =
+            await PaketService.marcarReembolsosMasivos({
+                ids: expenses.map(
+                    (expense) => expense.id
+                ),
+                paymentMethod,
+                notes,
             });
 
-            const primerError = fallidos[0]?.reason;
+        // Si todos fueron procesados correctamente
+        if (respuesta.completado) {
+            await onSuccess();
 
+            onClose();
+            return;
+        }
+
+        // Hubo errores parciales
+        await onSuccess();
+
+        setResult({
+            exitosos: respuesta.exitosos,
+            fallidos: respuesta.fallidos,
+        });
+
+        if (respuesta.errores?.length > 0) {
             setError(
-                primerError?.message ||
+                respuesta.errores[0]?.error ||
                     "Algunos reembolsos no pudieron registrarse."
             );
-        } catch (err) {
+        } else {
+            setError(
+                "Algunos reembolsos no pudieron registrarse."
+            );
+        }
+
+        return;
+    }
+
+    // =====================================================
+    // REEMBOLSO INDIVIDUAL
+    // =====================================================
+
+    respuesta =
+        await PaketService.marcarReembolso({
+            id: expenses[0].id,
+            paymentMethod,
+            notes,
+        });
+
+    await onSuccess();
+
+    onClose();
+
+} catch (err) {
+    console.error(
+        "Error registrando reembolso PAKET:",
+        err
+    );
+
+    setError(
+        err?.message ||
+            "No fue posible registrar el reembolso."
+    );
+} finally {
+    setSaving(false);
+}
             console.error(
                 "Error registrando reembolso PAKET:",
                 err
