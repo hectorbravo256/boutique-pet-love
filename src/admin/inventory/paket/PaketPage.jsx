@@ -182,18 +182,7 @@ try {
     onClose();
 
 } catch (err) {
-    console.error(
-        "Error registrando reembolso PAKET:",
-        err
-    );
 
-    setError(
-        err?.message ||
-            "No fue posible registrar el reembolso."
-    );
-} finally {
-    setSaving(false);
-}
             console.error(
                 "Error registrando reembolso PAKET:",
                 err
