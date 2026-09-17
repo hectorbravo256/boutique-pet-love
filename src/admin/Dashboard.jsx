@@ -87,11 +87,9 @@ const [ordersLoading, setOrdersLoading] = useState(true);
 
   }, []);
 
-  const totalVentas =
-    orders.reduce(
-      (acc, o) =>
-        acc + Number(o.total || 0),
-      0
+const totalVentas =
+    Number(
+        summary?.sales?.totalSales ?? 0
     );
 
   const totalPedidos =
@@ -107,10 +105,10 @@ const [ordersLoading, setOrdersLoading] = useState(true);
       o => o.estado === "enviado"
     ).length;
 
-  const ticketPromedio =
-    totalPedidos > 0
-      ? totalVentas / totalPedidos
-      : 0;
+const ticketPromedio =
+    Number(
+        summary?.sales?.averageTicket ?? 0
+    );
 
   const ventasHoy =
     orders.filter(o => {
@@ -478,6 +476,78 @@ if (ordersLoading) {
     onPurchase={() => navigate("/admin/crear/compras")}
 
 />
+  
+  {/* LOGÍSTICA PAKET */}
+
+<div className="
+    mt-8
+    grid
+    grid-cols-1
+    sm:grid-cols-2
+    xl:grid-cols-4
+    gap-5
+">
+
+    <StatCard
+        title="🚚 Despachos PAKET"
+        value={
+            summary?.shipping?.paketShipments ?? 0
+        }
+        color="text-blue-600"
+    />
+
+    <StatCard
+        title="📦 Costo PAKET"
+        value={`$${(
+            summary?.shipping?.paketCost ?? 0
+        ).toLocaleString("es-CL")}`}
+        color="text-violet-600"
+    />
+
+    <StatCard
+        title="💸 Reembolso pendiente"
+        value={`$${(
+            summary?.shipping?.paketReimbursementPending ?? 0
+        ).toLocaleString("es-CL")}`}
+        color="text-orange-600"
+    />
+
+    <StatCard
+        title="✅ Reembolsado"
+        value={`$${(
+            summary?.shipping?.paketReimbursed ?? 0
+        ).toLocaleString("es-CL")}`}
+        color="text-emerald-600"
+    />
+
+</div>
+
+  <div className="
+    mt-5
+    grid
+    grid-cols-1
+    sm:grid-cols-2
+    xl:grid-cols-2
+    gap-5
+">
+
+    <StatCard
+        title="🎁 Envíos gratis absorbidos"
+        value={`$${(
+            summary?.shipping?.paketCostAbsorbed ?? 0
+        ).toLocaleString("es-CL")}`}
+        color="text-pink-600"
+    />
+
+    <StatCard
+        title="💳 Envíos cobrados clientes"
+        value={`$${(
+            summary?.shipping?.paketChargedToCustomers ?? 0
+        ).toLocaleString("es-CL")}`}
+        color="text-cyan-600"
+    />
+
+</div>
 
       {/* GRID */}
       <div className="
