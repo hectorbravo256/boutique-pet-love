@@ -421,45 +421,20 @@ const formatearFechaHora = (valor) => {
             ? data[0]
             : data;
 
-        setOrders(prev =>
+// ============================================================
+// RECARGAR PEDIDOS DESDE SUPABASE
+// ============================================================
+// Esto es importante porque una venta puede tener
+// múltiples cambios pendientes.
+// Después de registrar un pago,
+// get-orders.js determina automáticamente:
+// - cuánto se ha pagado
+// - cuánto queda pendiente
+// - cuál es el siguiente cambio pendiente
+// - el total realmente cobrado
+// ============================================================
 
-          (
-            Array.isArray(prev)
-              ? prev
-              : []
-          ).map(o =>
-
-            o.id === pagoCambio.id
-
-              ? {
-                  ...o,
-
-                  adicional_cambio:
-                    Number(
-                      o.adicional_cambio || 0
-                    ),
-
-                  estado_pago_cambio:
-                    "paid",
-
-                  medio_pago_cambio:
-                    exchange?.payment_method ||
-                    medioPagoCambio,
-
-                  total_cobrado:
-                    Number(
-                      o.total || 0
-                    ) +
-                    Number(
-                      o.adicional_cambio || 0
-                    )
-                }
-
-              : o
-
-          )
-
-        );
+await cargarPedidos();
 
         setPagoCambio(null);
         setMedioPagoCambio("");
