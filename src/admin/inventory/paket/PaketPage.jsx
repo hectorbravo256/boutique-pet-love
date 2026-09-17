@@ -1476,29 +1476,26 @@ export default function PaketPage() {
                         ================================================== */}
 
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-5 py-5 border-t border-slate-200">
-                            <p className="text-sm text-slate-500">
-                                Mostrando{" "}
-                                <span className="font-bold text-slate-700">
-                                    {expensesFiltrados.length ===
-                                    0
-                                        ? 0
-                                        : inicio + 1}
-                                </span>{" "}
-                                a{" "}
-                                <span className="font-bold text-slate-700">
-                                    {Math.min(
-                                        fin,
-                                        expensesFiltrados.length
-                                    )}
-                                </span>{" "}
-                                de{" "}
-                                <span className="font-bold text-slate-700">
-                                    {
-                                        expensesFiltrados.length
-                                    }
-                                }{" "}
-                                registros
-                            </p>
+<p className="text-sm text-slate-500">
+    Mostrando{" "}
+    <span className="font-bold text-slate-700">
+        {expensesFiltrados.length === 0
+            ? 0
+            : inicio + 1}
+    </span>{" "}
+    a{" "}
+    <span className="font-bold text-slate-700">
+        {Math.min(
+            fin,
+            expensesFiltrados.length
+        )}
+    </span>{" "}
+    de{" "}
+    <span className="font-bold text-slate-700">
+        {expensesFiltrados.length}
+    </span>{" "}
+    registros
+</p>
 
                             <div className="flex flex-wrap items-center gap-2">
                                 {/* ANTERIOR */}
