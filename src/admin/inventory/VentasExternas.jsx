@@ -796,7 +796,6 @@ export default function VentasExternas() {
 
             </div>
 
-
             {/* =================================================
                 MENSAJES
             ================================================= */}
@@ -839,7 +838,6 @@ export default function VentasExternas() {
                 </div>
 
             )}
-
 
             {/* =================================================
                 NUEVA VENTA
@@ -919,7 +917,6 @@ export default function VentasExternas() {
                         esRegionPaket={esRegionPaket}
                     />
                     
-                    
                         </div>
                     )}
 
@@ -963,7 +960,6 @@ export default function VentasExternas() {
 
                         </div>
 
-
                         {items.length === 0 ? (
 
                             <div className="
@@ -980,18 +976,17 @@ export default function VentasExternas() {
 
                             <div>
 
-<ItemsVenta
-    items={items}
-    eliminarItem={eliminarItem}
-    moneda={moneda}
-/>
+                            <ItemsVenta
+                                items={items}
+                                eliminarItem={eliminarItem}
+                                moneda={moneda}
+                            />
 
                             </div>
 
                         )}
 
                     </div>
-
 
                     {/* OBSERVACIÓN */}
 
@@ -1021,10 +1016,10 @@ export default function VentasExternas() {
 
                     {/* MEDIO DE PAGO */}
 
-<MedioPagoSelector
-    medioPago={medioPago}
-    setMedioPago={setMedioPago}
-/>
+                    <MedioPagoSelector
+                        medioPago={medioPago}
+                        setMedioPago={setMedioPago}
+                    />
 
 
                     <button
@@ -1103,7 +1098,6 @@ export default function VentasExternas() {
                     />
                 
                 </AdminCard>
-
 
                 {/* =================================================
                     MODAL DETALLE
