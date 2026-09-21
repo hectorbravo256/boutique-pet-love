@@ -42,20 +42,20 @@ export default function VentasExternas() {
     const [medioPago, setMedioPago] =
         useState("efectivo");
 
-const [cliente, setCliente] = useState({
-    nombre: "",
-    rut: "",
-    correo: "",
-    telefono: "",
-    observacion: ""
-});
+    const [cliente, setCliente] = useState({
+        nombre: "",
+        rut: "",
+        correo: "",
+        telefono: "",
+        observacion: ""
+    });
 
-const [despacho, setDespacho] = useState({
-    direccion: "",
-    comuna: "",
-    region: "",
-    empresa_envio: ""
-});
+    const [despacho, setDespacho] = useState({
+        direccion: "",
+        comuna: "",
+        region: "",
+        empresa_envio: ""
+    });
 
     const [productoSeleccionado, setProductoSeleccionado] =
         useState("");
@@ -167,13 +167,13 @@ const [despacho, setDespacho] = useState({
                     observacion,
                     items
                 `)
-.in(
-    "tipo_venta",
-    [
-        "presencial",
-        "rrss"
-    ]
-)
+                .in(
+                    "tipo_venta",
+                    [
+                        "presencial",
+                        "rrss"
+                    ]
+                )
                 .order(
                     "created_at",
                     {
@@ -242,62 +242,62 @@ const [despacho, setDespacho] = useState({
         );
 
 
-/* =====================================================
-   DESPACHO
-===================================================== */
-
-const regionesPaket = [
-    "Región Metropolitana de Santiago",
-    "Valparaíso",
-    "Libertador General Bernardo O'Higgins"
-];
-
-const esVentaRRSS = tipoVenta === "rrss";
-
-const esRegionPaket =
-    esVentaRRSS &&
-    regionesPaket.includes(despacho.region);
-
-const empresaEnvio =
-    !esVentaRRSS
-        ? ""
-        : esRegionPaket
-            ? "paket"
-            : despacho.empresa_envio;
-
-const envioPorPagar =
-    esVentaRRSS && !esRegionPaket;
-
-const costoEnvio =
-    esRegionPaket ? 3500 : 0;
-
-
-/* =====================================================
-   SUBTOTAL PRODUCTOS
-===================================================== */
-
-const subtotalProductos =
-    useMemo(
-        () =>
-            items.reduce(
-                (sum, item) =>
-                    sum +
-                    (
-                        Number(item.price) *
-                        Number(item.quantity)
-                    ),
-                0
-            ),
-        [items]
-    );
-
-
-/* =====================================================
-   TOTAL
-===================================================== */
-
-const total =
-    subtotalProductos + costoEnvio;
+    /* =====================================================
+       DESPACHO
+    ===================================================== */
+    
+    const regionesPaket = [
+        "Región Metropolitana de Santiago",
+        "Valparaíso",
+        "Libertador General Bernardo O'Higgins"
+    ];
+    
+    const esVentaRRSS = tipoVenta === "rrss";
+    
+    const esRegionPaket =
+        esVentaRRSS &&
+        regionesPaket.includes(despacho.region);
+    
+    const empresaEnvio =
+        !esVentaRRSS
+            ? ""
+            : esRegionPaket
+                ? "paket"
+                : despacho.empresa_envio;
+    
+    const envioPorPagar =
+        esVentaRRSS && !esRegionPaket;
+    
+    const costoEnvio =
+        esRegionPaket ? 3500 : 0;
+    
+    
+    /* =====================================================
+       SUBTOTAL PRODUCTOS
+    ===================================================== */
+    
+    const subtotalProductos =
+        useMemo(
+            () =>
+                items.reduce(
+                    (sum, item) =>
+                        sum +
+                        (
+                            Number(item.price) *
+                            Number(item.quantity)
+                        ),
+                    0
+                ),
+            [items]
+        );
+    
+    
+    /* =====================================================
+       TOTAL
+    ===================================================== */
+    
+    const total =
+        subtotalProductos + costoEnvio;
 
 
 
@@ -480,14 +480,14 @@ const total =
 
         try {
 
-const payloadItems =
-    items.map(item => ({
-        variant_id:
-            Number(item.variant_id),
-
-        qty:
-            Number(item.quantity)
-    }));
+            const payloadItems =
+                items.map(item => ({
+                    variant_id:
+                        Number(item.variant_id),
+            
+                    qty:
+                        Number(item.quantity)
+                }));
 
 
             const {
@@ -522,39 +522,39 @@ const payloadItems =
                             medioPago,
 
                         p_vendedor:
-    "Administrador",
-
-p_direccion:
-    esVentaRRSS
-        ? despacho.direccion
-        : null,
-
-p_comuna:
-    esVentaRRSS
-        ? despacho.comuna
-        : null,
-
-p_region:
-    esVentaRRSS
-        ? despacho.region
-        : null,
-
-p_empresa_envio:
-    esVentaRRSS
-        ? empresaEnvio
-        : null,
-
-p_costo_envio:
-    esVentaRRSS
-        ? costoEnvio
-        : 0,
-
-p_envio_por_pagar:
-    esVentaRRSS
-        ? envioPorPagar
-        : false
-                    }
-                );
+                            "Administrador",
+                        
+                        p_direccion:
+                            esVentaRRSS
+                                ? despacho.direccion
+                                : null,
+                        
+                        p_comuna:
+                            esVentaRRSS
+                                ? despacho.comuna
+                                : null,
+                        
+                        p_region:
+                            esVentaRRSS
+                                ? despacho.region
+                                : null,
+                        
+                        p_empresa_envio:
+                            esVentaRRSS
+                                ? empresaEnvio
+                                : null,
+                        
+                        p_costo_envio:
+                            esVentaRRSS
+                                ? costoEnvio
+                                : 0,
+                        
+                        p_envio_por_pagar:
+                            esVentaRRSS
+                                ? envioPorPagar
+                                : false
+                                            }
+                                        );
 
 
             if (error) {
@@ -585,11 +585,11 @@ p_envio_por_pagar:
                 observacion: ""
             });
             setDespacho({
-    direccion: "",
-    comuna: "",
-    region: "",
-    empresa_envio: ""
-});
+                direccion: "",
+                comuna: "",
+                region: "",
+                empresa_envio: ""
+            });
 
             setItems([]);
 
@@ -897,48 +897,48 @@ p_envio_por_pagar:
 
                     {/* TIPO DE VENTA */}
 
-<CanalVentaSelector
-    tipoVenta={tipoVenta}
-    setTipoVenta={setTipoVenta}
-/>
+                    <CanalVentaSelector
+                        tipoVenta={tipoVenta}
+                        setTipoVenta={setTipoVenta}
+                    />
 
 
                     {/* CLIENTE */}
 
-<ClienteForm
-    cliente={cliente}
-    setCliente={setCliente}
-/>
+                    <ClienteForm
+                        cliente={cliente}
+                        setCliente={setCliente}
+                    />
 
                     {tipoVenta === "rrss" && (
-    <div className="space-y-4">
-
-<DespachoRRSS
-    despacho={despacho}
-    setDespacho={setDespacho}
-    esRegionPaket={esRegionPaket}
-/>
-
-
-    </div>
-)}
+                        <div className="space-y-4">
+                    
+                    <DespachoRRSS
+                        despacho={despacho}
+                        setDespacho={setDespacho}
+                        esRegionPaket={esRegionPaket}
+                    />
+                    
+                    
+                        </div>
+                    )}
 
 
                     {/* PRODUCTO */}
 
-<ProductoSelector
-    productos={productos}
-    productoSeleccionado={productoSeleccionado}
-    setProductoSeleccionado={setProductoSeleccionado}
-    varianteSeleccionada={varianteSeleccionada}
-    setVarianteSeleccionada={setVarianteSeleccionada}
-    variantesDisponibles={variantesDisponibles}
-    varianteActual={varianteActual}
-    cantidad={cantidad}
-    setCantidad={setCantidad}
-    agregarProducto={agregarProducto}
-    moneda={moneda}
-/>
+                    <ProductoSelector
+                        productos={productos}
+                        productoSeleccionado={productoSeleccionado}
+                        setProductoSeleccionado={setProductoSeleccionado}
+                        varianteSeleccionada={varianteSeleccionada}
+                        setVarianteSeleccionada={setVarianteSeleccionada}
+                        variantesDisponibles={variantesDisponibles}
+                        varianteActual={varianteActual}
+                        cantidad={cantidad}
+                        setCantidad={setCantidad}
+                        agregarProducto={agregarProducto}
+                        moneda={moneda}
+                    />
 
 
                     {/* DETALLE DE VENTA */}
@@ -1067,57 +1067,57 @@ p_envio_por_pagar:
                     RESUMEN
                 ================================================= */}
 
-               <ResumenVenta
-    subtotalProductos={subtotalProductos}
-    costoEnvio={costoEnvio}
-    total={total}
-    esVentaRRSS={esVentaRRSS}
-    envioPorPagar={envioPorPagar}
-    moneda={moneda}
-/>
+                <ResumenVenta
+                    subtotalProductos={subtotalProductos}
+                    costoEnvio={costoEnvio}
+                    total={total}
+                    esVentaRRSS={esVentaRRSS}
+                    envioPorPagar={envioPorPagar}
+                    moneda={moneda}
+                />
                 
-</div>
+                </div>
 
-{/* =================================================
-    HISTORIAL
-================================================= */}
+                {/* =================================================
+                    HISTORIAL
+                ================================================= */}
+                
+                <AdminCard>
+                
+                    <HistorialVentas
+                        ventas={ventas}
+                        ventasFiltradas={ventasFiltradas}
+                        busqueda={busqueda}
+                        setBusqueda={setBusqueda}
+                        filtroCanal={filtroCanal}
+                        setFiltroCanal={setFiltroCanal}
+                        filtroPago={filtroPago}
+                        setFiltroPago={setFiltroPago}
+                        actualizarHistorial={actualizarHistorial}
+                        actualizando={actualizando}
+                        fechaVenta={fechaVenta}
+                        etiquetaCanal={etiquetaCanal}
+                        etiquetaPago={etiquetaPago}
+                        moneda={moneda}
+                        setVentaSeleccionada={setVentaSeleccionada}
+                    />
+                
+                </AdminCard>
 
-<AdminCard>
 
-    <HistorialVentas
-        ventas={ventas}
-        ventasFiltradas={ventasFiltradas}
-        busqueda={busqueda}
-        setBusqueda={setBusqueda}
-        filtroCanal={filtroCanal}
-        setFiltroCanal={setFiltroCanal}
-        filtroPago={filtroPago}
-        setFiltroPago={setFiltroPago}
-        actualizarHistorial={actualizarHistorial}
-        actualizando={actualizando}
-        fechaVenta={fechaVenta}
-        etiquetaCanal={etiquetaCanal}
-        etiquetaPago={etiquetaPago}
-        moneda={moneda}
-        setVentaSeleccionada={setVentaSeleccionada}
-    />
-
-</AdminCard>
-
-
-{/* =================================================
-    MODAL DETALLE
-================================================= */}
-
-<VentaDetalleModal
-    ventaSeleccionada={ventaSeleccionada}
-    setVentaSeleccionada={setVentaSeleccionada}
-    imprimirComprobante={imprimirComprobanteUtil}
-    fechaVenta={fechaVenta}
-    etiquetaCanal={etiquetaCanal}
-    etiquetaPago={etiquetaPago}
-    moneda={moneda}
-/>
+                {/* =================================================
+                    MODAL DETALLE
+                ================================================= */}
+                
+                <VentaDetalleModal
+                    ventaSeleccionada={ventaSeleccionada}
+                    setVentaSeleccionada={setVentaSeleccionada}
+                    imprimirComprobante={imprimirComprobanteUtil}
+                    fechaVenta={fechaVenta}
+                    etiquetaCanal={etiquetaCanal}
+                    etiquetaPago={etiquetaPago}
+                    moneda={moneda}
+                />
 
         </div>
 
