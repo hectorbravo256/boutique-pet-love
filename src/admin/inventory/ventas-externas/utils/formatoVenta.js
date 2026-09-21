@@ -1,6 +1,6 @@
 import {
     formatearFechaHoraChile
-} from "../../utils/fechaChile";
+} from "../../../utils/fechaChile";
 
 
 /* =====================================================
