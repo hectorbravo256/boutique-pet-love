@@ -620,47 +620,7 @@ p_envio_por_pagar:
 
     };
 
-    /* =====================================================
-       IMPRIMIR COMPROBANTE
-    ===================================================== */
-
-
-
-
-
-
-   /* =====================================================
-   FORMATO FECHA
-===================================================== */
-
-/*
- * orders.created_at se almacena sin zona horaria,
- * pero representa un timestamp UTC.
- *
- * Se agrega explícitamente "Z" para que JavaScript
- * lo interprete como UTC antes de convertirlo a
- * America/Santiago mediante formatearFechaHoraChile().
- */
-
-
-
-
-
-
-    /* =====================================================
-       ETIQUETA CANAL
-    ===================================================== */
-
-
-
-
-    /* =====================================================
-       ETIQUETA MEDIO DE PAGO
-    ===================================================== */
-
-
-
-
+   
     /* =====================================================
        FILTRAR HISTORIAL
     ===================================================== */
@@ -740,60 +700,6 @@ p_envio_por_pagar:
             ]
         );
 
-
-    /* =====================================================
-       ESTADÍSTICAS
-    ===================================================== */
-
-    const estadisticas =
-        useMemo(
-            () => {
-
-                const total =
-                    ventas.reduce(
-                        (sum, venta) =>
-                            sum +
-                            Number(
-                                venta.total || 0
-                            ),
-                        0
-                    );
-
-
-                const presencial =
-                    ventas.filter(
-                        venta =>
-                            venta.tipo_venta ===
-                            "presencial"
-                    );
-
-
-                const rrss =
-                    ventas.filter(
-                        venta =>
-                            venta.tipo_venta ===
-                            "rrss"
-                    );
-
-
-                return {
-
-                    cantidad:
-                        ventas.length,
-
-                    total,
-
-                    presencial:
-                        presencial.length,
-
-                    rrss:
-                        rrss.length
-
-                };
-
-            },
-            [ventas]
-        );
 
 
     /* =====================================================
