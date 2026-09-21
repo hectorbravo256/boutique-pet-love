@@ -503,13 +503,19 @@ export default function VentasExternas() {
                             cliente.nombre,
 
                         p_rut:
-                            cliente.rut,
-
+                            esVentaRRSS
+                                ? cliente.rut
+                                : null,
+                        
                         p_correo:
-                            cliente.correo,
-
+                            esVentaRRSS
+                                ? cliente.correo
+                                : null,
+                        
                         p_telefono:
-                            cliente.telefono,
+                            esVentaRRSS
+                                ? cliente.telefono
+                                : null,
 
                         p_observacion:
                             cliente.observacion,
@@ -836,12 +842,9 @@ export default function VentasExternas() {
                 NUEVA VENTA
             ================================================= */}
 
-            <div className="
-                grid
-                xl:grid-cols-[1.3fr_0.7fr]
-                gap-6
-                mb-10
-            ">
+                <div className="
+                    mb-10
+                ">
 
 
                 {/* =================================================
@@ -899,6 +902,7 @@ export default function VentasExternas() {
                     <ClienteForm
                         cliente={cliente}
                         setCliente={setCliente}
+                        esVentaRRSS={esVentaRRSS}
                     />
 
                     {tipoVenta === "rrss" && (
@@ -1047,6 +1051,15 @@ export default function VentasExternas() {
                             : "💰 Registrar venta"}
 
                     </button>
+
+                    <ResumenVenta
+                        subtotalProductos={subtotalProductos}
+                        costoEnvio={costoEnvio}
+                        total={total}
+                        esVentaRRSS={esVentaRRSS}
+                        envioPorPagar={envioPorPagar}
+                        moneda={moneda}
+                    />
 
                 </AdminCard>
 
