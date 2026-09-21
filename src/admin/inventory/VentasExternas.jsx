@@ -271,7 +271,6 @@ export default function VentasExternas() {
     const costoEnvio =
         esRegionPaket ? 3500 : 0;
     
-    
     /* =====================================================
        SUBTOTAL PRODUCTOS
     ===================================================== */
@@ -520,7 +519,7 @@ export default function VentasExternas() {
 
                         p_medio_pago:
                             medioPago,
-
+                        
                         p_vendedor:
                             "Administrador",
                         
@@ -553,9 +552,8 @@ export default function VentasExternas() {
                             esVentaRRSS
                                 ? envioPorPagar
                                 : false
-                                            }
-                                        );
-
+                    }
+                );
 
             if (error) {
 
@@ -565,15 +563,12 @@ export default function VentasExternas() {
 
             }
 
-
             const resultado =
                 data?.[0];
-
 
             setMensaje(
                 `Venta #${resultado.numero_venta} registrada correctamente.`
             );
-
 
             /* Limpiar formulario */
 
@@ -597,7 +592,6 @@ export default function VentasExternas() {
             setVarianteSeleccionada("");
             setCantidad(1);
 
-
             /* Actualizar stock e historial */
 
             await cargarProductos();
@@ -620,7 +614,6 @@ export default function VentasExternas() {
 
     };
 
-   
     /* =====================================================
        FILTRAR HISTORIAL
     ===================================================== */
@@ -911,11 +904,11 @@ export default function VentasExternas() {
                     {tipoVenta === "rrss" && (
                         <div className="space-y-4">
                     
-                    <DespachoRRSS
-                        despacho={despacho}
-                        setDespacho={setDespacho}
-                        esRegionPaket={esRegionPaket}
-                    />
+                            <DespachoRRSS
+                                despacho={despacho}
+                                setDespacho={setDespacho}
+                                esRegionPaket={esRegionPaket}
+                            />
                     
                         </div>
                     )}
@@ -976,11 +969,11 @@ export default function VentasExternas() {
 
                             <div>
 
-                            <ItemsVenta
-                                items={items}
-                                eliminarItem={eliminarItem}
-                                moneda={moneda}
-                            />
+                                <ItemsVenta
+                                    items={items}
+                                    eliminarItem={eliminarItem}
+                                    moneda={moneda}
+                                />
 
                             </div>
 
