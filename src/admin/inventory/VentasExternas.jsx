@@ -17,9 +17,11 @@ import HistorialVentas from "./ventas-externas/components/HistorialVentas";
 import VentaDetalleModal from "./ventas-externas/components/VentaDetalleModal";
 
 import {
-    formatearFechaHoraChile,
-    formatearFechaChile
-} from "../utils/fechaChile";
+    moneda,
+    fechaVenta,
+    etiquetaCanal,
+    etiquetaPago
+} from "./ventas-externas/utils/formatoVenta";
 
 export default function VentasExternas() {
 
@@ -847,12 +849,7 @@ const fechaPrint = venta.created_at
 
     };
 
-    /* =====================================================
-       FORMATO MONEDA
-    ===================================================== */
 
-    const moneda = (valor) =>
-        `$${Number(valor || 0).toLocaleString("es-CL")}`;
 
 
    /* =====================================================
@@ -867,79 +864,24 @@ const fechaPrint = venta.created_at
  * lo interprete como UTC antes de convertirlo a
  * America/Santiago mediante formatearFechaHoraChile().
  */
-const normalizarFechaOrderUTC = (fecha) => {
-
-    if (!fecha) {
-        return null;
-    }
-
-    const fechaTexto = String(fecha);
-
-    /*
-     * Si ya contiene información de zona horaria
-     * (+00:00, -03:00, Z, etc.), no modificar.
-     */
-    if (
-        fechaTexto.endsWith("Z") ||
-        /[+-]\d{2}:\d{2}$/.test(fechaTexto)
-    ) {
-        return fechaTexto;
-    }
-
-    return `${fechaTexto}Z`;
-};
 
 
-const fechaVenta = (fecha) => {
 
-    const fechaUTC =
-        normalizarFechaOrderUTC(fecha);
 
-    return formatearFechaHoraChile(fechaUTC);
-};
 
 
     /* =====================================================
        ETIQUETA CANAL
     ===================================================== */
 
-    const etiquetaCanal = (tipo) => {
 
-        if (tipo === "rrss") {
-    return "📱 RRSS";
-}
-
-        return "🏪 Presencial";
-
-    };
 
 
     /* =====================================================
        ETIQUETA MEDIO DE PAGO
     ===================================================== */
 
-    const etiquetaPago = (medio) => {
 
-        switch (medio) {
-
-            case "efectivo":
-                return "💵 Efectivo";
-
-            case "transferencia":
-                return "🏦 Transferencia";
-
-            case "POS TUU":
-                return "💳 POS TUU";
-
-            case "mercado_pago":
-                return "🟢 Mercado Pago";
-
-            default:
-                return medio || "-";
-
-        }
-
-    };
 
 
     /* =====================================================
