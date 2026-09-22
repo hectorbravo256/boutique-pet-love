@@ -211,7 +211,7 @@ export default function ItemsVenta({
                                             font-black
                                             text-slate-800
                                         ">
-                                            {item.product_name}
+                                            {item.name}
                                         </p>
 
 
@@ -242,7 +242,7 @@ export default function ItemsVenta({
                                             font-black
                                             text-pink-600
                                         ">
-                                            {item.talla}
+                                            {item.size}
                                         </span>
 
                                     </div>
@@ -287,7 +287,7 @@ export default function ItemsVenta({
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            eliminarItem(index)
+                                            eliminarItem(item.variant_id)
                                         }
                                         className="
                                             flex
@@ -333,7 +333,7 @@ export default function ItemsVenta({
                                                 font-black
                                                 text-slate-800
                                             ">
-                                                {item.product_name}
+                                                {item.name}
                                             </p>
 
 
@@ -351,7 +351,7 @@ export default function ItemsVenta({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                eliminarItem(index)
+                                                eliminarItem(item.variant_id)
                                             }
                                             className="
                                                 flex
@@ -406,7 +406,7 @@ export default function ItemsVenta({
                                                 font-black
                                                 text-slate-700
                                             ">
-                                                {item.talla}
+                                                {item.size}
                                             </p>
 
                                         </div>
