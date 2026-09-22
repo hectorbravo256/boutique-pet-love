@@ -1156,38 +1156,169 @@ export default function VentasExternas() {
                     />
 
 
-                    <button
-                        type="button"
-                        disabled={
-                            guardando ||
-                            items.length === 0
-                        }
-                        onClick={
-                            registrarVenta
-                        }
-                        className="
-                            w-full
-                            py-4
-                            rounded-2xl
-                            bg-gradient-to-r
-                            from-pink-500
-                            to-purple-600
-                            text-white
-                            font-black
-                            text-lg
-                            shadow-lg
-                            hover:scale-[1.01]
-                            transition
-                            disabled:opacity-50
-                            disabled:cursor-not-allowed
-                        "
-                    >
-
-                        {guardando
-                            ? "Registrando..."
-                            : "💰 Registrar venta"}
-
-                    </button>
+                    <div className="
+                        mt-6
+                        rounded-3xl
+                        border
+                        border-pink-100
+                        bg-gradient-to-br
+                        from-pink-50
+                        via-white
+                        to-purple-50
+                        p-4
+                        md:p-5
+                    ">
+                    
+                        <button
+                            type="button"
+                            disabled={
+                                guardando ||
+                                items.length === 0
+                            }
+                            onClick={registrarVenta}
+                            aria-busy={guardando}
+                            className={`
+                                group
+                                relative
+                                w-full
+                                overflow-hidden
+                                rounded-2xl
+                                px-5
+                                py-4
+                                text-white
+                                shadow-lg
+                                transition-all
+                                duration-200
+                                focus:outline-none
+                                focus:ring-4
+                                focus:ring-pink-200
+                    
+                                ${
+                                    guardando ||
+                                    items.length === 0
+                                        ? `
+                                            cursor-not-allowed
+                                            bg-slate-300
+                                            shadow-none
+                                        `
+                                        : `
+                                            bg-gradient-to-r
+                                            from-pink-500
+                                            to-purple-600
+                                            hover:-translate-y-0.5
+                                            hover:shadow-xl
+                                            active:translate-y-0
+                                            active:scale-[0.99]
+                                        `
+                                }
+                            `}
+                        >
+                    
+                            {!guardando &&
+                                items.length > 0 && (
+                                    <div className="
+                                        absolute
+                                        inset-0
+                                        bg-gradient-to-r
+                                        from-white/0
+                                        via-white/15
+                                        to-white/0
+                                        opacity-0
+                                        transition
+                                        group-hover:opacity-100
+                                    " />
+                                )
+                            }
+                    
+                            <div className="
+                                relative
+                                flex
+                                items-center
+                                justify-center
+                                gap-3
+                            ">
+                    
+                                <span className="
+                                    flex
+                                    h-11
+                                    w-11
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-white/15
+                                    text-xl
+                                ">
+                                    {guardando
+                                        ? "⏳"
+                                        : items.length === 0
+                                            ? "🛒"
+                                            : "💰"
+                                    }
+                                </span>
+                    
+                                <span className="
+                                    flex
+                                    min-w-0
+                                    flex-col
+                                    items-start
+                                    text-left
+                                ">
+                    
+                                    <span className="
+                                        text-base
+                                        md:text-lg
+                                        font-black
+                                    ">
+                                        {guardando
+                                            ? "Registrando venta..."
+                                            : items.length === 0
+                                                ? "Agrega productos para registrar"
+                                                : "Registrar venta"
+                                        }
+                                    </span>
+                    
+                                    <span className="
+                                        mt-0.5
+                                        text-xs
+                                        font-medium
+                                        text-white/75
+                                    ">
+                                        {guardando
+                                            ? "No cierres esta ventana"
+                                            : items.length === 0
+                                                ? "Debes agregar al menos un producto"
+                                                : "Confirmar y guardar esta venta"
+                                        }
+                                    </span>
+                    
+                                </span>
+                    
+                                {!guardando &&
+                                    items.length > 0 && (
+                                        <span className="
+                                            ml-auto
+                                            hidden
+                                            h-9
+                                            w-9
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-full
+                                            bg-white/15
+                                            text-lg
+                                            sm:flex
+                                        ">
+                                            →
+                                        </span>
+                                    )
+                                }
+                    
+                            </div>
+                    
+                        </button>
+                    
+                    </div>
 
                     <ResumenVenta
                         subtotalProductos={subtotalProductos}
