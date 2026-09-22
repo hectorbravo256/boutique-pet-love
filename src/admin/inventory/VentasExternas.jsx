@@ -998,53 +998,11 @@ export default function VentasExternas() {
 
                     {/* DETALLE DE VENTA */}
 
-                    <div className="
-                        border
-                        border-slate-200
-                        rounded-2xl
-                        overflow-hidden
-                        mb-6
-                    ">
-
-                        <div className="
-                            bg-slate-50
-                            px-4
-                            py-3
-                            font-bold
-                            text-slate-600
-                        ">
-
-                            Detalle de la venta
-
-                        </div>
-
-                        {items.length === 0 ? (
-
-                            <div className="
-                                p-6
-                                text-center
-                                text-slate-400
-                            ">
-
-                                No hay productos agregados.
-
-                            </div>
-
-                        ) : (
-
-                            <div>
-
-                                <ItemsVenta
-                                    items={items}
-                                    eliminarItem={eliminarItem}
-                                    moneda={moneda}
-                                />
-
-                            </div>
-
-                        )}
-
-                    </div>
+                    <ItemsVenta
+                        items={items}
+                        eliminarItem={eliminarItem}
+                        moneda={moneda}
+                    />
 
                     {/* OBSERVACIÓN */}
 
