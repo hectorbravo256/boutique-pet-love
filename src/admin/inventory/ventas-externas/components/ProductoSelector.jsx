@@ -2,6 +2,7 @@ import SectionStep from "./SectionStep";
 
 
 export default function ProductoSelector({
+    numero,
     productos,
     productoSeleccionado,
     setProductoSeleccionado,
@@ -29,13 +30,13 @@ export default function ProductoSelector({
 
                 const tallaA =
                     Number(
-                        String(a.talla)
+                        String(a.size)
                             .replace(/\D/g, "")
                     );
-
+                
                 const tallaB =
                     Number(
-                        String(b.talla)
+                        String(b.size)
                             .replace(/\D/g, "")
                     );
 
@@ -58,7 +59,7 @@ export default function ProductoSelector({
         ">
 
             <SectionStep
-                numero="3"
+                numero={numero}
                 titulo="Productos"
                 descripcion="Selecciona el producto, talla y cantidad."
             />
@@ -229,7 +230,7 @@ export default function ProductoSelector({
                                             disabled={sinStock}
                                         >
 
-                                            {variante.talla}
+                                            {variante.size}
                                             {" · "}
                                             {moneda(
                                                 variante.price
@@ -447,7 +448,7 @@ export default function ProductoSelector({
                                 text-pink-600
                                 shadow-sm
                             ">
-                                Talla {varianteActual.talla}
+                                Talla {varianteActual.size}
                             </div>
 
                         </div>
