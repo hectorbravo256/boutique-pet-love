@@ -855,37 +855,98 @@ export default function VentasExternas() {
 
                     <div className="
                         flex
-                        justify-between
-                        items-center
-                        mb-6
+                        flex-col
+                        gap-3
+                        mb-8
                     ">
-
-                        <div>
-
-                            <p className="
+                    
+                        <div className="
+                            flex
+                            items-center
+                            justify-between
+                            gap-4
+                        ">
+                    
+                            <div>
+                    
+                                <p className="
+                                    text-xs
+                                    uppercase
+                                    tracking-[0.2em]
+                                    text-pink-500
+                                    font-bold
+                                ">
+                    
+                                    Nueva venta
+                    
+                                </p>
+                    
+                                <h2 className="
+                                    text-2xl
+                                    md:text-3xl
+                                    font-black
+                                    mt-1
+                                    text-slate-900
+                                ">
+                    
+                                    Registrar venta
+                    
+                                </h2>
+                    
+                            </div>
+                    
+                            <span className={`
+                                inline-flex
+                                items-center
+                                rounded-full
+                                px-4
+                                py-2
                                 text-xs
-                                uppercase
-                                tracking-[0.2em]
-                                text-pink-500
-                                font-bold
-                            ">
-
-                                Nueva venta
-
-                            </p>
-
-                            <h2 className="
-                                text-2xl
                                 font-black
-                                mt-1
-                            ">
-
-                                Registrar venta
-
-                            </h2>
-
+                                uppercase
+                                tracking-wide
+                                whitespace-nowrap
+                    
+                                ${
+                                    esVentaRRSS
+                                        ? `
+                                            bg-emerald-50
+                                            text-emerald-600
+                                            border
+                                            border-emerald-200
+                                        `
+                                        : `
+                                            bg-pink-50
+                                            text-pink-600
+                                            border
+                                            border-pink-200
+                                        `
+                                }
+                            `}>
+                    
+                                {esVentaRRSS
+                                    ? "Venta RRSS"
+                                    : "Venta presencial"
+                                }
+                    
+                            </span>
+                    
                         </div>
-
+                    
+                        <p className="
+                            text-sm
+                            md:text-base
+                            text-slate-500
+                            max-w-2xl
+                        ">
+                    
+                            {esVentaRRSS
+                                ? "Registra una venta realizada por redes sociales con despacho."
+                                : "Registra una venta realizada presencialmente en tienda."
+                            }
+                    
+                        </p>
+                    
                     </div>
 
 
