@@ -2,6 +2,7 @@ import SectionStep from "./SectionStep";
 
 
 export default function ItemsVenta({
+    numero,
     items,
     eliminarItem,
     moneda
@@ -20,7 +21,7 @@ export default function ItemsVenta({
         ">
 
             <SectionStep
-                numero="5"
+                numero={numero}
                 titulo="Detalle de la venta"
                 descripcion="Revisa los productos antes de registrar."
             />
