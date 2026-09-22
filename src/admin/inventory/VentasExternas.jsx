@@ -1048,28 +1048,146 @@ export default function VentasExternas() {
 
                     {/* OBSERVACIÓN */}
 
-                    <textarea
-                        value={
-                            cliente.observacion
-                        }
-                        onChange={e =>
-                            setCliente({
-                                ...cliente,
-                                observacion:
-                                    e.target.value
-                            })
-                        }
-                        placeholder="Observaciones"
-                        rows={3}
-                        className="
-                            w-full
-                            border
-                            border-slate-200
-                            rounded-xl
-                            p-3
-                            mb-6
-                        "
-                    />
+                    <section className="
+                        rounded-3xl
+                        border
+                        border-slate-200
+                        bg-white
+                        p-5
+                        md:p-6
+                        shadow-sm
+                    ">
+                    
+                        <div className="
+                            flex
+                            items-start
+                            gap-4
+                            mb-5
+                        ">
+                    
+                            <div className="
+                                flex
+                                h-10
+                                w-10
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-gradient-to-br
+                                from-pink-500
+                                to-purple-600
+                                text-white
+                                font-black
+                                shadow-md
+                            ">
+                    
+                                6
+                    
+                            </div>
+                    
+                    
+                            <div className="
+                                min-w-0
+                                pt-0.5
+                            ">
+                    
+                                <h3 className="
+                                    text-base
+                                    md:text-lg
+                                    font-black
+                                    text-slate-800
+                                ">
+                    
+                                    Observaciones
+                    
+                                </h3>
+                    
+                    
+                                <p className="
+                                    mt-1
+                                    text-sm
+                                    text-slate-500
+                                    leading-relaxed
+                                ">
+                    
+                                    Información adicional opcional.
+                    
+                                </p>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                    
+                        <div>
+                    
+                            <textarea
+                                value={cliente.observacion}
+                                onChange={(e) =>
+                                    setCliente({
+                                        ...cliente,
+                                        observacion: e.target.value
+                                    })
+                                }
+                                maxLength={300}
+                                rows={4}
+                                placeholder="Ej: Enviado por PAKET, retiro en tienda, horario de entrega..."
+                                className="
+                                    w-full
+                                    resize-none
+                                    rounded-2xl
+                                    border
+                                    border-slate-200
+                                    bg-slate-50
+                                    px-4
+                                    py-3.5
+                                    text-sm
+                                    leading-relaxed
+                                    text-slate-800
+                                    outline-none
+                                    transition
+                                    placeholder:text-slate-400
+                                    focus:border-pink-400
+                                    focus:bg-white
+                                    focus:ring-4
+                                    focus:ring-pink-100
+                                "
+                            />
+                    
+                    
+                            <div className="
+                                mt-2
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                            ">
+                    
+                                <span className="
+                                    text-xs
+                                    text-slate-400
+                                ">
+                    
+                                    Opcional
+                    
+                                </span>
+                    
+                    
+                                <span className="
+                                    text-xs
+                                    font-medium
+                                    text-slate-400
+                                ">
+                    
+                                    {cliente.observacion?.length || 0}/300
+                    
+                                </span>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                    </section>
 
 
                     {/* MEDIO DE PAGO */}
