@@ -74,6 +74,9 @@ export default function VentasExternas() {
 
     const [error, setError] =
         useState("");
+    
+    const [erroresValidacion, setErroresValidacion] =
+    useState([]);
 
     const [busqueda, setBusqueda] =
         useState("");
@@ -453,27 +456,82 @@ export default function VentasExternas() {
 
     };
 
+    /* =====================================================
+   VALIDACIÓN DEL FORMULARIO
+===================================================== */
+
+const validarFormulario = () => {
+
+    const errores = [];
+
+    if (!cliente.nombre.trim()) {
+        errores.push("Nombre del cliente");
+    }
+
+    if (esVentaRRSS) {
+
+        if (!despacho.direccion.trim()) {
+            errores.push("Dirección de despacho");
+        }
+
+        if (!despacho.comuna.trim()) {
+            errores.push("Comuna de despacho");
+        }
+
+        if (!despacho.region) {
+            errores.push("Región de despacho");
+        }
+
+        if (
+            despacho.region &&
+            !esRegionPaket &&
+            !despacho.empresa_envio
+        ) {
+            errores.push("Empresa de envío");
+        }
+
+    }
+
+    if (items.length === 0) {
+        errores.push("Agrega al menos un producto");
+    }
+
+    setErroresValidacion(errores);
+
+    if (errores.length > 0) {
+
+        setTimeout(() => {
+
+            document
+                .getElementById("errores-validacion-venta")
+                ?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+        }, 0);
+
+        return false;
+
+    }
+
+    return true;
+};
+
 
     /* =====================================================
        REGISTRAR VENTA
     ===================================================== */
 
     const registrarVenta = async () => {
-
+    
         setError("");
         setMensaje("");
-
-        if (items.length === 0) {
-
-            setError(
-                "Agrega al menos un producto."
-            );
-
+    
+        if (!validarFormulario()) {
             return;
-
         }
-
-
+    
         setGuardando(true);
 
 
@@ -597,6 +655,7 @@ export default function VentasExternas() {
             setProductoSeleccionado("");
             setVarianteSeleccionada("");
             setCantidad(1);
+            setErroresValidacion([]);
 
             /* Actualizar stock e historial */
 
@@ -1171,13 +1230,94 @@ export default function VentasExternas() {
                         p-4
                         md:p-5
                     ">
+                        {erroresValidacion.length > 0 && (
+                        
+                            <div
+                                id="errores-validacion-venta"
+                                className="
+                                    mb-4
+                                    rounded-2xl
+                                    border
+                                    border-red-200
+                                    bg-red-50
+                                    p-4
+                                    text-red-700
+                                "
+                            >
+                        
+                                <div className="
+                                    flex
+                                    items-start
+                                    gap-3
+                                ">
+                        
+                                    <div className="
+                                        flex
+                                        h-9
+                                        w-9
+                                        shrink-0
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-red-100
+                                        text-lg
+                                    ">
+                                        ⚠️
+                                    </div>
+                        
+                                    <div>
+                        
+                                        <p className="
+                                            font-black
+                                            text-red-800
+                                        ">
+                                            Faltan datos para registrar la venta
+                                        </p>
+                        
+                                        <p className="
+                                            mt-1
+                                            text-sm
+                                            text-red-600
+                                        ">
+                                            Completa los siguientes campos:
+                                        </p>
+                        
+                                        <ul className="
+                                            mt-3
+                                            space-y-1
+                                            text-sm
+                                            font-medium
+                                        ">
+                        
+                                            {erroresValidacion.map(
+                                                (campo) => (
+                                                    <li
+                                                        key={campo}
+                                                        className="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                        "
+                                                    >
+                                                        <span>•</span>
+                                                        <span>{campo}</span>
+                                                    </li>
+                                                )
+                                            )}
+                        
+                                        </ul>
+                        
+                                    </div>
+                        
+                                </div>
+                        
+                            </div>
+                        
+                        )}
                     
                         <button
                             type="button"
-                            disabled={
-                                guardando ||
-                                items.length === 0
-                            }
+                            disabled={guardando}
                             onClick={registrarVenta}
                             aria-busy={guardando}
                             className={`
@@ -1254,8 +1394,8 @@ export default function VentasExternas() {
                                 ">
                                     {guardando
                                         ? "⏳"
-                                        : items.length === 0
-                                            ? "🛒"
+                                        : erroresValidacion.length > 0
+                                            ? "⚠️"
                                             : "💰"
                                     }
                                 </span>
@@ -1273,12 +1413,12 @@ export default function VentasExternas() {
                                         md:text-lg
                                         font-black
                                     ">
-                                        {guardando
-                                            ? "Registrando venta..."
-                                            : items.length === 0
-                                                ? "Agrega productos para registrar"
-                                                : "Registrar venta"
-                                        }
+                                    {guardando
+                                        ? "Registrando venta..."
+                                        : erroresValidacion.length > 0
+                                            ? "Revisa los datos pendientes"
+                                            : "Registrar venta"
+                                    }
                                     </span>
                     
                                     <span className="
