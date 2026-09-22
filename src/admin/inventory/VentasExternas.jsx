@@ -248,8 +248,8 @@ export default function VentasExternas() {
     
     const regionesPaket = [
         "Región Metropolitana de Santiago",
-        "Valparaíso",
-        "Libertador General Bernardo O'Higgins"
+        "Región de Valparaíso",
+        "Región del Libertador General Bernardo O'Higgins"
     ];
     
     const esVentaRRSS = tipoVenta === "rrss";
@@ -982,6 +982,7 @@ export default function VentasExternas() {
                     {/* PRODUCTO */}
 
                     <ProductoSelector
+                        numero={esVentaRRSS ? 4 : 3}
                         productos={productos}
                         productoSeleccionado={productoSeleccionado}
                         setProductoSeleccionado={setProductoSeleccionado}
@@ -999,6 +1000,7 @@ export default function VentasExternas() {
                     {/* DETALLE DE VENTA */}
 
                     <ItemsVenta
+                        numero={esVentaRRSS ? 5 : 4}
                         items={items}
                         eliminarItem={eliminarItem}
                         moneda={moneda}
@@ -1039,7 +1041,7 @@ export default function VentasExternas() {
                                 shadow-md
                             ">
                     
-                                6
+                                {esVentaRRSS ? 6 : 5}
                     
                             </div>
                     
@@ -1151,6 +1153,7 @@ export default function VentasExternas() {
                     {/* MEDIO DE PAGO */}
 
                     <MedioPagoSelector
+                        numero={esVentaRRSS ? 7 : 6}
                         medioPago={medioPago}
                         setMedioPago={setMedioPago}
                     />
