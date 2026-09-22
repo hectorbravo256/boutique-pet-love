@@ -1337,8 +1337,7 @@ const validarFormulario = () => {
                                 focus:ring-pink-200
                     
                                 ${
-                                    guardando ||
-                                    items.length === 0
+                                    guardando
                                         ? `
                                             cursor-not-allowed
                                             bg-slate-300
@@ -1357,8 +1356,8 @@ const validarFormulario = () => {
                             `}
                         >
                     
-                            {!guardando &&
-                                items.length > 0 && (
+                                {!guardando &&
+                                    erroresValidacion.length === 0 && (
                                     <div className="
                                         absolute
                                         inset-0
@@ -1429,16 +1428,16 @@ const validarFormulario = () => {
                                     ">
                                         {guardando
                                             ? "No cierres esta ventana"
-                                            : items.length === 0
-                                                ? "Debes agregar al menos un producto"
+                                            : erroresValidacion.length > 0
+                                                ? "Completa la información requerida"
                                                 : "Confirmar y guardar esta venta"
                                         }
                                     </span>
                     
                                 </span>
                     
-                                {!guardando &&
-                                    items.length > 0 && (
+                                        {!guardando &&
+                                            erroresValidacion.length === 0 && (
                                         <span className="
                                             ml-auto
                                             hidden
