@@ -44,6 +44,7 @@ const opcionesPago = [
 ];
 
 export default function MedioPagoSelector({
+    numero,
     medioPago,
     setMedioPago
 }) {
@@ -59,7 +60,7 @@ export default function MedioPagoSelector({
         ">
 
             <SectionStep
-                numero="7"
+                numero={numero}
                 titulo="Medio de pago"
                 descripcion="Selecciona cómo fue recibido el pago."
             />
