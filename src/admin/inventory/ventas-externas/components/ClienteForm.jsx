@@ -23,9 +23,7 @@ export default function ClienteForm({
                             e.target.value
                     })
                 }
-                placeholder="
-                    Nombre del cliente
-                "
+                placeholder="Nombre del cliente"
                 className="
                     border
                     border-slate-200
