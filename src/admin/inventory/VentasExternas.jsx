@@ -1062,20 +1062,7 @@ export default function VentasExternas() {
                     />
 
                 </AdminCard>
-
-
-                {/* =================================================
-                    RESUMEN
-                ================================================= */}
-
-                <ResumenVenta
-                    subtotalProductos={subtotalProductos}
-                    costoEnvio={costoEnvio}
-                    total={total}
-                    esVentaRRSS={esVentaRRSS}
-                    envioPorPagar={envioPorPagar}
-                    moneda={moneda}
-                />
+                    
                 
                 </div>
 
