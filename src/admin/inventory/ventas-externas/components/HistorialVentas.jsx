@@ -16,6 +16,26 @@ export default function HistorialVentas({
     setVentaSeleccionada
 }) {
 
+        const etiquetaEstado = (estado) => {
+
+        switch (estado) {
+
+            case "pendiente":
+                return "Pendiente";
+
+            case "completada":
+                return "Completada";
+
+            case "cancelada":
+                return "Cancelada";
+
+            default:
+                return estado || "-";
+
+        }
+
+    };
+
     return (
         <div>
 
@@ -502,24 +522,34 @@ export default function HistorialVentas({
                                             py-4
                                         ">
 
-                                            <span className="
-                                                inline-flex
-                                                rounded-full
-                                                bg-emerald-100
-                                                px-3
-                                                py-1
-                                                text-xs
-                                                font-black
-                                                text-emerald-700
-                                            ">
-                                                {
-                                                    venta.estado_pago ===
-                                                    "pagado"
-                                                        ? "Pagado"
-                                                        : venta.estado_pago ||
-                                                          venta.estado ||
-                                                          "-"
-                                                }
+                                            <span
+                                                className={`
+                                                    inline-flex
+                                                    rounded-full
+                                                    px-3
+                                                    py-1
+                                                    text-xs
+                                                    font-black
+                                            
+                                                    ${
+                                                        venta.estado === "pendiente"
+                                                            ? `
+                                                                bg-amber-100
+                                                                text-amber-700
+                                                            `
+                                                            : venta.estado === "cancelada"
+                                                                ? `
+                                                                    bg-red-100
+                                                                    text-red-700
+                                                                `
+                                                                : `
+                                                                    bg-emerald-100
+                                                                    text-emerald-700
+                                                                `
+                                                    }
+                                                `}
+                                            >
+                                                {etiquetaEstado(venta.estado)}
                                             </span>
 
                                         </td>
