@@ -350,80 +350,94 @@ export default function Reservas() {
   }
 }
 
-  const convertirReserva = async () => {
+async function convertirReserva() {
+  setError("");
+  setMensaje("");
+  setMensajeConversion("");
+
   if (!reservaSeleccionada) return;
 
-  const saldo = Number(reservaSeleccionada.saldo_pendiente || 0);
+  const saldo = Number(
+    reservaSeleccionada.saldo_pendiente || 0
+  );
 
   if (saldo > 0.01) {
     setMensajeConversion(
-      "La reserva debe estar completamente pagada antes de convertirla en venta."
+      "La reserva debe estar completamente pagada antes de convertirse en venta."
     );
     return;
   }
 
   if (
-    reservaSeleccionada.estado === "convertida" ||
-    reservaSeleccionada.estado === "cancelada"
+    ["convertida", "cancelada"].includes(
+      reservaSeleccionada.estado
+    )
   ) {
     setMensajeConversion(
-      "Esta reserva no puede convertirse porque ya está convertida o cancelada."
+      "Esta reserva no puede convertirse."
     );
     return;
   }
 
   const confirmar = window.confirm(
     `¿Confirmar conversión de la reserva #${reservaSeleccionada.numero_reserva} a venta definitiva?\n\n` +
-      "Esta acción descontará el stock y generará la venta e inventario correspondiente."
+      "Se generará la venta y se descontará el stock."
   );
 
   if (!confirmar) return;
 
+  setConvirtiendoReserva(true);
+
   try {
-    setConvirtiendoReserva(true);
-    setMensajeConversion("");
+    const { data, error: rpcError } =
+      await supabase.rpc(
+        "convertir_reserva_a_venta",
+        {
+          p_reservation_id:
+            reservaSeleccionada.id,
+        }
+      );
 
-    const { data, error } = await supabase.rpc(
-      "convertir_reserva_a_venta",
-      {
-        p_reservation_id: reservaSeleccionada.id,
-      }
-    );
+    if (rpcError) {
+      console.error(
+        "Error convertir_reserva_a_venta:",
+        rpcError
+      );
 
-    if (error) {
-      console.error("Error convirtiendo reserva:", error);
-      throw error;
+      throw new Error(
+        rpcError.message ||
+          "No fue posible convertir la reserva."
+      );
     }
 
-    const resultado = Array.isArray(data) ? data[0] : data;
+    const resultado = Array.isArray(data)
+      ? data[0]
+      : data;
 
     if (!resultado) {
       throw new Error(
-        "Supabase no devolvió información de la venta generada."
+        "Supabase no devolvió los datos de la venta."
       );
     }
 
     setMensajeConversion(
-      `Reserva convertida correctamente. Venta #${resultado.numero_venta} creada.`
+      `Reserva #${resultado.numero_reserva} convertida correctamente. Venta #${resultado.numero_venta} creada.`
     );
 
     await cargarReservas();
-
-    if (resultado.reservation_id) {
-      await cargarDetalleReserva(resultado.reservation_id);
-    }
-  } catch (error) {
-    console.error("Error al convertir reserva:", error);
+    await abrirDetalleReserva(reservaSeleccionada);
+  } catch (err) {
+    console.error(err);
 
     setMensajeConversion(
-      error?.message ||
-        "No fue posible convertir la reserva en venta."
+      err?.message ||
+        "Ocurrió un error al convertir la reserva."
     );
   } finally {
     setConvirtiendoReserva(false);
   }
-};
-
+}
+ 
 function limpiarFormularioAbono() {
   setMontoNuevoAbono("");
   setMedioPagoNuevoAbono("");
@@ -2216,12 +2230,6 @@ function estadoClasses(estado) {
             </div>
           </AdminCard>
 
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <strong>Importante:</strong> los abonos se registran mediante
-            una operación segura de Supabase. La conversión de la reserva
-            en una venta definitiva y el descuento de stock se realizarán
-            en el siguiente paso.
-          </div>
         </div>
       )}
     </div>
