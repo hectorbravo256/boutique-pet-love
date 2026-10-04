@@ -1686,14 +1686,34 @@ function estadoClasses(estado) {
           </div>
         </div>
       </form>
-      {reservaSeleccionada && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
+    {reservaSeleccionada && (
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 sm:p-6">
+    <div className="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+      <div className="sticky top-0 z-20 flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">
-            Reserva #{reservaSeleccionada.numero_reserva}
-          </h2>
+          <div className="flex items-center gap-3">
+  <div>
+    <div className="flex items-center gap-3">
+      <h2 className="text-xl font-bold text-gray-900">
+        Reserva #{reservaSeleccionada.numero_reserva}
+      </h2>
+
+      <span
+        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${estadoClasses(
+          reservaSeleccionada.estado
+        )}`}
+      >
+        {estadoLabel(reservaSeleccionada.estado)}
+      </span>
+    </div>
+
+    <p className="mt-1 text-sm text-gray-500">
+      {new Date(
+        reservaSeleccionada.created_at
+      ).toLocaleString("es-CL")}
+    </p>
+  </div>
+</div>
 
           <p className="text-sm text-gray-500">
             {new Date(
@@ -1718,7 +1738,8 @@ function estadoClasses(estado) {
           Cargando detalle...
         </div>
       ) : (
-        <div className="space-y-6 p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+  <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <AdminCard>
               <div className="space-y-3">
