@@ -2250,10 +2250,9 @@ function estadoClasses(estado) {
               
             </div>
           </AdminCard>
-
+</div>
         </div>
       )}
-      </div>
     </div>
   </div>
 )}
