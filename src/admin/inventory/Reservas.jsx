@@ -577,13 +577,15 @@ function limpiarFormularioAbono() {
             return null;
           }
 
-          if (cantidadNueva > Number(item.stock || 0)) {
+          if (
+            Number(item.stock || 0) > 0 &&
+            cantidadNueva > Number(item.stock || 0)
+          ) {
             return {
               ...item,
               cantidad: Number(item.stock || 0),
             };
           }
-
           return {
             ...item,
             cantidad: cantidadNueva,
@@ -1411,17 +1413,16 @@ function estadoClasses(estado) {
                       Cantidad
                     </label>
 
-                    <input
-                      type="number"
-                      min="1"
-                      max={varianteActual?.stock || undefined}
-                      value={cantidad}
-                      onChange={(event) =>
-                        setCantidad(event.target.value)
-                      }
-                      disabled={!varianteActual}
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
-                    />
+                  <input
+                    type="number"
+                    min="1"
+                    value={cantidad}
+                    onChange={(event) =>
+                      setCantidad(event.target.value)
+                    }
+                    disabled={!varianteActual}
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+                  />
                   </div>
 
                   <div className="flex items-end md:col-span-2">
@@ -1491,8 +1492,13 @@ function estadoClasses(estado) {
                               <input
                                 type="number"
                                 min="1"
-                                max={item.stock}
                                 value={item.cantidad}
+                                onChange={(event) =>
+                                  cambiarCantidadItem(
+                                    item.variant_id,
+                                    event.target.value
+                                  )
+                                }
                                 onChange={(event) =>
                                   cambiarCantidadItem(
                                     item.variant_id,
