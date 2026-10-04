@@ -1392,7 +1392,7 @@ function estadoClasses(estado) {
                         Seleccionar talla
                       </option>
 
-                      {variantesDisponibles.map((variant) => (
+                  {variantesDisponibles.map((variant) => (
                     <option
                       key={variant.id}
                       value={variant.id}
@@ -1402,10 +1402,7 @@ function estadoClasses(estado) {
                         ? `Stock ${variant.stock}`
                         : "Sin stock · Bajo pedido"}
                     </option>
-                          Talla {variant.size} · Stock{" "}
-                          {variant.stock}
-                        </option>
-                      ))}
+                  ))}
                     </select>
                   </div>
 
