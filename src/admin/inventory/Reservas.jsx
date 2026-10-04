@@ -2253,6 +2253,7 @@ function estadoClasses(estado) {
 
         </div>
       )}
+      </div>
     </div>
   </div>
 )}
