@@ -2084,11 +2084,10 @@ function estadoClasses(estado) {
           </AdminCard>
 
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <strong>Estado actual:</strong> esta pantalla solo
-            permite consultar la reserva. La modificación de
-            abonos, estados y conversión a venta se implementará
-            en los siguientes pasos con funciones seguras de
-            Supabase.
+            <strong>Importante:</strong> los abonos se registran mediante
+            una operación segura de Supabase. La conversión de la reserva
+            en una venta definitiva y el descuento de stock se realizarán
+            en el siguiente paso.
           </div>
         </div>
       )}
