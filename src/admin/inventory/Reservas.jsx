@@ -1152,14 +1152,80 @@ function estadoClasses(estado) {
                       Región *
                     </label>
 
-                    <input
-                      type="text"
+                    <select
                       name="region"
                       value={cliente.region}
                       onChange={handleClienteChange}
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
-                      placeholder="Ej: Región Metropolitana de Santiago"
-                    />
+                      className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+                    >
+                      <option value="">
+                        Selecciona una región
+                      </option>
+                    
+                      <option value="Región de Arica y Parinacota">
+                        Región de Arica y Parinacota
+                      </option>
+                    
+                      <option value="Región de Tarapacá">
+                        Región de Tarapacá
+                      </option>
+                    
+                      <option value="Región de Antofagasta">
+                        Región de Antofagasta
+                      </option>
+                    
+                      <option value="Región de Atacama">
+                        Región de Atacama
+                      </option>
+                    
+                      <option value="Región de Coquimbo">
+                        Región de Coquimbo
+                      </option>
+                    
+                      <option value="Región de Valparaíso">
+                        Región de Valparaíso
+                      </option>
+                    
+                      <option value="Región Metropolitana de Santiago">
+                        Región Metropolitana de Santiago
+                      </option>
+                    
+                      <option value="Región del Libertador General Bernardo O'Higgins">
+                        Región del Libertador General Bernardo O'Higgins
+                      </option>
+                    
+                      <option value="Región del Maule">
+                        Región del Maule
+                      </option>
+                    
+                      <option value="Región de Ñuble">
+                        Región de Ñuble
+                      </option>
+                    
+                      <option value="Región del Biobío">
+                        Región del Biobío
+                      </option>
+                    
+                      <option value="Región de La Araucanía">
+                        Región de La Araucanía
+                      </option>
+                    
+                      <option value="Región de Los Ríos">
+                        Región de Los Ríos
+                      </option>
+                    
+                      <option value="Región de Los Lagos">
+                        Región de Los Lagos
+                      </option>
+                    
+                      <option value="Región de Aysén del General Carlos Ibáñez del Campo">
+                        Región de Aysén del General Carlos Ibáñez del Campo
+                      </option>
+                    
+                      <option value="Región de Magallanes y de la Antártica Chilena">
+                        Región de Magallanes y de la Antártica Chilena
+                      </option>
+                    </select>
 
                     <p className="mt-1 text-xs text-gray-500">
                       En RM, Valparaíso y O'Higgins se selecciona PAKET
