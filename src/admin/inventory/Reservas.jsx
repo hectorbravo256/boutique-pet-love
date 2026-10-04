@@ -72,6 +72,9 @@ export default function Reservas() {
   const [observacionNuevoAbono, setObservacionNuevoAbono] = useState("");
   const [guardandoAbono, setGuardandoAbono] = useState(false);
 
+  const [convirtiendoReserva, setConvirtiendoReserva] = useState(false);
+  const [mensajeConversion, setMensajeConversion] = useState("");
+
   const productoActual = useMemo(
     () =>
       productos.find(
@@ -346,6 +349,80 @@ export default function Reservas() {
     setGuardandoAbono(false);
   }
 }
+
+  const convertirReserva = async () => {
+  if (!reservaSeleccionada) return;
+
+  const saldo = Number(reservaSeleccionada.saldo_pendiente || 0);
+
+  if (saldo > 0.01) {
+    setMensajeConversion(
+      "La reserva debe estar completamente pagada antes de convertirla en venta."
+    );
+    return;
+  }
+
+  if (
+    reservaSeleccionada.estado === "convertida" ||
+    reservaSeleccionada.estado === "cancelada"
+  ) {
+    setMensajeConversion(
+      "Esta reserva no puede convertirse porque ya está convertida o cancelada."
+    );
+    return;
+  }
+
+  const confirmar = window.confirm(
+    `¿Confirmar conversión de la reserva #${reservaSeleccionada.numero_reserva} a venta definitiva?\n\n` +
+      "Esta acción descontará el stock y generará la venta e inventario correspondiente."
+  );
+
+  if (!confirmar) return;
+
+  try {
+    setConvirtiendoReserva(true);
+    setMensajeConversion("");
+
+    const { data, error } = await supabase.rpc(
+      "convertir_reserva_a_venta",
+      {
+        p_reservation_id: reservaSeleccionada.id,
+      }
+    );
+
+    if (error) {
+      console.error("Error convirtiendo reserva:", error);
+      throw error;
+    }
+
+    const resultado = Array.isArray(data) ? data[0] : data;
+
+    if (!resultado) {
+      throw new Error(
+        "Supabase no devolvió información de la venta generada."
+      );
+    }
+
+    setMensajeConversion(
+      `Reserva convertida correctamente. Venta #${resultado.numero_venta} creada.`
+    );
+
+    await cargarReservas();
+
+    if (resultado.reservation_id) {
+      await cargarDetalleReserva(resultado.reservation_id);
+    }
+  } catch (error) {
+    console.error("Error al convertir reserva:", error);
+
+    setMensajeConversion(
+      error?.message ||
+        "No fue posible convertir la reserva en venta."
+    );
+  } finally {
+    setConvirtiendoReserva(false);
+  }
+};
 
 function limpiarFormularioAbono() {
   setMontoNuevoAbono("");
@@ -2078,8 +2155,64 @@ function estadoClasses(estado) {
                 <div className="mt-1 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
                   {reservaSeleccionada.observacion ||
                     "Sin observaciones."}
-                </div>
+                </div>  
               </div>
+
+              {reservaSeleccionada &&
+  reservaSeleccionada.estado !== "convertida" &&
+  reservaSeleccionada.estado !== "cancelada" && (
+    <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4">
+      <div className="mb-3">
+        <h3 className="font-semibold text-green-900">
+          Convertir en venta definitiva
+        </h3>
+
+        <p className="mt-1 text-sm text-green-800">
+          Esta operación genera la venta, descuenta el stock y registra
+          automáticamente el movimiento de inventario.
+        </p>
+      </div>
+
+      <div className="mb-4 rounded-lg bg-white p-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">
+            Saldo pendiente
+          </span>
+
+          <span className="font-bold text-gray-900">
+            ${Number(
+              reservaSeleccionada.saldo_pendiente || 0
+            ).toLocaleString("es-CL")}
+          </span>
+        </div>
+      </div>
+
+      {Number(reservaSeleccionada.saldo_pendiente || 0) > 0.01 ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <strong>No disponible:</strong> esta reserva debe estar
+          completamente pagada antes de convertirse en venta.
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={convertirReserva}
+          disabled={convirtiendoReserva}
+          className="w-full rounded-lg bg-green-600 px-4 py-3 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {convirtiendoReserva
+            ? "Convirtiendo reserva..."
+            : "Convertir en venta"}
+        </button>
+      )}
+
+      {mensajeConversion && (
+        <div className="mt-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+          {mensajeConversion}
+        </div>
+      )}
+    </div>
+  )}
+              
             </div>
           </AdminCard>
 
