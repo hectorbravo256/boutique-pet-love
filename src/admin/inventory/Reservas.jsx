@@ -59,6 +59,13 @@ export default function Reservas() {
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  
+  const [reservas, setReservas] = useState([]);
+  const [loadingReservas, setLoadingReservas] = useState(true);
+  const [busquedaReserva, setBusquedaReserva] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [loadingDetalle, setLoadingDetalle] = useState(false);
 
   const productoActual = useMemo(
     () =>
@@ -110,6 +117,7 @@ export default function Reservas() {
 
   useEffect(() => {
     cargarProductos();
+    cargarReservas();
   }, []);
 
   useEffect(() => {
@@ -125,6 +133,105 @@ export default function Reservas() {
       setEnvioPorPagar(true);
     }
   }, [cliente.region]);
+
+  async function cargarReservas() {
+  setLoadingReservas(true);
+
+  const { data, error: reservasError } = await supabase
+    .from("reservations")
+    .select(`
+      id,
+      numero_reserva,
+      created_at,
+      updated_at,
+      nombre,
+      rut,
+      correo,
+      telefono,
+      direccion,
+      comuna,
+      region,
+      empresa_envio,
+      envio_por_pagar,
+      costo_envio,
+      subtotal_productos,
+      total,
+      total_abonado,
+      saldo_pendiente,
+      medio_pago_abono,
+      estado,
+      vendedor,
+      observacion,
+      order_id
+    `)
+    .order("created_at", {
+      ascending: false,
+    });
+
+  if (reservasError) {
+    console.error("Error cargando reservas:", reservasError);
+
+    setError(
+      reservasError.message ||
+        "No fue posible cargar las reservas."
+    );
+
+    setReservas([]);
+  } else {
+    setReservas(data || []);
+  }
+
+  setLoadingReservas(false);
+}
+
+  async function abrirDetalleReserva(reserva) {
+  setLoadingDetalle(true);
+  setError("");
+
+  const { data, error: detalleError } = await supabase
+    .from("reservations")
+    .select(`
+      *,
+      reservation_items (
+        id,
+        product_id,
+        variant_id,
+        producto,
+        talla,
+        cantidad,
+        precio_unitario,
+        subtotal
+      ),
+      reservation_payments (
+        id,
+        created_at,
+        monto,
+        medio_pago,
+        observacion,
+        created_by
+      )
+    `)
+    .eq("id", reserva.id)
+    .single();
+
+  if (detalleError) {
+    console.error(
+      "Error cargando detalle de reserva:",
+      detalleError
+    );
+
+    setError(
+      detalleError.message ||
+        "No fue posible cargar el detalle de la reserva."
+    );
+
+    setLoadingDetalle(false);
+    return;
+  }
+
+  setReservaSeleccionada(data);
+  setLoadingDetalle(false);
+}
 
   async function cargarProductos() {
     setLoadingProductos(true);
@@ -430,8 +537,277 @@ export default function Reservas() {
     setObservacion("");
   }
 
+  const reservasFiltradas = reservas.filter((reserva) => {
+  const texto = busquedaReserva.trim().toLowerCase();
+
+  const coincideBusqueda =
+    !texto ||
+    String(reserva.numero_reserva || "")
+      .toLowerCase()
+      .includes(texto) ||
+    String(reserva.nombre || "")
+      .toLowerCase()
+      .includes(texto) ||
+    String(reserva.rut || "")
+      .toLowerCase()
+      .includes(texto) ||
+    String(reserva.telefono || "")
+      .toLowerCase()
+      .includes(texto);
+
+  const coincideEstado =
+    filtroEstado === "todos" ||
+    reserva.estado === filtroEstado;
+
+  return coincideBusqueda && coincideEstado;
+});
+
+  function estadoLabel(estado) {
+  const estados = {
+    reservada: "Reservada",
+    abono_parcial: "Abono parcial",
+    pagada: "Pagada",
+    lista_entrega: "Lista para entrega",
+    convertida: "Convertida en venta",
+    cancelada: "Cancelada",
+  };
+
+  return estados[estado] || estado || "Sin estado";
+}
+
+function estadoClasses(estado) {
+  const clases = {
+    reservada:
+      "bg-blue-100 text-blue-700",
+    abono_parcial:
+      "bg-amber-100 text-amber-700",
+    pagada:
+      "bg-green-100 text-green-700",
+    lista_entrega:
+      "bg-purple-100 text-purple-700",
+    convertida:
+      "bg-emerald-100 text-emerald-700",
+    cancelada:
+      "bg-red-100 text-red-700",
+  };
+
+  return (
+    clases[estado] ||
+    "bg-gray-100 text-gray-700"
+  );
+}
+
   return (
     <div className="space-y-6 pb-10">
+      <AdminCard>
+  <div className="space-y-5">
+    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Reservas registradas
+        </h2>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Consulta y revisa las reservas existentes.
+        </p>
+      </div>
+
+      <div className="rounded-full bg-pink-50 px-4 py-2 text-sm font-semibold text-pink-700">
+        {reservasFiltradas.length} reserva
+        {reservasFiltradas.length === 1 ? "" : "s"}
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="md:col-span-2">
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Buscar
+        </label>
+
+        <input
+          type="text"
+          value={busquedaReserva}
+          onChange={(event) =>
+            setBusquedaReserva(event.target.value)
+          }
+          placeholder="Nº reserva, nombre, RUT o teléfono..."
+          className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Estado
+        </label>
+
+        <select
+          value={filtroEstado}
+          onChange={(event) =>
+            setFiltroEstado(event.target.value)
+          }
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+        >
+          <option value="todos">
+            Todos los estados
+          </option>
+
+          <option value="reservada">
+            Reservada
+          </option>
+
+          <option value="abono_parcial">
+            Abono parcial
+          </option>
+
+          <option value="pagada">
+            Pagada
+          </option>
+
+          <option value="lista_entrega">
+            Lista para entrega
+          </option>
+
+          <option value="convertida">
+            Convertida en venta
+          </option>
+
+          <option value="cancelada">
+            Cancelada
+          </option>
+        </select>
+      </div>
+    </div>
+
+    {loadingReservas ? (
+      <div className="rounded-xl bg-gray-50 px-4 py-10 text-center text-sm text-gray-500">
+        Cargando reservas...
+      </div>
+    ) : reservasFiltradas.length === 0 ? (
+      <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-10 text-center">
+        <div className="text-3xl">📋</div>
+
+        <p className="mt-2 font-semibold text-gray-700">
+          No hay reservas para mostrar
+        </p>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Prueba modificando los filtros o crea una nueva reserva.
+        </p>
+      </div>
+    ) : (
+      <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                Reserva
+              </th>
+
+              <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                Cliente
+              </th>
+
+              <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                Fecha
+              </th>
+
+              <th className="px-4 py-3 text-right font-semibold text-gray-600">
+                Total
+              </th>
+
+              <th className="px-4 py-3 text-right font-semibold text-gray-600">
+                Saldo
+              </th>
+
+              <th className="px-4 py-3 text-center font-semibold text-gray-600">
+                Estado
+              </th>
+
+              <th className="px-4 py-3 text-right font-semibold text-gray-600">
+                Acción
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-100 bg-white">
+            {reservasFiltradas.map((reserva) => (
+              <tr
+                key={reserva.id}
+                className="hover:bg-gray-50"
+              >
+                <td className="whitespace-nowrap px-4 py-3">
+                  <div className="font-bold text-gray-800">
+                    #{reserva.numero_reserva}
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    ID {reserva.id}
+                  </div>
+                </td>
+
+                <td className="px-4 py-3">
+                  <div className="font-semibold text-gray-800">
+                    {reserva.nombre}
+                  </div>
+
+                  <div className="text-xs text-gray-500">
+                    {reserva.telefono}
+                  </div>
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+                  {new Date(
+                    reserva.created_at
+                  ).toLocaleDateString("es-CL")}
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-800">
+                  {formatMoney(reserva.total)}
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-3 text-right">
+                  <span
+                    className={
+                      Number(reserva.saldo_pendiente) > 0
+                        ? "font-semibold text-amber-600"
+                        : "font-semibold text-green-600"
+                    }
+                  >
+                    {formatMoney(
+                      reserva.saldo_pendiente
+                    )}
+                  </span>
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-3 text-center">
+                  <span
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${estadoClasses(
+                      reserva.estado
+                    )}`}
+                  >
+                    {estadoLabel(reserva.estado)}
+                  </span>
+                </td>
+
+                <td className="whitespace-nowrap px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      abrirDetalleReserva(reserva)
+                    }
+                    className="rounded-lg bg-pink-50 px-3 py-2 text-xs font-semibold text-pink-700 transition hover:bg-pink-100"
+                  >
+                    Ver detalle
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+</AdminCard>
       <div>
         <h1 className="text-2xl font-bold text-gray-800">
           Reservas
@@ -1099,6 +1475,391 @@ export default function Reservas() {
           </div>
         </div>
       </form>
+      {reservaSeleccionada && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">
+            Reserva #{reservaSeleccionada.numero_reserva}
+          </h2>
+
+          <p className="text-sm text-gray-500">
+            {new Date(
+              reservaSeleccionada.created_at
+            ).toLocaleString("es-CL")}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            setReservaSeleccionada(null)
+          }
+          className="rounded-full bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200"
+        >
+          ✕
+        </button>
+      </div>
+
+      {loadingDetalle ? (
+        <div className="px-6 py-12 text-center text-gray-500">
+          Cargando detalle...
+        </div>
+      ) : (
+        <div className="space-y-6 p-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <AdminCard>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-gray-800">
+                  Datos del cliente
+                </h3>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Nombre
+                  </div>
+
+                  <div className="font-medium text-gray-800">
+                    {reservaSeleccionada.nombre}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    RUT
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.rut || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Teléfono
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.telefono}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Correo
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.correo || "—"}
+                  </div>
+                </div>
+              </div>
+            </AdminCard>
+
+            <AdminCard>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-gray-800">
+                  Despacho
+                </h3>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Dirección
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.direccion}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Comuna
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.comuna}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Región
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.region}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">
+                    Empresa
+                  </span>
+
+                  <span className="font-semibold uppercase text-gray-800">
+                    {reservaSeleccionada.empresa_envio}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">
+                    Modalidad
+                  </span>
+
+                  <span className="font-semibold text-gray-800">
+                    {reservaSeleccionada.envio_por_pagar
+                      ? "Por pagar"
+                      : formatMoney(
+                          reservaSeleccionada.costo_envio
+                        )}
+                  </span>
+                </div>
+              </div>
+            </AdminCard>
+          </div>
+
+          <AdminCard>
+            <div className="space-y-4">
+              <h3 className="font-semibold text-gray-800">
+                Productos
+              </h3>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                        Producto
+                      </th>
+
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                        Talla
+                      </th>
+
+                      <th className="px-4 py-3 text-center font-semibold text-gray-600">
+                        Cantidad
+                      </th>
+
+                      <th className="px-4 py-3 text-right font-semibold text-gray-600">
+                        Precio
+                      </th>
+
+                      <th className="px-4 py-3 text-right font-semibold text-gray-600">
+                        Subtotal
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-100 bg-white">
+                    {(reservaSeleccionada.reservation_items || []).map(
+                      (item) => (
+                        <tr key={item.id}>
+                          <td className="px-4 py-3 font-medium text-gray-800">
+                            {item.producto}
+                          </td>
+
+                          <td className="px-4 py-3 text-gray-600">
+                            {item.talla}
+                          </td>
+
+                          <td className="px-4 py-3 text-center text-gray-700">
+                            {item.cantidad}
+                          </td>
+
+                          <td className="px-4 py-3 text-right text-gray-600">
+                            {formatMoney(
+                              item.precio_unitario
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3 text-right font-semibold text-gray-800">
+                            {formatMoney(item.subtotal)}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </AdminCard>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <AdminCard>
+              <div>
+                <div className="text-sm text-gray-500">
+                  Total productos
+                </div>
+
+                <div className="mt-1 text-xl font-bold text-gray-800">
+                  {formatMoney(
+                    reservaSeleccionada.subtotal_productos
+                  )}
+                </div>
+              </div>
+            </AdminCard>
+
+            <AdminCard>
+              <div>
+                <div className="text-sm text-gray-500">
+                  Total reserva
+                </div>
+
+                <div className="mt-1 text-xl font-bold text-pink-600">
+                  {formatMoney(
+                    reservaSeleccionada.total
+                  )}
+                </div>
+              </div>
+            </AdminCard>
+
+            <AdminCard>
+              <div>
+                <div className="text-sm text-gray-500">
+                  Saldo pendiente
+                </div>
+
+                <div
+                  className={`mt-1 text-xl font-bold ${
+                    Number(
+                      reservaSeleccionada.saldo_pendiente
+                    ) > 0
+                      ? "text-amber-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {formatMoney(
+                    reservaSeleccionada.saldo_pendiente
+                  )}
+                </div>
+              </div>
+            </AdminCard>
+          </div>
+
+          <AdminCard>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-800">
+                  Pagos / Abonos
+                </h3>
+
+                <span className="font-bold text-green-600">
+                  {formatMoney(
+                    reservaSeleccionada.total_abonado
+                  )}
+                </span>
+              </div>
+
+              {(
+                reservaSeleccionada.reservation_payments || []
+              ).length === 0 ? (
+                <div className="rounded-xl bg-gray-50 px-4 py-5 text-center text-sm text-gray-500">
+                  Esta reserva todavía no registra abonos.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {reservaSeleccionada.reservation_payments.map(
+                    (pago) => (
+                      <div
+                        key={pago.id}
+                        className="flex flex-col gap-1 rounded-xl border border-gray-200 px-4 py-3 md:flex-row md:items-center md:justify-between"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-800">
+                            {formatMoney(pago.monto)}
+                          </div>
+
+                          <div className="text-xs text-gray-500">
+                            {pago.medio_pago}
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-gray-400">
+                          {new Date(
+                            pago.created_at
+                          ).toLocaleString("es-CL")}
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </AdminCard>
+
+          <AdminCard>
+            <div className="space-y-3">
+              <h3 className="font-semibold text-gray-800">
+                Información adicional
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Estado
+                  </div>
+
+                  <span
+                    className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${estadoClasses(
+                      reservaSeleccionada.estado
+                    )}`}
+                  >
+                    {estadoLabel(
+                      reservaSeleccionada.estado
+                    )}
+                  </span>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Vendedor
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.vendedor || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Venta asociada
+                  </div>
+
+                  <div className="text-gray-700">
+                    {reservaSeleccionada.order_id
+                      ? `Orden #${reservaSeleccionada.order_id}`
+                      : "Todavía no convertida"}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs text-gray-400">
+                  Observación
+                </div>
+
+                <div className="mt-1 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                  {reservaSeleccionada.observacion ||
+                    "Sin observaciones."}
+                </div>
+              </div>
+            </div>
+          </AdminCard>
+
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <strong>Estado actual:</strong> esta pantalla solo
+            permite consultar la reserva. La modificación de
+            abonos, estados y conversión a venta se implementará
+            en los siguientes pasos con funciones seguras de
+            Supabase.
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
     </div>
   );
 }
