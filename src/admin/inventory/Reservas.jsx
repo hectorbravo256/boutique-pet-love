@@ -511,10 +511,6 @@ function limpiarFormularioAbono() {
       return;
     }
 
-    if (Number(varianteActual.stock || 0) <= 0) {
-      setError("La talla seleccionada no tiene stock disponible.");
-      return;
-    }
 
     const itemExistente = items.find(
       (item) =>
@@ -524,9 +520,12 @@ function limpiarFormularioAbono() {
     const cantidadFinal =
       Number(itemExistente?.cantidad || 0) + cantidadAgregar;
 
-    if (cantidadFinal > Number(varianteActual.stock || 0)) {
+    if (
+      Number(varianteActual.stock || 0) > 0 &&
+      cantidadFinal > Number(varianteActual.stock || 0)
+    ) {
       setError(
-        `No puedes reservar más de ${varianteActual.stock} unidad(es) de esta talla.`
+        `No puedes reservar más de ${varianteActual.stock} unidad(es) disponibles de esta talla.`
       );
       return;
     }
@@ -1394,11 +1393,15 @@ function estadoClasses(estado) {
                       </option>
 
                       {variantesDisponibles.map((variant) => (
-                        <option
-                          key={variant.id}
-                          value={variant.id}
-                          disabled={Number(variant.stock || 0) <= 0}
-                        >
+                    <option
+                      key={variant.id}
+                      value={variant.id}
+                    >
+                      Talla {variant.size} ·{" "}
+                      {Number(variant.stock || 0) > 0
+                        ? `Stock ${variant.stock}`
+                        : "Sin stock · Bajo pedido"}
+                    </option>
                           Talla {variant.size} · Stock{" "}
                           {variant.stock}
                         </option>
