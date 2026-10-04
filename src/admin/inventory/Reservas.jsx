@@ -66,6 +66,11 @@ export default function Reservas() {
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
+  
+  const [montoNuevoAbono, setMontoNuevoAbono] = useState("");
+  const [medioPagoNuevoAbono, setMedioPagoNuevoAbono] = useState("");
+  const [observacionNuevoAbono, setObservacionNuevoAbono] = useState("");
+  const [guardandoAbono, setGuardandoAbono] = useState(false);
 
   const productoActual = useMemo(
     () =>
@@ -232,7 +237,122 @@ export default function Reservas() {
   setReservaSeleccionada(data);
   setLoadingDetalle(false);
 }
+  async function registrarAbono() {
+  setError("");
+  setMensaje("");
 
+  if (!reservaSeleccionada) return;
+
+  const monto = Number(montoNuevoAbono);
+  const saldo = Number(
+    reservaSeleccionada.saldo_pendiente || 0
+  );
+
+  if (!Number.isFinite(monto) || monto <= 0) {
+    setError("Ingresa un monto de abono mayor que $0.");
+    return;
+  }
+
+  if (monto > saldo) {
+    setError(
+      `El abono no puede superar el saldo pendiente de ${formatMoney(
+        saldo
+      )}.`
+    );
+    return;
+  }
+
+  if (!medioPagoNuevoAbono) {
+    setError("Selecciona el medio de pago del abono.");
+    return;
+  }
+
+  if (
+    ["convertida", "cancelada"].includes(
+      reservaSeleccionada.estado
+    )
+  ) {
+    setError(
+      "Esta reserva no permite registrar nuevos abonos."
+    );
+    return;
+  }
+
+  setGuardandoAbono(true);
+
+  try {
+    const { data, error: rpcError } =
+      await supabase.rpc(
+        "registrar_abono_reserva",
+        {
+          p_reservation_id: reservaSeleccionada.id,
+          p_monto: monto,
+          p_medio_pago: medioPagoNuevoAbono,
+          p_observacion:
+            observacionNuevoAbono.trim() || null,
+          p_created_by:
+            reservaSeleccionada.vendedor || null,
+        }
+      );
+
+    if (rpcError) {
+      console.error(
+        "Error registrar_abono_reserva:",
+        rpcError
+      );
+
+      throw new Error(
+        rpcError.message ||
+          "No fue posible registrar el abono."
+      );
+    }
+
+    const resultado = Array.isArray(data)
+      ? data[0]
+      : data;
+
+    setMontoNuevoAbono("");
+    setMedioPagoNuevoAbono("");
+    setObservacionNuevoAbono("");
+
+    await cargarReservas();
+    await abrirDetalleReserva(reservaSeleccionada);
+
+    if (resultado?.estado === "pagada") {
+      setMensaje(
+        `Abono de ${formatMoney(
+          monto
+        )} registrado correctamente. La reserva #${
+          reservaSeleccionada.numero_reserva
+        } quedó completamente pagada.`
+      );
+    } else {
+      setMensaje(
+        `Abono de ${formatMoney(
+          monto
+        )} registrado correctamente en la reserva #${
+          reservaSeleccionada.numero_reserva
+        }.`
+      );
+    }
+  } catch (err) {
+    console.error(err);
+
+    setError(
+      err?.message ||
+        "Ocurrió un error al registrar el abono."
+    );
+  } finally {
+    setGuardandoAbono(false);
+  }
+}
+
+function limpiarFormularioAbono() {
+  setMontoNuevoAbono("");
+  setMedioPagoNuevoAbono("");
+  setObservacionNuevoAbono("");
+}
+  
   async function cargarProductos() {
     setLoadingProductos(true);
     setError("");
@@ -1751,6 +1871,121 @@ function estadoClasses(estado) {
                   )}
                 </span>
               </div>
+
+              {Number(reservaSeleccionada.saldo_pendiente || 0) > 0 &&
+!["convertida", "cancelada"].includes(
+  reservaSeleccionada.estado
+) ? (
+  <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
+    <div className="mb-3">
+      <h4 className="font-semibold text-green-800">
+        Agregar abono
+      </h4>
+
+      <p className="mt-1 text-xs text-green-700">
+        Saldo pendiente:{" "}
+        <strong>
+          {formatMoney(
+            reservaSeleccionada.saldo_pendiente
+          )}
+        </strong>
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Monto
+        </label>
+
+        <input
+          type="number"
+          min="1"
+          step="1"
+          max={Number(
+            reservaSeleccionada.saldo_pendiente || 0
+          )}
+          value={montoNuevoAbono}
+          onChange={(event) =>
+            setMontoNuevoAbono(event.target.value)
+          }
+          placeholder="Ej. 10000"
+          disabled={guardandoAbono}
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:opacity-60"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Medio de pago
+        </label>
+
+        <select
+          value={medioPagoNuevoAbono}
+          onChange={(event) =>
+            setMedioPagoNuevoAbono(event.target.value)
+          }
+          disabled={guardandoAbono}
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:opacity-60"
+        >
+          <option value="">
+            Seleccionar...
+          </option>
+
+          {MEDIOS_PAGO.map((medio) => (
+            <option
+              key={medio.value}
+              value={medio.value}
+            >
+              {medio.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Observación
+        </label>
+
+        <input
+          type="text"
+          value={observacionNuevoAbono}
+          onChange={(event) =>
+            setObservacionNuevoAbono(
+              event.target.value
+            )
+          }
+          placeholder="Ej. Abono cliente"
+          disabled={guardandoAbono}
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:opacity-60"
+        />
+      </div>
+    </div>
+
+    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
+      <button
+        type="button"
+        onClick={limpiarFormularioAbono}
+        disabled={guardandoAbono}
+        className="rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60"
+      >
+        Limpiar
+      </button>
+
+      <button
+        type="button"
+        onClick={registrarAbono}
+        disabled={guardandoAbono}
+        className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {guardandoAbono
+          ? "Registrando..."
+          : "Registrar abono"}
+      </button>
+    </div>
+  </div>
+) : null}
 
               {(
                 reservaSeleccionada.reservation_payments || []
