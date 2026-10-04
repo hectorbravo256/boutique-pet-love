@@ -1715,11 +1715,6 @@ function estadoClasses(estado) {
   </div>
 </div>
 
-          <p className="text-sm text-gray-500">
-            {new Date(
-              reservaSeleccionada.created_at
-            ).toLocaleString("es-CL")}
-          </p>
         </div>
 
         <button
