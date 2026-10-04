@@ -38,6 +38,13 @@ const modules = [
         color: "from-green-500 to-emerald-500",
     },
     {
+    title: "Reservas",
+    description: "Registrar reservas, abonos y saldos pendientes.",
+    icon: "📋",
+    to: "/admin/inventario/reservas",
+    color: "from-pink-500 to-purple-600",
+    },
+    {
         title: "Reparaciones",
         description: "Enviar prendas a reparación y controlar reingresos.",
         icon: "🔧",
