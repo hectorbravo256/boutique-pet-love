@@ -27,13 +27,19 @@ export default function PurchasePage() {
             />
 
             {/* REGISTRO DE COMPRA */}
-            <InventorySection
-                title="Registrar compra"
-                subtitle="Ingresa los datos de la compra y agrega los productos recibidos."
-                className="overflow-visible"
-            >
+            <div>
+                <div className="mb-6">
+                    <h2 className="text-lg font-bold text-slate-900">
+                        Registrar compra
+                    </h2>
+            
+                    <p className="mt-1 text-sm text-slate-500">
+                        Ingresa los datos de la compra y agrega los productos recibidos.
+                    </p>
+                </div>
+            
                 <PurchaseForm />
-            </InventorySection>
+            </div>
 
             {/* HISTORIAL */}
             <InventorySection
