@@ -1128,38 +1128,51 @@ onClick={async () => {
 {[...p.product_variants]
   .sort((a, b) => {
 
-    const orden = [
-      "XXS",
-      "XS",
-      "S",
-      "M",
-      "L",
-      "XL",
-      "XXL",
-      "XXXL",
+    const ordenTallas = {
+      "XXS": 1,
+      "XS": 2,
+      "S": 3,
+      "M": 4,
+      "L": 5,
+      "XL": 6,
+      "XXL": 7,
+      "XXXL": 8
+    };
 
-      "Talla 0",
-      "Talla 1",
-      "Talla 2",
-      "Talla 3",
-      "Talla 4",
-      "Talla 5",
-      "Talla 6",
-      "Talla 7",
-      "Talla 8",
-      "Talla 9",
-      "Talla 10",
-      "Talla 11",
-      "Talla 12"
-    ];
+    const normalizarTalla = (talla) =>
+      String(talla || "")
+        .trim()
+        .replace(/^talla\s+/i, "")
+        .toUpperCase();
 
-    const posicionA = orden.indexOf(a.size);
-    const posicionB = orden.indexOf(b.size);
+    const tallaA = normalizarTalla(a.size);
+    const tallaB = normalizarTalla(b.size);
 
-    const ordenA = posicionA === -1 ? 999 : posicionA;
-    const ordenB = posicionB === -1 ? 999 : posicionB;
+    // Tallas con letras
+    if (
+      ordenTallas[tallaA] !== undefined &&
+      ordenTallas[tallaB] !== undefined
+    ) {
+      return ordenTallas[tallaA] - ordenTallas[tallaB];
+    }
 
-    return ordenA - ordenB;
+    // Tallas numéricas
+    const numeroA = tallaA.match(/^\d+$/)
+      ? parseInt(tallaA, 10)
+      : null;
+
+    const numeroB = tallaB.match(/^\d+$/)
+      ? parseInt(tallaB, 10)
+      : null;
+
+    if (numeroA !== null && numeroB !== null) {
+      return numeroA - numeroB;
+    }
+
+    if (numeroA === null && numeroB !== null) return -1;
+    if (numeroA !== null && numeroB === null) return 1;
+
+    return 0;
   })
   .map((v) => (
   <div key={v.id} style={{
