@@ -30,6 +30,7 @@ export default function PurchasePage() {
             <InventorySection
                 title="Registrar compra"
                 subtitle="Ingresa los datos de la compra y agrega los productos recibidos."
+                className="overflow-visible"
             >
                 <PurchaseForm />
             </InventorySection>
