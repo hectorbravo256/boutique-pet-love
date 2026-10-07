@@ -75,7 +75,12 @@ return (
 
         }
 
-summary={<></>}
+summary={
+    <PurchaseSummary
+        details={details}
+        documentType={documentType}
+    />
+}
 
         selector={
 
@@ -123,12 +128,6 @@ summary={<></>}
     details={details}
 
     setDetails={setDetails}
-
-/>
-                <PurchaseSummary
-
-    details={details}
-    documentType={documentType}
 
 />
             
