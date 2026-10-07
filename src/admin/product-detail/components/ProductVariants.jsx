@@ -85,7 +85,57 @@ export default function ProductVariants({
   gap-3
 ">
 
-    {producto.product_variants.map(v => (
+    {[...producto.product_variants]
+  .sort((a, b) => {
+
+    const ordenTallas = {
+      "XXS": 1,
+      "XS": 2,
+      "S": 3,
+      "M": 4,
+      "L": 5,
+      "XL": 6,
+      "XXL": 7,
+      "XXXL": 8
+    };
+
+    const normalizarTalla = (talla) =>
+      String(talla || "")
+        .trim()
+        .replace(/^talla\s+/i, "")
+        .toUpperCase();
+
+    const tallaA = normalizarTalla(a.size);
+    const tallaB = normalizarTalla(b.size);
+
+    // Tallas con letras
+    if (
+      ordenTallas[tallaA] !== undefined &&
+      ordenTallas[tallaB] !== undefined
+    ) {
+      return ordenTallas[tallaA] - ordenTallas[tallaB];
+    }
+
+    // Tallas numéricas
+    const numeroA = tallaA.match(/^\d+$/)
+      ? parseInt(tallaA, 10)
+      : null;
+
+    const numeroB = tallaB.match(/^\d+$/)
+      ? parseInt(tallaB, 10)
+      : null;
+
+    if (numeroA !== null && numeroB !== null) {
+      return numeroA - numeroB;
+    }
+
+    // Letras antes que números
+    if (numeroA === null && numeroB !== null) return -1;
+    if (numeroA !== null && numeroB === null) return 1;
+
+    return 0;
+  })
+  .map(v => (
 
 <div
   key={v.id}
