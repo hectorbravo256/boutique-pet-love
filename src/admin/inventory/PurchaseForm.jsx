@@ -6,7 +6,6 @@ import PurchaseLayout from "./layout/PurchaseLayout";
 import PurchaseSummary from "./components/PurchaseSummary";
 import PurchaseHeader from "./components/PurchaseHeader";
 import PurchaseItemsTable from "./components/PurchaseItemsTable";
-import PurchaseFooter from "./components/PurchaseFooter";
 import PurchaseProductModal from "./purchases/components/PurchaseProductModal";
 
 export default function PurchaseForm() {
@@ -78,6 +77,7 @@ summary={
     <PurchaseSummary
         details={details}
         documentType={documentType}
+        savePurchase={savePurchase}
     />
 }
 
@@ -114,22 +114,11 @@ summary={
 
     }}
             variantSummary={variantSummary}
-    loadVariantSummary={loadVariantSummary}
+            loadVariantSummary={loadVariantSummary}
 
-/>    
+                />    
             </>
-        }
-        
-
-footer={
-
-    <PurchaseFooter
-
-        savePurchase={savePurchase}
-
-    />
-
-}
+        } 
 
     />
 
