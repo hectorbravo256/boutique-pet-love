@@ -2,17 +2,11 @@ import QuantityInput from "../../shared/ui/QuantityInput";
 import CurrencyInput from "../../shared/ui/CurrencyInput";
 
 export default function PurchaseItemCard({
-
     item,
-
     index,
-
     updateQuantity,
-
     updateCost,
-
     removeItem
-
 }) {
 
     const subtotal =
@@ -20,186 +14,162 @@ export default function PurchaseItemCard({
         Number(item.unit_cost);
 
     return (
-
         <div
             className="
-                bg-white
-                border
+                w-full
                 rounded-2xl
-                px-5
-                py-3
+                border
+                border-slate-200
+                bg-white
+                p-4
                 shadow-sm
-                hover:shadow-md
                 transition-all
+                hover:shadow-md
             "
         >
 
-            <div className="flex items-center gap-5">
+            <div
+                className="
+                    grid
+                    grid-cols-1
+                    gap-4
+                    lg:grid-cols-[64px_minmax(140px,1fr)_70px_130px_145px_42px]
+                    lg:items-center
+                "
+            >
 
-                {/* Imagen */}
+                {/* IMAGEN */}
 
-                <div className="flex-shrink-0">
-
+                <div className="flex justify-center lg:justify-start">
                     <img
-
                         src={
                             item.image ||
                             "/placeholder-product.png"
                         }
-
                         alt={item.product_name}
-
                         className="
-                            w-16
                             h-16
+                            w-16
                             rounded-xl
-                            object-cover
                             border
+                            object-cover
                         "
-
                     />
-
                 </div>
 
-                {/* Producto */}
 
-                <div className="flex-1 min-w-[220px]">
+                {/* PRODUCTO */}
 
-                    <h3 className="font-bold leading-tight">
-
+                <div className="min-w-0">
+                    <h3
+                        className="
+                            break-words
+                            font-bold
+                            leading-tight
+                            text-slate-900
+                        "
+                    >
                         {item.product_name}
-
                     </h3>
 
-                    <div className="text-xs text-slate-500 mt-1">
-
+                    <div className="mt-1 text-xs text-slate-500">
                         {item.sku || "Sin SKU"}
-
                     </div>
-
                 </div>
 
-                {/* Talla */}
 
-                <div className="w-24 flex justify-center">
+                {/* TALLA */}
 
+                <div className="flex justify-start lg:justify-center">
                     <span
                         className="
                             inline-flex
-                            px-3
-                            py-1
                             rounded-full
                             bg-pink-100
-                            text-pink-600
-                            font-semibold
+                            px-3
+                            py-1
                             text-sm
+                            font-semibold
+                            text-pink-600
                         "
                     >
-
-                        {item.size}
-
+                        Talla {item.size}
                     </span>
-
                 </div>
 
-                {/* Cantidad */}
 
-<div className="w-[160px]">
+                {/* CANTIDAD */}
 
-    <QuantityInput
-
-        value={item.quantity}
-
-        onChange={(value)=>
-
-            updateQuantity(
-
-                index,
-
-                value
-
-            )
-
-        }
-
-    />
-
-</div>
-
-                {/* Costo */}
-
-                <div className="w-[170px]">
-
-                    <CurrencyInput
-
-                        value={item.unit_cost}
-
-                        onChange={(value)=>
-
-                            updateCost(
-
+                <div className="w-full">
+                    <QuantityInput
+                        value={item.quantity}
+                        onChange={(value) =>
+                            updateQuantity(
                                 index,
-
                                 value
-
                             )
-
                         }
-
                     />
-
                 </div>
 
-                {/* Subtotal */}
 
-                <div className="w-[150px]">
+                {/* COSTO */}
+
+                <div className="w-full">
+                    <CurrencyInput
+                        value={item.unit_cost}
+                        onChange={(value) =>
+                            updateCost(
+                                index,
+                                value
+                            )
+                        }
+                    />
+                </div>
+
+
+                {/* SUBTOTAL + ELIMINAR */}
+
+                <div className="flex items-center justify-between gap-2 lg:contents">
 
                     <div
                         className="
-                            h-12
-                            rounded-xl
-                            bg-slate-100
                             flex
+                            h-12
                             items-center
                             justify-center
+                            rounded-xl
+                            bg-slate-100
+                            px-3
                             font-black
+                            text-slate-900
                         "
                     >
-
                         $
-
                         {subtotal.toLocaleString("es-CL")}
-
                     </div>
 
-                </div>
-
-                {/* Eliminar */}
-
-                <div className="w-12 flex justify-center flex-shrink-0">
-
                     <button
-
-                        onClick={()=>
-
+                        type="button"
+                        onClick={() =>
                             removeItem(index)
-
                         }
-
                         className="
-                            w-10
+                            flex
                             h-10
+                            w-10
+                            shrink-0
+                            items-center
+                            justify-center
                             rounded-full
-                            hover:bg-red-50
                             text-red-500
-                            hover:text-red-700
                             transition
+                            hover:bg-red-50
+                            hover:text-red-700
                         "
-
+                        title="Eliminar producto"
                     >
-
                         🗑️
-
                     </button>
 
                 </div>
@@ -207,7 +177,5 @@ export default function PurchaseItemCard({
             </div>
 
         </div>
-
     );
-
 }
