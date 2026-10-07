@@ -41,7 +41,8 @@ const {
     variantSummary,
     loadVariantSummary,
 
-    savePurchase
+    savePurchase,
+    resetPurchase
 
 } = usePurchase();
 
@@ -78,6 +79,7 @@ summary={
         details={details}
         documentType={documentType}
         savePurchase={savePurchase}
+        resetPurchase={resetPurchase}
     />
 }
 
