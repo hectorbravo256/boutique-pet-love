@@ -13,9 +13,18 @@ export default function PurchaseHeader({
     setObservations
 }) {
 
-    return (
-        <div>
+return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
+        <div className="mb-5">
+            <h2 className="text-lg font-semibold text-slate-800">
+                1. Datos de la compra
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+                Ingresa la información del documento y del proveedor.
+            </p>
+        </div>
 
             {/* DATOS PRINCIPALES */}
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
