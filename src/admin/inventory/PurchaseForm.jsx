@@ -1,6 +1,5 @@
 import { useState } from "react";
 import AdminCard from "../components/AdminCard";
-import Button from "../shared/ui/Button";
 import usePurchase from "./hooks/usePurchase";
 
 import PurchaseLayout from "./layout/PurchaseLayout";
@@ -82,53 +81,13 @@ summary={
     />
 }
 
-        selector={
-
-<AdminCard>
-
-    <div className="flex items-center justify-between">
-
-        <div>
-
-            <h2 className="text-2xl font-black">
-
-                Productos
-
-            </h2>
-
-            <p className="text-slate-500">
-
-                Agrega uno o más productos.
-
-            </p>
-
-        </div>
-
-        <Button
-
-            onClick={() => setOpenProductModal(true)}
-
-        >
-
-            + Agregar producto
-
-        </Button>
-
-    </div>
-
-</AdminCard>
-
-        }
-
         table={
             <>
 
-            <PurchaseItemsTable
-
+<PurchaseItemsTable
     details={details}
-
     setDetails={setDetails}
-
+    onAddProduct={() => setOpenProductModal(true)}
 />
             
     <PurchaseProductModal
