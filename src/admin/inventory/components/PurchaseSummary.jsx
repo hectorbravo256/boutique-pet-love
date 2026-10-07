@@ -1,6 +1,7 @@
 export default function PurchaseSummary({
     details,
-    documentType
+    documentType,
+    savePurchase
 }) {
 
     //---------------------------------------
@@ -129,6 +130,29 @@ return (
                     <span className="text-3xl font-black text-pink-600">
                         {money(total)}
                     </span>
+
+                    <div className="mt-6 border-t border-slate-200 pt-6">
+
+                        <button
+                            type="button"
+                            onClick={savePurchase}
+                            className="
+                                w-full
+                                rounded-xl
+                                bg-pink-500
+                                px-5
+                                py-3.5
+                                text-base
+                                font-bold
+                                text-white
+                                transition
+                                hover:bg-pink-600
+                            "
+                        >
+                            Registrar compra
+                        </button>
+                    
+                    </div>
 
                 </div>
 
