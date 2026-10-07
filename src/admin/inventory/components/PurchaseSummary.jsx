@@ -1,7 +1,8 @@
 export default function PurchaseSummary({
     details,
     documentType,
-    savePurchase
+    savePurchase,
+    resetPurchase
 }) {
 
     //---------------------------------------
@@ -58,6 +59,24 @@ export default function PurchaseSummary({
     //---------------------------------------
     // RENDER
     //---------------------------------------
+
+    function handleResetPurchase() {
+
+    const hasData =
+        details.length > 0;
+
+    const confirmed = hasData
+        ? window.confirm(
+            "¿Estás seguro de que deseas limpiar toda la compra? Se eliminarán los productos y los datos ingresados."
+        )
+        : true;
+
+    if (!confirmed) {
+        return;
+    }
+
+    resetPurchase();
+}
 
 return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -150,6 +169,29 @@ return (
                             "
                         >
                             Registrar compra
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleResetPurchase}
+                            className="
+                                mt-3
+                                w-full
+                                rounded-xl
+                                border
+                                border-slate-300
+                                bg-white
+                                px-5
+                                py-3
+                                text-base
+                                font-medium
+                                text-slate-600
+                                transition
+                                hover:bg-slate-50
+                                hover:text-slate-800
+                            "
+                        >
+                            Limpiar formulario
                         </button>
                     
                     </div>
