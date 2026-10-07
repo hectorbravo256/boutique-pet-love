@@ -606,6 +606,35 @@ alert(
 
     }
 
+//----------------------------------------
+// Limpiar formulario de compra
+//----------------------------------------
+
+function resetPurchase() {
+
+    setSupplier("");
+
+    setDocumentType("factura_afecta");
+
+    setInvoiceNumber("");
+
+    setObservations("");
+
+    setDetails([]);
+
+    setVariants([]);
+
+    setVariantSummary(null);
+
+    setDetail({
+        product_id: "",
+        variant_id: "",
+        quantity: 1,
+        unit_cost: 0
+    });
+
+}
+
     //----------------------------------------
     // RETURN
     //----------------------------------------
@@ -643,7 +672,9 @@ alert(
 
         loadVariantSummary,
 
-        savePurchase
+        savePurchase,
+
+        resetPurchase
 
     };
 
