@@ -820,48 +820,56 @@ const precioFinal = precioBase * cantidad;
 
   <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
     {[...product.product_variants]
-      .sort((a, b) => {
+  .sort((a, b) => {
 
-        const orden = [
-          "XXS",
-          "XS",
-          "S",
-          "M",
-          "L",
-          "XL",
-          "XXL",
-          "XXXL",
+    const ordenTallas = {
+      "XXS": 1,
+      "XS": 2,
+      "S": 3,
+      "M": 4,
+      "L": 5,
+      "XL": 6,
+      "XXL": 7,
+      "XXXL": 8
+    };
 
-          "Talla 0",
-          "Talla 1",
-          "Talla 2",
-          "Talla 3",
-          "Talla 4",
-          "Talla 5",
-          "Talla 6",
-          "Talla 7",
-          "Talla 8",
-          "Talla 9",
-          "Talla 10",
-          "Talla 11",
-          "Talla 12"
-        ];
+    const normalizarTalla = (talla) =>
+      String(talla || "")
+        .trim()
+        .replace(/^talla\s+/i, "")
+        .toUpperCase();
 
-        const posicionA = orden.indexOf(a.size);
-        const posicionB = orden.indexOf(b.size);
+    const tallaA = normalizarTalla(a.size);
+    const tallaB = normalizarTalla(b.size);
 
-        // Si una talla no está en el listado,
-        // enviarla al final.
-        const ordenA =
-          posicionA === -1 ? 999 : posicionA;
+    // Tallas con letras
+    if (
+      ordenTallas[tallaA] !== undefined &&
+      ordenTallas[tallaB] !== undefined
+    ) {
+      return ordenTallas[tallaA] - ordenTallas[tallaB];
+    }
 
-        const ordenB =
-          posicionB === -1 ? 999 : posicionB;
+    // Tallas numéricas
+    const numeroA = tallaA.match(/^\d+$/)
+      ? parseInt(tallaA, 10)
+      : null;
 
-        return ordenA - ordenB;
+    const numeroB = tallaB.match(/^\d+$/)
+      ? parseInt(tallaB, 10)
+      : null;
 
-      })
-      .map(v => {
+    if (numeroA !== null && numeroB !== null) {
+      return numeroA - numeroB;
+    }
+
+    // Si una es letra y otra numérica
+    if (numeroA === null && numeroB !== null) return -1;
+    if (numeroA !== null && numeroB === null) return 1;
+
+    return 0;
+  })
+  .map(v => {
                 const stock = v.stock || 0;
                 const isActive = selected === v.id;
 
