@@ -19,20 +19,22 @@ export default function PurchaseLayout({
     }
 
     return (
-        <div className="grid gap-8 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
 
             {/* CONTENIDO PRINCIPAL */}
-            <div className="min-w-0 space-y-8 xl:col-span-2">
+            <div className="space-y-6 xl:col-span-2">
                 {header}
                 {selector}
                 {table}
                 {footer}
             </div>
 
-            {/* RESUMEN LATERAL */}
-            <aside className="min-w-0 self-start xl:sticky xl:top-6">
-                {summary}
-            </aside>
+            {/* RESUMEN */}
+            <div className="xl:col-span-1">
+                <div className="sticky top-6">
+                    {summary}
+                </div>
+            </div>
 
         </div>
     );
