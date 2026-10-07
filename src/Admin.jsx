@@ -346,10 +346,58 @@ const resaltar = (texto) => {
   );
 };
 
-const stockOrdenado = [...stock].sort((a, b) =>
-  (productos[a.product_id] || "").localeCompare(productos[b.product_id] || "") ||
-  a.size.localeCompare(b.size, undefined, { numeric: true })
-);
+const ordenTallas = [
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "XXXL",
+
+  "Talla 0",
+  "Talla 1",
+  "Talla 2",
+  "Talla 3",
+  "Talla 4",
+  "Talla 5",
+  "Talla 6",
+  "Talla 7",
+  "Talla 8",
+  "Talla 9",
+  "Talla 10",
+  "Talla 11",
+  "Talla 12"
+];
+
+const stockOrdenado = [...stock].sort((a, b) => {
+
+  // Primero ordenar por producto
+  const productoA = productos[a.product_id] || "";
+  const productoB = productos[b.product_id] || "";
+
+  const productoOrden =
+    productoA.localeCompare(productoB, "es", {
+      sensitivity: "base"
+    });
+
+  if (productoOrden !== 0) {
+    return productoOrden;
+  }
+
+  // Después ordenar por talla
+  const posicionA = ordenTallas.indexOf(a.size);
+  const posicionB = ordenTallas.indexOf(b.size);
+
+  const ordenA =
+    posicionA === -1 ? 999 : posicionA;
+
+  const ordenB =
+    posicionB === -1 ? 999 : posicionB;
+
+  return ordenA - ordenB;
+});
 
 
 
@@ -1077,11 +1125,41 @@ onClick={async () => {
           gap: 12
         }}>
 
-          {[...p.product_variants]
+{[...p.product_variants]
   .sort((a, b) => {
-    const numA = parseInt(a.size.match(/\d+/)?.[0] || 0);
-    const numB = parseInt(b.size.match(/\d+/)?.[0] || 0);
-    return numA - numB;
+
+    const orden = [
+      "XXS",
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "XXXL",
+
+      "Talla 0",
+      "Talla 1",
+      "Talla 2",
+      "Talla 3",
+      "Talla 4",
+      "Talla 5",
+      "Talla 6",
+      "Talla 7",
+      "Talla 8",
+      "Talla 9",
+      "Talla 10",
+      "Talla 11",
+      "Talla 12"
+    ];
+
+    const posicionA = orden.indexOf(a.size);
+    const posicionB = orden.indexOf(b.size);
+
+    const ordenA = posicionA === -1 ? 999 : posicionA;
+    const ordenB = posicionB === -1 ? 999 : posicionB;
+
+    return ordenA - ordenB;
   })
   .map((v) => (
   <div key={v.id} style={{
