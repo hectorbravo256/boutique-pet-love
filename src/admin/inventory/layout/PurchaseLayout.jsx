@@ -1,63 +1,39 @@
 export default function PurchaseLayout({
-
     header,
-
     summary,
-
     selector,
-
     table,
-
     footer
-
 }) {
-
     const hasSummary = !!summary;
 
+    if (!hasSummary) {
+        return (
+            <div className="space-y-8">
+                {header}
+                {selector}
+                {table}
+                {footer}
+            </div>
+        );
+    }
+
     return (
+        <div className="grid gap-8 xl:grid-cols-3">
 
-        <div className="space-y-8">
-
-            <div
-                className={
-                    hasSummary
-                        ? "grid xl:grid-cols-3 gap-8"
-                        : "w-full"
-                }
-            >
-
-                <div
-                    className={
-                        hasSummary
-                            ? "xl:col-span-2"
-                            : "w-full"
-                    }
-                >
-
-                    {header}
-
-                </div>
-
-                {hasSummary && (
-
-                    <div>
-
-                        {summary}
-
-                    </div>
-
-                )}
-
+            {/* CONTENIDO PRINCIPAL */}
+            <div className="min-w-0 space-y-8 xl:col-span-2">
+                {header}
+                {selector}
+                {table}
+                {footer}
             </div>
 
-            {selector}
-
-            {table}
-
-            {footer}
+            {/* RESUMEN LATERAL */}
+            <aside className="min-w-0 self-start xl:sticky xl:top-6">
+                {summary}
+            </aside>
 
         </div>
-
     );
-
 }
