@@ -815,46 +815,53 @@ const precioFinal = precioBase * cantidad;
 
 
         {/* TALLAS */}
-        <div style={{ marginTop: 25 }}>
-          <p style={{ marginBottom: 10 }}>Talla</p>
+<div style={{ marginTop: 25 }}>
+  <p style={{ marginBottom: 10 }}>Talla</p>
 
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {[...product.product_variants]
-              .sort((a, b) => {
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+    {[...product.product_variants]
+      .sort((a, b) => {
 
-  const orden = [
-    "XXS",
-    "XS",
-    "S",
-    "M",
-    "L",
-    "XL",
-    "XXL",
-    "XXXL",
+        const orden = [
+          "XXS",
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "XXXL",
 
-    "Talla 0",
-    "Talla 1",
-    "Talla 2",
-    "Talla 3",
-    "Talla 4",
-    "Talla 5",
-    "Talla 6",
-    "Talla 7",
-    "Talla 8",
-    "Talla 9",
-    "Talla 10",
-    "Talla 11",
-    "Talla 12"
-  ];
+          "Talla 0",
+          "Talla 1",
+          "Talla 2",
+          "Talla 3",
+          "Talla 4",
+          "Talla 5",
+          "Talla 6",
+          "Talla 7",
+          "Talla 8",
+          "Talla 9",
+          "Talla 10",
+          "Talla 11",
+          "Talla 12"
+        ];
 
-  return (
-    orden.indexOf(a.size)
-    -
-    orden.indexOf(b.size)
-  );
+        const posicionA = orden.indexOf(a.size);
+        const posicionB = orden.indexOf(b.size);
 
-})
-              .map(v => {
+        // Si una talla no está en el listado,
+        // enviarla al final.
+        const ordenA =
+          posicionA === -1 ? 999 : posicionA;
+
+        const ordenB =
+          posicionB === -1 ? 999 : posicionB;
+
+        return ordenA - ordenB;
+
+      })
+      .map(v => {
                 const stock = v.stock || 0;
                 const isActive = selected === v.id;
 
