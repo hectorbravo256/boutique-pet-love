@@ -2,7 +2,8 @@ import PurchaseItemCard from "./PurchaseItemCard";
 
 export default function PurchaseItemsTable({
     details,
-    setDetails
+    setDetails,
+    onAddProduct
 }) {
 
     //---------------------------------------
@@ -60,21 +61,42 @@ export default function PurchaseItemsTable({
     //---------------------------------------
 
     return (
-        <div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
             {/* ENCABEZADO DE PRODUCTOS */}
 
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                <div>
-                    <h2 className="text-2xl font-black text-slate-900">
-                        Productos de la compra
-                    </h2>
-
-                    <p className="mt-1 text-sm text-slate-500">
-                        Revisa los productos antes de guardar la compra.
-                    </p>
-                </div>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        
+            <div>
+                <h2 className="text-lg font-semibold text-slate-800">
+                    2. Agregar productos
+                </h2>
+        
+                <p className="mt-1 text-sm text-slate-500">
+                    Agrega y revisa los productos que forman parte de esta compra.
+                </p>
+            </div>
+        
+            <button
+                type="button"
+                onClick={onAddProduct}
+                className="
+                    inline-flex
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-pink-500
+                    px-5
+                    py-3
+                    text-sm
+                    font-bold
+                    text-white
+                    transition
+                    hover:bg-pink-600
+                "
+            >
+                + Agregar producto
+            </button>
 
                 {/* CONTADOR */}
 
