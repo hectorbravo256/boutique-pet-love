@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { supabase } from "../../supabaseClient";
 import AdminCard from "../components/AdminCard";
 
@@ -825,10 +826,51 @@ function estadoClasses(estado) {
         </p>
       </div>
 
-      <div className="rounded-full bg-pink-50 px-4 py-2 text-sm font-semibold text-pink-700">
-        {reservasFiltradas.length} reserva
-        {reservasFiltradas.length === 1 ? "" : "s"}
-      </div>
+<div className="flex items-center gap-2">
+
+  <div className="rounded-xl bg-pink-50 px-4 py-2 text-sm font-semibold text-pink-700">
+    {reservasFiltradas.length} reserva
+    {reservasFiltradas.length === 1 ? "" : "s"}
+  </div>
+
+  <button
+    type="button"
+    onClick={cargarReservas}
+    disabled={loadingReservas}
+    title="Actualizar historial"
+    className="
+      flex
+      h-10
+      w-10
+      items-center
+      justify-center
+      rounded-xl
+      border
+      border-slate-200
+      bg-white
+      text-slate-500
+      shadow-sm
+      transition
+
+      hover:border-pink-200
+      hover:bg-pink-50
+      hover:text-pink-600
+
+      disabled:cursor-not-allowed
+      disabled:opacity-50
+    "
+  >
+    <RefreshCw
+      size={17}
+      className={
+        loadingReservas
+          ? "animate-spin"
+          : ""
+      }
+    />
+  </button>
+
+</div>
     </div>
 
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
