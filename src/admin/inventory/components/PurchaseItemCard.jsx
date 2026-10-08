@@ -33,7 +33,7 @@ export default function PurchaseItemCard({
                     grid
                     grid-cols-1
                     gap-4
-                    lg:grid-cols-[64px_minmax(140px,1fr)_70px_130px_145px_42px]
+                    lg:grid-cols-[56px_minmax(120px,1fr)_68px_120px_130px_100px_40px]
                     lg:items-center
                 "
             >
@@ -128,51 +128,57 @@ export default function PurchaseItemCard({
                 </div>
 
 
-                {/* SUBTOTAL + ELIMINAR */}
+{/* SUBTOTAL */}
 
-                <div className="flex items-center justify-between gap-2 lg:contents">
+<div
+    className="
+        flex
+        h-12
+        items-center
+        justify-center
+        rounded-xl
+        bg-slate-100
+        px-3
+        font-black
+        text-slate-900
+    "
+>
+    ${subtotal.toLocaleString("es-CL")}
+</div>
 
-                    <div
-                        className="
-                            flex
-                            h-12
-                            items-center
-                            justify-center
-                            rounded-xl
-                            bg-slate-100
-                            px-3
-                            font-black
-                            text-slate-900
-                        "
-                    >
-                        $
-                        {subtotal.toLocaleString("es-CL")}
-                    </div>
 
-                    <button
-                        type="button"
-                        onClick={() =>
-                            removeItem(index)
-                        }
-                        className="
-                            flex
-                            h-10
-                            w-10
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded-full
-                            text-red-500
-                            transition
-                            hover:bg-red-50
-                            hover:text-red-700
-                        "
-                        title="Eliminar producto"
-                    >
-                        🗑️
-                    </button>
+{/* ELIMINAR */}
 
-                </div>
+<div className="flex justify-center">
+
+    <button
+        type="button"
+        onClick={() =>
+            removeItem(index)
+        }
+        className="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-red-200
+            bg-red-50
+            text-red-500
+            transition
+            hover:border-red-300
+            hover:bg-red-100
+            hover:text-red-700
+        "
+        title="Eliminar producto"
+        aria-label="Eliminar producto"
+    >
+        🗑️
+    </button>
+
+</div>
 
             </div>
 
