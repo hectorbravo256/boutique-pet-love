@@ -810,9 +810,10 @@ function estadoClasses(estado) {
 }
 
   return (
-    <div className="space-y-6 pb-10">
-      <AdminCard>
-  <div className="space-y-5">
+    <div className="flex flex-col gap-6 pb-10">
+  <div className="order-last">
+    <AdminCard>
+      <div className="space-y-5">
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div>
         <h2 className="text-lg font-semibold text-gray-800">
@@ -1020,6 +1021,7 @@ function estadoClasses(estado) {
     )}
   </div>
 </AdminCard>
+  </div>
       <div>
         <h1 className="text-2xl font-bold text-gray-800">
           Reservas
