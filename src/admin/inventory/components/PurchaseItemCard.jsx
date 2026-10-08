@@ -33,7 +33,7 @@ export default function PurchaseItemCard({
                     grid
                     grid-cols-1
                     gap-4
-                    lg:grid-cols-[56px_minmax(120px,1fr)_68px_120px_130px_100px_40px]
+                    lg:grid-cols-[56px_minmax(150px,1fr)_68px_120px_130px_100px_40px]
                     lg:items-center
                 "
             >
