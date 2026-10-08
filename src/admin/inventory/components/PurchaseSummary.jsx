@@ -150,7 +150,9 @@ return (
                         {money(total)}
                     </span>
 
-                    <div className="mt-6 border-t border-slate-200 pt-6">
+                    </div>
+
+                    <div className="mt-5 space-y-3">
 
                         <button
                             type="button"
@@ -193,8 +195,6 @@ return (
                         >
                             Limpiar formulario
                         </button>
-                    
-                    </div>
 
                 </div>
 
