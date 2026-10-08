@@ -13,10 +13,15 @@ export default function AdminLayout() {
   const location =
     useLocation();
 
-  const [
-    sidebarOpen,
-    setSidebarOpen
-  ] = useState(false);
+const [
+  sidebarOpen,
+  setSidebarOpen
+] = useState(false);
+
+const [
+  sidebarCollapsed,
+  setSidebarCollapsed
+] = useState(false);
 
   const isActive =
     (path) =>
@@ -62,15 +67,22 @@ export default function AdminLayout() {
 
   return (
 
-<div className="
-  min-h-screen
-  bg-gradient-to-b
-  from-[#fff7fb]
-  via-white
-  to-[#fdf2f8]
-  flex
-  md:pl-[280px]
-">
+<div
+  className={`
+    min-h-screen
+    bg-gradient-to-b
+    from-[#fff7fb]
+    via-white
+    to-[#fdf2f8]
+    flex
+    transition-all
+    duration-300
+    ${sidebarCollapsed
+      ? "md:pl-[82px]"
+      : "md:pl-[280px]"
+    }
+  `}
+>
 
       {/* MOBILE TOPBAR */}
       <div className="
@@ -178,60 +190,101 @@ export default function AdminLayout() {
       }
 
       {/* SIDEBAR */}
-      <aside className={`
-        fixed
-        top-0
-        left-0
+      <aside
+        className={`
+          fixed
+          top-0
+          left-0
+      
+          h-screen
+      
+          flex
+          flex-col
+      
+          bg-[#111827]
+      
+          border-r
+          border-white/5
+      
+          p-6
+      
+          z-[80]
+      
+          transition-all
+          duration-300
+      
+          ${
+            sidebarCollapsed
+              ? "md:w-[82px]"
+              : "md:w-[280px]"
+          }
+      
+          w-[280px]
+      
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+          }
+      
+          md:translate-x-0
+        `}
+      >
 
-        h-screen
-        w-[280px]
-
-        flex
-        flex-col
-
-        bg-[#111827]
-
-        border-r
-        border-white/5
-
-        p-6
-
-        z-[80]
-
-        transition-all
-        duration-300
-
-        ${sidebarOpen
-          ? "translate-x-0"
-          : "-translate-x-full"
-        }
-
-        md:translate-x-0
-      `}>
-
-        {/* HEADER */}
-        <div className="mb-10">
-
-          <p className="
-            uppercase
-            tracking-[0.35em]
-            text-[11px]
-            text-pink-400
-            font-bold
-          ">
-            Administración
-          </p>
-
-          <h1 className="
-            text-3xl
-            font-black
-            text-white
-            mt-3
-          ">
-            ⚙️ Admin
-          </h1>
-
-        </div>
+      {/* HEADER */}
+      
+      <div
+        className={`
+          mb-10
+          flex
+          items-center
+          ${
+            sidebarCollapsed
+              ? "justify-center"
+              : "justify-between"
+          }
+        `}
+      >
+      
+        {!sidebarCollapsed && (
+          <div>
+      
+            <p className="
+              uppercase
+              tracking-[0.35em]
+              text-[11px]
+              text-pink-400
+              font-bold
+            ">
+              Administración
+            </p>
+      
+            <h1 className="
+              text-3xl
+              font-black
+              text-white
+              mt-3
+            ">
+              ⚙️ Admin
+            </h1>
+      
+          </div>
+        )}
+      
+        {sidebarCollapsed && (
+          <div
+            className="
+              text-3xl
+              font-black
+              text-white
+            "
+            title="Administración"
+          >
+            ⚙️
+          </div>
+        )}
+      
+      </div>
 
         {/* MENU */}
         <nav className="
@@ -251,48 +304,63 @@ export default function AdminLayout() {
                 setSidebarOpen(false)
               }
 
-              className={`
-                flex
-                items-center
-                gap-3
-
-                px-4
-                py-3
-
-                rounded-2xl
-
-                font-semibold
-
-                transition-all
-                duration-300
-
-                hover:-translate-y-0.5
-
-                ${
-                  isActive(item.path)
-
-                    ? `
-                      bg-gradient-to-r
-                      from-pink-500
-                      to-purple-500
-                      text-white
-                      shadow-lg
-                    `
-
-                    : `
-                      text-slate-300
-                      hover:bg-white/5
-                      hover:text-white
-                    `
-                }
-              `}
+            className={`
+              flex
+              items-center
+            
+              ${
+                sidebarCollapsed
+                  ? "justify-center px-0"
+                  : "gap-3 px-4"
+              }
+            
+              py-3
+            
+              rounded-2xl
+            
+              font-semibold
+            
+              transition-all
+              duration-300
+            
+              hover:-translate-y-0.5
+            
+              ${
+                isActive(item.path)
+            
+                  ? `
+                    bg-gradient-to-r
+                    from-pink-500
+                    to-purple-500
+                    text-white
+                    shadow-lg
+                  `
+            
+                  : `
+                    text-slate-300
+                    hover:bg-white/5
+                    hover:text-white
+                  `
+              }
+            `}
             >
 
-              <span className="text-lg">
-                {item.icon}
+            <span
+              className="text-lg"
+              title={
+                sidebarCollapsed
+                  ? item.label
+                  : undefined
+              }
+            >
+              {item.icon}
+            </span>
+            
+            {!sidebarCollapsed && (
+              <span>
+                {item.label}
               </span>
-
-              {item.label}
+            )}
 
             </Link>
 
@@ -300,34 +368,32 @@ export default function AdminLayout() {
 
         </nav>
 
-        {/* FOOTER */}
+      {/* FOOTER */}
+      
+      {!sidebarCollapsed && (
         <div className="
           mt-auto
           pt-8
         ">
-
+      
           <div className="
             rounded-3xl
-
             bg-white/5
-
             border
             border-white/10
-
             p-5
           ">
-
+      
             <p className="
               text-xs
               uppercase
               tracking-[0.25em]
-
               text-slate-400
               font-bold
             ">
               Boutique Pet Love
             </p>
-
+      
             <p className="
               mt-3
               text-sm
@@ -337,10 +403,58 @@ export default function AdminLayout() {
               Panel administrativo premium
               para ecommerce.
             </p>
-
+      
           </div>
-
+      
         </div>
+      )}
+
+        {/* COLLAPSE BUTTON */}
+
+<button
+  type="button"
+  onClick={() =>
+    setSidebarCollapsed(!sidebarCollapsed)
+  }
+  className="
+    hidden
+    md:flex
+
+    absolute
+    -right-3
+    top-8
+
+    h-7
+    w-7
+
+    items-center
+    justify-center
+
+    rounded-full
+
+    border
+    border-slate-200
+
+    bg-white
+
+    text-slate-600
+
+    shadow-md
+
+    transition-all
+    duration-300
+
+    hover:scale-110
+    hover:text-pink-600
+  "
+  title={
+    sidebarCollapsed
+      ? "Expandir menú"
+      : "Minimizar menú"
+  }
+>
+  {sidebarCollapsed ? "▶" : "◀"}
+</button>
 
       </aside>
 
