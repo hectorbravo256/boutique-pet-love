@@ -19,13 +19,6 @@ export default function PurchasePage() {
                 </Link>
             </div>
 
-            {/* ENCABEZADO */}
-            <InventorySection
-                icon="📥"
-                title="Compras"
-                subtitle="Recepción de mercadería y actualización de stock."
-            />
-
             {/* REGISTRO DE COMPRA */}
             <div>
                 <div className="mb-6">
