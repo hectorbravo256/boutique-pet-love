@@ -421,11 +421,12 @@ const [
     md:flex
 
     absolute
-    -right-3
-    top-8
+    -right-4
+    top-1/2
+    -translate-y-1/2
 
-    h-7
-    w-7
+    h-8
+    w-8
 
     items-center
     justify-center
