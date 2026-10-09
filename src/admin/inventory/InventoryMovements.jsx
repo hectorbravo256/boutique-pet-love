@@ -25,6 +25,7 @@ export default function InventoryMovements() {
             >
                 ← Volver a Inventario
             </Link>
+           </div>
         <h1 className="text-2xl font-bold mb-4">
           Movimientos de inventario
         </h1>
@@ -98,6 +99,7 @@ export default function InventoryMovements() {
             >
                 ← Volver a Inventario
             </Link>
+        </div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">
