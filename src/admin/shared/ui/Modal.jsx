@@ -169,9 +169,8 @@ const sizes = {
     className="
 
         p-8
-
-        max-h-[88vh]
-
+        max-h-[92vh]
+        min-h-[420px]
         overflow-y-auto
 
     "
