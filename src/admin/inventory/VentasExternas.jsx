@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
     useEffect,
     useMemo,
@@ -801,6 +802,24 @@ const validarFormulario = () => {
             p-4
             md:p-8
         ">
+
+            <div className="mb-6">
+    <Link
+        to="/admin/inventario"
+        className="
+            inline-flex
+            items-center
+            text-sm
+            font-semibold
+            text-pink-600
+            transition
+            hover:text-pink-700
+            hover:underline
+        "
+    >
+        ← Volver a Inventario
+    </Link>
+</div>
 
 
             {/* =================================================
