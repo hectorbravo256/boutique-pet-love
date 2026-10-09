@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import { formatearFechaHoraChile } from "../../utils/fechaChile";
@@ -811,6 +812,23 @@ const selectedProductVariants = useMemo(() => {
 
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+    <Link
+        to="/admin/inventario"
+        className="
+            inline-flex
+            items-center
+            text-sm
+            font-semibold
+            text-pink-600
+            transition
+            hover:text-pink-700
+            hover:underline
+        "
+    >
+        ← Volver a Inventario
+    </Link>
+</div>
       {/* ENCABEZADO */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
