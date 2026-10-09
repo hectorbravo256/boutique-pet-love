@@ -858,6 +858,24 @@ const validarFormulario = () => {
         ← Volver a Inventario
     </Link>
 </div>
+            {/* Encabezado independiente, sin tarjeta */}
+<div className="mb-6">
+    <p className="text-xs font-bold uppercase tracking-[0.25em] text-pink-500">
+        Nueva venta
+    </p>
+
+    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-black tracking-tight text-slate-900">
+            Registrar venta 🛒
+        </h1>
+
+        {/* Conserva aquí la etiqueta actual del canal */}
+    </div>
+
+    <p className="mt-2 text-slate-500">
+        Registra ventas presenciales y ventas realizadas por RRSS.
+    </p>
+</div>
 
 
             {/* =================================================
@@ -935,33 +953,6 @@ const validarFormulario = () => {
                             gap-4
                         ">
                     
-                            <div>
-                    
-                                <p className="
-                                    text-xs
-                                    uppercase
-                                    tracking-[0.2em]
-                                    text-pink-500
-                                    font-bold
-                                ">
-                    
-                                    Nueva venta
-                    
-                                </p>
-                    
-                                <h2 className="
-                                    text-2xl
-                                    md:text-3xl
-                                    font-black
-                                    mt-1
-                                    text-slate-900
-                                ">
-                    
-                                    Registrar venta 🛒
-                    
-                                </h2>
-                    
-                            </div>
                     
                             <span className={`
                                 inline-flex
