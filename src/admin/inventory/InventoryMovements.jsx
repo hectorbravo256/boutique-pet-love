@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import useInventoryMovements from "../shared/hooks/useInventoryMovements";
 import { formatearFechaHoraChile } from "../utils/fechaChile";
 
@@ -22,6 +23,23 @@ export default function InventoryMovements() {
   if (error) {
     return (
       <div className="p-6">
+        <div className="mb-6">
+            <Link
+                to="/admin/inventario"
+                className="
+                    inline-flex
+                    items-center
+                    text-sm
+                    font-semibold
+                    text-pink-600
+                    transition
+                    hover:text-pink-700
+                    hover:underline
+                "
+            >
+                ← Volver a Inventario
+            </Link>
+        </div>
         <h1 className="text-2xl font-bold mb-4">
           Movimientos de inventario
         </h1>
