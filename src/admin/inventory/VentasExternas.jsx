@@ -1278,7 +1278,7 @@ const validarFormulario = () => {
                     />
 
                     </AdminCard>
-
+                </div>
         <aside className="min-w-0 self-start xl:sticky xl:top-6">
     <div className="space-y-4">
 
