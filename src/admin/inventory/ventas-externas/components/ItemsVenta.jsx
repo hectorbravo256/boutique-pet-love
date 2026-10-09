@@ -5,26 +5,27 @@ export default function ItemsVenta({
     numero,
     items,
     eliminarItem,
-    moneda
+    moneda,
+    integrado = false
 }) {
 
     return (
 
-        <section className="
-            rounded-3xl
-            border
-            border-slate-200
-            bg-white
-            p-5
-            md:p-6
-            shadow-sm
-        ">
+            <section
+                className={
+                    integrado
+                        ? "mt-6 border-t border-slate-200 pt-6"
+                        : "rounded-3xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm"
+                }
+            >
 
-            <SectionStep
-                numero={numero}
-                titulo="Detalle de la venta"
-                descripcion="Revisa los productos antes de registrar."
-            />
+            {!integrado && (
+                <SectionStep
+                    numero={numero}
+                    titulo="Detalle de la venta"
+                    descripcion="Revisa los productos antes de registrar."
+                />
+            )}
 
 
             {/* =====================================================
