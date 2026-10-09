@@ -11,6 +11,7 @@ import CanalVentaSelector from "./ventas-externas/components/CanalVentaSelector"
 import ClienteForm from "./ventas-externas/components/ClienteForm";
 import MedioPagoSelector from "./ventas-externas/components/MedioPagoSelector";
 import ProductoSelector from "./ventas-externas/components/ProductoSelector";
+import VentaProductoModal from "./ventas-externas/components/VentaProductoModal";
 import DespachoRRSS from "./ventas-externas/components/DespachoRRSS";
 import ItemsVenta from "./ventas-externas/components/ItemsVenta";
 import ResumenVenta from "./ventas-externas/components/ResumenVenta";
@@ -70,6 +71,8 @@ export default function VentasExternas() {
     const [items, setItems] =
         useState([]);
 
+    const [modalProductoAbierto, setModalProductoAbierto] = useState(false);
+
     const [mensaje, setMensaje] =
         useState("");
 
@@ -116,6 +119,7 @@ export default function VentasExternas() {
                 .select(`
                     id,
                     name,
+                    category,
                     active,
                     product_variants (
                         id,
@@ -308,9 +312,17 @@ export default function VentasExternas() {
        AGREGAR PRODUCTO
     ===================================================== */
 
-    const agregarProducto = () => {
+    const agregarProducto = (
+    productoModal = null,
+    varianteModal = null,
+    cantidadModal = null
+) => {
 
         setError("");
+
+    const productoParaAgregar = productoModal || productoActual;
+    const varianteParaAgregar = varianteModal || varianteActual;
+    const qty = Number(cantidadModal ?? cantidad);
 
         if (!productoActual) {
 
@@ -1482,5 +1494,14 @@ const validarFormulario = () => {
         </div>
 
     );
+
+    <VentaProductoModal
+    open={modalProductoAbierto}
+    onClose={() => setModalProductoAbierto(false)}
+    productos={productos}
+    onAgregar={(producto, variante, cantidadModal) => {
+        agregarProducto(producto, variante, cantidadModal);
+    }}
+/>
 
 }
