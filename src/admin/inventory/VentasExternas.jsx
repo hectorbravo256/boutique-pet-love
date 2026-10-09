@@ -1002,18 +1002,10 @@ const validarFormulario = () => {
                     <ProductoSelector
                         numero={esVentaRRSS ? 4 : 3}
                         productos={productos}
-                        productoSeleccionado={productoSeleccionado}
-                        setProductoSeleccionado={setProductoSeleccionado}
-                        varianteSeleccionada={varianteSeleccionada}
-                        setVarianteSeleccionada={setVarianteSeleccionada}
-                        variantesDisponibles={variantesDisponibles}
-                        varianteActual={varianteActual}
-                        cantidad={cantidad}
-                        setCantidad={setCantidad}
-                        agregarProducto={agregarProducto}
                         moneda={moneda}
                         items={items}
                         eliminarItem={eliminarItem}
+                        abrirModal={() => setModalProductoAbierto(true)}
                     />
 
 
