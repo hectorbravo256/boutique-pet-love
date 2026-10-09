@@ -937,87 +937,81 @@ const validarFormulario = () => {
 <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
     <div className="min-w-0 space-y-6 xl:col-span-2">
                     
-                <AdminCard>
 
-                    <div className="
-                        flex
-                        flex-col
-                        gap-3
-                        mb-8
-                    ">
-                    
+                {/* PASO 1: TIPO DE VENTA */}
+                <section className="
+                    rounded-3xl
+                    border
+                    border-slate-200
+                    bg-white
+                    p-5
+                    md:p-6
+                    shadow-sm
+                ">
+                    <div className="flex items-start gap-4 mb-5">
                         <div className="
                             flex
+                            h-10
+                            w-10
+                            shrink-0
                             items-center
-                            justify-between
-                            gap-4
+                            justify-center
+                            rounded-full
+                            bg-gradient-to-br
+                            from-pink-500
+                            to-purple-600
+                            text-white
+                            font-black
+                            shadow-md
                         ">
-                    
-                    
-                            <span className={`
-                                inline-flex
-                                items-center
-                                rounded-full
-                                px-4
-                                py-2
-                                text-xs
-                                font-black
-                                uppercase
-                                tracking-wide
-                                whitespace-nowrap
-                    
-                                ${
-                                    esVentaRRSS
-                                        ? `
-                                            bg-emerald-50
-                                            text-emerald-600
-                                            border
-                                            border-emerald-200
-                                        `
-                                        : `
-                                            bg-pink-50
-                                            text-pink-600
-                                            border
-                                            border-pink-200
-                                        `
-                                }
-                            `}>
-                    
-                                {esVentaRRSS
-                                    ? "Venta RRSS"
-                                    : "Venta presencial"
-                                }
-                    
-                            </span>
-                    
+                            1
                         </div>
-                    
-                        <p className="
-                            text-sm
-                            md:text-base
-                            text-slate-500
-                            max-w-2xl
-                        ">
-                    
-                            {esVentaRRSS
-                                ? "Registra una venta realizada por redes sociales con despacho."
-                                : "Registra una venta realizada presencialmente en tienda."
+
+                        <div className="min-w-0 flex-1 pt-0.5">
+                            <h3 className="text-base md:text-lg font-black text-slate-800">
+                                Tipo de venta
+                            </h3>
+
+                            <p className="mt-1 text-sm text-slate-500 leading-relaxed">
+                                {esVentaRRSS
+                                    ? "Registra una venta realizada por redes sociales con despacho."
+                                    : "Registra una venta realizada presencialmente en tienda."
+                                }
+                            </p>
+                        </div>
+
+                        <span className={`
+                            inline-flex
+                            items-center
+                            rounded-full
+                            border
+                            px-3
+                            py-2
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-wide
+                            ${
+                                esVentaRRSS
+                                    ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                    : "bg-pink-50 text-pink-600 border-pink-200"
                             }
-                    
-                        </p>
-                    
+                        `}>
+                            {esVentaRRSS
+                                ? "Venta RRSS"
+                                : "Venta presencial"
+                            }
+                        </span>
                     </div>
-
-
-                    {/* TIPO DE VENTA */}
 
                     <CanalVentaSelector
                         tipoVenta={tipoVenta}
                         setTipoVenta={setTipoVenta}
                     />
+                </section>
 
+                {/* CLIENTE */}
 
-                    {/* CLIENTE */}
 
                     <ClienteForm
                         cliente={cliente}
@@ -1217,7 +1211,6 @@ const validarFormulario = () => {
                         setMedioPago={setMedioPago}
                     />
 
-                    </AdminCard>
                 </div>
         
 <aside className="min-w-0 self-start xl:sticky xl:top-6">
