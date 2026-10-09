@@ -189,7 +189,7 @@ export default function ProductSearch({
                             border
                             bg-white
                             shadow-xl
-                            max-h-80
+                            max-h-96
                             overflow-y-auto
                         "
 
