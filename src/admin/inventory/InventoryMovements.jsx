@@ -9,6 +9,22 @@ export default function InventoryMovements() {
   if (loading) {
     return (
       <div className="p-6">
+         <div className="mb-6">
+            <Link
+                to="/admin/inventario"
+                className="
+                    inline-flex
+                    items-center
+                    text-sm
+                    font-semibold
+                    text-pink-600
+                    transition
+                    hover:text-pink-700
+                    hover:underline
+                "
+            >
+                ← Volver a Inventario
+            </Link>
         <h1 className="text-2xl font-bold mb-4">
           Movimientos de inventario
         </h1>
@@ -23,7 +39,7 @@ export default function InventoryMovements() {
   if (error) {
     return (
       <div className="p-6">
-        <div className="mb-6">
+         <div className="mb-6">
             <Link
                 to="/admin/inventario"
                 className="
@@ -66,6 +82,22 @@ export default function InventoryMovements() {
 
   return (
     <div className="p-6">
+      <div className="mb-6">
+            <Link
+                to="/admin/inventario"
+                className="
+                    inline-flex
+                    items-center
+                    text-sm
+                    font-semibold
+                    text-pink-600
+                    transition
+                    hover:text-pink-700
+                    hover:underline
+                "
+            >
+                ← Volver a Inventario
+            </Link>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">
