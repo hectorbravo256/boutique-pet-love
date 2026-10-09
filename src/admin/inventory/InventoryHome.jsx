@@ -3,32 +3,11 @@ import AdminCard from "../components/AdminCard";
 
 const modules = [
     {
-        title: "Inventario Maestro",
-        description: "Administrar stock, precios y variantes.",
-        icon: "📦",
-        to: "/admin/inventario/master",
-        color: "from-pink-500 to-fuchsia-600",
-    },
-    {
-        title: "Proveedores",
-        description: "Administrar proveedores, contactos y empresas.",
-        icon: "🤝",
-        to: "/admin/inventario/proveedores",
-        color: "from-sky-500 to-cyan-500",
-    },
-    {
         title: "Compras",
         description: "Registrar compras y recepción de mercadería.",
         icon: "📥",
         to: "/admin/inventario/compras",
         color: "from-blue-500 to-cyan-500",
-    },
-    {
-        title: "Movimientos",
-        description: "Entradas, salidas y ajustes.",
-        icon: "🔄",
-        to: "/admin/inventario/movimientos",
-        color: "from-orange-500 to-amber-500",
     },
     {
         title: "Ventas",
@@ -38,11 +17,11 @@ const modules = [
         color: "from-green-500 to-emerald-500",
     },
     {
-    title: "Reservas",
-    description: "Registrar reservas, abonos y saldos pendientes.",
-    icon: "📋",
-    to: "/admin/inventario/reservas",
-    color: "from-pink-500 to-purple-600",
+        title: "Reservas",
+        description: "Registrar reservas, abonos y saldos pendientes.",
+        icon: "📋",
+        to: "/admin/inventario/reservas",
+        color: "from-pink-500 to-purple-600",
     },
     {
         title: "Reparaciones",
@@ -57,6 +36,27 @@ const modules = [
         icon: "📦",
         to: "/admin/inventario/paket",
         color: "from-emerald-500 to-teal-500",
+    },
+    {
+        title: "Movimientos",
+        description: "Entradas, salidas y ajustes.",
+        icon: "🔄",
+        to: "/admin/inventario/movimientos",
+        color: "from-orange-500 to-amber-500",
+    },
+    {
+        title: "Inventario Maestro",
+        description: "Administrar stock, precios y variantes.",
+        icon: "📦",
+        to: "/admin/inventario/master",
+        color: "from-pink-500 to-fuchsia-600",
+    },
+    {
+        title: "Proveedores",
+        description: "Administrar proveedores, contactos y empresas.",
+        icon: "🤝",
+        to: "/admin/inventario/proveedores",
+        color: "from-sky-500 to-cyan-500",
     },
 ];
 
