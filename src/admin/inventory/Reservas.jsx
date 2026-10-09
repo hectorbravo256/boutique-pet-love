@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { supabase } from "../../supabaseClient";
@@ -812,6 +813,25 @@ function estadoClasses(estado) {
 
   return (
     <div className="flex flex-col gap-6 pb-10">
+
+      <div className="mb-6">
+    <Link
+        to="/admin/inventario"
+        className="
+            inline-flex
+            items-center
+            text-sm
+            font-semibold
+            text-pink-600
+            transition
+            hover:text-pink-700
+            hover:underline
+        "
+    >
+        ← Volver a Inventario
+    </Link>
+</div>
+      
   <div className="order-last">
     <AdminCard>
       <div className="space-y-5">
