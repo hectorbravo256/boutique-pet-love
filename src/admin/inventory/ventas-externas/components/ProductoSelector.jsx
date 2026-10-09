@@ -8,7 +8,6 @@ export default function ProductoSelector({
     eliminarItem,
     abrirModal
 }) {
-    const [busqueda, setBusqueda] = useState("");
 
     return (
         <section className="
