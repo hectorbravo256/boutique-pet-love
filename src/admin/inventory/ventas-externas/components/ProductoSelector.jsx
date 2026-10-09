@@ -1,5 +1,5 @@
 import SectionStep from "./SectionStep";
-
+import ItemsVenta from "./ItemsVenta";
 
 export default function ProductoSelector({
     numero,
@@ -13,9 +13,11 @@ export default function ProductoSelector({
     cantidad,
     setCantidad,
     agregarProducto,
-    moneda
+    moneda,
+    items,
+    eliminarItem
 }) {
-
+    
     /*
     =====================================================
     ORDENAR TALLAS
@@ -456,6 +458,14 @@ export default function ProductoSelector({
                     </div>
 
                 )}
+
+            <ItemsVenta
+                numero={numero + 1}
+                items={items}
+                eliminarItem={eliminarItem}
+                moneda={moneda}
+                integrado={true}
+            />
 
             </div>
 
