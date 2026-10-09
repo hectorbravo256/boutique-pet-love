@@ -96,13 +96,14 @@ export default function VentaProductoModal({
     };
 
     return (
-        <Modal
-            open={open}
-            onClose={cerrar}
-            title="Agregar producto"
-            size="xl"
-            closeOnBackdrop={false}
-        >
+            <Modal
+                open={open}
+                onClose={cerrar}
+                title="Agregar producto"
+                size="xl"
+                closeOnBackdrop={false}
+                workspace
+            >
             <div className="space-y-5">
                 <div>
                     <label className="mb-2 block text-sm font-semibold">
