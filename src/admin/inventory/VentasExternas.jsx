@@ -312,144 +312,97 @@ export default function VentasExternas() {
        AGREGAR PRODUCTO
     ===================================================== */
 
-    const agregarProducto = (
-    productoModal = null,
-    varianteModal = null,
-    cantidadModal = null
-) => {
 
+    const agregarProducto = (
+        productoModal = null,
+        varianteModal = null,
+        cantidadModal = null
+    ) => {
         setError("");
 
-    const productoParaAgregar = productoModal || productoActual;
-    const varianteParaAgregar = varianteModal || varianteActual;
-    const qty = Number(cantidadModal ?? cantidad);
+        const productoParaAgregar = productoModal || productoActual;
+        const varianteParaAgregar = varianteModal || varianteActual;
+        const qty = Number(cantidadModal ?? cantidad);
 
-        if (!productoActual) {
-
-            setError(
-                "Selecciona un producto."
-            );
-
-            return;
-
+        if (!productoParaAgregar) {
+            setError("Selecciona un producto.");
+            return false;
         }
 
-        if (!varianteActual) {
-
-            setError(
-                "Selecciona una talla."
-            );
-
-            return;
-
+        if (!varianteParaAgregar) {
+            setError("Selecciona una talla.");
+            return false;
         }
 
-        const qty =
-            Number(cantidad);
-
-
-        if (
-            !Number.isInteger(qty) ||
-            qty <= 0
-        ) {
-
-            setError(
-                "La cantidad debe ser mayor que cero."
-            );
-
-            return;
-
+        if (!Number.isInteger(qty) || qty <= 0) {
+            setError("La cantidad debe ser mayor que cero.");
+            return false;
         }
 
-
-        /* Stock considerando lo que ya está
-           agregado al carrito */
-
-        const cantidadEnCarrito =
-            items
-                .filter(
-                    item =>
-                        Number(item.variant_id) ===
-                        Number(varianteActual.id)
-                )
-                .reduce(
-                    (sum, item) =>
-                        sum +
-                        Number(item.quantity),
-                    0
-                );
-
+        const cantidadEnCarrito = items
+            .filter(
+                (item) =>
+                    Number(item.variant_id) ===
+                    Number(varianteParaAgregar.id)
+            )
+            .reduce(
+                (sum, item) => sum + Number(item.quantity),
+                0
+            );
 
         if (
             cantidadEnCarrito + qty >
-            Number(varianteActual.stock || 0)
+            Number(varianteParaAgregar.stock || 0)
         ) {
-
             setError(
-                `Stock insuficiente. Disponible: ${varianteActual.stock}.`
+                `Stock insuficiente. Disponible: ${Math.max(
+                    0,
+                    Number(varianteParaAgregar.stock || 0) -
+                        cantidadEnCarrito
+                )}.`
             );
-
-            return;
-
+            return false;
         }
 
-
-        const existente =
-            items.find(
-                item =>
-                    Number(item.variant_id) ===
-                    Number(varianteActual.id)
-            );
-
+        const existente = items.find(
+            (item) =>
+                Number(item.variant_id) ===
+                Number(varianteParaAgregar.id)
+        );
 
         if (existente) {
-
-            setItems(
-                items.map(item =>
+            setItems((prev) =>
+                prev.map((item) =>
                     Number(item.variant_id) ===
-                    Number(varianteActual.id)
+                    Number(varianteParaAgregar.id)
                         ? {
                             ...item,
                             quantity:
-                                Number(item.quantity) +
-                                qty
+                                Number(item.quantity) + qty
                         }
                         : item
                 )
             );
-
         } else {
-
-            setItems([
-                ...items,
+            setItems((prev) => [
+                ...prev,
                 {
-                    variant_id:
-                        varianteActual.id,
-
-                    product_id:
-                        productoActual.id,
-
-                    name:
-                        productoActual.name,
-
-                    size:
-                        varianteActual.size,
-
-                    price:
-                        Number(varianteActual.price),
-
-                    quantity:
-                        qty
+                    variant_id: varianteParaAgregar.id,
+                    product_id: productoParaAgregar.id,
+                    name: productoParaAgregar.name,
+                    size: varianteParaAgregar.size,
+                    price: Number(varianteParaAgregar.price),
+                    quantity: qty
                 }
             ]);
-
         }
-
 
         setProductoSeleccionado("");
         setVarianteSeleccionada("");
         setCantidad(1);
+        setError("");
 
+        return true;
     };
 
 
@@ -1491,17 +1444,26 @@ const validarFormulario = () => {
                     moneda={moneda}
                 />
 
+                <VentaProductoModal
+                    open={modalProductoAbierto}
+                    onClose={() => setModalProductoAbierto(false)}
+                    productos={productos}
+                    onAgregar={(producto, variante, cantidadModal) => {
+                        const agregado = agregarProducto(
+                            producto,
+                            variante,
+                            cantidadModal
+                        );
+
+                        if (agregado) {
+                            setModalProductoAbierto(false);
+                        }
+
+                        return agregado;
+                    }}
+                />
+
         </div>
 
     );
-
-    <VentaProductoModal
-    open={modalProductoAbierto}
-    onClose={() => setModalProductoAbierto(false)}
-    productos={productos}
-    onAgregar={(producto, variante, cantidadModal) => {
-        agregarProducto(producto, variante, cantidadModal);
-    }}
-/>
-
 }
