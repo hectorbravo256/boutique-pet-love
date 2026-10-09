@@ -121,6 +121,9 @@ export default function VentasExternas() {
                     name,
                     category,
                     active,
+                    product_images (
+                        url
+                    ),
                     product_variants (
                         id,
                         size,
