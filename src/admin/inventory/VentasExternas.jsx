@@ -1047,17 +1047,10 @@ const validarFormulario = () => {
                         setCantidad={setCantidad}
                         agregarProducto={agregarProducto}
                         moneda={moneda}
-                    />
-
-
-                    {/* DETALLE DE VENTA */}
-
-                    <ItemsVenta
-                        numero={esVentaRRSS ? 5 : 4}
                         items={items}
                         eliminarItem={eliminarItem}
-                        moneda={moneda}
                     />
+
 
                     {/* OBSERVACIÓN */}
 
