@@ -861,57 +861,6 @@ const validarFormulario = () => {
 
 
             {/* =================================================
-                HEADER
-            ================================================= */}
-
-            <div className="
-                mb-8
-                rounded-[30px]
-                bg-gradient-to-r
-                from-pink-500
-                to-purple-600
-                text-white
-                p-8
-                shadow-xl
-            ">
-
-                <p className="
-                    text-xs
-                    uppercase
-                    tracking-[0.3em]
-                    font-bold
-                    text-pink-100
-                ">
-
-                    Boutique Pet Love ERP
-
-                </p>
-
-                <h1 className="
-                    text-4xl
-                    md:text-5xl
-                    font-black
-                    mt-2
-                ">
-
-                    🛒 Ventas externas
-
-                </h1>
-
-                <p className="
-                    mt-3
-                    text-white/90
-                    text-lg
-                ">
-
-                    Registra ventas presenciales y ventas
-                    realizadas por RRSS.
-
-                </p>
-
-            </div>
-
-            {/* =================================================
                 MENSAJES
             ================================================= */}
 
@@ -1008,7 +957,7 @@ const validarFormulario = () => {
                                     text-slate-900
                                 ">
                     
-                                    Registrar venta
+                                    Registrar venta 🛒
                     
                                 </h2>
                     
