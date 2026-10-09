@@ -1,6 +1,7 @@
 
 import { useMemo, useState } from "react";
 import Modal from "../../../shared/ui/Modal";
+import ProductSearch from "../../../shared/ui/ProductSearch";
 
 export default function VentaProductoModal({
     open,
@@ -9,51 +10,42 @@ export default function VentaProductoModal({
     onAgregar
 }) {
     const [categoria, setCategoria] = useState("");
-    const [busqueda, setBusqueda] = useState("");
     const [productoId, setProductoId] = useState("");
     const [varianteId, setVarianteId] = useState("");
     const [cantidad, setCantidad] = useState(1);
 
     const categorias = useMemo(
-        () => [
-            ...new Set(
-                productos
-                    .map((p) => p.category)
-                    .filter(Boolean)
-            )
-        ].sort((a, b) => a.localeCompare(b)),
+        () =>
+            [...new Set(
+                productos.map((p) => p.category).filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b)),
         [productos]
     );
 
     const productosFiltrados = useMemo(
         () =>
-            productos.filter((p) => {
-                const coincideCategoria =
-                    !categoria || p.category === categoria;
-
-                const coincideNombre =
-                    p.name
-                        .toLowerCase()
-                        .includes(busqueda.trim().toLowerCase());
-
-                return coincideCategoria && coincideNombre;
-            }),
-        [productos, categoria, busqueda]
+            productos.filter(
+                (p) => !categoria || p.category === categoria
+            ),
+        [productos, categoria]
     );
 
     const productoSeleccionado = productos.find(
         (p) => String(p.id) === String(productoId)
     );
 
-    const variantes = (productoSeleccionado?.product_variants || [])
-        .slice()
-        .sort((a, b) =>
-            String(a.size).localeCompare(
-                String(b.size),
-                undefined,
-                { numeric: true }
-            )
-        );
+    const variantes = useMemo(
+        () =>
+            [...(productoSeleccionado?.product_variants || [])].sort(
+                (a, b) =>
+                    String(a.size).localeCompare(
+                        String(b.size),
+                        undefined,
+                        { numeric: true }
+                    )
+            ),
+        [productoSeleccionado]
+    );
 
     const varianteSeleccionada = variantes.find(
         (v) => String(v.id) === String(varianteId)
@@ -61,7 +53,6 @@ export default function VentaProductoModal({
 
     const reiniciar = () => {
         setCategoria("");
-        setBusqueda("");
         setProductoId("");
         setVarianteId("");
         setCantidad(1);
@@ -72,25 +63,36 @@ export default function VentaProductoModal({
         onClose();
     };
 
+    const seleccionarProducto = (producto) => {
+        setProductoId(String(producto.id));
+        setVarianteId("");
+        setCantidad(1);
+    };
+
     const agregar = () => {
-        if (!productoSeleccionado || !varianteSeleccionada) {
-            return;
-        }
+        if (!productoSeleccionado || !varianteSeleccionada) return;
+
+        const stock = Number(varianteSeleccionada.stock || 0);
+        const qty = Number(cantidad);
 
         if (
-            !Number.isInteger(Number(cantidad)) ||
-            Number(cantidad) < 1
+            !Number.isInteger(qty) ||
+            qty < 1 ||
+            qty > stock
         ) {
             return;
         }
 
-        onAgregar(
+        const resultado = onAgregar(
             productoSeleccionado,
             varianteSeleccionada,
-            Number(cantidad)
+            qty
         );
 
-        reiniciar();
+        // El formulario principal devuelve true cuando agrega correctamente.
+        if (resultado === true) {
+            reiniciar();
+        }
     };
 
     return (
@@ -113,11 +115,11 @@ export default function VentaProductoModal({
                             setCategoria(e.target.value);
                             setProductoId("");
                             setVarianteId("");
+                            setCantidad(1);
                         }}
                         className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
                     >
                         <option value="">Todas las categorías</option>
-
                         {categorias.map((cat) => (
                             <option key={cat} value={cat}>
                                 {cat}
@@ -131,104 +133,134 @@ export default function VentaProductoModal({
                         Buscar producto
                     </label>
 
-                    <input
-                        type="text"
-                        value={busqueda}
-                        onChange={(e) => {
-                            setBusqueda(e.target.value);
-                            setProductoId("");
-                            setVarianteId("");
-                        }}
-                        placeholder="Escribe el nombre del producto..."
-                        className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                    <ProductSearch
+                        key={categoria}
+                        products={productosFiltrados}
+                        value={productoId}
+                        onSelect={seleccionarProducto}
                     />
                 </div>
 
-                <div>
-                    <label className="mb-2 block text-sm font-semibold">
-                        Producto
-                    </label>
+                {productoSeleccionado && (
+                    <>
+                        <div>
+                            <div className="mb-3">
+                                <label className="block text-sm font-semibold">
+                                    Talla
+                                </label>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Selecciona una talla disponible.
+                                </p>
+                            </div>
 
-                    <select
-                        value={productoId}
-                        onChange={(e) => {
-                            setProductoId(e.target.value);
-                            setVarianteId("");
-                        }}
-                        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
-                    >
-                        <option value="">Selecciona un producto</option>
+                            {variantes.length > 0 ? (
+                                <div className="flex flex-wrap gap-3">
+                                    {variantes.map((v) => {
+                                        const sinStock =
+                                            Number(v.stock || 0) <= 0;
 
-                        {productosFiltrados.map((p) => (
-                            <option key={p.id} value={p.id}>
-                                {p.name}
-                            </option>
-                        ))}
-                    </select>
+                                        const seleccionada =
+                                            String(v.id) === String(varianteId);
 
-                    {productosFiltrados.length === 0 && (
-                        <p className="mt-2 text-sm text-slate-500">
-                            No se encontraron productos para este filtro.
-                        </p>
-                    )}
-                </div>
+                                        return (
+                                            <button
+                                                key={v.id}
+                                                type="button"
+                                                disabled={sinStock}
+                                                onClick={() => {
+                                                    setVarianteId(String(v.id));
+                                                    setCantidad(1);
+                                                }}
+                                                className={`rounded-xl border px-5 py-3 font-semibold transition ${
+                                                    seleccionada
+                                                        ? "border-pink-500 bg-pink-500 text-white shadow-md"
+                                                        : "border-slate-300 bg-white text-slate-800 hover:border-pink-400 hover:bg-pink-50"
+                                                } ${
+                                                    sinStock
+                                                        ? "cursor-not-allowed opacity-35 line-through"
+                                                        : ""
+                                                }`}
+                                                title={
+                                                    sinStock
+                                                        ? "Sin stock"
+                                                        : `Stock disponible: ${v.stock}`
+                                                }
+                                            >
+                                                {String(v.size).toLowerCase().startsWith("talla")
+                                                    ? v.size
+                                                    : `Talla ${v.size}`}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-500">
+                                    Este producto no tiene tallas registradas.
+                                </p>
+                            )}
+                        </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <label className="mb-2 block text-sm font-semibold">
-                            Talla
-                        </label>
+                        {varianteSeleccionada && (
+                            <>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <label className="mb-2 block text-sm font-semibold">
+                                            Cantidad
+                                        </label>
 
-                        <select
-                            value={varianteId}
-                            onChange={(e) => setVarianteId(e.target.value)}
-                            disabled={!productoSeleccionado}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 disabled:opacity-50"
-                        >
-                            <option value="">Selecciona una talla</option>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max={Number(varianteSeleccionada.stock || 0)}
+                                            step="1"
+                                            value={cantidad}
+                                            onChange={(e) => {
+                                                const valor = e.target.value;
+                                                setCantidad(
+                                                    valor === "" ? "" : Number(valor)
+                                                );
+                                            }}
+                                            className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                                        />
 
-                            {variantes.map((v) => (
-                                <option
-                                    key={v.id}
-                                    value={v.id}
-                                    disabled={Number(v.stock || 0) <= 0}
-                                >
-                                    {v.size} · Stock: {v.stock || 0}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                                        <p className="mt-1 text-xs text-slate-500">
+                                            Stock disponible: {varianteSeleccionada.stock || 0}
+                                        </p>
+                                    </div>
 
-                    <div>
-                        <label className="mb-2 block text-sm font-semibold">
-                            Cantidad
-                        </label>
+                                    <div>
+                                        <label className="mb-2 block text-sm font-semibold">
+                                            Precio unitario
+                                        </label>
 
-                        <input
-                            type="number"
-                            min="1"
-                            max={varianteSeleccionada?.stock}
-                            value={cantidad}
-                            onChange={(e) =>
-                                setCantidad(Number(e.target.value))
-                            }
-                            className="w-full rounded-xl border border-slate-300 px-4 py-3"
-                        />
-                    </div>
-                </div>
+                                        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold">
+                                            $
+                                            {Number(
+                                                varianteSeleccionada.price || 0
+                                            ).toLocaleString("es-CL")}
+                                        </div>
+                                    </div>
+                                </div>
 
-                {varianteSeleccionada && (
-                    <div className="rounded-xl bg-pink-50 p-4">
-                        <p className="font-semibold text-slate-800">
-                            {productoSeleccionado.name}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
-                            Talla {varianteSeleccionada.size}
-                            {" · "}
-                            Precio unitario: $
-                            {Number(varianteSeleccionada.price).toLocaleString("es-CL")}
-                        </p>
-                    </div>
+                                <div className="rounded-xl bg-pink-50 p-4">
+                                    <p className="font-semibold text-slate-800">
+                                        {productoSeleccionado.name}
+                                    </p>
+                                    <p className="mt-1 text-sm text-slate-600">
+                                        Talla {varianteSeleccionada.size}
+                                        {" · "}
+                                        Subtotal: $
+                                        {(
+                                            Number(varianteSeleccionada.price || 0) *
+                                            (Number.isInteger(Number(cantidad))
+                                                ? Number(cantidad)
+                                                : 0)
+                                        ).toLocaleString("es-CL")}
+                                    </p>
+                                </div>
+                            </>
+                        )}
+                    </>
                 )}
 
                 <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -248,7 +280,8 @@ export default function VentaProductoModal({
                             !varianteSeleccionada ||
                             !Number.isInteger(Number(cantidad)) ||
                             Number(cantidad) < 1 ||
-                            Number(cantidad) > Number(varianteSeleccionada?.stock || 0)
+                            Number(cantidad) >
+                                Number(varianteSeleccionada?.stock || 0)
                         }
                         className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
                     >
