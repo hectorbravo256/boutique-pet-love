@@ -113,26 +113,31 @@ export default function VentasExternas() {
 
     const cargarProductos = async () => {
 
-        const { data, error } =
-            await supabase
-                .from("products")
-                .select(`
-                    id,
-                    name,
-                    category,
-                    active,
-                    product_images (
-                        url
-                    ),
-                    product_variants (
-                        id,
-                        size,
-                        price,
-                        stock
-                    )
-                `)
-                .eq("active", true)
-                .order("name");
+        
+const { data, error } = await supabase
+    .from("products")
+    .select(`
+        id,
+        name,
+        category,
+        active,
+        product_images (
+            url,
+            sort_order
+        ),
+        product_variants (
+            id,
+            size,
+            price,
+            stock
+        )
+    `)
+    .eq("active", true)
+    .order("name")
+    .order("sort_order", {
+        referencedTable: "product_images",
+        ascending: true
+    });
 
         if (error) {
 
