@@ -1279,288 +1279,235 @@ const validarFormulario = () => {
 
                     </AdminCard>
                 </div>
-        <aside className="min-w-0 self-start xl:sticky xl:top-6">
+        
+<aside className="min-w-0 self-start xl:sticky xl:top-6">
     <div className="space-y-4">
 
-                    <div className="
-                        mt-6
-                        rounded-3xl
+        {/* Resumen de la venta: productos, despacho y total */}
+        <ResumenVenta
+            subtotalProductos={subtotalProductos}
+            costoEnvio={costoEnvio}
+            total={total}
+            esVentaRRSS={esVentaRRSS}
+            envioPorPagar={envioPorPagar}
+            moneda={moneda}
+        />
+
+        {/* Errores de validación y botón Registrar venta */}
+        <div
+            className="
+                mt-6
+                rounded-3xl
+                border
+                border-pink-100
+                bg-gradient-to-br
+                from-pink-50
+                via-white
+                to-purple-50
+                p-4
+                md:p-5
+            "
+        >
+            {erroresValidacion.length > 0 && (
+                <div
+                    id="errores-validacion-venta"
+                    className="
+                        mb-4
+                        rounded-2xl
                         border
-                        border-pink-100
-                        bg-gradient-to-br
-                        from-pink-50
-                        via-white
-                        to-purple-50
+                        border-red-200
+                        bg-red-50
                         p-4
-                        md:p-5
-                    ">
-                        {erroresValidacion.length > 0 && (
-                        
-                            <div
-                                id="errores-validacion-venta"
-                                className="
-                                    mb-4
-                                    rounded-2xl
-                                    border
-                                    border-red-200
-                                    bg-red-50
-                                    p-4
-                                    text-red-700
-                                "
-                            >
-                        
-                                <div className="
-                                    flex
-                                    items-start
-                                    gap-3
-                                ">
-                        
-                                    <div className="
-                                        flex
-                                        h-9
-                                        w-9
-                                        shrink-0
-                                        items-center
-                                        justify-center
-                                        rounded-full
-                                        bg-red-100
-                                        text-lg
-                                    ">
-                                        ⚠️
-                                    </div>
-                        
-                                    <div>
-                        
-                                        <p className="
-                                            font-black
-                                            text-red-800
-                                        ">
-                                            Faltan datos para registrar la venta
-                                        </p>
-                        
-                                        <p className="
-                                            mt-1
-                                            text-sm
-                                            text-red-600
-                                        ">
-                                            Completa los siguientes campos:
-                                        </p>
-                        
-                                        <ul className="
-                                            mt-3
-                                            space-y-1
-                                            text-sm
-                                            font-medium
-                                        ">
-                        
-                                            {erroresValidacion.map(
-                                                (campo) => (
-                                                    <li
-                                                        key={campo}
-                                                        className="
-                                                            flex
-                                                            items-center
-                                                            gap-2
-                                                        "
-                                                    >
-                                                        <span>•</span>
-                                                        <span>{campo}</span>
-                                                    </li>
-                                                )
-                                            )}
-                        
-                                        </ul>
-                        
-                                    </div>
-                        
-                                </div>
-                        
-                            </div>
-                        
-                        )}
-                    
-                        <button
-                            type="button"
-                            disabled={guardando}
-                            onClick={registrarVenta}
-                            aria-busy={guardando}
-                            className={`
-                                group
-                                relative
-                                w-full
-                                overflow-hidden
-                                rounded-2xl
-                                px-5
-                                py-4
-                                text-white
-                                shadow-lg
-                                transition-all
-                                duration-200
-                                focus:outline-none
-                                focus:ring-4
-                                focus:ring-pink-200
-                    
-                                ${
-                                    guardando
-                                        ? `
-                                            cursor-not-allowed
-                                            bg-slate-300
-                                            shadow-none
-                                        `
-                                        : `
-                                            bg-gradient-to-r
-                                            from-pink-500
-                                            to-purple-600
-                                            hover:-translate-y-0.5
-                                            hover:shadow-xl
-                                            active:translate-y-0
-                                            active:scale-[0.99]
-                                        `
-                                }
-                            `}
-                        >
-                    
-                                {!guardando &&
-                                    erroresValidacion.length === 0 && (
-                                    <div className="
-                                        absolute
-                                        inset-0
-                                        bg-gradient-to-r
-                                        from-white/0
-                                        via-white/15
-                                        to-white/0
-                                        opacity-0
-                                        transition
-                                        group-hover:opacity-100
-                                    " />
-                                )
-                            }
-                    
-                            <div className="
-                                relative
+                        text-red-700
+                    "
+                >
+                    <div className="flex items-start gap-3">
+                        <div
+                            className="
                                 flex
+                                h-9
+                                w-9
+                                shrink-0
                                 items-center
                                 justify-center
-                                gap-3
-                            ">
-                    
-                                <span className="
-                                    flex
-                                    h-11
-                                    w-11
-                                    shrink-0
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    bg-white/15
-                                    text-xl
-                                ">
-                                    {guardando
-                                        ? "⏳"
-                                        : erroresValidacion.length > 0
-                                            ? "⚠️"
-                                            : "💰"
-                                    }
-                                </span>
-                    
-                                <span className="
-                                    flex
-                                    min-w-0
-                                    flex-col
-                                    items-start
-                                    text-left
-                                ">
-                    
-                                    <span className="
-                                        text-base
-                                        md:text-lg
-                                        font-black
-                                    ">
-                                    {guardando
-                                        ? "Registrando venta..."
-                                        : erroresValidacion.length > 0
-                                            ? "Revisa los datos pendientes"
-                                            : "Registrar venta"
-                                    }
-                                    </span>
-                    
-                                    <span className="
-                                        mt-0.5
-                                        text-xs
-                                        font-medium
-                                        text-white/75
-                                    ">
-                                        {guardando
-                                            ? "No cierres esta ventana"
-                                            : erroresValidacion.length > 0
-                                                ? "Completa la información requerida"
-                                                : "Confirmar y guardar esta venta"
-                                        }
-                                    </span>
-                    
-                                </span>
-                    
-                                        {!guardando &&
-                                            erroresValidacion.length === 0 && (
-                                        <span className="
-                                            ml-auto
-                                            hidden
-                                            h-9
-                                            w-9
-                                            shrink-0
-                                            items-center
-                                            justify-center
-                                            rounded-full
-                                            bg-white/15
-                                            text-lg
-                                            sm:flex
-                                        ">
-                                            →
-                                        </span>
-                                    )
-                                }
-                    
-                            </div>
-                    
-                        </button>
-                    
-                    </div>
+                                rounded-full
+                                bg-red-100
+                                text-lg
+                            "
+                        >
+                            ⚠️
+                        </div>
 
-                    <ResumenVenta
-                        subtotalProductos={subtotalProductos}
-                        costoEnvio={costoEnvio}
-                        total={total}
-                        esVentaRRSS={esVentaRRSS}
-                        envioPorPagar={envioPorPagar}
-                        moneda={moneda}
+                        <div>
+                            <p className="font-black text-red-800">
+                                Faltan datos para registrar la venta
+                            </p>
+
+                            <p className="mt-1 text-sm text-red-600">
+                                Completa los siguientes campos:
+                            </p>
+
+                            <ul className="mt-3 space-y-1 text-sm font-medium">
+                                {erroresValidacion.map((campo) => (
+                                    <li
+                                        key={campo}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <span>•</span>
+                                        <span>{campo}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <button
+                type="button"
+                disabled={guardando}
+                onClick={registrarVenta}
+                aria-busy={guardando}
+                className={`
+                    group
+                    relative
+                    w-full
+                    overflow-hidden
+                    rounded-2xl
+                    px-5
+                    py-4
+                    text-white
+                    shadow-lg
+                    transition-all
+                    duration-200
+                    focus:outline-none
+                    focus:ring-4
+                    focus:ring-pink-200
+                    ${
+                        guardando
+                            ? `
+                                cursor-not-allowed
+                                bg-slate-300
+                                shadow-none
+                            `
+                            : `
+                                bg-gradient-to-r
+                                from-pink-500
+                                to-purple-600
+                                hover:-translate-y-0.5
+                                hover:shadow-xl
+                                active:translate-y-0
+                                active:scale-[0.99]
+                            `
+                    }
+                `}
+            >
+                {!guardando && erroresValidacion.length === 0 && (
+                    <div
+                        className="
+                            absolute
+                            inset-0
+                            bg-gradient-to-r
+                            from-white/0
+                            via-white/15
+                            to-white/0
+                            opacity-0
+                            transition
+                            group-hover:opacity-100
+                        "
                     />
+                )}
 
+                <div className="relative flex items-center justify-center gap-3">
+                    <span
+                        className="
+                            flex
+                            h-11
+                            w-11
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-white/15
+                            text-xl
+                        "
+                    >
+                        {guardando
+                            ? "⏳"
+                            : erroresValidacion.length > 0
+                                ? "⚠️"
+                                : "💰"}
+                    </span>
+
+                    <span className="flex min-w-0 flex-col items-start text-left">
+                        <span className="text-base font-black md:text-lg">
+                            {guardando
+                                ? "Registrando venta..."
+                                : erroresValidacion.length > 0
+                                    ? "Revisa los datos pendientes"
+                                    : "Registrar venta"}
+                        </span>
+
+                        <span className="mt-0.5 text-xs font-medium text-white/75">
+                            {guardando
+                                ? "No cierres esta ventana"
+                                : erroresValidacion.length > 0
+                                    ? "Completa la información requerida"
+                                    : "Confirmar y guardar esta venta"}
+                        </span>
+                    </span>
+
+                    {!guardando && erroresValidacion.length === 0 && (
+                        <span
+                            className="
+                                ml-auto
+                                hidden
+                                h-9
+                                w-9
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-white/15
+                                text-lg
+                                sm:flex
+                            "
+                        >
+                            →
+                        </span>
+                    )}
+                </div>
+            </button>
+        </div>
+
+        {/* Limpiar formulario: siempre después de Registrar venta */}
         <button
-    type="button"
-    onClick={limpiarFormulario}
-    disabled={guardando}
-    className="
-        w-full
-        rounded-xl
-        border
-        border-slate-300
-        bg-white
-        px-5
-        py-3
-        font-semibold
-        text-slate-600
-        transition
-        hover:border-slate-400
-        hover:bg-slate-50
-        disabled:cursor-not-allowed
-        disabled:opacity-50
-    "
->
-    Limpiar formulario
-</button>
+            type="button"
+            onClick={limpiarFormulario}
+            disabled={guardando}
+            className="
+                w-full
+                rounded-xl
+                border
+                border-slate-300
+                bg-white
+                px-5
+                py-3
+                font-semibold
+                text-slate-600
+                transition
+                hover:border-slate-400
+                hover:bg-slate-50
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+            "
+        >
+            Limpiar formulario
+        </button>
 
-                    </div>
+    </div>
 </aside>
+
                     
                 
                 </div>
