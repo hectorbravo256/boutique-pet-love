@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import ItemsVenta from "./ItemsVenta";
 
 export default function ProductoSelector({
