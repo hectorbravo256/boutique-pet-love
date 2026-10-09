@@ -150,12 +150,22 @@ export default function VentaProductoModal({
                             <label className="mb-2 block text-sm font-semibold">
                                 Producto
                             </label>
-                            <ProductSearch
-                                key={categoria}
-                                products={productosFiltrados}
-                                value={productoId}
-                                onSelect={seleccionarProducto}
-                            />
+                                <ProductSearch
+                                    key={categoria}
+                                    products={productosFiltrados}
+                                    value={productoId}
+                                    onSelect={(producto) => {
+                                        if (!producto) {
+                                            setProductoId("");
+                                            setVarianteId("");
+                                            setCantidad(1);
+                                            return;
+                                        }
+                                
+                                        seleccionarProducto(producto);
+                                    }}
+                                    compact
+                                />
                         </div>
 
                         {productoSeleccionado && (
