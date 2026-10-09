@@ -759,6 +759,42 @@ const validarFormulario = () => {
             ]
         );
 
+     const limpiarFormulario = () => {
+    if (guardando) return;
+
+    const confirmar = window.confirm(
+        "¿Deseas limpiar el formulario? Se eliminarán los datos ingresados y los productos agregados que aún no se han registrado."
+    );
+
+    if (!confirmar) return;
+
+    setTipoVenta("presencial");
+    setMedioPago("efectivo");
+
+    setCliente({
+        nombre: "",
+        rut: "",
+        correo: "",
+        telefono: "",
+        observacion: "",
+    });
+
+    setDespacho({
+        direccion: "",
+        comuna: "",
+        region: "",
+        empresa_envio: "",
+    });
+
+    setProductoSeleccionado("");
+    setVarianteSeleccionada("");
+    setCantidad(1);
+    setItems([]);
+
+    setMensaje("");
+    setError("");
+    setErroresValidacion([]);
+};
 
 
     /* =====================================================
@@ -792,6 +828,8 @@ const validarFormulario = () => {
         );
 
     }
+
+   
 
 
     return (
@@ -929,6 +967,9 @@ const validarFormulario = () => {
                     FORMULARIO
                 ================================================= */}
 
+<div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
+    <div className="min-w-0 space-y-6 xl:col-span-2">
+                    
                 <AdminCard>
 
                     <div className="
@@ -1236,6 +1277,10 @@ const validarFormulario = () => {
                         setMedioPago={setMedioPago}
                     />
 
+                    </AdminCard>
+
+        <aside className="min-w-0 self-start xl:sticky xl:top-6">
+    <div className="space-y-4">
 
                     <div className="
                         mt-6
@@ -1490,10 +1535,36 @@ const validarFormulario = () => {
                         moneda={moneda}
                     />
 
-                </AdminCard>
+        <button
+    type="button"
+    onClick={limpiarFormulario}
+    disabled={guardando}
+    className="
+        w-full
+        rounded-xl
+        border
+        border-slate-300
+        bg-white
+        px-5
+        py-3
+        font-semibold
+        text-slate-600
+        transition
+        hover:border-slate-400
+        hover:bg-slate-50
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+    "
+>
+    Limpiar formulario
+</button>
+
+                    </div>
+</aside>
                     
                 
                 </div>
+     </div>
 
                 {/* =================================================
                     HISTORIAL
