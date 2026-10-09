@@ -1,7 +1,6 @@
 
 import { useMemo, useState } from "react";
 import Modal from "../../../shared/ui/Modal";
-import ProductSearch from "../../../shared/ui/ProductSearch";
 import ProductCard from "../../shared/ProductCard";
 
 export default function VentaProductoModal({
@@ -11,25 +10,30 @@ export default function VentaProductoModal({
     onAgregar
 }) {
     const [categoria, setCategoria] = useState("");
+    const [busqueda, setBusqueda] = useState("");
     const [productoId, setProductoId] = useState("");
     const [varianteId, setVarianteId] = useState("");
     const [cantidad, setCantidad] = useState(1);
 
     const categorias = useMemo(
         () =>
-            [...new Set(
-                productos.map((p) => p.category).filter(Boolean)
-            )].sort((a, b) => a.localeCompare(b)),
+            [...new Set(productos.map((p) => p.category).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b)),
         [productos]
     );
 
-    const productosFiltrados = useMemo(
-        () =>
-            productos.filter(
-                (p) => !categoria || p.category === categoria
-            ),
-        [productos, categoria]
-    );
+    const productosFiltrados = useMemo(() => {
+        const termino = busqueda.trim().toLowerCase();
+
+        return productos.filter((p) => {
+            const coincideCategoria =
+                !categoria || p.category === categoria;
+            const coincideNombre =
+                !termino || p.name.toLowerCase().includes(termino);
+
+            return coincideCategoria && coincideNombre;
+        });
+    }, [productos, categoria, busqueda]);
 
     const productoSeleccionado = productos.find(
         (p) => String(p.id) === String(productoId)
@@ -54,6 +58,7 @@ export default function VentaProductoModal({
 
     const reiniciar = () => {
         setCategoria("");
+        setBusqueda("");
         setProductoId("");
         setVarianteId("");
         setCantidad(1);
@@ -70,15 +75,20 @@ export default function VentaProductoModal({
         setCantidad(1);
     };
 
+    const cambiarProducto = () => {
+        setProductoId("");
+        setVarianteId("");
+        setCantidad(1);
+        setBusqueda("");
+    };
+
     const agregar = () => {
         if (!productoSeleccionado || !varianteSeleccionada) return;
 
         const stock = Number(varianteSeleccionada.stock || 0);
         const qty = Number(cantidad);
 
-        if (!Number.isInteger(qty) || qty < 1 || qty > stock) {
-            return;
-        }
+        if (!Number.isInteger(qty) || qty < 1 || qty > stock) return;
 
         const resultado = onAgregar(
             productoSeleccionado,
@@ -100,79 +110,112 @@ export default function VentaProductoModal({
             closeOnBackdrop={false}
             workspace
         >
-            <div className="rounded-3xl border border-slate-300 bg-white p-4 md:p-6">
-                <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-8">
+            <div className="rounded-3xl border border-slate-200 bg-white p-4 md:p-6">
 
-                    {/* Tarjeta fija del producto */}
-                    <div className="w-full shrink-0 md:w-56">
-                        {productoSeleccionado ? (
-                            <ProductCard product={productoSeleccionado} />
+                {!productoSeleccionado ? (
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold">
+                                    Categoría
+                                </label>
+                                <select
+                                    value={categoria}
+                                    onChange={(e) => setCategoria(e.target.value)}
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
+                                >
+                                    <option value="">Todas las categorías</option>
+                                    {categorias.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold">
+                                    Buscar producto
+                                </label>
+                                <input
+                                    type="search"
+                                    value={busqueda}
+                                    onChange={(e) => setBusqueda(e.target.value)}
+                                    placeholder="Escribe el nombre..."
+                                    className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm text-slate-500">
+                                {productosFiltrados.length} productos encontrados
+                            </p>
+                            {busqueda && (
+                                <button
+                                    type="button"
+                                    onClick={() => setBusqueda("")}
+                                    className="text-sm font-semibold text-pink-600 hover:text-pink-700"
+                                >
+                                    Limpiar búsqueda
+                                </button>
+                            )}
+                        </div>
+
+                        {productosFiltrados.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                                {productosFiltrados.map((producto) => {
+                                    const imagen =
+                                        producto.product_images?.[0]?.url;
+
+                                    return (
+                                        <button
+                                            key={producto.id}
+                                            type="button"
+                                            onClick={() => seleccionarProducto(producto)}
+                                            className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-2 text-center transition hover:border-pink-400 hover:bg-pink-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                                            title={`Seleccionar ${producto.name}`}
+                                        >
+                                            <img
+                                                src={imagen || "/placeholder-product.png"}
+                                                alt={producto.name}
+                                                loading="lazy"
+                                                className="aspect-square w-full rounded-xl bg-slate-100 object-cover"
+                                            />
+                                            <span className="mt-2 block text-sm font-semibold leading-snug text-slate-800 group-hover:text-pink-700">
+                                                {producto.name}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         ) : (
-                            <div className="flex min-h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                                <span className="mb-3 text-5xl">🐾</span>
-                                <p className="font-bold text-slate-700">
-                                    Selecciona un producto
-                                </p>
-                                <p className="mt-1 text-sm text-slate-500">
-                                    Aquí aparecerán su imagen y sus datos.
-                                </p>
+                            <div className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-slate-500">
+                                No se encontraron productos con estos filtros.
                             </div>
                         )}
                     </div>
-
-                    {/* Controles de selección */}
-                    <div className="min-w-0 flex-1 space-y-5">
-
-                        <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                                Categoría
-                            </label>
-                            <select
-                                value={categoria}
-                                onChange={(e) => {
-                                    setCategoria(e.target.value);
-                                    setProductoId("");
-                                    setVarianteId("");
-                                    setCantidad(1);
-                                }}
-                                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
+                ) : (
+                    <div className="space-y-5">
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={cambiarProducto}
+                                className="rounded-xl border border-pink-200 px-4 py-2 text-sm font-semibold text-pink-600 hover:bg-pink-50"
                             >
-                                <option value="">Todas las categorías</option>
-                                {categorias.map((cat) => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
-                                    </option>
-                                ))}
-                            </select>
+                                ← Cambiar producto
+                            </button>
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                                Producto
-                            </label>
-                                <ProductSearch
-                                    key={categoria}
-                                    products={productosFiltrados}
-                                    value={productoId}
-                                    onSelect={(producto) => {
-                                        if (!producto) {
-                                            setProductoId("");
-                                            setVarianteId("");
-                                            setCantidad(1);
-                                            return;
-                                        }
-                                
-                                        seleccionarProducto(producto);
-                                    }}
-                                    compact
-                                />
-                        </div>
+                        <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-8">
+                            <div className="mx-auto w-full max-w-56 shrink-0 md:mx-0">
+                                <ProductCard product={productoSeleccionado} />
+                            </div>
 
-                        {productoSeleccionado && (
-                            <>
+                            <div className="min-w-0 flex-1 space-y-5">
                                 <div>
                                     <label className="mb-3 block text-sm font-semibold">
-                                        Talla
+                                        Selecciona una talla
                                     </label>
 
                                     {variantes.length > 0 ? (
@@ -277,36 +320,36 @@ export default function VentaProductoModal({
                                         </div>
                                     </>
                                 )}
-                            </>
-                        )}
 
-                        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <button
-                                type="button"
-                                onClick={cerrar}
-                                className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700"
-                            >
-                                Cancelar
-                            </button>
+                                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={cerrar}
+                                        className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700"
+                                    >
+                                        Cancelar
+                                    </button>
 
-                            <button
-                                type="button"
-                                onClick={agregar}
-                                disabled={
-                                    !productoSeleccionado ||
-                                    !varianteSeleccionada ||
-                                    !Number.isInteger(Number(cantidad)) ||
-                                    Number(cantidad) < 1 ||
-                                    Number(cantidad) >
-                                        Number(varianteSeleccionada?.stock || 0)
-                                }
-                                className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                                + Agregar producto
-                            </button>
+                                    <button
+                                        type="button"
+                                        onClick={agregar}
+                                        disabled={
+                                            !productoSeleccionado ||
+                                            !varianteSeleccionada ||
+                                            !Number.isInteger(Number(cantidad)) ||
+                                            Number(cantidad) < 1 ||
+                                            Number(cantidad) >
+                                                Number(varianteSeleccionada?.stock || 0)
+                                        }
+                                        className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                    >
+                                        + Agregar producto
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </Modal>
     );
