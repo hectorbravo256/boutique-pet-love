@@ -38,6 +38,13 @@ const modules = [
         color: "from-emerald-500 to-teal-500",
     },
     {
+      title: "Etiquetas",
+      description: "Generar e imprimir códigos de barras para productos y tallas.",
+      icon: "🏷️",
+      to: "/admin/inventario/etiquetas",
+      color: "from-pink-500 to-purple-600",
+    },
+    {
         title: "Movimientos",
         description: "Entradas, salidas y ajustes.",
         icon: "🔄",
