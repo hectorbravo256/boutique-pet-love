@@ -1,6 +1,7 @@
-global.WebSocket = require("ws");
+import WebSocket from "ws";
+import { createClient } from "@supabase/supabase-js";
 
-const { createClient } = require("@supabase/supabase-js");
+globalThis.WebSocket = WebSocket;
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -16,7 +17,7 @@ const supabase = createClient(
   }
 );
 
-exports.handler = async () => {
+export const handler = async () => {
 
   try {
 
