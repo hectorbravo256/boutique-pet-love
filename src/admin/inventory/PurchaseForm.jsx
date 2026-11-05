@@ -119,13 +119,10 @@ const procesarEscaneoCompra = async (codigoIngresado) => {
 
             costo = Number(resumen?.last_cost || 0);
         }
-
+        
+        // Permitir agregar productos sin costo anterior.
         if (!Number.isFinite(costo) || costo <= 0) {
-            setErrorEscaner(
-                `${producto.name} (${variante.size}) no tiene un costo ` +
-                "de compra válido. Agrégalo manualmente para indicar su costo."
-            );
-            return;
+            costo = 0;
         }
 
         setDetails(prev => {
@@ -163,9 +160,16 @@ const procesarEscaneoCompra = async (codigoIngresado) => {
             ];
         });
 
-        setMensajeEscaner(
-            `Agregado: ${producto.name} - ${variante.size}`
-        );
+            if (costo === 0) {
+                setMensajeEscaner(
+                    `Agregado: ${producto.name} - ${variante.size}. ` +
+                    "Pendiente de ingresar costo unitario."
+                );
+            } else {
+                setMensajeEscaner(
+                    `Agregado: ${producto.name} - ${variante.size}`
+                );
+            }
 
     } catch (error) {
         console.error("Error al escanear compra:", error);
