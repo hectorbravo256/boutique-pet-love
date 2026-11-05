@@ -71,6 +71,9 @@ export default function VentasExternas() {
     const [items, setItems] =
         useState([]);
 
+    const [codigoEscaneado, setCodigoEscaneado] = useState("");
+    const [mensajeEscaner, setMensajeEscaner] = useState("");
+
     const [modalProductoAbierto, setModalProductoAbierto] = useState(false);
 
     const [mensaje, setMensaje] =
@@ -129,7 +132,9 @@ const { data, error } = await supabase
             id,
             size,
             price,
-            stock
+            stock,
+            sku,
+            barcode
         )
     `)
     .eq("active", true)
@@ -412,6 +417,51 @@ const { data, error } = await supabase
 
         return true;
     };
+
+    
+const procesarCodigoBarras = (codigoIngresado) => {
+    const codigo = String(codigoIngresado || "")
+        .trim()
+        .toUpperCase();
+
+    if (!codigo) return;
+
+    setMensajeEscaner("");
+
+    const productoEncontrado = productos.find(producto =>
+        (producto.product_variants || []).some(variante =>
+            String(variante.barcode || "").trim().toUpperCase() === codigo ||
+            String(variante.sku || "").trim().toUpperCase() === codigo
+        )
+    );
+
+    if (!productoEncontrado) {
+        setError(`Código no encontrado: ${codigo}`);
+        setCodigoEscaneado("");
+        return;
+    }
+
+    const varianteEncontrada =
+        productoEncontrado.product_variants.find(variante =>
+            String(variante.barcode || "").trim().toUpperCase() === codigo ||
+            String(variante.sku || "").trim().toUpperCase() === codigo
+        );
+
+    const agregado = agregarProducto(
+        productoEncontrado,
+        varianteEncontrada,
+        1
+    );
+
+    if (agregado) {
+        setMensajeEscaner(
+            `Agregado: ${productoEncontrado.name} - ${varianteEncontrada.size}`
+        );
+    }
+
+    setCodigoEscaneado("");
+};
+
 
 
     /* =====================================================
@@ -1006,6 +1056,50 @@ const validarFormulario = () => {
 
 
                     {/* PRODUCTO */}
+
+        
+{tipoVenta === "presencial" && (
+    <section className="rounded-3xl border border-pink-200 bg-white p-5 shadow-sm mb-4">
+        <div className="mb-3">
+            <h3 className="text-lg font-bold text-slate-900">
+                Escanear código de barras
+            </h3>
+            <p className="text-sm text-slate-500">
+                Escanea la etiqueta del producto para agregarlo a la venta.
+            </p>
+        </div>
+
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                procesarCodigoBarras(codigoEscaneado);
+            }}
+            className="flex flex-wrap gap-3"
+        >
+            <input
+                type="text"
+                value={codigoEscaneado}
+                onChange={(e) => setCodigoEscaneado(e.target.value)}
+                placeholder="Escanea o escribe BPL-00000001"
+                autoComplete="off"
+                className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 focus:border-pink-500 focus:outline-none"
+            />
+
+            <button
+                type="submit"
+                className="rounded-xl bg-pink-600 px-5 py-3 font-semibold text-white hover:bg-pink-700"
+            >
+                Agregar
+            </button>
+        </form>
+
+        {mensajeEscaner && (
+            <p className="mt-3 text-sm font-semibold text-green-700">
+                ✓ {mensajeEscaner}
+            </p>
+        )}
+    </section>
+)}
 
                     <ProductoSelector
                         numero={esVentaRRSS ? 4 : 3}
