@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { Code128Svg } from './code128';
+import { jsPDF } from 'jspdf';
+import { encodeCode128B } from './code128';
 
 const peso = value => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(value || 0);
 const MAX_LABELS = 500;
@@ -39,6 +41,95 @@ export default function BarcodeLabelsPage() {
     return next;
   });
 
+  
+const downloadPDF = () => {
+  if (!total || total > MAX_LABELS) return;
+
+  try {
+    setError('');
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [50, 30],
+      compress: true
+    });
+
+    let page = 0;
+
+    selected.forEach(variant => {
+      for (let i = 0; i < variant.quantity; i++) {
+        if (page > 0) pdf.addPage([50, 30], 'landscape');
+        page++;
+
+        const code = String(variant.barcode || variant.sku || '');
+        const bars = encodeCode128B(code);
+
+        pdf.setTextColor(0, 0, 0);
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.text('BOUTIQUE PET LOVE', 25, 4.5, {
+          align: 'center'
+        });
+
+        pdf.setFontSize(7.5);
+        const name = pdf.splitTextToSize(
+          variant.productName,
+          46
+        )[0];
+
+        pdf.text(name, 25, 9, { align: 'center' });
+
+        pdf.setFontSize(7);
+        pdf.text(`Talla ${variant.size}`, 2, 13);
+
+        if (showPrice) {
+          pdf.text(peso(variant.price), 48, 13, {
+            align: 'right'
+          });
+        }
+
+        // Código de barras Code 128 B vectorial
+        const totalUnits = [...bars].reduce(
+          (sum, n) => sum + Number(n), 0
+        );
+
+        const barcodeX = 2;
+        const barcodeY = 15;
+        const barcodeWidth = 46;
+        const barcodeHeight = 9;
+        const unit = barcodeWidth / totalUnits;
+
+        let x = barcodeX;
+
+        for (let j = 0; j < bars.length; j++) {
+          const width = Number(bars[j]) * unit;
+
+          if (j % 2 === 0) {
+            pdf.rect(x, barcodeY, width, barcodeHeight, 'F');
+          }
+
+          x += width;
+        }
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(7);
+        pdf.text(code, 25, 27.5, {
+          align: 'center'
+        });
+      }
+    });
+
+    pdf.save('etiquetas-boutique-pet-love-50x30.pdf');
+
+  } catch (err) {
+    console.error('Error generando PDF:', err);
+    setError(`No se pudo generar el PDF: ${err.message}`);
+  }
+};
+
+
 const print = () => {
   if (!total || total > MAX_LABELS) return;
   window.print();
@@ -48,6 +139,16 @@ const print = () => {
     <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
       <div><p className="text-xs font-bold tracking-[.25em] uppercase text-pink-500">Inventario · Etiquetas</p><h1 className="text-3xl font-black text-slate-900 mt-2">Etiquetas de productos</h1><p className="text-slate-500 mt-2">Códigos Code 128 · Xprinter XP-420B · 50 × 30 mm</p></div>
       <button type="button" disabled={!total || total > MAX_LABELS} onClick={print} className="rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-bold text-white shadow-lg disabled:opacity-40">🖨 Imprimir {total} etiquetas</button>
+      
+<button
+  type="button"
+  disabled={!total || total > MAX_LABELS}
+  onClick={downloadPDF}
+  className="rounded-2xl bg-emerald-600 px-6 py-3 font-bold text-white shadow-lg disabled:opacity-40"
+>
+  📄 Descargar PDF ({total} etiquetas)
+</button>
+
     </div>
 
     <div className="rounded-3xl bg-white border border-slate-100 shadow-sm p-5 space-y-4 print:hidden">
