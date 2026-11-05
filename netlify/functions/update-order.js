@@ -1,13 +1,14 @@
-global.WebSocket = require("ws");
+import WebSocket from "ws";
+import { createClient } from "@supabase/supabase-js";
 
-const { createClient } = require("@supabase/supabase-js");
+globalThis.WebSocket = WebSocket;
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const { id, estado } = JSON.parse(event.body);
     if (!id || !estado) {
