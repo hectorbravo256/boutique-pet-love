@@ -11,6 +11,14 @@ export default function PurchaseSummary({
 
     const totalProducts = details.length;
 
+    const productosSinCosto = details.filter(item =>
+    !Number.isFinite(Number(item.unit_cost)) ||
+    Number(item.unit_cost) <= 0
+    );
+
+    const compraConCostosPendientes =
+        productosSinCosto.length > 0;
+
     const totalUnits = details.reduce(
         (acc, item) => acc + Number(item.quantity),
         0
@@ -154,24 +162,43 @@ return (
 
                     <div className="mt-5 space-y-3">
 
-                        <button
-                            type="button"
-                            onClick={savePurchase}
-                            className="
-                                w-full
-                                rounded-xl
-                                bg-pink-500
-                                px-5
-                                py-3.5
-                                text-base
-                                font-bold
-                                text-white
-                                transition
-                                hover:bg-pink-600
-                            "
-                        >
-                            Registrar compra
-                        </button>
+
+{compraConCostosPendientes && (
+    <div
+        role="alert"
+        className="rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+    >
+        <p className="text-sm font-bold text-red-700">
+            ⚠️ Hay {productosSinCosto.length} producto(s)
+            con costo pendiente.
+        </p>
+
+        <p className="mt-1 text-xs text-red-600">
+            Completa todos los costos unitarios para
+            poder registrar esta compra.
+        </p>
+    </div>
+)}
+
+<button
+    type="button"
+    onClick={savePurchase}
+    disabled={compraConCostosPendientes}
+    className={`
+        w-full rounded-xl px-5 py-3.5
+        text-base font-bold text-white transition
+        ${
+            compraConCostosPendientes
+                ? "cursor-not-allowed bg-slate-300"
+                : "bg-pink-500 hover:bg-pink-600"
+        }
+    `}
+>
+    {compraConCostosPendientes
+        ? `Faltan ${productosSinCosto.length} costo(s)`
+        : "Registrar compra"}
+</button>
+
 
                         <button
                             type="button"
