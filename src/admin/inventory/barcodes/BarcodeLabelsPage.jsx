@@ -38,10 +38,105 @@ export default function BarcodeLabelsPage() {
     filtered.forEach(p => (p.product_variants || []).forEach(v => { next[v.id] = Math.max(0, v.stock || 0); }));
     return next;
   });
-  const print = () => {
-    if (!total || total > MAX_LABELS) return;
-    window.print();
-  };
+
+const print = () => {
+  if (!total || total > MAX_LABELS) return;
+
+  const labels = document.querySelector('.bpl-print-root');
+  if (!labels) return;
+
+  const popup = window.open('', '_blank', 'width=650,height=650');
+
+  if (!popup) {
+    alert('Permite las ventanas emergentes de Boutique Pet Love para imprimir.');
+    return;
+  }
+
+  const css = `
+    @page {
+      size: 50mm 30mm;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: white;
+      color: black;
+      font-family: Arial, sans-serif;
+    }
+
+    .bpl-label {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 50mm;
+      height: 30mm;
+      padding: 1.7mm;
+      margin: 0;
+      overflow: hidden;
+      break-inside: avoid;
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .bpl-label:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .bpl-label .text-center {
+      text-align: center;
+    }
+
+    .bpl-label .font-bold {
+      font-weight: 700;
+    }
+
+    .bpl-label .truncate {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .bpl-label .flex {
+      display: flex;
+    }
+
+    .bpl-label .justify-between {
+      justify-content: space-between;
+    }
+
+    .bpl-label svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  `;
+
+  popup.document.open();
+
+  popup.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Etiquetas Boutique Pet Love</title>
+        <style>${css}</style>
+      </head>
+      <body>${labels.innerHTML}</body>
+    </html>
+  `);
+
+  popup.document.close();
+
+  popup.focus();
+  popup.print();
+};
 
   return <div className="space-y-6">
     <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
