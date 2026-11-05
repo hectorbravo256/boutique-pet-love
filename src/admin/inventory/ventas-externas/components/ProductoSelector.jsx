@@ -1,4 +1,5 @@
 
+import { useRef } from "react";
 import ItemsVenta from "./ItemsVenta";
 
 export default function ProductoSelector({
@@ -14,6 +15,8 @@ export default function ProductoSelector({
     procesarCodigoBarras,
     errorProducto
 }) {
+    const inputEscanerRef = useRef(null);
+    
     return (
         <section className="
             rounded-3xl border border-slate-200
@@ -64,14 +67,25 @@ export default function ProductoSelector({
                     Escanea la etiqueta para agregar el producto automáticamente.
                 </p>
 
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        procesarCodigoBarras(codigoEscaneado);
-                    }}
-                    className="flex flex-wrap gap-3"
-                >
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                    
+                            if (!codigoEscaneado.trim()) {
+                                inputEscanerRef.current?.focus();
+                                return;
+                            }
+                    
+                            procesarCodigoBarras(codigoEscaneado);
+                    
+                            // Mantener el cursor listo para el siguiente escaneo.
+                            inputEscanerRef.current?.focus();
+                        }}
+                        className="flex flex-wrap gap-3"
+                    >
+
                     <input
+                        ref={inputEscanerRef}
                         type="text"
                         value={codigoEscaneado}
                         onChange={(e) => setCodigoEscaneado(e.target.value)}
