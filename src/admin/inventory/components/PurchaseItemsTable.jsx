@@ -1,10 +1,18 @@
+import { useRef } from "react";
 import PurchaseItemCard from "./PurchaseItemCard";
 
 export default function PurchaseItemsTable({
     details,
     setDetails,
-    onAddProduct
+    onAddProduct,
+    codigoCompra,
+    setCodigoCompra,
+    procesarEscaneoCompra,
+    errorEscaner,
+    mensajeEscaner,
+    escaneando
 }) {
+    const inputEscanerRef = useRef(null);
 
     //---------------------------------------
     // Actualizar cantidad
@@ -132,7 +140,82 @@ export default function PurchaseItemsTable({
                 </div>
 
             </div>
+            
+            
+{/* LECTOR DE CÓDIGOS DE BARRAS */}
+<div className="mb-6 border-t border-slate-200 pt-5">
+    <div className="mb-3">
+        <h3 className="text-sm font-bold text-slate-800">
+            Escanear código de barras
+        </h3>
 
+        <p className="mt-1 text-xs text-slate-500">
+            Escanea una etiqueta para agregar el producto a la compra.
+            Se utilizará su último costo de adquisición disponible.
+        </p>
+    </div>
+
+    <form
+        onSubmit={async (e) => {
+            e.preventDefault();
+
+            await procesarEscaneoCompra(codigoCompra);
+
+            inputEscanerRef.current?.focus();
+        }}
+        className="flex flex-wrap gap-3"
+    >
+        <input
+            ref={inputEscanerRef}
+            type="text"
+            value={codigoCompra}
+            onChange={(e) => setCodigoCompra(e.target.value)}
+            placeholder="Escanea o escribe BPL-00000001"
+            autoComplete="off"
+            disabled={escaneando}
+            className="
+                min-w-0 flex-1 rounded-xl
+                border border-slate-300
+                px-4 py-3
+                focus:border-pink-500
+                focus:outline-none
+                disabled:bg-slate-100
+            "
+        />
+
+        <button
+            type="submit"
+            disabled={escaneando || !codigoCompra.trim()}
+            className="
+                rounded-xl bg-pink-600
+                px-5 py-3 font-bold text-white
+                hover:bg-pink-700
+                disabled:opacity-50
+            "
+        >
+            {escaneando ? "Buscando..." : "Agregar"}
+        </button>
+    </form>
+
+    {errorEscaner && (
+        <div
+            role="alert"
+            className="
+                mt-3 rounded-xl border border-red-200
+                bg-red-50 px-4 py-3
+                text-sm font-semibold text-red-700
+            "
+        >
+            ⚠️ {errorEscaner}
+        </div>
+    )}
+
+    {mensajeEscaner && !errorEscaner && (
+        <p className="mt-3 text-sm font-semibold text-green-700">
+            ✓ {mensajeEscaner}
+        </p>
+    )}
+</div>
 
             {/* SIN PRODUCTOS */}
 
