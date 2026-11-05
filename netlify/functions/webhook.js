@@ -1,22 +1,17 @@
-global.WebSocket = require("ws");
+import WebSocket from "ws";
+import mercadoPago from "./webhook/mercadoPago.js";
+import venta from "./webhook/confirmarVenta.js";
+import pdf from "./webhook/generarPDF.js";
+import correo from "./webhook/enviarCorreo.js";
 
-const {
-  obtenerPagoMercadoPago,
-} = require("./webhook/mercadoPago");
+globalThis.WebSocket = WebSocket;
 
-const {
-  confirmarVenta,
-} = require("./webhook/confirmarVenta");
+const { obtenerPagoMercadoPago } = mercadoPago;
+const { confirmarVenta } = venta;
+const { generarPDF } = pdf;
+const { enviarCorreo } = correo;
 
-const {
-  generarPDF,
-} = require("./webhook/generarPDF");
-
-const {
-  enviarCorreo,
-} = require("./webhook/enviarCorreo");
-
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     // ============================================================
     // 1. LEER WEBHOOK
