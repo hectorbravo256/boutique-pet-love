@@ -13,6 +13,10 @@ export default function PurchaseItemCard({
         Number(item.quantity) *
         Number(item.unit_cost);
 
+    const costoPendiente =
+    !Number.isFinite(Number(item.unit_cost)) ||
+    Number(item.unit_cost) <= 0;
+
     return (
         <div
             className="
@@ -116,15 +120,22 @@ export default function PurchaseItemCard({
                 {/* COSTO */}
 
                 <div className="w-full">
-                    <CurrencyInput
-                        value={item.unit_cost}
-                        onChange={(value) =>
-                            updateCost(
-                                index,
-                                value
-                            )
-                        }
-                    />
+                    <div className={
+                        costoPendiente
+                            ? "rounded-xl border-2 border-red-400"
+                            : ""
+                    }>
+                        <CurrencyInput
+                            value={item.unit_cost}
+                            onChange={(value) => updateCost(index, value)}
+                        />
+                    </div>
+                
+                    {costoPendiente && (
+                        <p className="mt-1 text-xs font-bold text-red-600">
+                            ⚠️ Costo pendiente
+                        </p>
+                    )}
                 </div>
 
 
