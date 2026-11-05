@@ -113,12 +113,24 @@ const procesarEscaneoCompra = async (codigoIngresado) => {
 
         let costo = Number(existente?.unit_cost || 0);
 
-        if (!existente) {
-            const resumen =
-                await InventoryService.getVariantSummary(variante.id);
 
-            costo = Number(resumen?.last_cost || 0);
+if (!existente) {
+    try {
+        const resumen =
+            await InventoryService.getVariantSummary(variante.id);
+
+        costo = Number(resumen?.last_cost || 0);
+    } catch (error) {
+        // PGRST116: no existe una fila de resumen.
+        // Otros errores deben seguir notificándose.
+        if (error.code !== "PGRST116") {
+            throw error;
         }
+
+        costo = 0;
+    }
+}
+
         
         // Permitir agregar productos sin costo anterior.
         if (!Number.isFinite(costo) || costo <= 0) {
