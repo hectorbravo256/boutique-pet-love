@@ -73,6 +73,7 @@ export default function VentasExternas() {
 
     const [codigoEscaneado, setCodigoEscaneado] = useState("");
     const [mensajeEscaner, setMensajeEscaner] = useState("");
+    const [errorProducto, setErrorProducto] = useState("");
 
     const [modalProductoAbierto, setModalProductoAbierto] = useState(false);
 
@@ -331,24 +332,24 @@ const { data, error } = await supabase
         varianteModal = null,
         cantidadModal = null
     ) => {
-        setError("");
+        setErrorProducto("");
 
         const productoParaAgregar = productoModal || productoActual;
         const varianteParaAgregar = varianteModal || varianteActual;
         const qty = Number(cantidadModal ?? cantidad);
 
         if (!productoParaAgregar) {
-            setError("Selecciona un producto.");
+            setErrorProducto("Selecciona un producto.");
             return false;
         }
 
         if (!varianteParaAgregar) {
-            setError("Selecciona una talla.");
+            setErrorProducto("Selecciona una talla.");
             return false;
         }
 
         if (!Number.isInteger(qty) || qty <= 0) {
-            setError("La cantidad debe ser mayor que cero.");
+            setErrorProducto("La cantidad debe ser mayor que cero.");
             return false;
         }
 
@@ -367,7 +368,7 @@ const { data, error } = await supabase
             cantidadEnCarrito + qty >
             Number(varianteParaAgregar.stock || 0)
         ) {
-            setError(
+            setErrorProducto(
                 `Stock insuficiente. Disponible: ${Math.max(
                     0,
                     Number(varianteParaAgregar.stock || 0) -
@@ -413,7 +414,7 @@ const { data, error } = await supabase
         setProductoSeleccionado("");
         setVarianteSeleccionada("");
         setCantidad(1);
-        setError("");
+        setErrorProducto("");
 
         return true;
     };
@@ -427,6 +428,7 @@ const procesarCodigoBarras = (codigoIngresado) => {
     if (!codigo) return;
 
     setMensajeEscaner("");
+    setErrorProducto("");
 
     const productoEncontrado = productos.find(producto =>
         (producto.product_variants || []).some(variante =>
@@ -436,7 +438,7 @@ const procesarCodigoBarras = (codigoIngresado) => {
     );
 
     if (!productoEncontrado) {
-        setError(`Código no encontrado: ${codigo}`);
+        setErrorProducto(`Código no encontrado: ${codigo}`);
         setCodigoEscaneado("");
         return;
     }
@@ -1068,6 +1070,7 @@ const validarFormulario = () => {
                         setCodigoEscaneado={setCodigoEscaneado}
                         mensajeEscaner={mensajeEscaner}
                         procesarCodigoBarras={procesarCodigoBarras}
+                        errorProducto={errorProducto}
                     />
 
 
