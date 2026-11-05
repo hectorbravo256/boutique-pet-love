@@ -82,7 +82,14 @@ const downloadPDF = () => {
         pdf.text(name, 25, 9, { align: 'center' });
 
         pdf.setFontSize(7);
-        pdf.text(`Talla ${variant.size}`, 2, 13);
+        pdf.text(
+  /^talla\s/i.test(String(variant.size))
+    ? String(variant.size)
+    : `Talla ${variant.size}`,
+  2,
+  13,
+  { align: 'center' }
+);
 
         if (showPrice) {
           pdf.text(peso(variant.price), 48, 13, {
@@ -130,15 +137,9 @@ const downloadPDF = () => {
 };
 
 
-const print = () => {
-  if (!total || total > MAX_LABELS) return;
-  window.print();
-};
-
   return <div className="space-y-6">
     <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
       <div><p className="text-xs font-bold tracking-[.25em] uppercase text-pink-500">Inventario · Etiquetas</p><h1 className="text-3xl font-black text-slate-900 mt-2">Etiquetas de productos</h1><p className="text-slate-500 mt-2">Códigos Code 128 · Xprinter XP-420B · 50 × 30 mm</p></div>
-      <button type="button" disabled={!total || total > MAX_LABELS} onClick={print} className="rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-bold text-white shadow-lg disabled:opacity-40">🖨 Imprimir {total} etiquetas</button>
       
 <button
   type="button"
