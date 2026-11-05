@@ -11,7 +11,8 @@ export default function ProductoSelector({
     codigoEscaneado,
     setCodigoEscaneado,
     mensajeEscaner,
-    procesarCodigoBarras
+    procesarCodigoBarras,
+    errorProducto
 }) {
     return (
         <section className="
@@ -93,6 +94,21 @@ export default function ProductoSelector({
                         Agregar
                     </button>
                 </form>
+                
+                {errorProducto && (
+                    <div
+                        role="alert"
+                        className="
+                            mt-3 flex items-start gap-2
+                            rounded-xl border border-red-200
+                            bg-red-50 px-4 py-3
+                            text-sm font-semibold text-red-700
+                        "
+                    >
+                        <span>⚠️</span>
+                        <span>{errorProducto}</span>
+                    </div>
+                )}
 
                 {mensajeEscaner && (
                     <p className="mt-3 text-sm font-semibold text-green-700">
