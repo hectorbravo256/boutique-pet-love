@@ -14,28 +14,34 @@ jobs:
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js 20
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Regenerar package-lock.json
+      - name: Regenerar package-lock
         run: |
-          rm -f package-lock.json
-          npm install --package-lock-only
+          rm -rf node_modules package-lock.json
+          npm install --package-lock-only --include=optional
 
-      - name: Instalar dependencias
-        run: npm ci
-
-      - name: Comprobar compilacion
-        run: npm run build
-
-      - name: Guardar package-lock.json
+      - name: Guardar package-lock actualizado
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package-lock.json
           if ! git diff --cached --quiet; then
-            git commit -m "Fix: regenerar dependencias npm"
+            git commit -m "Fix: actualizar package-lock"
             git push
           fi
+
+      - name: Instalar dependencias
+        run: npm ci --include=optional
+
+      - name: Reparar paquetes nativos Linux
+        run: |
+          npm install --no-save --package-lock=false \
+            @rollup/rollup-linux-x64-gnu \
+            @tailwindcss/oxide-linux-x64-gnu
+
+      - name: Comprobar compilacion
+        run: npm run build
