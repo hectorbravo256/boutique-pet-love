@@ -86,7 +86,7 @@ const downloadPDF = () => {
   /^talla\s/i.test(String(variant.size))
     ? String(variant.size)
     : `Talla ${variant.size}`,
-  2,
+  25,
   13,
   { align: 'center' }
 );
