@@ -97,7 +97,11 @@ export default function PurchaseItemCard({
                             text-pink-600
                         "
                     >
-                        Talla {item.size}
+                        
+                    {/^talla\s+/i.test(String(item.size || "").trim())
+                        ? String(item.size).trim()
+                        : `Talla ${item.size}`}
+
                     </span>
                 </div>
 
