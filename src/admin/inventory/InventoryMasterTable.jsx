@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminCard from "../components/AdminCard";
 import useInventoryMaster from "../shared/hooks/useInventoryMaster";
 import InventoryEditor from "./InventoryEditor";
@@ -10,24 +10,23 @@ const TALLAS = [
     "6XL", "7XL", "8XL"
 ];
 
+
 function indiceTalla(valor) {
     const talla = String(valor ?? "")
         .trim()
         .toUpperCase()
-        .replace(/\s+/g, "");
+        .replace(/\s+/g, "")
+        .replace(/^TALLA/, "");
 
-    const numero = talla.match(/^(?:TALLA|T)(\d{1,2})$/);
+    // T0, T1, T2... T12
+    const numerica = talla.match(/^T?(\d{1,2})$/);
 
-    if (numero) {
-        const n = Number(numero[1]);
-        return n >= 0 && n <= 12 ? n : -1;
+    if (numerica) {
+        const numero = Number(numerica[1]);
+        return numero >= 0 && numero <= 12 ? numero : -1;
     }
 
-    if (/^\d{1,2}$/.test(talla)) {
-        const n = Number(talla);
-        return n >= 0 && n <= 12 ? n : -1;
-    }
-
+    // 2XS, XS, S, M, L, XL... 8XL
     return TALLAS.indexOf(talla);
 }
 
@@ -43,10 +42,28 @@ export default function InventoryMasterTable() {
 
     const [selectedItem, setSelectedItem] = useState(null);
 
+    const [categoryFilter, setCategoryFilter] = useState("TODAS");
+
+const categorias = useMemo(() => {
+    return [...new Set(
+        inventory
+            .map(item => item.category)
+            .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "es"));
+}, [inventory]);
+
+const inventarioFiltrado = useMemo(() => {
+    if (categoryFilter === "TODAS") return inventory;
+
+    return inventory.filter(
+        item => item.category === categoryFilter
+    );
+}, [inventory, categoryFilter]);
+
     const productos = useMemo(() => {
         const grupos = new Map();
 
-        inventory.forEach(item => {
+        inventarioFiltrado.forEach(item => {
             // product_id tiene prioridad sobre el nombre.
             // Así no unimos productos diferentes por accidente.
             const clave = item.product_id != null
@@ -86,7 +103,7 @@ export default function InventoryMasterTable() {
                 "es"
             )
         );
-    }, [inventory]);
+    }, [inventarioFiltrado]);
 
     const totalUnidades = productos.reduce(
         (total, producto) => total + producto.total,
@@ -96,6 +113,22 @@ export default function InventoryMasterTable() {
     if (loading) {
         return <p>Cargando inventario...</p>;
     }
+
+    useEffect(() => {
+    if (!selectedItem) return;
+
+    const cerrarConEscape = (event) => {
+        if (event.key === "Escape") {
+            setSelectedItem(null);
+        }
+    };
+
+    window.addEventListener("keydown", cerrarConEscape);
+
+    return () => {
+        window.removeEventListener("keydown", cerrarConEscape);
+    };
+}, [selectedItem]);
 
     return (
         <div className="space-y-5">
@@ -123,7 +156,7 @@ export default function InventoryMasterTable() {
                         Variantes visibles
                     </p>
                     <p className="text-2xl font-black text-slate-900">
-                        {inventory.length}
+                        {inventarioFiltrado.length}
                     </p>
                 </div>
             </div>
@@ -146,6 +179,20 @@ export default function InventoryMasterTable() {
                         placeholder="Buscar producto..."
                         className="w-full rounded-xl border border-slate-300 px-4 py-3 md:w-80"
                     />
+                    
+                    <select
+                        value={categoryFilter}
+                        onChange={e => setCategoryFilter(e.target.value)}
+                        className="rounded-xl border border-slate-300 px-4 py-3"
+                    >
+                        <option value="TODAS">Todas las categorías</option>
+                    
+                        {categorias.map(categoria => (
+                            <option key={categoria} value={categoria}>
+                                {categoria.replace(" - ", " · ")}
+                            </option>
+                        ))}
+                    </select>
 
                     <select
                         value={statusFilter}
@@ -159,11 +206,8 @@ export default function InventoryMasterTable() {
                     </select>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-                    <div className={selectedItem
-                        ? "min-w-0 xl:col-span-9"
-                        : "min-w-0 xl:col-span-12"
-                    }>
+                <div className="min-w-0">
+                    <div className="min-w-0">
                         <div className="overflow-x-auto rounded-2xl border border-slate-200">
                             <table className="w-full min-w-[1120px] border-collapse text-sm">
                                 <thead className="bg-slate-100">
@@ -303,16 +347,42 @@ export default function InventoryMasterTable() {
                         )}
                     </div>
 
-                    {selectedItem && (
-                        <div className="min-w-0 xl:col-span-3">
-                            <InventoryEditor
-                                item={selectedItem}
-                                onClose={() => setSelectedItem(null)}
-                            />
-                        </div>
-                    )}
                 </div>
             </AdminCard>
+
+            
+{selectedItem && (
+    <div
+        className="
+            fixed inset-0 z-[100]
+            flex items-center justify-center
+            bg-slate-950/60 p-4
+        "
+        onMouseDown={e => {
+            if (e.target === e.currentTarget) {
+                setSelectedItem(null);
+            }
+        }}
+    >
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Detalle de variante"
+            className="
+                w-full max-w-2xl
+                max-h-[90vh] overflow-y-auto
+                rounded-3xl bg-white
+                shadow-2xl
+            "
+        >
+            <InventoryEditor
+                item={selectedItem}
+                onClose={() => setSelectedItem(null)}
+            />
+        </div>
+    </div>
+)}
+      
         </div>
     );
 }
