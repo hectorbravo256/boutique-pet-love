@@ -1,321 +1,318 @@
-import useInventoryMaster from "../shared/hooks/useInventoryMaster";
+
+import { useMemo, useState } from "react";
 import AdminCard from "../components/AdminCard";
-import { useState } from "react";
+import useInventoryMaster from "../shared/hooks/useInventoryMaster";
 import InventoryEditor from "./InventoryEditor";
 
+const TALLAS = [
+    "2XS", "XS", "S", "M", "L", "XL",
+    "2XL", "3XL", "4XL", "5XL",
+    "6XL", "7XL", "8XL"
+];
+
+function indiceTalla(valor) {
+    const talla = String(valor ?? "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+
+    const numero = talla.match(/^(?:TALLA|T)(\d{1,2})$/);
+
+    if (numero) {
+        const n = Number(numero[1]);
+        return n >= 0 && n <= 12 ? n : -1;
+    }
+
+    if (/^\d{1,2}$/.test(talla)) {
+        const n = Number(talla);
+        return n >= 0 && n <= 12 ? n : -1;
+    }
+
+    return TALLAS.indexOf(talla);
+}
+
 export default function InventoryMasterTable() {
-
     const {
-
-    inventory,
-
-    loading,
-
-    search,
-
-    setSearch,
-
-    statusFilter,
-
-    setStatusFilter
-
-} = useInventoryMaster();
+        inventory,
+        loading,
+        search,
+        setSearch,
+        statusFilter,
+        setStatusFilter
+    } = useInventoryMaster();
 
     const [selectedItem, setSelectedItem] = useState(null);
+
+    const productos = useMemo(() => {
+        const grupos = new Map();
+
+        inventory.forEach(item => {
+            // product_id tiene prioridad sobre el nombre.
+            // Así no unimos productos diferentes por accidente.
+            const clave = item.product_id != null
+                ? `id:${item.product_id}`
+                : `nombre:${item.product_name}|${item.category}`;
+
+            if (!grupos.has(clave)) {
+                grupos.set(clave, {
+                    clave,
+                    nombre: item.product_name,
+                    categoria: item.category,
+                    imagen: item.image,
+                    tallas: Array.from(
+                        { length: 13 },
+                        () => []
+                    ),
+                    otras: [],
+                    total: 0
+                });
+            }
+
+            const grupo = grupos.get(clave);
+            const indice = indiceTalla(item.size);
+
+            if (indice === -1) {
+                grupo.otras.push(item);
+            } else {
+                grupo.tallas[indice].push(item);
+            }
+
+            grupo.total += Number(item.stock || 0);
+        });
+
+        return [...grupos.values()].sort((a, b) =>
+            String(a.nombre).localeCompare(
+                String(b.nombre),
+                "es"
+            )
+        );
+    }, [inventory]);
+
+    const totalUnidades = productos.reduce(
+        (total, producto) => total + producto.total,
+        0
+    );
 
     if (loading) {
         return <p>Cargando inventario...</p>;
     }
 
     return (
-
-        <AdminCard className="h-[calc(100vh-140px)] flex flex-col">
-
-            <h2 className="text-3xl font-black mb-6">
-
-                Inventario Maestro
-
-            </h2>
-
-            <div className="flex flex-wrap gap-4 mb-6">
-
-    <input
-
-        value={search}
-
-        onChange={(e)=>
-            setSearch(e.target.value)
-        }
-
-        placeholder="Buscar producto..."
-
-        className="
-            border
-            rounded-xl
-            p-3
-            w-80
-        "
-
-    />
-
-    <select
-
-        value={statusFilter}
-
-        onChange={(e)=>
-            setStatusFilter(e.target.value)
-        }
-
-        className="
-            border
-            rounded-xl
-            p-3
-        "
-
-    >
-
-        <option value="TODOS">Todos</option>
-
-        <option value="OK">OK</option>
-
-        <option value="CRITICO">Crítico</option>
-
-        <option value="SIN STOCK">Sin stock</option>
-
-    </select>
-
-</div>
-
-       
-        
-        <div className="grid flex-1 grid-cols-1 xl:grid-cols-12 gap-8 min-h-0">
-
-    {/* Tabla */}
-
-    <div className="xl:col-span-8 h-full min-h-0">
-
-                    <div className="h-full overflow-auto rounded-2xl border">
-
-                <table className="w-full">
-
-<thead className="sticky top-0 bg-white z-10">
-    <tr className="border-b text-slate-500 bg-white">
-
-        <th className="w-24 py-3">Imagen</th>
-
-        <th className="min-w-[280px] text-left">
-            Producto
-        </th>
-
-        <th className="w-24 text-center">
-            Talla
-        </th>
-
-        <th className="w-24 text-center">
-            Stock
-        </th>
-
-        <th className="w-32 text-right">
-            Precio
-        </th>
-
-        <th className="w-32 text-center">
-            Estado
-        </th>
-
-    </tr>
-</thead>
-
-                    <tbody>
-
-                        {inventory.map(item => (
-
-                            <tr
-    key={item.variant_id}
-    onClick={() => setSelectedItem(item)}
-    className={`
-        cursor-pointer
-        border-b
-        transition-all
-        hover:bg-pink-50
-        hover:shadow-sm
-        ${
-            selectedItem?.variant_id === item.variant_id
-                ? "bg-pink-100"
-                : ""
-        }
-    `}
->
-
-                                <td className="py-2 align-middle">
-
-                                    <img
-
-                                        src={item.image}
-
-                                        alt={item.product_name}
-
-                                        className="
-    w-14
-    h-14
-    rounded-xl
-    object-cover
-    shadow-sm
-    border
-"
-
-                                    />
-
-                                </td>
-
-                                <td className="py-2 align-middle">
-
-    <div className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
-
-        {item.product_name}
-
-    </div>
-
-<div className="text-xs text-slate-400 mt-1">
-    {item.category.replace(" - ", " · ")}
-</div>
-
-</td>
-
-                                <td className="text-center">
-
-                                    {item.size}
-
-                                </td>
-
-<td className="text-center">
-
-    <span
-        className={`
-            font-black
-
-            ${
-                item.stock === 0
-
-                    ? "text-red-600"
-
-                : item.stock <= 3
-
-                    ? "text-orange-500"
-
-                : "text-green-600"
-            }
-        `}
-    >
-
-        {item.stock}
-
-    </span>
-
-</td>
-
-                                <td className="text-right">
-
-                                    $
-
-                                    {Number(
-                                        item.sale_price
-                                    ).toLocaleString("es-CL")}
-
-                                </td>
-
-<td className="text-center">
-
-    <span
-        className={`
-            px-3
-            py-1
-            rounded-full
-            text-xs
-            font-bold
-
-            ${
-                item.status === "OK"
-                    ? "bg-green-100 text-green-700"
-
-                : item.status === "CRITICO"
-                    ? "bg-orange-100 text-orange-700"
-
-                : "bg-red-100 text-red-700"
-            }
-        `}
-    >
-
-        {item.status}
-
-    </span>
-
-</td>
-
-                                
-
-                            </tr>
-
-                        ))}
-
-                    </tbody>
-
-                </table>
-                
-            </div>
-
-    </div>
-
-    {/* Panel */}
-
-    <div className="xl:col-span-4 h-full min-h-0">
-        
-        {selectedItem ? (
-
-            <InventoryEditor
-
-                item={selectedItem}
-
-                onClose={() => setSelectedItem(null)}
-
-            />
-
-        ) : (
-
-            <AdminCard>
-
-                <div className="text-center py-20">
-
-                    <div className="text-5xl mb-4">
-
-                        📦
-
-                    </div>
-
-                    <h3 className="text-xl font-bold">
-
-                        Selecciona una variante
-
-                    </h3>
-
-                    <p className="text-slate-500 mt-2">
-
-                        Haz clic sobre un producto para visualizar y editar su información.
-
+        <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                <div className="rounded-2xl border bg-white p-4">
+                    <p className="text-xs text-slate-500">
+                        Productos visibles
                     </p>
-
+                    <p className="text-2xl font-black text-slate-900">
+                        {productos.length}
+                    </p>
                 </div>
 
+                <div className="rounded-2xl border bg-white p-4">
+                    <p className="text-xs text-slate-500">
+                        Unidades visibles
+                    </p>
+                    <p className="text-2xl font-black text-pink-600">
+                        {totalUnidades}
+                    </p>
+                </div>
+
+                <div className="col-span-2 rounded-2xl border bg-white p-4 md:col-span-1">
+                    <p className="text-xs text-slate-500">
+                        Variantes visibles
+                    </p>
+                    <p className="text-2xl font-black text-slate-900">
+                        {inventory.length}
+                    </p>
+                </div>
+            </div>
+
+            <AdminCard>
+                <div className="mb-5">
+                    <h2 className="text-2xl font-black text-slate-900">
+                        Inventario Maestro
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                        Existencias por producto y talla.
+                        Selecciona una cantidad para ver la variante.
+                    </p>
+                </div>
+
+                <div className="mb-5 flex flex-wrap gap-3">
+                    <input
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Buscar producto..."
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 md:w-80"
+                    />
+
+                    <select
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value)}
+                        className="rounded-xl border border-slate-300 px-4 py-3"
+                    >
+                        <option value="TODOS">Todos</option>
+                        <option value="OK">OK</option>
+                        <option value="CRITICO">Crítico</option>
+                        <option value="SIN STOCK">Sin stock</option>
+                    </select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
+                    <div className={selectedItem
+                        ? "min-w-0 xl:col-span-9"
+                        : "min-w-0 xl:col-span-12"
+                    }>
+                        <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                            <table className="w-full min-w-[1120px] border-collapse text-sm">
+                                <thead className="bg-slate-100">
+                                    <tr>
+                                        <th className="sticky left-0 z-20 min-w-[220px] border-b border-r bg-slate-100 p-3 text-left">
+                                            Producto
+                                        </th>
+
+                                        {TALLAS.map((talla, indice) => (
+                                            <th
+                                                key={indice}
+                                                className="min-w-[56px] border-b border-r p-2 text-center"
+                                            >
+                                                <div className="font-black text-slate-800">
+                                                    T{indice}
+                                                </div>
+                                                <div className="text-[10px] text-slate-500">
+                                                    {talla}
+                                                </div>
+                                            </th>
+                                        ))}
+
+                                        <th className="min-w-[75px] border-b bg-pink-50 p-3 text-center">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {productos.map(producto => (
+                                        <tr
+                                            key={producto.clave}
+                                            className="hover:bg-pink-50/40"
+                                        >
+                                            <td className="sticky left-0 z-10 border-b border-r bg-white p-2">
+                                                <div className="flex items-center gap-3">
+                                                    <img
+                                                        src={producto.imagen || "/placeholder.png"}
+                                                        alt={producto.nombre}
+                                                        className="h-12 w-12 shrink-0 rounded-lg border object-cover"
+                                                    />
+
+                                                    <div className="min-w-0">
+                                                        <p className="font-bold text-slate-800">
+                                                            {producto.nombre}
+                                                        </p>
+                                                        <p className="text-xs text-slate-400">
+                                                            {producto.categoria || ""}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            {producto.tallas.map((variantes, indice) => (
+                                                <td
+                                                    key={indice}
+                                                    className="border-b border-r p-1 text-center"
+                                                >
+                                                    {variantes.length === 0 ? (
+                                                        <span className="text-slate-300">
+                                                            —
+                                                        </span>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            {variantes.map(variante => {
+                                                                const stock = Number(variante.stock || 0);
+
+                                                                return (
+                                                                    <button
+                                                                        key={variante.variant_id}
+                                                                        type="button"
+                                                                        onClick={() => setSelectedItem(variante)}
+                                                                        title={`${variante.size} · Stock: ${stock}`}
+                                                                        className={`
+                                                                            w-full rounded-lg px-1 py-2
+                                                                            text-xs font-black transition
+                                                                            hover:ring-2 hover:ring-pink-400
+                                                                            ${
+                                                                                selectedItem?.variant_id === variante.variant_id
+                                                                                    ? "ring-2 ring-pink-500"
+                                                                                    : ""
+                                                                            }
+                                                                            ${
+                                                                                stock === 0
+                                                                                    ? "bg-red-50 text-red-600"
+                                                                                    : stock <= 3
+                                                                                        ? "bg-orange-50 text-orange-600"
+                                                                                        : "bg-green-50 text-green-700"
+                                                                            }
+                                                                        `}
+                                                                    >
+                                                                        {stock}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            ))}
+
+                                            <td className="border-b bg-pink-50 p-2 text-center font-black text-pink-700">
+                                                {producto.total}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {productos.some(p => p.otras.length > 0) && (
+                            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                                <h3 className="mb-2 font-bold text-amber-800">
+                                    Variantes con tallas no reconocidas
+                                </h3>
+
+                                <div className="flex flex-wrap gap-2">
+                                    {productos.flatMap(p =>
+                                        p.otras.map(item => (
+                                            <button
+                                                key={item.variant_id}
+                                                type="button"
+                                                onClick={() => setSelectedItem(item)}
+                                                className="rounded-lg border border-amber-300 bg-white px-3 py-2 text-xs text-amber-900 hover:bg-amber-100"
+                                            >
+                                                {p.nombre} · {item.size} · Stock {item.stock}
+                                            </button>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {productos.length === 0 && (
+                            <p className="py-10 text-center text-slate-500">
+                                No hay productos para los filtros seleccionados.
+                            </p>
+                        )}
+                    </div>
+
+                    {selectedItem && (
+                        <div className="min-w-0 xl:col-span-3">
+                            <InventoryEditor
+                                item={selectedItem}
+                                onClose={() => setSelectedItem(null)}
+                            />
+                        </div>
+                    )}
+                </div>
             </AdminCard>
-
-        )}
-
-    </div>
-
-</div>
-
-            </AdminCard>
-
+        </div>
     );
-
 }
