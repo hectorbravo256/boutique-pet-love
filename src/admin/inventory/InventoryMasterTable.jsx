@@ -1,8 +1,9 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AdminCard from "../components/AdminCard";
 import useInventoryMaster from "../shared/hooks/useInventoryMaster";
 import InventoryEditor from "./InventoryEditor";
+import { supabase } from "../../supabaseClient";
 
 const TALLAS = [
     "2XS", "XS", "S", "M", "L", "XL",
@@ -47,6 +48,17 @@ export default function InventoryMasterTable() {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const [categoryFilter, setCategoryFilter] = useState("TODAS");
+
+    
+    const [codigoEscaner, setCodigoEscaner] = useState("");
+    const [escaneando, setEscaneando] = useState(false);
+    const [errorEscaner, setErrorEscaner] = useState("");
+    const [mensajeEscaner, setMensajeEscaner] = useState("");
+    const [varianteEscaneada, setVarianteEscaneada] = useState(null);
+    
+    const escaneoEnProceso = useRef(false);
+    const inputEscanerRef = useRef(null);
+
 
 const categorias = useMemo(() => {
     return [...new Set(
@@ -114,6 +126,75 @@ const inventarioFiltrado = useMemo(() => {
         0
     );
 
+    
+const procesarEscaneoInventario = async (codigoIngresado) => {
+    const codigo = String(codigoIngresado || "")
+        .trim()
+        .toUpperCase();
+
+    if (!codigo || escaneoEnProceso.current) return;
+
+    escaneoEnProceso.current = true;
+    setEscaneando(true);
+    setErrorEscaner("");
+    setMensajeEscaner("");
+
+    try {
+        const { data: coincidencias, error } = await supabase
+            .from("product_variants")
+            .select("id, product_id, size, barcode, sku")
+            .or(`barcode.eq.${codigo},sku.eq.${codigo}`)
+            .limit(2);
+
+        if (error) throw error;
+
+        if (!coincidencias?.length) {
+            setErrorEscaner(
+                `Código no encontrado: ${codigo}`
+            );
+            return;
+        }
+
+        if (coincidencias.length > 1) {
+            setErrorEscaner(
+                `El código ${codigo} corresponde a más de una variante.`
+            );
+            return;
+        }
+
+        const variante = coincidencias[0];
+
+        // El hook ya aplica filtros de búsqueda y estado.
+        // Restablecerlos para localizar la variante.
+        setSearch("");
+        setStatusFilter("TODOS");
+        setCategoryFilter("TODAS");
+
+        setVarianteEscaneada(String(variante.id));
+
+        // El inventario del hook se actualizará tras
+        // restablecer los filtros.
+        setMensajeEscaner(
+            `Código reconocido: ${codigo}. Localizando variante...`
+        );
+
+    } catch (error) {
+        console.error("Error al consultar código:", error);
+        setErrorEscaner(
+            "No fue posible consultar el código de barras."
+        );
+    } finally {
+        setCodigoEscaner("");
+        setEscaneando(false);
+        escaneoEnProceso.current = false;
+
+        // Mantener el foco para el siguiente escaneo.
+        requestAnimationFrame(() => {
+            inputEscanerRef.current?.focus();
+        });
+    }
+};
+
         useEffect(() => {
     if (!selectedItem) return;
 
@@ -129,6 +210,33 @@ const inventarioFiltrado = useMemo(() => {
         window.removeEventListener("keydown", cerrarConEscape);
     };
 }, [selectedItem]);
+
+    
+useEffect(() => {
+    if (!varianteEscaneada || loading) return;
+
+    const encontrada = inventory.find(
+        item =>
+            String(item.variant_id) === varianteEscaneada
+    );
+
+    if (!encontrada) {
+        setErrorEscaner(
+            "El código existe, pero su variante no aparece " +
+            "en el Inventario Maestro."
+        );
+        setVarianteEscaneada(null);
+        return;
+    }
+
+    setSelectedItem(encontrada);
+    setMensajeEscaner(
+        `✓ Encontrado: ${encontrada.product_name} - ${encontrada.size}`
+    );
+    setVarianteEscaneada(null);
+}, [varianteEscaneada, inventory, loading]);
+
+    
 
     if (loading) {
         return <p>Cargando inventario...</p>;
@@ -166,6 +274,63 @@ const inventarioFiltrado = useMemo(() => {
             </div>
 
             <AdminCard>
+
+                <div className="mb-6 rounded-2xl border border-pink-200 bg-pink-50/40 p-4 sm:p-5">
+                    <div className="mb-3">
+                        <h3 className="font-bold text-slate-900">
+                            Escanear código de barras
+                        </h3>
+                        <p className="mt-1 text-xs text-slate-500">
+                            Escanea una etiqueta para consultar su stock,
+                            talla y precio de venta.
+                        </p>
+                    </div>
+                
+                    <form
+                        onSubmit={e => {
+                            e.preventDefault();
+                            procesarEscaneoInventario(codigoEscaner);
+                        }}
+                        className="flex flex-col gap-3 sm:flex-row"
+                    >
+                        <input
+                            ref={inputEscanerRef}
+                            type="text"
+                            value={codigoEscaner}
+                            onChange={e => setCodigoEscaner(e.target.value)}
+                            placeholder="Escanea o escribe BPL-00000001"
+                            autoComplete="off"
+                            className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+                        />
+                
+                        <button
+                            type="submit"
+                            disabled={escaneando || !codigoEscaner.trim()}
+                            className="rounded-xl bg-pink-500 px-7 py-3 font-bold text-white transition hover:bg-pink-600 disabled:opacity-50"
+                        >
+                            {escaneando ? "Buscando..." : "Consultar"}
+                        </button>
+                    </form>
+                
+                    {errorEscaner && (
+                        <p
+                            role="alert"
+                            className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700"
+                        >
+                            ⚠️ {errorEscaner}
+                        </p>
+                    )}
+                
+                    {mensajeEscaner && !errorEscaner && (
+                        <p
+                            role="status"
+                            className="mt-3 text-sm font-semibold text-green-700"
+                        >
+                            {mensajeEscaner}
+                        </p>
+                    )}
+                </div>
+                
                 <div className="mb-5">
                     <h2 className="text-2xl font-black text-slate-900">
                         Inventario Maestro
