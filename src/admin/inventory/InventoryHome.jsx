@@ -59,6 +59,13 @@ const modules = [
         color: "from-pink-500 to-fuchsia-600",
     },
     {
+        title: "Conteo Físico",
+        description: "Contar prendas con lector de códigos de barras y detectar diferencias de stock.",
+        icon: "📊",
+        to: "/admin/inventario/conteo-fisico",
+        color: "from-violet-500 to-fuchsia-600",
+    },
+    {
         title: "Proveedores",
         description: "Administrar proveedores, contactos y empresas.",
         icon: "🤝",
