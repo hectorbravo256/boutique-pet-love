@@ -384,7 +384,7 @@ const inventarioFiltrado = useMemo(() => {
             aria-modal="true"
             aria-label="Detalle de variante"
             className="
-                w-full max-w-2xl
+                w-full max-w-xl
                 max-h-[90vh] overflow-y-auto
                 rounded-3xl bg-white
                 shadow-2xl
