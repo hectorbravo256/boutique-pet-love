@@ -26,6 +26,7 @@ const AdminCategorias = lazy(() => import("./admin/AdminCategorias"));
 const CategoriaDetalle = lazy(() => import("./admin/CategoriaDetalle"));
 import AdminInventario from "./admin/AdminInventario";
 const InventoryMasterPage = lazy(() => import("./admin/inventory/master/InventoryMasterPage"));
+const PhysicalInventoryCount = lazy(() => import("./admin/inventory/PhysicalInventoryCount"));
 const PurchasePage = lazy(() => import("./admin/inventory/purchases/PurchasePage"));
 const SuppliersPage = lazy(() => import("./admin/inventory/suppliers/SuppliersPage"));
 const VentasExternas = lazy(() => import("./admin/inventory/VentasExternas"));
@@ -1302,6 +1303,14 @@ export default function App() {
       <InventoryMasterPage />
     </Suspense>
   }
+/>
+<Route
+    path="/admin/inventario/conteo-fisico"
+    element={
+        <Suspense fallback={<div>Cargando conteo físico...</div>}>
+            <PhysicalInventoryCount />
+        </Suspense>
+    }
 />
 	<Route
   path="/admin/inventario/compras"
