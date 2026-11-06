@@ -18,6 +18,10 @@ function indiceTalla(valor) {
         .replace(/\s+/g, "")
         .replace(/^TALLA/, "");
 
+    if (["UNICA", "ÚNICA", "UNICO", "ÚNICO", "TU"].includes(talla)) {
+    return 13;
+}
+
     // T0, T1, T2... T12
     const numerica = talla.match(/^T?(\d{1,2})$/);
 
@@ -77,7 +81,7 @@ const inventarioFiltrado = useMemo(() => {
                     categoria: item.category,
                     imagen: item.image,
                     tallas: Array.from(
-                        { length: 13 },
+                        { length: 14 },
                         () => []
                     ),
                     otras: [],
@@ -229,6 +233,15 @@ const inventarioFiltrado = useMemo(() => {
                                                 </div>
                                             </th>
                                         ))}
+                                        
+                                        <th className="min-w-[72px] border-b border-r bg-purple-50 p-2 text-center">
+                                            <div className="font-black text-purple-800">
+                                                Única
+                                            </div>
+                                            <div className="text-[10px] text-purple-500">
+                                                TU
+                                            </div>
+                                        </th>
 
                                         <th className="min-w-[75px] border-b bg-pink-50 p-3 text-center">
                                             Total
@@ -264,7 +277,9 @@ const inventarioFiltrado = useMemo(() => {
                                             {producto.tallas.map((variantes, indice) => (
                                                 <td
                                                     key={indice}
-                                                    className="border-b border-r p-1 text-center"
+                                                    className={`border-b border-r p-1 text-center ${
+                                                        indice === 13 ? "bg-purple-50/50" : ""
+                                                    }`}
                                                 >
                                                     {variantes.length === 0 ? (
                                                         <span className="text-slate-300">
