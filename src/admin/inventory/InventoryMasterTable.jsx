@@ -110,11 +110,7 @@ const inventarioFiltrado = useMemo(() => {
         0
     );
 
-    if (loading) {
-        return <p>Cargando inventario...</p>;
-    }
-
-    useEffect(() => {
+        useEffect(() => {
     if (!selectedItem) return;
 
     const cerrarConEscape = (event) => {
@@ -129,6 +125,10 @@ const inventarioFiltrado = useMemo(() => {
         window.removeEventListener("keydown", cerrarConEscape);
     };
 }, [selectedItem]);
+
+    if (loading) {
+        return <p>Cargando inventario...</p>;
+    }
 
     return (
         <div className="space-y-5">
