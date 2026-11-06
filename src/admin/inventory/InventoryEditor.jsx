@@ -1,292 +1,181 @@
-import { useEffect, useState } from "react";
-import AdminCard from "../components/AdminCard";
 
-export default function InventoryEditor({
+const EQUIVALENCIAS = [
+    "2XS", "XS", "S", "M", "L", "XL",
+    "2XL", "3XL", "4XL", "5XL",
+    "6XL", "7XL", "8XL"
+];
 
-    item,
+function mostrarTalla(valor) {
+    const talla = String(valor ?? "").trim();
+    const normalizada = talla
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/^TALLA/, "");
 
-    onClose
+    if (["UNICA", "ÚNICA", "UNICO", "ÚNICO", "TU"].includes(normalizada)) {
+        return "Única";
+    }
 
-}) {
+    const numero = normalizada.match(/^T?(\d{1,2})$/);
 
-    const [stock, setStock] = useState(item.stock);
-    const [price, setPrice] = useState(item.sale_price);
+    if (numero) {
+        const n = Number(numero[1]);
 
-useEffect(() => {
-    setStock(item.stock);
-    setPrice(item.sale_price);
-}, [item]);
+        if (n >= 0 && n <= 12) {
+            return `T${n} / ${EQUIVALENCIAS[n]}`;
+        }
+    }
 
-    
+    const indice = EQUIVALENCIAS.indexOf(normalizada);
+
+    if (indice >= 0) {
+        return `T${indice} / ${EQUIVALENCIAS[indice]}`;
+    }
+
+    return talla;
+}
+
+const formatoPeso = valor =>
+    new Intl.NumberFormat("es-CL", {
+        style: "currency",
+        currency: "CLP",
+        maximumFractionDigits: 0
+    }).format(Number(valor || 0));
+
+export default function InventoryEditor({ item, onClose }) {
     if (!item) return null;
 
+    const stock = Number(item.stock || 0);
+    const precio = Number(item.sale_price || 0);
+
+    const estadoColor =
+        item.status === "OK"
+            ? "bg-green-100 text-green-700"
+            : item.status === "CRITICO"
+                ? "bg-orange-100 text-orange-700"
+                : "bg-red-100 text-red-700";
 
     return (
-
-        <AdminCard className="h-full flex flex-col overflow-hidden">
-
-            <div className="flex justify-between items-center mb-6">
-
-                <h2 className="text-xl font-black">
-    Detalle de Variante
-</h2>
+        <div className="p-5 sm:p-6">
+            {/* ENCABEZADO */}
+            <div className="mb-5 flex items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-xl font-black text-slate-900">
+                        Detalle de variante
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        Consulta de inventario
+                    </p>
+                </div>
 
                 <button
-
+                    type="button"
                     onClick={onClose}
-
-                    className="
-                        w-11
-h-11
-rounded-xl
-flex
-items-center
-justify-center
-bg-slate-100
-hover:bg-slate-200
-transition
-                    "
-
+                    aria-label="Cerrar detalle"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl hover:bg-slate-200"
                 >
-
-                    ✕
-
+                    ×
                 </button>
-
             </div>
 
-<div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6">
+            {/* PRODUCTO */}
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-200 p-4">
+                <img
+                    src={item.image || "/placeholder.png"}
+                    alt={item.product_name}
+                    className="h-24 w-24 shrink-0 rounded-xl object-cover shadow-sm sm:h-28 sm:w-28"
+                />
 
+                <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-black leading-tight text-slate-900">
+                        {item.product_name}
+                    </h3>
 
-<div
-    className="
-        bg-white
-        rounded-2xl
-        border
-        p-6
-        flex
-        flex-col
-        items-center
-        text-center
-    "
->
+                    <p className="mt-1 text-sm text-slate-500">
+                        {String(item.category || "").replace(" - ", " · ")}
+                    </p>
 
-    <img
-        src={item.image}
-        alt={item.product_name}
-        className="
-    w-28
-    h-28
-    rounded-2xl
-    object-cover
-    shadow-lg
-"
-    />
+                    <div className="mt-3 flex flex-wrap gap-2">
+                        <span className="rounded-lg bg-pink-50 px-3 py-1.5 text-xs font-bold text-pink-700">
+                            {mostrarTalla(item.size)}
+                        </span>
 
-    <div className="mt-5 w-full">
-
-        <h3
-            className="
-                text-2xl
-                font-bold
-                leading-tight
-            "
-        >
-            {item.product_name}
-        </h3>
-
-        <p className="mt-2 text-slate-500">
-            {item.category.replace(" - ", " · ")}
-        </p>
-
-    </div>
-
-</div>
-
-<div
-    className="
-        bg-slate-50
-        rounded-2xl
-        p-6
-        space-y-8
-        w-full
-    "
->
-
-    <h4 className="
-    text-xs
-    uppercase
-    tracking-widest
-    text-slate-400
-    font-bold
-">
-    Información
-</h4>
-    
-
-<div className="flex justify-between items-center">
-
-    <span className="text-sm text-slate-500">
-        Talla
-    </span>
-
-    <span className="font-bold text-lg">
-        {item.size}
-    </span>
-
-</div>
-
-
-    <h4 className="
-    text-xs
-    uppercase
-    tracking-widest
-    text-slate-400
-    font-bold
-">
-    Edición
-</h4>
-
-<div className="space-y-2">
-
-    <label className="text-sm text-slate-500">
-        Stock
-    </label>
-
-        <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            className="
-    mt-2
-    w-full
-    rounded-xl
-    border
-    border-slate-300
-    px-4
-    py-3
-    text-lg
-    font-semibold
-    focus:border-pink-500
-    focus:ring-2
-    focus:ring-pink-200
-    outline-none
-    transition
-"
-        />
-
-    </div>
-
-        <label className="text-xs text-slate-500">
-            Precio
-        </label>
-
-        <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="
-    mt-2
-    w-full
-    rounded-xl
-    border
-    border-slate-300
-    px-4
-    py-3
-    text-lg
-    font-semibold
-    focus:border-pink-500
-    focus:ring-2
-    focus:ring-pink-200
-    outline-none
-    transition
-"
-        />
-
-
-    <div>
-
-        <div className="flex justify-between items-center">
-
-    <span className="text-sm text-slate-500">
-        Estado
-    </span>
-
-        <div className="mt-2">
-
-            <span
-                className={`
-                    inline-flex
-                    px-4
-                    py-2
-                    rounded-full
-                    text-sm
-                    font-bold
-
-                    ${
-                        item.status === "OK"
-                            ? "bg-green-100 text-green-700"
-
-                        : item.status === "CRITICO"
-                            ? "bg-orange-100 text-orange-700"
-
-                        : "bg-red-100 text-red-700"
-                    }
-                `}
-            >
-                {item.status}
-            </span>
-
+                        <span className={`rounded-lg px-3 py-1.5 text-xs font-bold ${estadoColor}`}>
+                            {item.status || "Sin estado"}
+                        </span>
+                    </div>
+                </div>
             </div>
-</div>
 
-    </div>
+            {/* INFORMACIÓN */}
+            <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-slate-50 p-4">
+                    <p className="text-xs font-medium text-slate-500">
+                        Stock disponible
+                    </p>
 
-    <div className="flex gap-3 pt-4">
+                    <p className={`mt-2 text-2xl font-black ${
+                        stock === 0
+                            ? "text-red-600"
+                            : stock <= 3
+                                ? "text-orange-600"
+                                : "text-green-700"
+                    }`}>
+                        {stock}
+                        <span className="ml-1 text-xs font-normal text-slate-500">
+                            unidades
+                        </span>
+                    </p>
+                </div>
 
-        <button
-            className="
-    flex-1
-    bg-gradient-to-r
-    from-pink-500
-    to-fuchsia-600
-    text-white
-    rounded-xl
-    py-3
-    font-bold
-    shadow-lg
-    hover:shadow-xl
-    hover:scale-[1.02]
-    transition-all
-"
-        >
-            Guardar cambios
-        </button>
+                <div className="rounded-xl bg-slate-50 p-4">
+                    <p className="text-xs font-medium text-slate-500">
+                        Precio de venta
+                    </p>
 
-        <button
-            onClick={onClose}
-            className="
-    h-12
-    px-6
-    rounded-xl
-    border
-    border-slate-300
-    bg-white
-    hover:bg-slate-100
-    transition
-"
-        >
-            Cancelar
-        </button>
+                    <p className="mt-2 text-xl font-black text-slate-900">
+                        {formatoPeso(precio)}
+                    </p>
+                </div>
+            </div>
 
-    </div>
+            {/* IDENTIFICACIÓN */}
+            <div className="mt-4 rounded-xl border border-slate-200 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                    Identificación
+                </p>
 
-</div>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                        <p className="text-xs text-slate-500">
+                            Variante
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-800">
+                            {mostrarTalla(item.size)}
+                        </p>
+                    </div>
 
-    </div>
-            
-        </AdminCard>
+                    <div>
+                        <p className="text-xs text-slate-500">
+                            ID de variante
+                        </p>
+                        <p className="mt-1 break-all text-sm font-semibold text-slate-800">
+                            {item.variant_id ?? "No disponible"}
+                        </p>
+                    </div>
+                </div>
+            </div>
 
+            {/* ACCIONES */}
+            <div className="mt-5 flex justify-end">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-xl bg-slate-900 px-8 py-3 font-bold text-white transition hover:bg-slate-700"
+                >
+                    Cerrar
+                </button>
+            </div>
+        </div>
     );
-
 }
