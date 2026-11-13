@@ -51,6 +51,33 @@ const sortInventory = (a, b) =>
   Number(a.variant_id) - Number(b.variant_id);
 
 
+const SESSION_STATUS = {
+  draft: {
+    label: "Borrador",
+    color: "bg-slate-100 text-slate-700"
+  },
+  in_progress: {
+    label: "En proceso",
+    color: "bg-blue-100 text-blue-700"
+  },
+  closed: {
+    label: "Cerrado",
+    color: "bg-amber-100 text-amber-800"
+  },
+  applied: {
+    label: "Ajustes aplicados",
+    color: "bg-green-100 text-green-700"
+  }
+};
+
+const formatDate = value =>
+  value
+    ? new Date(value).toLocaleString("es-CL", {
+        dateStyle: "short",
+        timeStyle: "short"
+      })
+    : "—";
+
 export default function PhysicalInventoryCount() {
   const [sessions, setSessions] = useState([]);
   const [session, setSession] = useState(null);
@@ -73,12 +100,50 @@ export default function PhysicalInventoryCount() {
   const pendingRef = useRef(Promise.resolve());
 
   const notifyError = e => { console.error(e); setError(e?.message || String(e)); };
-  const loadSessions = async () => {
-    const { data, error: e } = await supabase.from("physical_count_sessions")
-      .select("*").order("created_at", { ascending: false });
-    if (e) throw e;
-    setSessions(data || []);
-  };
+
+const loadSessions = async () => {
+  const { data, error: e } = await supabase
+    .from("physical_count_sessions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (e) throw e;
+
+  const result = await Promise.all(
+    (data || []).map(async s => {
+      const { data: rows, error: itemsError } = await supabase
+        .from("physical_count_items")
+        .select("system_stock, counted_stock")
+        .eq("session_id", s.id);
+
+      if (itemsError) throw itemsError;
+
+      const counted = (rows || []).filter(
+        x => x.counted_stock !== null
+      );
+
+      const changed = counted.filter(
+        x => Number(x.counted_stock) !== Number(x.system_stock)
+      );
+
+      return {
+        ...s,
+        totalVariants: (rows || []).length,
+        countedVariants: counted.length,
+        adjustedVariants: changed.length,
+        adjustedUnits: changed.reduce(
+          (sum, x) =>
+            sum + Math.abs(
+              Number(x.counted_stock) - Number(x.system_stock)
+            ),
+          0
+        )
+      };
+    })
+  );
+
+  setSessions(result);
+};
 
 const loadSession = async id => {
   const [
@@ -328,12 +393,98 @@ const applyAdjustments = async () => {
         <button disabled={busy} className={`${btn} bg-pink-500 text-white`}>{busy ? "Creando..." : "Crear y comenzar conteo"}</button>
       </form>
       <section className="rounded-3xl border bg-white p-6">
-        <h2 className="mb-4 text-xl font-black">Historial de sesiones</h2>
-        {sessions.length === 0 && <p className="text-slate-500">Todavía no hay sesiones guardadas.</p>}
-        <div className="space-y-2">{sessions.map(s => <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
-          <div><p className="font-bold">{s.name}</p><p className="text-xs text-slate-500">{s.mode === "complete" ? "Completo" : s.category} · {s.responsible} · {new Date(s.created_at).toLocaleString("es-CL")} · {s.status}</p></div>
-          <button type="button" className={`${btn} bg-slate-900 text-white`} onClick={async () => { try { await loadSession(s.id); } catch(e) { notifyError(e); } }}>Abrir</button>
-        </div>)}</div>
+
+<h2 className="mb-4 text-xl font-black">
+  Historial de sesiones
+</h2>
+
+{sessions.length === 0 && (
+  <p className="text-slate-500">
+    Todavía no hay sesiones guardadas.
+  </p>
+)}
+
+<div className="space-y-4">
+  {sessions.map(s => {
+    const status = SESSION_STATUS[s.status] || {
+      label: s.status,
+      color: "bg-slate-100 text-slate-700"
+    };
+
+    return (
+      <div
+        key={s.id}
+        className="rounded-2xl border border-slate-200 bg-white p-5"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-black text-slate-900">
+              {s.name}
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              {s.mode === "complete"
+                ? "Inventario completo"
+                : `Categoría: ${s.category}`}
+              {" · "}
+              Responsable: {s.responsible}
+            </p>
+          </div>
+
+          <span className={`rounded-full px-3 py-2 text-xs font-bold ${status.color}`}>
+            {status.label}
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            ["Variantes", s.totalVariants],
+            ["Contadas", s.countedVariants],
+            ["Con diferencias", s.adjustedVariants],
+            ["Unidades de diferencia", s.adjustedUnits]
+          ].map(([title, value]) => (
+            <div
+              key={title}
+              className="rounded-xl bg-slate-50 p-3"
+            >
+              <p className="text-xs text-slate-500">
+                {title}
+              </p>
+              <p className="mt-1 text-xl font-black">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t pt-4">
+          <div className="space-y-1 text-xs text-slate-500">
+            <p>Creación: {formatDate(s.created_at)}</p>
+            {s.closed_at && (
+              <p>Cierre: {formatDate(s.closed_at)}</p>
+            )}
+            {s.applied_at && (
+              <p>Aplicación: {formatDate(s.applied_at)}</p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            className={`${btn} bg-slate-900 text-white`}
+            onClick={async () => {
+              try {
+                await loadSession(s.id);
+              } catch (e) {
+                notifyError(e);
+              }
+            }}
+          >
+            Ver detalle
+          </button>
+        </div>
+      </div>
+    );
+  })}
+</div>
       </section>
     </> : <>
       <section className="rounded-3xl border bg-white p-5">
