@@ -15,11 +15,20 @@ const movementLabel = (movement) => {
   return movement.movement_type || "No registrado";
 };
 
-function DetailField({ label, value }) {
+const countSessionName = (movement) => {
+  if (!movement.physical_count_session_id) return "No corresponde";
+  // Los ajustes existentes guardan el nombre en las observaciones.
+  const match = String(movement.notes || "").match(/ajuste por conteo f[ií]sico\s*:\s*(.+)/i);
+  return match?.[1]?.trim() || "Sesión de conteo físico";
+};
+
+function DetailField({ label, value, emphasize = false }) {
   return (
-    <div className="min-w-0 rounded-xl bg-slate-50 p-4">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 break-words font-semibold text-slate-900">{value ?? "No registrado"}</p>
+    <div className="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5">
+      <p className="text-[11px] leading-4 text-slate-500">{label}</p>
+      <p className={`mt-0.5 break-words text-sm font-semibold leading-5 ${emphasize ? "text-pink-600" : "text-slate-900"}`}>
+        {value ?? "No registrado"}
+      </p>
     </div>
   );
 }
@@ -33,9 +42,13 @@ function MovementDetailModal({ movement, onClose }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
+  const quantity = signedQuantity(movement);
+  const sessionName = countSessionName(movement);
+  const isCount = Boolean(movement.physical_count_session_id);
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3 sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -44,14 +57,14 @@ function MovementDetailModal({ movement, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="movement-detail-title"
-        className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
+        className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
       >
-        <div className="mb-5 flex items-start justify-between gap-4">
+        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
           <div>
-            <h2 id="movement-detail-title" className="text-xl font-bold text-slate-900">
+            <h2 id="movement-detail-title" className="text-lg font-bold text-slate-900">
               Detalle del movimiento
             </h2>
-            <p className="text-sm text-slate-500">Consulta y trazabilidad del inventario</p>
+            <p className="text-xs text-slate-500">Consulta y trazabilidad del inventario</p>
           </div>
           <button
             type="button"
@@ -61,56 +74,65 @@ function MovementDetailModal({ movement, onClose }) {
           >
             ✕
           </button>
+        </header>
+
+        <div className="min-h-0 overflow-y-auto px-4 py-3 sm:px-5">
+          <div className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-slate-200 px-3 py-2.5">
+            <div className="min-w-0">
+              <p className="font-bold text-slate-900">
+                {movement.products?.name || "Producto desconocido"}
+              </p>
+              <p className="text-xs text-slate-500">
+                {movement.product_variants?.size || "Talla no registrada"}
+              </p>
+            </div>
+            <div className="text-left text-xs text-slate-500 sm:text-right">
+              <p>{formatearFechaHoraChile(movement.created_at)}</p>
+              <p title={String(movement.id)} className="mt-0.5">ID: {String(movement.id).slice(0, 8)}…</p>
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <DetailField label="Movimiento" value={movementLabel(movement)} />
+            <DetailField label="Cantidad" value={`${quantity > 0 ? "+" : ""}${quantity}`} emphasize />
+            <DetailField label="Stock anterior" value={movement.stock_before} />
+            <DetailField label="Stock posterior" value={movement.stock_after} />
+          </div>
+
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <DetailField label="Documento" value={movement.document_number || "No registrado"} />
+            <DetailField label="Orden asociada" value={movement.order_id ? `#${movement.order_id}` : "No registrado"} />
+            <DetailField label="Medio de pago" value={movement.payment_method || "No registrado"} />
+          </div>
+
+          {isCount && (
+            <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <p className="text-[11px] text-amber-800">Sesión de conteo físico</p>
+              <p className="text-sm font-semibold text-slate-900">{sessionName}</p>
+              <p className="mt-0.5 text-[11px] text-slate-500" title={movement.physical_count_session_id}>
+                Referencia: {String(movement.physical_count_session_id).slice(0, 8)}…
+              </p>
+            </div>
+          )}
+
+          <div className="mt-2 rounded-xl border border-slate-200 px-3 py-2.5">
+            <p className="text-xs text-slate-500">Observaciones</p>
+            <p className="mt-0.5 whitespace-pre-wrap break-words text-sm font-medium text-slate-900">
+              {movement.notes || "Sin observaciones"}
+            </p>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-lg font-bold text-slate-900">
-            {movement.products?.name || "Producto desconocido"}
-          </p>
-          <p className="text-sm text-slate-500">
-            {movement.product_variants?.size || "Talla no registrada"}
-          </p>
-          <p className="mt-2 text-xs text-slate-500">
-            Movimiento #{movement.id} · {formatearFechaHoraChile(movement.created_at)}
-          </p>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <DetailField label="Tipo de movimiento" value={movementLabel(movement)} />
-          <DetailField
-            label="Cantidad"
-            value={`${signedQuantity(movement) > 0 ? "+" : ""}${signedQuantity(movement)}`}
-          />
-          <DetailField label="Stock anterior" value={movement.stock_before} />
-          <DetailField label="Stock posterior" value={movement.stock_after} />
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <DetailField label="Documento" value={movement.document_number || null} />
-          <DetailField label="Orden asociada" value={movement.order_id ? `#${movement.order_id}` : null} />
-          <DetailField label="Medio de pago" value={movement.payment_method || null} />
-          <DetailField label="Sesión de conteo físico" value={movement.physical_count_session_id || "No corresponde"} />
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-slate-200 p-4">
-          <p className="text-sm text-slate-500">Observaciones</p>
-          <p className="mt-1 whitespace-pre-wrap break-words text-sm font-medium text-slate-900">
-            {movement.notes || "Sin observaciones"}
-          </p>
-        </div>
-
-        <p className="mt-4 text-xs text-slate-500">
-          Registro de solo lectura. Los datos no registrados se muestran como tales.
-        </p>
-        <div className="mt-5 flex justify-end">
+        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 sm:px-5">
+          <p className="text-xs text-slate-500">Registro de solo lectura</p>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-700"
+            className="rounded-xl bg-slate-900 px-5 py-2 font-semibold text-white hover:bg-slate-700"
           >
             Cerrar
           </button>
-        </div>
+        </footer>
       </section>
     </div>
   );
