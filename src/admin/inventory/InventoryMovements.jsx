@@ -160,32 +160,50 @@ export default function InventoryMovements() {
   )}
 </td>
 
-                  <td className="px-4 py-3">
-  {m.movement_type === "PURCHASE" ? (
+
+<td className="px-4 py-3">
+  {m.physical_count_session_id ? (
+    <span className="font-semibold text-amber-700">
+      Ajuste por conteo físico
+    </span>
+  ) : m.movement_type === "PURCHASE" ? (
     <span className="font-semibold text-green-600">
-      🟢 Entrada
+      Entrada
     </span>
   ) : m.movement_type === "SALE" ? (
     <span className="font-semibold text-red-600">
-      🔴 Salida
+      Salida
     </span>
   ) : (
     <span>{m.movement_type || "—"}</span>
   )}
 </td>
 
-                  <td className="px-4 py-3 font-semibold">
-                    <span
-  className={
-    m.movement_type === "SALE"
-      ? "font-semibold text-red-600"
-      : "font-semibold text-green-600"
-  }
->
-  {m.movement_type === "SALE" ? "-" : "+"}
-  {m.quantity ?? 0}
-</span>
-                  </td>
+                  
+<td className="px-4 py-3 font-semibold">
+  {(() => {
+    const quantity = Number(m.quantity ?? 0);
+    const signedQuantity =
+      m.movement_type === "SALE"
+        ? -Math.abs(quantity)
+        : quantity;
+
+    return (
+      <span
+        className={
+          signedQuantity < 0
+            ? "text-red-600"
+            : signedQuantity > 0
+              ? "text-green-600"
+              : "text-slate-500"
+        }
+      >
+        {signedQuantity > 0 ? "+" : ""}
+        {signedQuantity}
+      </span>
+    );
+  })()}
+</td>
 
 <td className="px-4 py-3 font-semibold">
   {m.stock_before ?? "—"} → {m.stock_after ?? "—"}
@@ -193,9 +211,17 @@ export default function InventoryMovements() {
 
 <td className="px-4 py-3">
   <div className="font-medium">
-    {m.document_number
-      ? `Doc. ${m.document_number}`
-      : "Sin documento"}
+
+{m.physical_count_session_id ? (
+  <span className="font-semibold text-amber-700">
+    Conteo físico
+  </span>
+) : m.document_number ? (
+  `Doc. ${m.document_number}`
+) : (
+  "Sin documento"
+)}
+
   </div>
 
   {m.order_id && (
