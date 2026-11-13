@@ -66,6 +66,14 @@ const modules = [
         color: "from-violet-500 to-fuchsia-600",
     },
     {
+      title: "Reportes de Inventario",
+      description:
+        "Analizar existencias, valorización y alertas de stock.",
+      icon: "📈",
+      to: "/admin/inventario/reportes",
+      color: "from-violet-500 to-indigo-600",
+    },
+    {
         title: "Proveedores",
         description: "Administrar proveedores, contactos y empresas.",
         icon: "🤝",
