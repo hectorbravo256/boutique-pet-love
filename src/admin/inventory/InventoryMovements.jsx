@@ -4,7 +4,14 @@ import useInventoryMovements from "../shared/hooks/useInventoryMovements";
 import { formatearFechaHoraChile } from "../utils/fechaChile";
 
 export default function InventoryMovements() {
-  const { movimientos, loading, error, reload } = useInventoryMovements();
+  
+const {
+  movimientos, loading, error, reload,
+  page, setPage, type, setType,
+  from, setFrom, to, setTo,
+  total, totalPages, pageSize
+} = useInventoryMovements();
+
 
   if (loading) {
     return (
@@ -118,6 +125,75 @@ export default function InventoryMovements() {
           Actualizar
         </button>
       </div>
+
+      
+<div className="mb-5 flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4">
+  <div>
+    <label className="mb-1 block text-sm font-semibold">
+      Tipo de movimiento
+    </label>
+    <select
+      value={type}
+      onChange={(e) => {
+        setType(e.target.value);
+        setPage(1);
+      }}
+      className="rounded-lg border px-3 py-2"
+    >
+      <option value="all">Todos</option>
+      <option value="purchase">Entradas</option>
+      <option value="sale">Salidas</option>
+      <option value="adjustment">Ajustes por conteo</option>
+    </select>
+  </div>
+
+  <div>
+    <label className="mb-1 block text-sm font-semibold">
+      Desde
+    </label>
+    <input
+      type="date"
+      value={from}
+      onChange={(e) => {
+        setFrom(e.target.value);
+        setPage(1);
+      }}
+      className="rounded-lg border px-3 py-2"
+    />
+  </div>
+
+  <div>
+    <label className="mb-1 block text-sm font-semibold">
+      Hasta
+    </label>
+    <input
+      type="date"
+      value={to}
+      onChange={(e) => {
+        setTo(e.target.value);
+        setPage(1);
+      }}
+      className="rounded-lg border px-3 py-2"
+    />
+  </div>
+
+  <button
+    type="button"
+    onClick={() => {
+      setType("all");
+      setFrom("");
+      setTo("");
+      setPage(1);
+    }}
+    className="rounded-lg border px-4 py-2"
+  >
+    Limpiar filtros
+  </button>
+</div>
+
+<div className="mb-3 text-sm text-slate-500">
+  {total} movimientos encontrados
+</div>
 
       {movimientos.length === 0 ? (
         <div className="rounded-xl border bg-white p-8 text-center text-gray-500">
@@ -245,6 +321,39 @@ export default function InventoryMovements() {
           </table>
         </div>
       )}
+      
+<div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+  <span className="text-sm text-slate-500">
+    {total === 0
+      ? "Sin resultados"
+      : `Mostrando ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} de ${total}`}
+  </span>
+
+  <div className="flex items-center gap-3">
+    <button
+      type="button"
+      disabled={page <= 1 || loading}
+      onClick={() => setPage(p => Math.max(1, p - 1))}
+      className="rounded-lg border px-4 py-2 disabled:opacity-40"
+    >
+      Anterior
+    </button>
+
+    <span className="text-sm font-semibold">
+      Página {page} de {totalPages}
+    </span>
+
+    <button
+      type="button"
+      disabled={page >= totalPages || loading}
+      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+      className="rounded-lg border px-4 py-2 disabled:opacity-40"
+    >
+      Siguiente
+    </button>
+  </div>
+</div>
+
     </div>
   );
 }
