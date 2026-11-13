@@ -6,6 +6,51 @@ const cls = "rounded-xl border border-slate-300 px-4 py-3 outline-none focus:bor
 const btn = "rounded-xl px-4 py-3 font-semibold disabled:opacity-40";
 const label = value => String(value ?? "").replace(/^Talla\s+/i, "Talla ");
 
+const SIZE_ORDER = {
+  "2XS": 0, "XXS": 0,
+  "XS": 1,
+  "S": 2,
+  "M": 3,
+  "L": 4,
+  "XL": 5,
+  "2XL": 6, "XXL": 6,
+  "3XL": 7, "XXXL": 7,
+  "4XL": 8,
+  "5XL": 9,
+  "6XL": 10,
+  "7XL": 11,
+  "8XL": 12,
+  "UNICA": 13, "ÚNICA": 13
+};
+
+const sizeIndex = value => {
+  const size = String(value ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/^TALLA\s+/, "")
+    .replace(/\s+/g, "");
+
+  if (size === "ÚNICA" || size === "UNICA") return 13;
+
+  const numeric = /^(?:T)?(\d{1,2})$/.exec(size);
+  if (numeric) return Number(numeric[1]);
+
+  return SIZE_ORDER[size] ?? 99;
+};
+
+const sortInventory = (a, b) =>
+  String(a.product_name ?? "").localeCompare(
+    String(b.product_name ?? ""),
+    "es",
+    { sensitivity: "base" }
+  ) ||
+  sizeIndex(a.size) - sizeIndex(b.size) ||
+  String(a.size ?? "").localeCompare(
+    String(b.size ?? ""), "es"
+  ) ||
+  Number(a.variant_id) - Number(b.variant_id);
+
+
 export default function PhysicalInventoryCount() {
   const [sessions, setSessions] = useState([]);
   const [session, setSession] = useState(null);
@@ -34,19 +79,59 @@ export default function PhysicalInventoryCount() {
     if (e) throw e;
     setSessions(data || []);
   };
-  const loadSession = async id => {
-    const [{ data: s, error: se }, { data: rows, error: re }] = await Promise.all([
-      supabase.from("physical_count_sessions").select("*").eq("id", id).single(),
-      supabase.from("physical_count_items").select("*").eq("session_id", id).order("product_name")
-    ]);
-    if (se || re) throw se || re;
-    sessionRef.current = s;
-    itemsRef.current = rows || [];
-    setSession(s);
-    setItems(rows || []);
-    setError("");
-    setMessage("");
-  };
+
+const loadSession = async id => {
+  const [
+    { data: s, error: se },
+    { data: rows, error: re },
+    { data: images, error: ie }
+  ] = await Promise.all([
+    supabase
+      .from("physical_count_sessions")
+      .select("*")
+      .eq("id", id)
+      .single(),
+
+    supabase
+      .from("physical_count_items")
+      .select("*")
+      .eq("session_id", id)
+      .order("product_name"),
+
+    supabase
+      .from("vw_inventory_master")
+      .select("variant_id, image")
+  ]);
+
+  if (se || re) throw se || re;
+
+  if (ie) {
+    console.warn("No se pudieron cargar imágenes:", ie);
+  }
+
+  const imageMap = new Map(
+    (images || []).map(v => [
+      String(v.variant_id),
+      v.image
+    ])
+  );
+
+  const orderedRows = (rows || [])
+    .map(item => ({
+      ...item,
+      image: imageMap.get(String(item.variant_id)) || null
+    }))
+    .sort(sortInventory);
+
+  sessionRef.current = s;
+  itemsRef.current = orderedRows;
+
+  setSession(s);
+  setItems(orderedRows);
+  setError("");
+  setMessage("");
+};
+
   useEffect(() => {
     let active = true;
     (async () => {
@@ -219,7 +304,35 @@ export default function PhysicalInventoryCount() {
       <section className="rounded-3xl border bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Resultado del conteo</h2><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCSV} className={`${btn} border`}>Descargar CSV</button>{session.status !== "closed" && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}</div></div>
         <div className="mt-4 flex flex-wrap gap-3"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar producto..." className={cls}/><select value={only} onChange={e => setOnly(e.target.value)} className={cls}><option value="all">Todas las variantes</option><option value="pending">Pendientes</option><option value="differences">Con diferencias</option></select></div>
-        <div className="mt-4 overflow-x-auto rounded-xl border"><table className="w-full min-w-[750px] text-sm"><thead className="bg-slate-100 text-left"><tr>{["Producto", "Talla", "Sistema", "Físico", "Diferencia", "Estado"].map(h => <th key={h} className="p-3">{h}</th>)}</tr></thead><tbody>{visible.map(x => <tr key={x.variant_id} className="border-t"><td className="p-3 font-semibold">{x.product_name}<p className="text-xs font-normal text-slate-500">{x.category}</p></td><td className="p-3">{label(x.size)}</td><td className="p-3">{x.system_stock}</td><td className="p-3">{session.status === "closed" ? (x.counted_stock ?? "—") : <div className="flex items-center gap-2"><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Math.max(0,Number(x.counted_stock ?? 0)-1)); setBusy(false); }}>−</button><input aria-label={`Conteo ${x.product_name} ${x.size}`} type="number" min="0" step="1" value={x.counted_stock ?? ""} placeholder="Pend." onChange={e => { const val=e.target.value; if (val === "") return; const n=Number(val); if(Number.isSafeInteger(n) && n>=0) { setBusy(true); saveCount(x.variant_id,n).finally(()=>setBusy(false)); } }} className="w-20 rounded border px-2 py-2"/><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Number(x.counted_stock ?? 0)+1); setBusy(false); }}>+</button>{x.counted_stock === null && <button type="button" disabled={busy} onClick={async () => { setBusy(true); await saveCount(x.variant_id,0); setBusy(false); }} className="text-xs text-pink-600 underline">Marcar 0</button>}</div>}</td><td className={`p-3 font-bold ${x.counted_stock !== null && x.counted_stock !== x.system_stock ? "text-red-600" : "text-green-700"}`}>{x.counted_stock === null ? "—" : (x.counted_stock-x.system_stock>0?"+":"")+(x.counted_stock-x.system_stock)}</td><td className="p-3">{x.counted_stock === null ? "Pendiente" : "Contado"}</td></tr>)}</tbody></table></div>
+        <div className="mt-4 overflow-x-auto rounded-xl border"><table className="w-full min-w-[750px] text-sm"><thead className="bg-slate-100 text-left"><tr>{["Producto", "Talla", "Sistema", "Físico", "Diferencia", "Estado"].map(h => <th key={h} className="p-3">{h}</th>)}</tr></thead><tbody>{visible.map(x => <tr key={x.variant_id} className="border-t">
+          
+<td className="p-3">
+  <div className="flex min-w-[220px] items-center gap-3">
+    {x.image ? (
+      <img
+        src={x.image}
+        alt={x.product_name}
+        loading="lazy"
+        className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover"
+      />
+    ) : (
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl">
+        📦
+      </div>
+    )}
+
+    <div className="min-w-0">
+      <p className="font-semibold text-slate-900">
+        {x.product_name}
+      </p>
+      <p className="text-xs text-slate-500">
+        {x.category}
+      </p>
+    </div>
+  </div>
+</td>
+
+          <td className="p-3">{label(x.size)}</td><td className="p-3">{x.system_stock}</td><td className="p-3">{session.status === "closed" ? (x.counted_stock ?? "—") : <div className="flex items-center gap-2"><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Math.max(0,Number(x.counted_stock ?? 0)-1)); setBusy(false); }}>−</button><input aria-label={`Conteo ${x.product_name} ${x.size}`} type="number" min="0" step="1" value={x.counted_stock ?? ""} placeholder="Pend." onChange={e => { const val=e.target.value; if (val === "") return; const n=Number(val); if(Number.isSafeInteger(n) && n>=0) { setBusy(true); saveCount(x.variant_id,n).finally(()=>setBusy(false)); } }} className="w-20 rounded border px-2 py-2"/><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Number(x.counted_stock ?? 0)+1); setBusy(false); }}>+</button>{x.counted_stock === null && <button type="button" disabled={busy} onClick={async () => { setBusy(true); await saveCount(x.variant_id,0); setBusy(false); }} className="text-xs text-pink-600 underline">Marcar 0</button>}</div>}</td><td className={`p-3 font-bold ${x.counted_stock !== null && x.counted_stock !== x.system_stock ? "text-red-600" : "text-green-700"}`}>{x.counted_stock === null ? "—" : (x.counted_stock-x.system_stock>0?"+":"")+(x.counted_stock-x.system_stock)}</td><td className="p-3">{x.counted_stock === null ? "Pendiente" : "Contado"}</td></tr>)}</tbody></table></div>
         <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Las sesiones guardan una referencia del stock al momento de su creación. Cerrar una sesión no modifica las existencias reales. Para aplicar ajustes se requerirá una fase posterior con revisión y auditoría.</p>
       </section>
     </>}
