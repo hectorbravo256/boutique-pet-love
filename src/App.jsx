@@ -35,7 +35,7 @@ const InventoryMovements = lazy(() => import("./admin/inventory/InventoryMovemen
 const RepairsPage = lazy(() => import("./admin/inventory/repairs/RepairsPage"));
 const PaketPage = lazy(() => import("./admin/inventory/paket/PaketPage"));
 const BarcodeLabelsPage = lazy(() => import("./admin/inventory/barcodes/BarcodeLabelsPage"));
-
+const InventoryReports = lazy(() => import("./admin/inventory/InventoryReports"));
 
 
 /* ================= PRODUCTOS ================= */
@@ -1373,6 +1373,14 @@ export default function App() {
   element={
     <Suspense fallback={<div>Cargando...</div>}>
       <BarcodeLabelsPage />
+    </Suspense>
+  }
+/>
+	<Route
+  path="/admin/inventario/reportes"
+  element={
+    <Suspense fallback={<div>Cargando reportes...</div>}>
+      <InventoryReports />
     </Suspense>
   }
 />
