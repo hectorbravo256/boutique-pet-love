@@ -277,7 +277,11 @@ const applyAdjustments = async () => {
 };
 
   const closeSession = async () => {
-    if (!session || busy || session.status === "closed") return;
+    if (
+  !session ||
+  busy ||
+  !["draft", "in_progress"].includes(session.status)
+) return;
     if (counted.length !== items.length) {
       setError(`Hay ${items.length - counted.length} variantes sin contar. Registra 0 explícitamente si fueron revisadas.`);
       return;
@@ -345,9 +349,9 @@ const applyAdjustments = async () => {
       </section>}
       <section className="rounded-3xl border bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Resultado del conteo</h2><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCSV} className={`${btn} border`}>Descargar CSV</button>
-          {session.status !== "closed" && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}
+          {!["closed", "applied"].includes(session.status) && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}
           
-{!["closed", "applied"].includes(session.status) && (
+{session.status === "closed" && (
   <button
     type="button"
     disabled={busy}
