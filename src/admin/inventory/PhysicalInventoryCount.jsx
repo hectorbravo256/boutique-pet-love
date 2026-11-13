@@ -163,7 +163,7 @@ const loadSession = async id => {
 
   const saveCount = async (id, qty) => {
     const s = sessionRef.current;
-    if (!s \|\| ["closed", "applied"].includes(s.status)) return;
+    if (!s || ["closed", "applied"].includes(s.status)) return;
     if (!Number.isSafeInteger(qty) || qty < 0) return;
     const previous = itemsRef.current;
     const next = previous.map(x => String(x.variant_id) === String(id)
