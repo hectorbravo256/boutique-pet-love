@@ -95,31 +95,67 @@ const stockCritico =
     // MOVIMIENTOS
     //---------------------------------------------------------
 
-    async getMovements(limit = 50) {
 
-        const { data, error } = await ApiClient.db
+async getMovements({
+  page = 1,
+  pageSize = 20,
+  type = "all",
+  from = "",
+  to = ""
+} = {}) {
+  const start = (page - 1) * pageSize;
 
-            .from("inventory_movements")
+  let query = ApiClient.db
+    .from("inventory_movements")
+    .select(`
+      *,
+      products(name),
+      product_variants(size)
+    `, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
 
-            .select(`
-                *,
-                products(name),
-                product_variants(size)
-            `)
+  if (type === "purchase") {
+    query = query.eq("movement_type", "PURCHASE");
+  } else if (type === "sale") {
+    query = query.eq("movement_type", "SALE");
+  } else if (type === "adjustment") {
+    query = query.not(
+      "physical_count_session_id",
+      "is",
+      null
+    );
+  }
 
-            .order("created_at", {
+  if (from) {
+    query = query.gte(
+      "created_at",
+      new Date(`${from}T00:00:00`).toISOString()
+    );
+  }
 
-                ascending: false
+  if (to) {
+    const nextDay = new Date(`${to}T00:00:00`);
+    nextDay.setDate(nextDay.getDate() + 1);
 
-            })
+    query = query.lt(
+      "created_at",
+      nextDay.toISOString()
+    );
+  }
 
-            .limit(limit);
+  const { data, count, error } = await query.range(
+    start,
+    start + pageSize - 1
+  );
 
-        if (error) throw error;
+  if (error) throw error;
 
-        return data || [];
-
-    },
+  return {
+    movimientos: data || [],
+    total: count || 0
+  };
+},
 
     //---------------------------------------------------------
     // PRODUCTOS ACTIVOS
