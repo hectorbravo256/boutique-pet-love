@@ -101,6 +101,7 @@ export default function PhysicalInventoryCount() {
 
   const notifyError = e => { console.error(e); setError(e?.message || String(e)); };
 
+
 const loadSessions = async () => {
   const { data, error: e } = await supabase
     .from("physical_count_sessions")
@@ -109,41 +110,9 @@ const loadSessions = async () => {
 
   if (e) throw e;
 
-  const result = await Promise.all(
-    (data || []).map(async s => {
-      const { data: rows, error: itemsError } = await supabase
-        .from("physical_count_items")
-        .select("system_stock, counted_stock")
-        .eq("session_id", s.id);
-
-      if (itemsError) throw itemsError;
-
-      const counted = (rows || []).filter(
-        x => x.counted_stock !== null
-      );
-
-      const changed = counted.filter(
-        x => Number(x.counted_stock) !== Number(x.system_stock)
-      );
-
-      return {
-        ...s,
-        totalVariants: (rows || []).length,
-        countedVariants: counted.length,
-        adjustedVariants: changed.length,
-        adjustedUnits: changed.reduce(
-          (sum, x) =>
-            sum + Math.abs(
-              Number(x.counted_stock) - Number(x.system_stock)
-            ),
-          0
-        )
-      };
-    })
-  );
-
-  setSessions(result);
+  setSessions(data || []);
 };
+
 
 const loadSession = async id => {
   const [
