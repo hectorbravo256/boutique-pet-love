@@ -163,7 +163,7 @@ const loadSession = async id => {
 
   const saveCount = async (id, qty) => {
     const s = sessionRef.current;
-    if (!s || s.status === "closed") return;
+    if (!s \|\| ["closed", "applied"].includes(s.status)) return;
     if (!Number.isSafeInteger(qty) || qty < 0) return;
     const previous = itemsRef.current;
     const next = previous.map(x => String(x.variant_id) === String(id)
@@ -234,6 +234,47 @@ const loadSession = async id => {
     const url = URL.createObjectURL(blob); const a = document.createElement("a");
     a.href = url; a.download = `conteo-${session.id}.csv`; a.click(); URL.revokeObjectURL(url);
   };
+  
+const applyAdjustments = async () => {
+  if (!session || session.status !== "closed" || busy) return;
+
+  const changes = items.filter(
+    x => x.counted_stock !== null &&
+         x.counted_stock !== x.system_stock
+  );
+
+  const confirmed = window.confirm(
+    `¿Aplicar ${changes.length} ajustes de inventario?\n\n` +
+    "Se actualizará el stock real y se registrarán los movimientos.\n" +
+    "Esta operación no se puede repetir."
+  );
+
+  if (!confirmed) return;
+
+  setBusy(true);
+  setError("");
+
+  try {
+    const { data, error: e } = await supabase.rpc(
+      "apply_physical_count",
+      { p_session_id: session.id }
+    );
+
+    if (e) throw e;
+
+    await loadSession(session.id);
+    await loadSessions();
+
+    setMessage(
+      `✓ Ajustes aplicados: ${data?.adjusted_variants ?? 0} variantes actualizadas.`
+    );
+  } catch (e) {
+    notifyError(e);
+  } finally {
+    setBusy(false);
+  }
+};
+
   const closeSession = async () => {
     if (!session || busy || session.status === "closed") return;
     if (counted.length !== items.length) {
@@ -297,12 +338,32 @@ const loadSession = async id => {
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{[["Variantes totales",items.length],["Contadas",counted.length],["Pendientes",items.length-counted.length],["Diferencias",differences.length]].map(([k,v]) => <div key={k} className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">{k}</p><p className="text-2xl font-black">{v}</p></div>)}</div>
       </section>
-      {session.status !== "closed" && <section className="rounded-3xl border bg-white p-5">
+      {!["closed", "applied"].includes(session.status) && <section className="rounded-3xl border bg-white p-5">
         <h2 className="text-lg font-black">Escanear código de barras</h2><p className="text-sm text-slate-500">Cada escaneo suma una unidad y se guarda en Supabase.</p>
         <form onSubmit={scan} className="mt-3 flex gap-3"><input ref={inputRef} autoFocus value={code} onChange={e => setCode(e.target.value)} placeholder="BPL-00000001" className={`${cls} min-w-0 flex-1`}/><button disabled={busy || !code.trim()} className={`${btn} bg-pink-500 text-white`}>Agregar</button></form>
       </section>}
       <section className="rounded-3xl border bg-white p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Resultado del conteo</h2><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCSV} className={`${btn} border`}>Descargar CSV</button>{session.status !== "closed" && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}</div></div>
+        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Resultado del conteo</h2><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCSV} className={`${btn} border`}>Descargar CSV</button>
+          {session.status !== "closed" && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}
+          
+{session.status === "closed" && (
+  <button
+    type="button"
+    disabled={busy}
+    onClick={applyAdjustments}
+    className={`${btn} bg-emerald-600 text-white`}
+  >
+    Aprobar y aplicar ajustes
+  </button>
+)}
+
+{session.status === "applied" && (
+  <span className="rounded-xl bg-green-50 px-4 py-3 font-bold text-green-700">
+    ✓ Ajustes aplicados
+  </span>
+)}
+
+        </div></div>
         <div className="mt-4 flex flex-wrap gap-3"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar producto..." className={cls}/><select value={only} onChange={e => setOnly(e.target.value)} className={cls}><option value="all">Todas las variantes</option><option value="pending">Pendientes</option><option value="differences">Con diferencias</option></select></div>
         <div className="mt-4 overflow-x-auto rounded-xl border"><table className="w-full min-w-[750px] text-sm"><thead className="bg-slate-100 text-left"><tr>{["Producto", "Talla", "Sistema", "Físico", "Diferencia", "Estado"].map(h => <th key={h} className="p-3">{h}</th>)}</tr></thead><tbody>{visible.map(x => <tr key={x.variant_id} className="border-t">
           
@@ -332,7 +393,7 @@ const loadSession = async id => {
   </div>
 </td>
 
-          <td className="p-3">{label(x.size)}</td><td className="p-3">{x.system_stock}</td><td className="p-3">{session.status === "closed" ? (x.counted_stock ?? "—") : <div className="flex items-center gap-2"><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Math.max(0,Number(x.counted_stock ?? 0)-1)); setBusy(false); }}>−</button><input aria-label={`Conteo ${x.product_name} ${x.size}`} type="number" min="0" step="1" value={x.counted_stock ?? ""} placeholder="Pend." onChange={e => { const val=e.target.value; if (val === "") return; const n=Number(val); if(Number.isSafeInteger(n) && n>=0) { setBusy(true); saveCount(x.variant_id,n).finally(()=>setBusy(false)); } }} className="w-20 rounded border px-2 py-2"/><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Number(x.counted_stock ?? 0)+1); setBusy(false); }}>+</button>{x.counted_stock === null && <button type="button" disabled={busy} onClick={async () => { setBusy(true); await saveCount(x.variant_id,0); setBusy(false); }} className="text-xs text-pink-600 underline">Marcar 0</button>}</div>}</td><td className={`p-3 font-bold ${x.counted_stock !== null && x.counted_stock !== x.system_stock ? "text-red-600" : "text-green-700"}`}>{x.counted_stock === null ? "—" : (x.counted_stock-x.system_stock>0?"+":"")+(x.counted_stock-x.system_stock)}</td><td className="p-3">{x.counted_stock === null ? "Pendiente" : "Contado"}</td></tr>)}</tbody></table></div>
+          <td className="p-3">{label(x.size)}</td><td className="p-3">{x.system_stock}</td><td className="p-3">{["closed", "applied"].includes(session.status) ? (x.counted_stock ?? "—") : <div className="flex items-center gap-2"><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Math.max(0,Number(x.counted_stock ?? 0)-1)); setBusy(false); }}>−</button><input aria-label={`Conteo ${x.product_name} ${x.size}`} type="number" min="0" step="1" value={x.counted_stock ?? ""} placeholder="Pend." onChange={e => { const val=e.target.value; if (val === "") return; const n=Number(val); if(Number.isSafeInteger(n) && n>=0) { setBusy(true); saveCount(x.variant_id,n).finally(()=>setBusy(false)); } }} className="w-20 rounded border px-2 py-2"/><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Number(x.counted_stock ?? 0)+1); setBusy(false); }}>+</button>{x.counted_stock === null && <button type="button" disabled={busy} onClick={async () => { setBusy(true); await saveCount(x.variant_id,0); setBusy(false); }} className="text-xs text-pink-600 underline">Marcar 0</button>}</div>}</td><td className={`p-3 font-bold ${x.counted_stock !== null && x.counted_stock !== x.system_stock ? "text-red-600" : "text-green-700"}`}>{x.counted_stock === null ? "—" : (x.counted_stock-x.system_stock>0?"+":"")+(x.counted_stock-x.system_stock)}</td><td className="p-3">{x.counted_stock === null ? "Pendiente" : "Contado"}</td></tr>)}</tbody></table></div>
         <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Las sesiones guardan una referencia del stock al momento de su creación. Cerrar una sesión no modifica las existencias reales. Para aplicar ajustes se requerirá una fase posterior con revisión y auditoría.</p>
       </section>
     </>}
