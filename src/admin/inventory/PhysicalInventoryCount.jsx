@@ -404,7 +404,8 @@ const applyAdjustments = async () => {
   </p>
 )}
 
-<div className="space-y-4">
+
+<div className="space-y-3">
   {sessions.map(s => {
     const status = SESSION_STATUS[s.status] || {
       label: s.status,
@@ -414,58 +415,32 @@ const applyAdjustments = async () => {
     return (
       <div
         key={s.id}
-        className="rounded-2xl border border-slate-200 bg-white p-5"
+        className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4"
       >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-black text-slate-900">
-              {s.name}
-            </h3>
-            <p className="mt-1 text-sm text-slate-500">
-              {s.mode === "complete"
-                ? "Inventario completo"
-                : `Categoría: ${s.category}`}
-              {" · "}
-              Responsable: {s.responsible}
-            </p>
-          </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-black text-slate-900">
+            {s.name}
+          </h3>
 
-          <span className={`rounded-full px-3 py-2 text-xs font-bold ${status.color}`}>
+          <p className="mt-1 text-sm text-slate-500">
+            {s.mode === "complete"
+              ? "Inventario completo"
+              : `Categoría: ${s.category}`}
+            {" · "}
+            Responsable: {s.responsible}
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Creado: {formatDate(s.created_at)}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className={`rounded-full px-3 py-2 text-xs font-bold ${status.color}`}
+          >
             {status.label}
           </span>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            ["Variantes", s.totalVariants],
-            ["Contadas", s.countedVariants],
-            ["Con diferencias", s.adjustedVariants],
-            ["Unidades de diferencia", s.adjustedUnits]
-          ].map(([title, value]) => (
-            <div
-              key={title}
-              className="rounded-xl bg-slate-50 p-3"
-            >
-              <p className="text-xs text-slate-500">
-                {title}
-              </p>
-              <p className="mt-1 text-xl font-black">
-                {value}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-t pt-4">
-          <div className="space-y-1 text-xs text-slate-500">
-            <p>Creación: {formatDate(s.created_at)}</p>
-            {s.closed_at && (
-              <p>Cierre: {formatDate(s.closed_at)}</p>
-            )}
-            {s.applied_at && (
-              <p>Aplicación: {formatDate(s.applied_at)}</p>
-            )}
-          </div>
 
           <button
             type="button"
@@ -485,6 +460,7 @@ const applyAdjustments = async () => {
     );
   })}
 </div>
+
       </section>
     </> : <>
       <section className="rounded-3xl border bg-white p-5">
