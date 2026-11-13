@@ -1,437 +1,227 @@
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 
+const cls = "rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-pink-500";
+const btn = "rounded-xl px-4 py-3 font-semibold disabled:opacity-40";
+const label = value => String(value ?? "").replace(/^Talla\s+/i, "Talla ");
+
 export default function PhysicalInventoryCount() {
-    const [inventory, setInventory] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [codigo, setCodigo] = useState("");
-    const [conteos, setConteos] = useState({});
-    const [mensaje, setMensaje] = useState("");
-    const [error, setError] = useState("");
-    const [buscando, setBuscando] = useState(false);
-    const [categoria, setCategoria] = useState("TODAS");
-    const [busqueda, setBusqueda] = useState("");
+  const [sessions, setSessions] = useState([]);
+  const [session, setSession] = useState(null);
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [name, setName] = useState("");
+  const [responsible, setResponsible] = useState("");
+  const [mode, setMode] = useState("complete");
+  const [category, setCategory] = useState("");
+  const [code, setCode] = useState("");
+  const [search, setSearch] = useState("");
+  const [only, setOnly] = useState("all");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const inputRef = useRef(null);
+  const lockRef = useRef(false);
+  const sessionRef = useRef(null);
+  const itemsRef = useRef([]);
+  const pendingRef = useRef(Promise.resolve());
 
-    const inputRef = useRef(null);
-    const ocupadoRef = useRef(false);
+  const notifyError = e => { console.error(e); setError(e?.message || String(e)); };
+  const loadSessions = async () => {
+    const { data, error: e } = await supabase.from("physical_count_sessions")
+      .select("*").order("created_at", { ascending: false });
+    if (e) throw e;
+    setSessions(data || []);
+  };
+  const loadSession = async id => {
+    const [{ data: s, error: se }, { data: rows, error: re }] = await Promise.all([
+      supabase.from("physical_count_sessions").select("*").eq("id", id).single(),
+      supabase.from("physical_count_items").select("*").eq("session_id", id).order("product_name")
+    ]);
+    if (se || re) throw se || re;
+    sessionRef.current = s;
+    itemsRef.current = rows || [];
+    setSession(s);
+    setItems(rows || []);
+    setError("");
+    setMessage("");
+  };
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data, error: e } = await supabase.from("products").select("category");
+        if (e) throw e;
+        if (active) setCategories([...new Set((data || []).map(p => p.category).filter(Boolean))].sort());
+        await loadSessions();
+      } catch (e) { if (active) notifyError(e); }
+    })();
+    return () => { active = false; };
+  }, []);
 
-    useEffect(() => {
-        let activo = true;
+  const createSession = async e => {
+    e.preventDefault();
+    if (busy || !name.trim() || !responsible.trim() || (mode === "category" && !category)) return;
+    setBusy(true); setError("");
+    try {
+      const { data: id, error: e } = await supabase.rpc("create_physical_count", {
+        p_name: name.trim(), p_mode: mode, p_category: mode === "category" ? category : null,
+        p_responsible: responsible.trim()
+      });
+      if (e) throw e;
+      await loadSession(id);
+      await loadSessions();
+      setMessage("Sesión creada y guardada en Supabase.");
+    } catch (e) { notifyError(e); } finally { setBusy(false); }
+  };
 
-        async function cargar() {
-            const { data, error: err } = await supabase
-                .from("vw_inventory_master")
-                .select("*")
-                .order("product_name");
+  const saveCount = async (id, qty) => {
+    const s = sessionRef.current;
+    if (!s || s.status === "closed") return;
+    if (!Number.isSafeInteger(qty) || qty < 0) return;
+    const previous = itemsRef.current;
+    const next = previous.map(x => String(x.variant_id) === String(id)
+      ? { ...x, counted_stock: qty, counted_at: new Date().toISOString() } : x);
+    itemsRef.current = next;
+    setItems(next);
+    setMessage("Guardando conteo...");
+    // Cola serial: evita que dos escaneos del mismo producto se sobrescriban en la BD.
+    pendingRef.current = pendingRef.current.catch(() => {}).then(async () => {
+      const { data, error: e } = await supabase.from("physical_count_items")
+        .update({ counted_stock: qty, counted_at: new Date().toISOString() })
+        .eq("session_id", s.id).eq("variant_id", id).select("variant_id");
+      if (e) throw e;
+      if (!data?.length) throw new Error("No se guardó el conteo. Revisa permisos o estado de la sesión.");
+      if (s.status === "draft") {
+        const { data: updated, error: se } = await supabase.from("physical_count_sessions")
+          .update({ status: "in_progress", updated_at: new Date().toISOString() })
+          .eq("id", s.id).eq("status", "draft").select("*").maybeSingle();
+        if (se) throw se;
+        if (updated) { sessionRef.current = updated; setSession(updated); }
+      }
+      setMessage("✓ Conteo guardado en Supabase");
+    }).catch(async e => {
+      notifyError(e);
+      setMessage("⚠️ No se pudo guardar. Recargando valores de Supabase.");
+      try { await loadSession(s.id); } catch (loadError) { notifyError(loadError); }
+      throw e;
+    });
+    try { await pendingRef.current; } catch { /* Error mostrado arriba */ }
+  };
 
-            if (!activo) return;
+  const scan = async e => {
+    e.preventDefault();
+    const value = code.trim().toUpperCase();
+    if (!value || lockRef.current || !session || session.status === "closed") return;
+    lockRef.current = true; setBusy(true); setError("");
+    try {
+      // Los códigos de esta tienda se generan a partir del ID de variante.
+      const match = /^BPL-(\d{8})$/.exec(value);
+      if (!match) throw new Error(`Código no válido: ${value}`);
+      const id = String(Number(match[1]));
+      const row = itemsRef.current.find(x => String(x.variant_id) === id);
+      if (!row) throw new Error(`Código no incluido en esta sesión: ${value}`);
+      await saveCount(id, Number(row.counted_stock ?? 0) + 1);
+      setCode("");
+      setSearch(""); setOnly("all");
+    } catch (e) { notifyError(e); }
+    finally { setBusy(false); lockRef.current = false; inputRef.current?.focus(); }
+  };
 
-            if (err) {
-                setError(err.message);
-            } else {
-                setInventory(data || []);
-            }
+  const visible = useMemo(() => items.filter(x => {
+    const q = `${x.product_name} ${x.size} ${x.category}`.toLowerCase();
+    const diff = x.counted_stock !== null && x.counted_stock !== x.system_stock;
+    return q.includes(search.toLowerCase()) &&
+      (only === "all" || (only === "pending" && x.counted_stock === null) ||
+       (only === "differences" && diff));
+  }), [items, search, only]);
+  const counted = items.filter(x => x.counted_stock !== null);
+  const differences = counted.filter(x => x.counted_stock !== x.system_stock);
+  const exportCSV = () => {
+    const headers = ["Producto", "Categoria", "Talla", "ID Variante", "Stock Sistema", "Conteo Fisico", "Diferencia", "Estado"];
+    const escape = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = items.map(x => [x.product_name, x.category, x.size, x.variant_id, x.system_stock,
+      x.counted_stock ?? "", x.counted_stock === null ? "" : x.counted_stock - x.system_stock,
+      x.counted_stock === null ? "Pendiente" : "Contado"]);
+    const blob = new Blob(["\uFEFF" + [headers, ...rows].map(r => r.map(escape).join(";")).join("\r\n")],
+      { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = `conteo-${session.id}.csv`; a.click(); URL.revokeObjectURL(url);
+  };
+  const closeSession = async () => {
+    if (!session || busy || session.status === "closed") return;
+    if (counted.length !== items.length) {
+      setError(`Hay ${items.length - counted.length} variantes sin contar. Registra 0 explícitamente si fueron revisadas.`);
+      return;
+    }
+    if (!window.confirm("¿Cerrar la sesión? No se podrá editar después. Esto NO modifica el stock real.")) return;
+    setBusy(true);
+    try {
+      await pendingRef.current.catch(() => {});
+      const { data, error: e } = await supabase.from("physical_count_sessions")
+        .update({ status: "closed", closed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        .eq("id", session.id).in("status", ["draft", "in_progress"]).select("*").single();
+      if (e) throw e;
+      sessionRef.current = data; setSession(data); await loadSessions();
+      setMessage("Sesión cerrada. No se modificó el stock de productos.");
+    } catch (e) { notifyError(e); } finally { setBusy(false); }
+  };
 
-            setLoading(false);
-        }
-
-        cargar();
-        return () => { activo = false; };
-    }, []);
-
-    const inventarioPorId = useMemo(
-        () => new Map(
-            inventory.map(v => [String(v.variant_id), v])
-        ),
-        [inventory]
-    );
-
-    const filas = useMemo(() => {
-        return Object.entries(conteos)
-            .map(([id, cantidad]) => {
-                const item = inventarioPorId.get(id);
-                if (!item) return null;
-
-                const sistema = Number(item.stock || 0);
-                const fisico = Number(cantidad);
-
-                return {
-                    ...item,
-                    id,
-                    sistema,
-                    fisico,
-                    diferencia: fisico - sistema
-                };
-            })
-            .filter(Boolean)
-            .filter(item =>
-                (categoria === "TODAS" ||
-                    item.category === categoria) &&
-                `${item.product_name} ${item.size}`
-                    .toLowerCase()
-                    .includes(busqueda.toLowerCase())
-            )
-            .sort((a, b) =>
-                a.product_name.localeCompare(
-                    b.product_name, "es"
-                )
-            );
-    }, [conteos, inventarioPorId, categoria, busqueda]);
-
-    const categorias = useMemo(
-        () => [...new Set(
-            inventory.map(v => v.category).filter(Boolean)
-        )].sort(),
-        [inventory]
-    );
-
-    const resumen = useMemo(() => ({
-        variantes: filas.length,
-        unidades: filas.reduce((s, v) => s + v.fisico, 0),
-        diferencias: filas.filter(v => v.diferencia !== 0).length
-    }), [filas]);
-
-    const actualizarCantidad = (id, valor) => {
-        const numero = Number(valor);
-        if (!Number.isInteger(numero) || numero < 0) return;
-
-        setConteos(prev => ({
-            ...prev,
-            [String(id)]: numero
-        }));
-    };
-
-    const escanear = async (valor) => {
-        const texto = String(valor || "").trim().toUpperCase();
-
-        if (!texto || ocupadoRef.current) return;
-
-        ocupadoRef.current = true;
-        setBuscando(true);
-        setError("");
-        setMensaje("");
-
-        try {
-            const { data, error: err } = await supabase
-                .from("product_variants")
-                .select("id, barcode, sku")
-                .or(`barcode.eq.${texto},sku.eq.${texto}`)
-                .limit(2);
-
-            if (err) throw err;
-
-            if (!data?.length) {
-                setError(`Código no encontrado: ${texto}`);
-                return;
-            }
-
-            if (data.length > 1) {
-                setError(`Código duplicado: ${texto}`);
-                return;
-            }
-
-            const id = String(data[0].id);
-            const item = inventarioPorId.get(id);
-
-            if (!item) {
-                setError("La variante no aparece en el Inventario Maestro.");
-                return;
-            }
-
-            setConteos(prev => ({
-                ...prev,
-                [id]: Number(prev[id] || 0) + 1
-            }));
-
-            setCategoria("TODAS");
-            setBusqueda("");
-            setMensaje(
-                `✓ Contado: ${item.product_name} · ${item.size}`
-            );
-        } catch (err) {
-            console.error(err);
-            setError("No se pudo consultar el código.");
-        } finally {
-            setCodigo("");
-            setBuscando(false);
-            ocupadoRef.current = false;
-            requestAnimationFrame(() => inputRef.current?.focus());
-        }
-    };
-
-    const quitar = id => {
-        setConteos(prev => {
-            const siguiente = { ...prev };
-            delete siguiente[String(id)];
-            return siguiente;
-        });
-    };
-
-    const limpiar = () => {
-        if (!window.confirm(
-            "¿Eliminar todas las cantidades contadas?"
-        )) return;
-
-        setConteos({});
-        setMensaje("");
-        setError("");
-    };
-
-    const descargarCSV = () => {
-        const encabezados = [
-            "Producto", "Categoria", "Talla",
-            "ID Variante", "Stock Sistema",
-            "Conteo Fisico", "Diferencia"
-        ];
-
-        const escapar = valor =>
-            `"${String(valor ?? "").replace(/"/g, '""')}"`;
-
-        const contenido = [
-            encabezados.map(escapar).join(";"),
-            ...filas.map(v => [
-                v.product_name, v.category, v.size,
-                v.variant_id, v.sistema,
-                v.fisico, v.diferencia
-            ].map(escapar).join(";"))
-        ].join("\r\n");
-
-        const blob = new Blob(
-            ["\uFEFF" + contenido],
-            { type: "text/csv;charset=utf-8;" }
-        );
-
-        const url = URL.createObjectURL(blob);
-        const enlace = document.createElement("a");
-        enlace.href = url;
-        enlace.download = "conteo-fisico-boutique-pet-love.csv";
-        enlace.click();
-        URL.revokeObjectURL(url);
-    };
-
-    return (
-        <div className="space-y-6 p-4 sm:p-6">
-            <Link
-                to="/admin/inventario"
-                className="font-semibold text-pink-600"
-            >
-                ← Volver a Inventario
-            </Link>
-
-            <div className="rounded-3xl border bg-white p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-pink-500">
-                    BOUTIQUE PET LOVE ERP
-                </p>
-                <h1 className="mt-2 text-3xl font-black text-slate-900">
-                    📊 Conteo Físico
-                </h1>
-                <p className="mt-2 text-slate-500">
-                    Escanea las prendas y compara las cantidades
-                    físicas con el inventario del sistema.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {[
-                    ["Variantes contadas", resumen.variantes],
-                    ["Unidades contadas", resumen.unidades],
-                    ["Con diferencias", resumen.diferencias]
-                ].map(([titulo, valor]) => (
-                    <div key={titulo} className="rounded-2xl border bg-white p-5">
-                        <p className="text-sm text-slate-500">{titulo}</p>
-                        <p className="mt-1 text-3xl font-black">{valor}</p>
-                    </div>
-                ))}
-            </div>
-
-            <section className="rounded-3xl border bg-white p-5 sm:p-6">
-                <h2 className="text-lg font-black">
-                    Escanear código de barras
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                    Cada escaneo suma una unidad al conteo físico.
-                </p>
-
-                <form
-                    className="mt-4 flex flex-col gap-3 sm:flex-row"
-                    onSubmit={e => {
-                        e.preventDefault();
-                        escanear(codigo);
-                    }}
-                >
-                    <input
-                        ref={inputRef}
-                        autoFocus
-                        value={codigo}
-                        onChange={e => setCodigo(e.target.value)}
-                        placeholder="Escanea o escribe BPL-00000001"
-                        autoComplete="off"
-                        className="min-w-0 flex-1 rounded-xl border px-4 py-3 focus:border-pink-500 outline-none"
-                    />
-                    <button
-                        disabled={buscando || !codigo.trim()}
-                        className="rounded-xl bg-pink-500 px-7 py-3 font-bold text-white disabled:opacity-50"
-                    >
-                        {buscando ? "Buscando..." : "Agregar"}
-                    </button>
-                </form>
-
-                {mensaje && (
-                    <p role="status" className="mt-3 font-semibold text-green-700">
-                        {mensaje}
-                    </p>
-                )}
-                {error && (
-                    <p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 font-semibold text-red-700">
-                        ⚠️ {error}
-                    </p>
-                )}
-            </section>
-
-            <section className="rounded-3xl border bg-white p-5 sm:p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h2 className="text-xl font-black">
-                            Resultado del conteo
-                        </h2>
-                        <p className="text-sm text-slate-500">
-                            Compara y corrige las cantidades físicas.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            type="button"
-                            disabled={!filas.length}
-                            onClick={descargarCSV}
-                            className="rounded-xl border px-4 py-2 font-semibold disabled:opacity-40"
-                        >
-                            Descargar CSV
-                        </button>
-                        <button
-                            type="button"
-                            disabled={!Object.keys(conteos).length}
-                            onClick={limpiar}
-                            className="rounded-xl border border-red-200 px-4 py-2 font-semibold text-red-600 disabled:opacity-40"
-                        >
-                            Limpiar conteo
-                        </button>
-                    </div>
-                </div>
-
-                <div className="mt-5 flex flex-wrap gap-3">
-                    <input
-                        value={busqueda}
-                        onChange={e => setBusqueda(e.target.value)}
-                        placeholder="Buscar producto..."
-                        className="rounded-xl border px-4 py-3"
-                    />
-                    <select
-                        value={categoria}
-                        onChange={e => setCategoria(e.target.value)}
-                        className="rounded-xl border px-4 py-3"
-                    >
-                        <option value="TODAS">Todas las categorías</option>
-                        {categorias.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="mt-5 overflow-x-auto rounded-xl border">
-                    <table className="min-w-[800px] w-full text-sm">
-                        <thead className="bg-slate-100 text-left">
-                            <tr>
-                                {[
-                                    "Producto", "Talla", "Sistema",
-                                    "Físico", "Diferencia", "Acción"
-                                ].map(t => (
-                                    <th key={t} className="p-3">{t}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filas.map(v => (
-                                <tr key={v.id} className="border-t">
-                                    <td className="p-3">
-                                        <div className="flex items-center gap-3">
-                                            <img
-                                                src={v.image || "/placeholder.png"}
-                                                alt=""
-                                                className="h-12 w-12 rounded-lg object-cover"
-                                            />
-                                            <div>
-                                                <p className="font-bold">
-                                                    {v.product_name}
-                                                </p>
-                                                <p className="text-xs text-slate-500">
-                                                    {v.category}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-3 font-semibold">
-                                        {v.size}
-                                    </td>
-                                    <td className="p-3 font-bold">
-                                        {v.sistema}
-                                    </td>
-                                    <td className="p-3">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value={v.fisico}
-                                            onChange={e => {
-                                                if (e.target.value !== "") {
-                                                    actualizarCantidad(
-                                                        v.id,
-                                                        e.target.value
-                                                    );
-                                                }
-                                            }}
-                                            className="w-24 rounded-lg border px-3 py-2 font-bold"
-                                        />
-                                    </td>
-                                    <td className={`p-3 font-black ${
-                                        v.diferencia === 0
-                                            ? "text-green-700"
-                                            : "text-red-600"
-                                    }`}>
-                                        {v.diferencia > 0 ? "+" : ""}
-                                        {v.diferencia}
-                                    </td>
-                                    <td className="p-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => quitar(v.id)}
-                                            className="text-red-600 hover:underline"
-                                        >
-                                            Quitar
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {!filas.length && (
-                    <p className="py-8 text-center text-slate-500">
-                        {loading
-                            ? "Cargando inventario..."
-                            : "Todavía no hay prendas contadas en esta vista."}
-                    </p>
-                )}
-
-                <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-                    ⚠️ Conteo de prueba: no modifica existencias en Supabase.
-                    Las cantidades se mantienen solamente mientras
-                    esta pantalla permanezca abierta. Descarga el CSV
-                    antes de salir si necesitas conservarlas.
-                </p>
-            </section>
+  return <div className="space-y-6 p-4 sm:p-6">
+    <Link to="/admin/inventario" className="font-semibold text-pink-600">← Volver a Inventario</Link>
+    <header className="rounded-3xl border bg-white p-6">
+      <p className="text-xs font-bold uppercase tracking-widest text-pink-500">BOUTIQUE PET LOVE ERP</p>
+      <h1 className="mt-2 text-3xl font-black">📊 Conteo Físico</h1>
+      <p className="text-slate-500">Sesiones guardadas de inventario completo o por categoría.</p>
+    </header>
+    {error && <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">⚠️ {error}</div>}
+    {message && <div role="status" className="rounded-xl bg-green-50 p-3 text-green-800">{message}</div>}
+    {!session ? <>
+      <form onSubmit={createSession} className="space-y-4 rounded-3xl border bg-white p-6">
+        <h2 className="text-xl font-black">Crear sesión de conteo</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="space-y-1"><span className="text-sm font-semibold">Nombre del inventario</span>
+            <input required minLength={3} maxLength={120} value={name} onChange={e => setName(e.target.value)} placeholder="Inventario noviembre 2026" className={`${cls} w-full`}/></label>
+          <label className="space-y-1"><span className="text-sm font-semibold">Responsable</span>
+            <input required minLength={2} maxLength={120} value={responsible} onChange={e => setResponsible(e.target.value)} placeholder="Nombre del responsable" className={`${cls} w-full`}/></label>
+          <label className="space-y-1"><span className="text-sm font-semibold">Modalidad</span>
+            <select value={mode} onChange={e => setMode(e.target.value)} className={`${cls} w-full`}>
+              <option value="complete">Inventario completo</option><option value="category">Por categoría</option>
+            </select></label>
+          {mode === "category" && <label className="space-y-1"><span className="text-sm font-semibold">Categoría</span>
+            <select required value={category} onChange={e => setCategory(e.target.value)} className={`${cls} w-full`}>
+              <option value="">Selecciona categoría</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select></label>}
         </div>
-    );
+        <button disabled={busy} className={`${btn} bg-pink-500 text-white`}>{busy ? "Creando..." : "Crear y comenzar conteo"}</button>
+      </form>
+      <section className="rounded-3xl border bg-white p-6">
+        <h2 className="mb-4 text-xl font-black">Historial de sesiones</h2>
+        {sessions.length === 0 && <p className="text-slate-500">Todavía no hay sesiones guardadas.</p>}
+        <div className="space-y-2">{sessions.map(s => <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+          <div><p className="font-bold">{s.name}</p><p className="text-xs text-slate-500">{s.mode === "complete" ? "Completo" : s.category} · {s.responsible} · {new Date(s.created_at).toLocaleString("es-CL")} · {s.status}</p></div>
+          <button type="button" className={`${btn} bg-slate-900 text-white`} onClick={async () => { try { await loadSession(s.id); } catch(e) { notifyError(e); } }}>Abrir</button>
+        </div>)}</div>
+      </section>
+    </> : <>
+      <section className="rounded-3xl border bg-white p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><h2 className="text-xl font-black">{session.name}</h2><p className="text-sm text-slate-500">{session.mode === "complete" ? "Inventario completo" : `Categoría: ${session.category}`} · Responsable: {session.responsible} · {session.status}</p></div>
+          <button type="button" className={`${btn} border`} onClick={async () => { await pendingRef.current.catch(() => {}); sessionRef.current=null; setSession(null); setItems([]); setError(""); await loadSessions().catch(notifyError); }}>← Sesiones</button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{[["Variantes totales",items.length],["Contadas",counted.length],["Pendientes",items.length-counted.length],["Diferencias",differences.length]].map(([k,v]) => <div key={k} className="rounded-xl bg-slate-50 p-3"><p className="text-xs text-slate-500">{k}</p><p className="text-2xl font-black">{v}</p></div>)}</div>
+      </section>
+      {session.status !== "closed" && <section className="rounded-3xl border bg-white p-5">
+        <h2 className="text-lg font-black">Escanear código de barras</h2><p className="text-sm text-slate-500">Cada escaneo suma una unidad y se guarda en Supabase.</p>
+        <form onSubmit={scan} className="mt-3 flex gap-3"><input ref={inputRef} autoFocus value={code} onChange={e => setCode(e.target.value)} placeholder="BPL-00000001" className={`${cls} min-w-0 flex-1`}/><button disabled={busy || !code.trim()} className={`${btn} bg-pink-500 text-white`}>Agregar</button></form>
+      </section>}
+      <section className="rounded-3xl border bg-white p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Resultado del conteo</h2><div className="flex flex-wrap gap-2"><button type="button" onClick={exportCSV} className={`${btn} border`}>Descargar CSV</button>{session.status !== "closed" && <button type="button" disabled={busy} onClick={closeSession} className={`${btn} bg-slate-900 text-white`}>Cerrar sesión</button>}</div></div>
+        <div className="mt-4 flex flex-wrap gap-3"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar producto..." className={cls}/><select value={only} onChange={e => setOnly(e.target.value)} className={cls}><option value="all">Todas las variantes</option><option value="pending">Pendientes</option><option value="differences">Con diferencias</option></select></div>
+        <div className="mt-4 overflow-x-auto rounded-xl border"><table className="w-full min-w-[750px] text-sm"><thead className="bg-slate-100 text-left"><tr>{["Producto", "Talla", "Sistema", "Físico", "Diferencia", "Estado"].map(h => <th key={h} className="p-3">{h}</th>)}</tr></thead><tbody>{visible.map(x => <tr key={x.variant_id} className="border-t"><td className="p-3 font-semibold">{x.product_name}<p className="text-xs font-normal text-slate-500">{x.category}</p></td><td className="p-3">{label(x.size)}</td><td className="p-3">{x.system_stock}</td><td className="p-3">{session.status === "closed" ? (x.counted_stock ?? "—") : <div className="flex items-center gap-2"><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Math.max(0,Number(x.counted_stock ?? 0)-1)); setBusy(false); }}>−</button><input aria-label={`Conteo ${x.product_name} ${x.size}`} type="number" min="0" step="1" value={x.counted_stock ?? ""} placeholder="Pend." onChange={e => { const val=e.target.value; if (val === "") return; const n=Number(val); if(Number.isSafeInteger(n) && n>=0) { setBusy(true); saveCount(x.variant_id,n).finally(()=>setBusy(false)); } }} className="w-20 rounded border px-2 py-2"/><button type="button" disabled={busy} className="rounded border px-2 py-1" onClick={async () => { setBusy(true); await saveCount(x.variant_id,Number(x.counted_stock ?? 0)+1); setBusy(false); }}>+</button>{x.counted_stock === null && <button type="button" disabled={busy} onClick={async () => { setBusy(true); await saveCount(x.variant_id,0); setBusy(false); }} className="text-xs text-pink-600 underline">Marcar 0</button>}</div>}</td><td className={`p-3 font-bold ${x.counted_stock !== null && x.counted_stock !== x.system_stock ? "text-red-600" : "text-green-700"}`}>{x.counted_stock === null ? "—" : (x.counted_stock-x.system_stock>0?"+":"")+(x.counted_stock-x.system_stock)}</td><td className="p-3">{x.counted_stock === null ? "Pendiente" : "Contado"}</td></tr>)}</tbody></table></div>
+        <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Las sesiones guardan una referencia del stock al momento de su creación. Cerrar una sesión no modifica las existencias reales. Para aplicar ajustes se requerirá una fase posterior con revisión y auditoría.</p>
+      </section>
+    </>}
+  </div>;
 }
