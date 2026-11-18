@@ -14,6 +14,7 @@ const Gender = lazy(() => import("./Gender"));
 const Collection = lazy(() => import("./Collection"));
 const Product = lazy(() => import("./Product"));
 const Success = lazy(() => import("./Success"));
+const PoliticasDespachosCambiosDevoluciones = lazy(() => import("./PoliticasDespachosCambiosDevoluciones"));
 
 const AdminLayout = lazy(() => import("./admin/AdminLayout"));
 const Dashboard = lazy(() => import("./admin/Dashboard"));
@@ -1214,6 +1215,14 @@ export default function App() {
 <Route path="/coleccion/:slug" element={ <Suspense fallback={<div>Cargando...</div>}> <Collection /> </Suspense> } />
 <Route path="/producto/:slug" element={ <Suspense fallback={<div>Cargando...</div>}> <Product /> </Suspense> } />
 <Route path="/success" element={ <Suspense fallback={<div>Cargando...</div>}> <Success /> </Suspense> } />
+<Route
+  path="/politicas-de-despachos-cambios-y-devoluciones"
+  element={
+    <Suspense fallback={<div>Cargando políticas...</div>}>
+      <PoliticasDespachosCambiosDevoluciones />
+    </Suspense>
+  }
+/>
 </Route>
 	  
     {/* 🔴 ADMIN (SIN HEADER) */}
