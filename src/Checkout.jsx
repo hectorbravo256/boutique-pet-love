@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+import {
+  calculatePaketPickup,
+  formatPaketDate,
+} from "./admin/inventory/paket/paketShippingSchedule";
 
 
 export default function Checkout({
@@ -26,6 +30,82 @@ const [discount, setDiscount] = useState(0);
 const [couponError, setCouponError] = useState("");
 const [stockDB, setStockDB] = useState([]);
 const [loading, setLoading] = useState(false);
+
+const [paketSettings, setPaketSettings] = useState(null);
+const [paketExceptions, setPaketExceptions] = useState([]);
+const [paketLoading, setPaketLoading] = useState(true);
+const [paketError, setPaketError] = useState(false);
+const [paketNow, setPaketNow] = useState(() => new Date());
+
+useEffect(() => {
+  let active = true;
+
+  async function cargarCalendarioPaket() {
+    try {
+      const [settingsResult, exceptionsResult] =
+        await Promise.all([
+          supabase
+            .from("paket_shipping_settings")
+            .select("*")
+            .eq("id", 1)
+            .single(),
+          supabase
+            .from("paket_shipping_exceptions")
+            .select("date, reason"),
+        ]);
+
+      if (settingsResult.error) {
+        throw settingsResult.error;
+      }
+
+      if (exceptionsResult.error) {
+        throw exceptionsResult.error;
+      }
+
+      if (!active) return;
+
+      setPaketSettings(settingsResult.data);
+      setPaketExceptions(exceptionsResult.data || []);
+      setPaketError(false);
+    } catch (error) {
+      console.error("Error calendario PAKET:", error);
+
+      if (active) {
+        setPaketError(true);
+      }
+    } finally {
+      if (active) {
+        setPaketLoading(false);
+      }
+    }
+  }
+
+  cargarCalendarioPaket();
+
+  // Actualizar el cálculo cada minuto.
+  const interval = setInterval(() => {
+    setPaketNow(new Date());
+  }, 60000);
+
+  return () => {
+    active = false;
+    clearInterval(interval);
+  };
+}, []);
+
+let paketPickup = null;
+
+if (aplicaEnvio && paketSettings && !paketError) {
+  try {
+    paketPickup = calculatePaketPickup({
+      purchasedAt: paketNow,
+      settings: paketSettings,
+      exceptions: paketExceptions,
+    });
+  } catch (error) {
+    console.error("Error calculando retiro PAKET:", error);
+  }
+}
 
 const discountPercent =
   discount <= 1
@@ -415,6 +495,56 @@ window.innerWidth >= 768
  <p className={`text-xs font-medium ${aplicaEnvio ? "text-green-600" : "text-orange-500"}`}>
   {mensajeEnvio}
 </p>
+
+	
+{/* 📦 FECHA ESTIMADA DE RETIRO PAKET */}
+{aplicaEnvio && (
+  <div className="mt-3 rounded-xl border border-pink-200 bg-pink-50 p-4">
+    <div className="flex items-center gap-2 mb-2">
+      <span className="text-xl">📦</span>
+
+      <h3 className="font-bold text-slate-900 text-sm">
+        Próximo retiro PAKET
+      </h3>
+    </div>
+
+    {paketLoading ? (
+      <p className="text-sm text-slate-500">
+        Consultando calendario de despachos...
+      </p>
+    ) : paketError ? (
+      <p className="text-sm text-slate-600">
+        No fue posible consultar la fecha de retiro.
+      </p>
+    ) : paketPickup?.enabled && paketPickup.pickupDate ? (
+      <>
+        <p className="text-lg font-black text-pink-700 capitalize">
+          {formatPaketDate(paketPickup.pickupDate)}
+        </p>
+
+        <p className="text-xs text-slate-600 mt-2">
+          Tu pedido será preparado para el próximo
+          retiro programado de PAKET.
+        </p>
+
+        <p className="text-xs text-slate-500 mt-2">
+          Esta fecha es estimada y corresponde al
+          retiro del pedido, no a su entrega.
+        </p>
+      </>
+    ) : paketSettings?.enabled === false ? (
+      <p className="text-sm text-amber-700">
+        El calendario de retiros PAKET está
+        temporalmente deshabilitado.
+      </p>
+    ) : (
+      <p className="text-sm text-slate-600">
+        Fecha de retiro no disponible.
+      </p>
+    )}
+  </div>
+)}
+
 
 	{/* 🎟 CUPÓN */}
 <div className="mt-3">
