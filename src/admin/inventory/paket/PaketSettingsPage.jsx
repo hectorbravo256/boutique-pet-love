@@ -501,8 +501,8 @@ export default function PaketSettingsPage() {
             Compra posterior al horario de corte
           </p>
           <p className="text-sm text-amber-700 mt-1">
-            Se agregó un día hábil adicional al plazo
-            de retiro.
+            El retiro se calculó considerando el horario
+            de corte y los días disponibles de PAKET.
           </p>
         </div>
       )}
