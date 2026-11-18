@@ -198,6 +198,44 @@ if (purchaseLocal) {
   purchase = datePartsChile(instant);
 }
 
+  
+  // Calcular el día de la semana de la compra.
+  const purchaseWeekday = weekdayISO(purchase.date);
+
+  // El horario de corte es inclusivo:
+  // a las 22:00 ya se considera fuera de plazo.
+  const afterCutoff = purchase.time >= cutoff;
+
+  // Por defecto, retiro el próximo día habilitado.
+  let requiredDays = 1;
+
+  // Lunes a jueves después del corte:
+  // se agrega un día hábil adicional.
+  if (
+    purchaseWeekday >= 1 &&
+    purchaseWeekday <= 4 &&
+    afterCutoff &&
+    isBusinessDay(purchase.date)
+  ) {
+    requiredDays = 2;
+  }
+
+  // Domingo desde las 22:00:
+  // el retiro se realiza el martes.
+  if (purchaseWeekday === 7 && afterCutoff) {
+    requiredDays = 2;
+  }
+
+  // Viernes y sábado:
+  // retiro el próximo día habilitado,
+  // independientemente de la hora.
+
+  // Agregar días adicionales de preparación.
+  requiredDays += prep;
+
+  // Contador de días hábiles.
+  let counted = 0;
+
 
   let cursor = purchase.date;
 
