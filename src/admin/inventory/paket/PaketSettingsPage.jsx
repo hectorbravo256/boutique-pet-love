@@ -2,6 +2,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../../../supabaseClient";
+import {
+  calculatePaketPickup,
+  formatPaketDate,
+} from "./paketShippingSchedule";
 
 const DIAS = [
   ["Lunes", 1],
@@ -21,6 +25,8 @@ export default function PaketSettingsPage() {
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [fechaSimulacion, setFechaSimulacion] = useState("");
+  const [horaSimulacion, setHoraSimulacion] = useState("18:00");
 
   async function cargarDatos() {
     setCargando(true);
@@ -140,6 +146,26 @@ export default function PaketSettingsPage() {
 
     await cargarDatos();
     setMensaje("Fecha desbloqueada correctamente.");
+  }
+
+  // Simulación de retiro PAKET.
+  // No guarda pedidos ni modifica Supabase.
+  let resultadoSimulacion = null;
+  let errorSimulacion = "";
+
+  if (config && fechaSimulacion && horaSimulacion) {
+    try {
+      resultadoSimulacion = calculatePaketPickup({
+        purchaseLocal: {
+          date: fechaSimulacion,
+          time: horaSimulacion,
+        },
+        settings: config,
+        exceptions: excepciones,
+      });
+    } catch (error) {
+      errorSimulacion = error.message;
+    }
   }
 
   return (
@@ -361,6 +387,141 @@ export default function PaketSettingsPage() {
                 )}
               </div>
             </section>
+
+            
+<section className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-5">
+  <div>
+    <div className="flex items-center gap-3">
+      <span className="text-2xl">📦</span>
+      <h2 className="text-xl font-bold text-slate-900">
+        Simulador de retiros PAKET
+      </h2>
+    </div>
+
+    <p className="text-sm text-slate-500 mt-2">
+      Simula una compra y comprueba la fecha estimada
+      de retiro según las reglas configuradas.
+    </p>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <label className="block">
+      <span className="block text-sm font-semibold mb-2">
+        Fecha de compra
+      </span>
+
+      <input
+        type="date"
+        value={fechaSimulacion}
+        onChange={(e) =>
+          setFechaSimulacion(e.target.value)
+        }
+        className="w-full border border-slate-200 rounded-xl p-3"
+      />
+    </label>
+
+    <label className="block">
+      <span className="block text-sm font-semibold mb-2">
+        Hora de compra
+      </span>
+
+      <input
+        type="time"
+        value={horaSimulacion}
+        onChange={(e) =>
+          setHoraSimulacion(e.target.value)
+        }
+        className="w-full border border-slate-200 rounded-xl p-3"
+      />
+    </label>
+  </div>
+
+  {errorSimulacion && (
+    <div
+      role="alert"
+      className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4"
+    >
+      {errorSimulacion}
+    </div>
+  )}
+
+  {!fechaSimulacion && (
+    <div className="bg-slate-50 rounded-2xl p-5 text-sm text-slate-500">
+      Selecciona una fecha para comenzar la simulación.
+    </div>
+  )}
+
+  {resultadoSimulacion && !resultadoSimulacion.enabled && (
+    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+      <p className="font-bold text-amber-800">
+        Servicio PAKET deshabilitado
+      </p>
+      <p className="text-sm text-amber-700 mt-1">
+        No hay retiros disponibles mientras el servicio
+        esté desactivado.
+      </p>
+    </div>
+  )}
+
+  {resultadoSimulacion?.enabled && (
+    <div className="bg-pink-50 border border-pink-200 rounded-2xl p-5 space-y-4">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-wide text-pink-700">
+          Próximo retiro estimado
+        </p>
+
+        <p className="text-2xl font-black text-slate-900 mt-2 capitalize">
+          {formatPaketDate(resultadoSimulacion.pickupDate)}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-white rounded-xl p-4">
+          <p className="text-xs text-slate-500">
+            Horario de corte
+          </p>
+          <p className="font-bold text-slate-900 mt-1">
+            {config.cutoff} hrs.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl p-4">
+          <p className="text-xs text-slate-500">
+            Días hábiles hasta el retiro
+          </p>
+          <p className="font-bold text-slate-900 mt-1">
+            {resultadoSimulacion.businessDaysAdded}
+          </p>
+        </div>
+      </div>
+
+      {resultadoSimulacion.afterCutoff && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <p className="font-semibold text-amber-800 text-sm">
+            Compra posterior al horario de corte
+          </p>
+          <p className="text-sm text-amber-700 mt-1">
+            Se agregó un día hábil adicional al plazo
+            de retiro.
+          </p>
+        </div>
+      )}
+
+      <p className="text-xs text-slate-600">
+        La fecha corresponde al retiro por PAKET,
+        no a la entrega al cliente.
+      </p>
+    </div>
+  )}
+
+  <p className="text-xs text-slate-500">
+    Simulación local: no crea pedidos ni modifica
+    la configuración guardada en Supabase.
+    Utiliza los valores actualmente visibles
+    en el formulario y las fechas bloqueadas cargadas.
+  </p>
+</section>
+
 
             <p className="text-xs text-slate-500">
               Esta pantalla guarda las condiciones de despacho.
