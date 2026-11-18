@@ -94,6 +94,7 @@ function weekdayISO(dateString) {
  */
 export function calculatePaketPickup({
   purchasedAt = new Date(),
+  purchaseLocal = null,
   settings,
   exceptions = [],
 }) {
@@ -177,7 +178,25 @@ export function calculatePaketPickup({
     !blocked.has(date);
 
   // Fecha y hora de compra en Chile.
-  const purchase = datePartsChile(instant);
+  let purchase;
+
+if (purchaseLocal) {
+  const { date, time } = purchaseLocal;
+
+  if (
+    typeof date !== "string" ||
+    typeof time !== "string" ||
+    !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)
+  ) {
+    throw new Error("Fecha u hora de simulación inválida.");
+  }
+
+  utcDay(date);
+
+  purchase = { date, time };
+} else {
+  purchase = datePartsChile(instant);
+}
 
   const purchaseIsBusinessDay =
     isBusinessDay(purchase.date);
