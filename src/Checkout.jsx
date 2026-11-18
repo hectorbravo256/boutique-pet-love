@@ -426,7 +426,7 @@ const stock =
     
       {/* 🧾 RESUMEN */}
 <div
-  className="bg-white p-6 rounded-2xl shadow max-h-[90vh] overflow-y-auto"
+  className="bg-white p-4 md:p-5 rounded-2xl shadow"
 style={{
   position: typeof window !== "undefined" &&
 window.innerWidth >= 768
@@ -647,27 +647,29 @@ window.innerWidth >= 768
         </p>
 
 		  
+
 {paketCountdown && (
-  <div className="mt-4 rounded-xl border border-pink-200 bg-white p-3">
-    <div className="flex items-center gap-2">
-      <span aria-hidden="true">⏱️</span>
-      <p className="text-xs font-semibold text-slate-700">
-        Tiempo para mantener este despacho programado
-      </p>
+  <div className="mt-3 rounded-lg border border-pink-200 bg-white px-3 py-2">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
+        <span aria-hidden="true">⏱️</span>
+        <p className="text-xs font-semibold text-slate-700">
+          Tiempo para mantener este despacho
+        </p>
+      </div>
+
+      <span
+        className="text-xl font-black text-pink-600 tabular-nums"
+        role="timer"
+        aria-label={`Tiempo restante: ${paketCountdown.time}`}
+      >
+        {paketCountdown.time}
+      </span>
     </div>
 
-    <p
-      className="mt-2 text-2xl font-black tracking-wider text-pink-600 tabular-nums"
-      role="timer"
-      aria-label={`Tiempo restante: ${paketCountdown.time}`}
-    >
-      {paketCountdown.time}
-    </p>
-
     <p className="mt-1 text-xs text-slate-500">
-      Horario límite: {paketCountdown.cutoff} hrs.
-      Finaliza tu compra antes de este horario
-      para mantener la fecha de despacho indicada.
+      Compra antes de las {paketCountdown.cutoff} hrs.
+      para mantener la fecha indicada.
     </p>
   </div>
 )}
