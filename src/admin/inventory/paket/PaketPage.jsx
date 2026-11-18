@@ -848,7 +848,7 @@ export default function PaketPage() {
 
     return (
         <div className="max-w-[1500px] mx-auto p-6 md:p-8">
-            <div className="mb-6">
+<div className="mb-6 flex flex-wrap items-center justify-between gap-3">
     <Link
         to="/admin/inventario"
         className="
@@ -863,6 +863,27 @@ export default function PaketPage() {
         "
     >
         ← Volver a Inventario
+    </Link>
+
+    <Link
+        to="/admin/inventario/paket/configuracion"
+        className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-xl
+            bg-slate-900
+            px-5
+            py-3
+            text-sm
+            font-bold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-slate-800
+        "
+    >
+        ⚙️ Configuración PAKET
     </Link>
 </div>
             {/* =====================================================
