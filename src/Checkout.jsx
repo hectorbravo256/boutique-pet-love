@@ -504,7 +504,7 @@ window.innerWidth >= 768
       <span className="text-xl">📦</span>
 
       <h3 className="font-bold text-slate-900 text-sm">
-        Próximo retiro PAKET
+        Despacho programado
       </h3>
     </div>
 
@@ -523,14 +523,9 @@ window.innerWidth >= 768
         </p>
 
         <p className="text-xs text-slate-600 mt-2">
-          Tu pedido será preparado para el próximo
-          retiro programado de PAKET.
+          Tu pedido será entregado a PAKET para su despacho en la fecha indicada.
         </p>
 
-        <p className="text-xs text-slate-500 mt-2">
-          Esta fecha es estimada y corresponde al
-          retiro del pedido, no a su entrega.
-        </p>
       </>
     ) : paketSettings?.enabled === false ? (
       <p className="text-sm text-amber-700">
