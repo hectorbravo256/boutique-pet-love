@@ -82,10 +82,10 @@ useEffect(() => {
 
   cargarCalendarioPaket();
 
-  // Actualizar el cálculo cada minuto.
-  const interval = setInterval(() => {
-    setPaketNow(new Date());
-  }, 60000);
+// Actualizar el contador cada segundo.
+const interval = setInterval(() => {
+  setPaketNow(new Date());
+}, 1000);
 
   return () => {
     active = false;
@@ -106,6 +106,126 @@ if (aplicaEnvio && paketSettings && !paketError) {
     console.error("Error calculando retiro PAKET:", error);
   }
 }
+
+
+  // ⏱️ Contador regresivo de despacho PAKET.
+  // Solo se muestra cuando el corte cambia
+  // realmente la fecha programada de despacho.
+
+  let paketCountdown = null;
+
+  if (
+    aplicaEnvio &&
+    paketSettings?.enabled &&
+    paketPickup?.enabled &&
+    paketPickup.pickupDate &&
+    !paketError
+  ) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "America/Santiago",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23",
+      }).formatToParts(paketNow);
+
+      const getPart = (type) =>
+        parts.find((p) => p.type === type)?.value;
+
+      const date = [
+        getPart("year"),
+        getPart("month"),
+        getPart("day"),
+      ].join("-");
+
+      const hour = Number(getPart("hour"));
+      const minute = Number(getPart("minute"));
+      const second = Number(getPart("second"));
+
+      const currentSeconds =
+        hour * 3600 + minute * 60 + second;
+
+      const [cutoffHour, cutoffMinute] =
+        paketSettings.cutoff.split(":").map(Number);
+
+      const cutoffSeconds =
+        cutoffHour * 3600 + cutoffMinute * 60;
+
+      const weekday =
+        ((new Date(`${date}T12:00:00Z`).getUTCDay() + 6) % 7) + 1;
+
+      const blockedToday = paketExceptions.some(
+        (item) => item.date === date
+      );
+
+      const pickupWeekdays =
+        paketSettings.pickup_weekdays || [];
+
+      const activeWeekday =
+        pickupWeekdays.includes(weekday);
+
+      // La regla del corte afecta:
+      // lunes a jueves habilitados, y domingo.
+      const cutoffApplies =
+        (weekday >= 1 &&
+          weekday <= 4 &&
+          activeWeekday &&
+          !blockedToday) ||
+        weekday === 7;
+
+      if (
+        cutoffApplies &&
+        currentSeconds < cutoffSeconds
+      ) {
+        // Comprobar que al llegar al corte
+        // realmente cambie el día de despacho.
+        const afterCutoffPickup = calculatePaketPickup({
+          purchaseLocal: {
+            date,
+            time: paketSettings.cutoff,
+          },
+          settings: paketSettings,
+          exceptions: paketExceptions,
+        });
+
+        if (
+          afterCutoffPickup.pickupDate !==
+          paketPickup.pickupDate
+        ) {
+          const remaining =
+            cutoffSeconds - currentSeconds;
+
+          const hours = Math.floor(remaining / 3600);
+          const minutes = Math.floor(
+            (remaining % 3600) / 60
+          );
+          const seconds = remaining % 60;
+
+          const pad = (n) =>
+            String(n).padStart(2, "0");
+
+          paketCountdown = {
+            time: [
+              pad(hours),
+              pad(minutes),
+              pad(seconds),
+            ].join(":"),
+            cutoff: paketSettings.cutoff,
+          };
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Error calculando contador PAKET:",
+        error
+      );
+    }
+  }
+
 
 const discountPercent =
   discount <= 1
@@ -514,7 +634,7 @@ window.innerWidth >= 768
       </p>
     ) : paketError ? (
       <p className="text-sm text-slate-600">
-        No fue posible consultar la fecha de retiro.
+        No fue posible consultar la fecha de despacho.
       </p>
     ) : paketPickup?.enabled && paketPickup.pickupDate ? (
       <>
@@ -526,15 +646,42 @@ window.innerWidth >= 768
           Tu pedido será entregado a PAKET para su despacho en la fecha indicada.
         </p>
 
+		  
+{paketCountdown && (
+  <div className="mt-4 rounded-xl border border-pink-200 bg-white p-3">
+    <div className="flex items-center gap-2">
+      <span aria-hidden="true">⏱️</span>
+      <p className="text-xs font-semibold text-slate-700">
+        Tiempo para mantener este despacho programado
+      </p>
+    </div>
+
+    <p
+      className="mt-2 text-2xl font-black tracking-wider text-pink-600 tabular-nums"
+      role="timer"
+      aria-label={`Tiempo restante: ${paketCountdown.time}`}
+    >
+      {paketCountdown.time}
+    </p>
+
+    <p className="mt-1 text-xs text-slate-500">
+      Horario límite: {paketCountdown.cutoff} hrs.
+      Finaliza tu compra antes de este horario
+      para mantener la fecha de despacho indicada.
+    </p>
+  </div>
+)}
+
+
       </>
     ) : paketSettings?.enabled === false ? (
       <p className="text-sm text-amber-700">
-        El calendario de retiros PAKET está
+        El servicio de despacho PAKET está
         temporalmente deshabilitado.
       </p>
     ) : (
       <p className="text-sm text-slate-600">
-        Fecha de retiro no disponible.
+        Fecha de despacho no disponible.
       </p>
     )}
   </div>
