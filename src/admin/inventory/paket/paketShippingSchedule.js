@@ -198,36 +198,7 @@ if (purchaseLocal) {
   purchase = datePartsChile(instant);
 }
 
-  const purchaseIsBusinessDay =
-    isBusinessDay(purchase.date);
 
-  // El corte solo aplica cuando la compra
-  // se realiza en un día hábil.
-  const afterCutoff =
-    purchaseIsBusinessDay &&
-    purchase.time >= cutoff;
-
-  /**
-   * Reglas:
-   *
-   * Compra en día hábil antes del corte:
-   * retiro el próximo día hábil.
-   *
-   * Compra después del corte:
-   * se añade un día hábil adicional.
-   *
-   * Compra en fin de semana o feriado:
-   * retiro el próximo día hábil disponible.
-   *
-   * Los días de preparación se suman
-   * al plazo correspondiente.
-   */
-  const requiredDays =
-    1 +
-    (afterCutoff ? 1 : 0) +
-    prep;
-
-  let counted = 0;
   let cursor = purchase.date;
 
   // Límite de seguridad para evitar
