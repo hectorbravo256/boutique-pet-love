@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   useParams,
-  useNavigate
+  Link
 } from "react-router-dom";
 
 import { supabase } from "./supabaseClient";
@@ -11,8 +11,6 @@ export default function Collection() {
 
   const { slug } = useParams();
 
-  const navigate =
-    useNavigate();
 
   const [products, setProducts] =
     useState([]);
@@ -179,14 +177,10 @@ export default function Collection() {
 
           return (
 
-            <div
+            <Link
               key={product.id}
 
-              onClick={() =>
-                navigate(
-                  `/producto/${product.slug}`
-                )
-              }
+              to={`/producto/${product.slug}`}
 
               className="
                 bg-white
@@ -250,7 +244,7 @@ export default function Collection() {
 
               </div>
 
-            </div>
+            </Link>
 
           );
 
