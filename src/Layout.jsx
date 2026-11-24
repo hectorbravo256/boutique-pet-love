@@ -485,9 +485,9 @@ useEffect(() => {
   leading-tight
 ">
 
-      <h1 className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
+      <span className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
         BOUTIQUE PET LOVE
-      </h1>
+      </span>
 
       <p className="text-purple-600 text-xs md:text-sm">
         Moda y accesorios para mascotas
