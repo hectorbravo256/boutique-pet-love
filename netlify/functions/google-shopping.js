@@ -17,8 +17,9 @@ export function buildFeed(products, now = new Date()) {
       const price = Number(v.price);
       if (!Number.isInteger(price) || price <= 0 || v.id == null || !String(v.size ?? "").trim()) continue;
       const sale = Math.round(price * (1-percent/100));
+      const size = String(v.size).trim().replace(/^talla\s+/i, "");
       const link = site + "/producto/" + encodeURIComponent(p.slug) + "?variant=" + encodeURIComponent(v.id);
-      const fields = {id:"bpl-"+v.id,item_group_id:"bpl-product-"+p.id,title:(p.name+" - Talla "+v.size).slice(0,150),description:String(p.description || p.meta_description || p.name).replace(/<[^>]*>/g," ").slice(0,5000),link,image_link:images[0],condition:"new",availability:Number(v.stock)>0?"in_stock":"out_of_stock",price:price+" CLP",size:v.size,product_type:"Mascotas > Ropa y accesorios > "+(p.category || "Otros")};
+      const fields = {id:"bpl-"+v.id,item_group_id:"bpl-product-"+p.id,title:(p.name+" - Talla "+size).slice(0,150),description:String(p.description || p.meta_description || p.name).replace(/<[^>]*>/g," ").slice(0,5000),link,image_link:images[0],condition:"new",availability:Number(v.stock)>0?"in_stock":"out_of_stock",price:price+" CLP",size:size,product_type:"Mascotas > Ropa y accesorios > "+(p.category || "Otros")};
       if (discount && sale > 0 && sale < price) fields.sale_price = sale+" CLP";
       items.push("<item>"+Object.entries(fields).map(([k,val])=>tag(k,val)).join("")+images.slice(1,11).map(i=>tag("additional_image_link",i)).join("")+"</item>");
     }
