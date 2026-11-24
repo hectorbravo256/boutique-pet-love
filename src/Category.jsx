@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import NotFound from "./NotFound";
 import { Helmet } from "react-helmet-async";
 
 export default function Category() {
@@ -8,6 +9,7 @@ export default function Category() {
 
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState(null);
+  const [loadResult, setLoadResult] = useState(null);
 
   const categoryName = slug
   ?.replaceAll("-", " ")
@@ -114,16 +116,20 @@ const seoUrl =
 
 useEffect(() => {
 
+  let cancelled = false;
+  setCategory(null); setProducts([]); setLoadResult(null);
   const cargar = async () => {
 
     // Buscar categoría por slug
-    const { data: categoryData } = await supabase
+    const { data: categoryData, error: categoryError } = await supabase
       .from("categories")
       .select("*")
       .eq("slug", slug)
+      .eq("active", true)
       .single();
 
-    if (!categoryData) return;
+    if (cancelled) return;
+    if (!categoryData) { setLoadResult({slug, error: Boolean(categoryError && categoryError.code !== "PGRST116")}); return; }
     
     setCategory(categoryData);
 
@@ -145,6 +151,7 @@ useEffect(() => {
         ascending: true
       });
 
+    if (cancelled) return;
     if (!error) {
       setProducts(data || []);
     }
@@ -152,9 +159,12 @@ useEffect(() => {
   };
 
   cargar();
+  return () => { cancelled = true; };
 
 }, [slug]);
 
+if (loadResult?.slug === slug) return <NotFound unavailable={loadResult.error} />;
+if (!category || category.slug !== slug) return <div className="p-10">Cargando...</div>;
 return (
 
   <>
