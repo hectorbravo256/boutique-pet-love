@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import { Helmet } from "react-helmet-async";
 
@@ -7,6 +7,8 @@ const WHATSAPP = "https://wa.me/56982700002";
 
 export default function Product() {
   const { slug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedVariant = searchParams.get("variant");
 
   
   const [product, setProduct] = useState(null);
@@ -22,6 +24,7 @@ export default function Product() {
 
   /* ================= SELECT TALLA ================= */
   const handleSelect = (variant) => {
+    setSearchParams(prev => { const next = new URLSearchParams(prev); next.set("variant", String(variant.id)); return next; }, { replace: true });
     setSelected(variant.id);
     setSelectedVariant(variant);
     setQty(1);
@@ -266,15 +269,13 @@ const prevImage = () => {
   useEffect(() => {
     if (!product) return;
 
-    const firstAvailable = product.product_variants.find(
-      v => (v.stock || 0) > 0
-    );
-
-    if (firstAvailable) {
-      setSelected(firstAvailable.id);
-      setSelectedVariant(firstAvailable);
-    }
-  }, [product]);
+    const variants = product.product_variants || [];
+    const chosen = variants.find(v => String(v.id) === requestedVariant)
+      || variants.find(v => Number(v.stock) > 0) || variants[0] || null;
+    setSelected(chosen?.id ?? null);
+    setSelectedVariant(chosen);
+    setQty(1);
+  }, [product, requestedVariant]);
 
   if (!product) {
   return (
@@ -370,7 +371,7 @@ const seoUrl =
 
   description: seoDescription,
 
-  sku: product.slug,
+  sku: selectedVariant?.sku || String(selectedVariant?.id || product.slug),
 
   brand: {
     "@type": "Brand",
@@ -380,25 +381,10 @@ const seoUrl =
   offers: {
     "@type": "Offer",
 
-    price:
-      product.product_variants?.length
-        ? Math.min(
-            ...product.product_variants.map(
-              v => Number(v.price)
-            )
-          )
-        : 0,
-
+    price: selectedVariant ? (tieneDescuento ? Math.round(selectedVariant.price * (1 - product.discount_percent / 100)) : Number(selectedVariant.price)) : undefined,
     priceCurrency: "CLP",
-
-    availability:
-      product.product_variants?.some(
-        v => v.stock > 0
-      )
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-
-    url: seoUrl
+    availability: Number(selectedVariant?.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    url: selectedVariant ? seoUrl + "?variant=" + encodeURIComponent(selectedVariant.id) : seoUrl
   }
 };
 
