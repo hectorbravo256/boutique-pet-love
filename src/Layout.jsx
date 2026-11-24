@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
@@ -9,7 +9,6 @@ export default function Layout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [cart, setCart] = useState([]);
@@ -256,11 +255,8 @@ useEffect(() => {
 ">
 
   {/* INICIO */}
-  <button
-    onClick={() => {
-      navigate("/");
-      setMenuOpen(false);
-    }}
+  <Link
+    to={"/"} onClick={() => setMenuOpen(false)}
 
     className="
   text-left
@@ -274,7 +270,7 @@ useEffect(() => {
 "
   >
     🏠 Inicio
-  </button>
+  </Link>
 
 {/* CATEGORÍAS */}
 	<div className="border-t border-pink-100 pt-6">
@@ -294,18 +290,10 @@ useEffect(() => {
 
 {categories.map(category => (
 
-  <button
+  <Link
     key={category.id}
 
-    onClick={() => {
-
-      navigate(
-        `/categoria/${category.slug}`
-      );
-
-      setMenuOpen(false);
-
-    }}
+    to={`/categoria/${category.slug}`} onClick={() => setMenuOpen(false)}
 
     className="
       text-left
@@ -317,7 +305,7 @@ useEffect(() => {
     "
   >
     ✨ {category.name}
-  </button>
+  </Link>
 
 ))}
 
@@ -342,33 +330,24 @@ useEffect(() => {
 
     <div className="flex flex-col gap-3">
 
-      <button
-        onClick={() => {
-          navigate("/genero/macho");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/genero/macho"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🐶 Macho
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/genero/hembra");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/genero/hembra"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🎀 Hembra
-      </button>
+      </Link>
 
-		<button
-  onClick={() => {
-    navigate("/genero/unisex");
-    setMenuOpen(false);
-  }}
+		<Link
+  to={"/genero/unisex"} onClick={() => setMenuOpen(false)}
 
   className="
     text-left
@@ -380,7 +359,7 @@ useEffect(() => {
   "
 >
   ✨ Unisex
-</button>
+</Link>
 
     </div>
 
@@ -403,49 +382,37 @@ useEffect(() => {
 
     <div className="flex flex-col gap-3">
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/new");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/new"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🆕 Nueva colección
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/best-seller");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/best-seller"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🔥 Best Sellers
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/luxury");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/luxury"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         👑 Luxury
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/exclusive");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/exclusive"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         💎 Exclusivos
-      </button>
+      </Link>
 
     </div>
 
@@ -455,16 +422,7 @@ useEffect(() => {
   
 
   {/* CONTACTO */}
-  <button
-    onClick={() => {
-      navigate("/", {
-        state: {
-          scrollTo: "contacto"
-        }
-      });
-
-      setMenuOpen(false);
-    }}
+  <Link to="/" state={{scrollTo:"contacto"}} onClick={() => setMenuOpen(false)}
 
     className="
       mt-4
@@ -476,7 +434,7 @@ useEffect(() => {
     "
   >
     📞 Contacto
-  </button>
+  </Link>
 
 </div>
 
@@ -505,8 +463,7 @@ useEffect(() => {
 
     {/* 🟣 CENTRO → LOGO */}
  <div className="flex justify-center">
-  <div
-    onClick={() => navigate("/")}
+  <Link to="/"
     className="flex items-center gap-4 cursor-pointer"
   >
     
@@ -538,7 +495,7 @@ useEffect(() => {
 
     </div>
 
-  </div>
+  </Link>
 </div>
 
 
