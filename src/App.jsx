@@ -5,6 +5,7 @@ import { Routes, Route, BrowserRouter, Link, useLocation } from "react-router-do
 import './index.css';
 import { supabase } from "./supabaseClient";
 import Layout from "./Layout";
+import NotFound from "./NotFound";
 import ScrollToTop from "./ScrollToTop";
 import ProductCard from "./ProductCard";
 
@@ -1408,6 +1409,7 @@ export default function App() {
   }
 />
 
+  <Route element={<Layout />}><Route path="*" element={<NotFound />} /></Route>
   </Routes>
 </BrowserRouter>    
   );
