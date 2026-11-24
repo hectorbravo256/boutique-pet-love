@@ -25,9 +25,27 @@ export function errorResponse(status,method) {
  if(missing)headers["X-Robots-Tag"]="noindex, follow";else headers["Retry-After"]="60";
  return new Response(method==="HEAD"?null:"<!doctype html><html lang='es'><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>"+title+" | Boutique Pet Love</title><body style='font-family:system-ui;text-align:center;padding:12vh 20px;color:#333'><h1 style='color:#db2777'>"+title+"</h1><p>"+message+"</p><a style='color:#db2777' href='/'>Volver al inicio</a></body></html>",{status,headers});
 }
+// Per-isolate bounded positive cache; never cache prices, missing rows or failures.
+export function createCatalogCache({ttl=60000,max=1000,clock=Date.now,lookup=catalogStatus}={}) {
+ const entries=new Map();
+ return async (path,env,fetcher=fetch)=>{
+ const now=clock();
+ const hit=entries.get(path);
+ if(hit!==undefined && hit>now)return 200;
+ entries.delete(path);
+ const status=await lookup(path,env,fetcher);
+ if(status===200){
+ for(const [key,expires] of entries)if(expires<=clock())entries.delete(key);
+ while(entries.size>=max && entries.size)entries.delete(entries.keys().next().value);
+ if(max>0)entries.set(path,clock()+ttl);
+ }
+ return status;
+ };
+}
+const cachedCatalogStatus=createCatalogCache();
 export default async function handler(request,context){
  if(!["GET","HEAD"].includes(request.method))return;
- const status=await catalogStatus(new URL(request.url).pathname,k=>Netlify.env.get(k));
+ const status=await cachedCatalogStatus(new URL(request.url).pathname,k=>Netlify.env.get(k));
  if(status===200)return;
  return errorResponse(status,request.method);
 }
