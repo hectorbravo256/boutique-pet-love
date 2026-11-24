@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import NotFound from "./NotFound";
+import {buildProductSchema, categorySlug} from "./productSchema";
 import { Helmet } from "react-helmet-async";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -354,35 +355,7 @@ const seoImage =
 const seoUrl =
   `https://boutiquepetlove.cl/producto/${product.slug}`;
 
-  const productSchema = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-
-  name: product.name,
-
-  image:
-    product.product_images?.map(
-      img => img.url
-    ) || [],
-
-  description: seoDescription,
-
-  sku: selectedVariant?.sku || String(selectedVariant?.id || product.slug),
-
-  brand: {
-    "@type": "Brand",
-    name: "Boutique Pet Love"
-  },
-
-  offers: {
-    "@type": "Offer",
-
-    price: selectedVariant ? (tieneDescuento ? Math.round(selectedVariant.price * (1 - product.discount_percent / 100)) : Number(selectedVariant.price)) : undefined,
-    priceCurrency: "CLP",
-    availability: Number(selectedVariant?.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-    url: selectedVariant ? seoUrl + "?variant=" + encodeURIComponent(selectedVariant.id) : seoUrl
-  }
-};
+  const productSchema = buildProductSchema(product);
 
   const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -403,11 +376,7 @@ const seoUrl =
       name: product.category,
 
       item:
-        `https://boutiquepetlove.cl/categoria/${product.category
-          ?.toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")}`
+        `https://boutiquepetlove.cl/categoria/${categorySlug(product.category)}`
     },
 
     {
@@ -484,9 +453,9 @@ return (
   content={seoImage}
 />
 
-<script type="application/ld+json">
-  {JSON.stringify(productSchema)}
-</script>
+{productSchema && <script type="application/ld+json">
+  {JSON.stringify(productSchema).replace(/</g, "\\u003c")}
+</script>}
 
     <script type="application/ld+json">
   {JSON.stringify(breadcrumbSchema)}
@@ -519,12 +488,7 @@ return (
   {" > "}
 
   <a
-href={`/categoria/${product.category
-  ?.toLowerCase()
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .replace(/\s*-\s*/g, "-")
-  .replace(/\s+/g, "-")
+href={`/categoria/${categorySlug(product.category)
 }`}
     className="hover:text-pink-500"
   >
