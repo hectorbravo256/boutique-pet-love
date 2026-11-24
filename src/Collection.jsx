@@ -5,6 +5,7 @@ import {
   Link
 } from "react-router-dom";
 
+import NotFound from "./NotFound";
 import { supabase } from "./supabaseClient";
 
 export default function Collection() {
@@ -20,7 +21,7 @@ export default function Collection() {
 
   useEffect(() => {
 
-    cargar();
+    if (["new","best-seller","luxury","exclusive"].includes(slug)) cargar();
 
   }, [slug]);
 
@@ -106,6 +107,7 @@ export default function Collection() {
 
   };
 
+  if (!["new","best-seller","luxury","exclusive"].includes(slug)) return <NotFound />;
   if (loading) {
 
     return (
