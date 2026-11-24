@@ -444,7 +444,7 @@ const precioBase =
 
   <span
     className="
-      w-full
+      block text-center w-full
       bg-gradient-to-r
       from-pink-500
       to-purple-500
