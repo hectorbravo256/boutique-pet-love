@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   useParams,
-  useNavigate
+  Link
 } from "react-router-dom";
 
 import { supabase } from "./supabaseClient";
@@ -11,8 +11,6 @@ export default function Gender() {
 
   const { slug } = useParams();
 
-  const navigate =
-    useNavigate();
 
   const [products, setProducts] =
     useState([]);
@@ -145,14 +143,10 @@ export default function Gender() {
 
           return (
 
-            <div
+            <Link
               key={product.id}
 
-              onClick={() =>
-                navigate(
-                  `/producto/${product.slug}`
-                )
-              }
+              to={`/producto/${product.slug}`}
 
               style={{
                 background: "#fff",
@@ -235,7 +229,7 @@ export default function Gender() {
 
               </div>
 
-            </div>
+            </Link>
 
           );
 
