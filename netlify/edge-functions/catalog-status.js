@@ -1,4 +1,4 @@
-import {fetchPublicProduct,renderProductHtml} from "./product-html.js";
+import {fetchPublicProduct,renderProductHtml} from "../lib/product-html.js";
 export async function catalogStatus(path, env, fetcher = fetch) {
  const match = /^\/(producto|categoria)\/([^/]+)\/?$/i.exec(path);
  if (!match) return 404;
