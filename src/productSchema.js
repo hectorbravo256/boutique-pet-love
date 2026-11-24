@@ -20,7 +20,7 @@ export function buildProductSchema(p, now = new Date()) {
  const sale=Math.round(price*(1-Number(p.discount_percent)/100));
  const effective=activeDiscount(p,now)&&sale>0&&sale<price?sale:price;
  const link=url+"?variant="+encodeURIComponent(v.id);
- variants.push({"@type":"Product","@id":link+"#product",name:p.name+" - Talla "+size,description,image:images,size,sku:"bpl-"+v.id,offers:{"@type":"Offer",url:link,price:effective,priceCurrency:"CLP",availability:Number(v.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock",itemCondition:"https://schema.org/NewCondition",seller:{"@id":site+"/#store"}}});
+ variants.push({"@type":"Product","@id":link+"#product",name:p.name+" - Talla "+size,description,image:images,size,sku:"bpl-"+v.id,offers:{"@type":"Offer",url:link,price:effective,priceCurrency:"CLP",availability:Number(v.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock",itemCondition:"https://schema.org/NewCondition",seller:{"@id":site+"/#store"},hasMerchantReturnPolicy:{"@id":site+"/#return-policy"}}});
  }
  if(!variants.length)return null;
  return {"@context":"https://schema.org","@type":"ProductGroup","@id":url+"#group",url,name:p.name,description,image:images,productGroupID:groupId,variesBy:["https://schema.org/size"],hasVariant:variants};
