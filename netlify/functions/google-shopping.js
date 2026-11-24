@@ -48,6 +48,6 @@ export async function handler(event) {
     return {statusCode:200,headers:{"Content-Type":"application/xml; charset=utf-8","Cache-Control":"public, max-age=300"},body:event.httpMethod==="HEAD"?"":body};
   } catch (error) {
     console.error("Google Shopping feed:",error.message);
-    return {statusCode:503,headers:{"Cache-Control":"no-store"},body:"Catalog temporarily unavailable" + (process.env.CONTEXT === "deploy-preview" ? " [" + stage + (typeof error.code === "string" && /^(?:[0-9A-Z]{5}|PGRST[0-9]{3})$/.test(error.code) ? ":" + error.code : "") + "]" : "")};
+    return {statusCode:503,headers:{"Cache-Control":"no-store"},body:"Catalog temporarily unavailable" + ((event.headers?.host || "").startsWith("deploy-preview-3--fluffy-daifuku-56b90b.netlify.app") ? " [" + stage + (typeof error.code === "string" && /^(?:[0-9A-Z]{5}|PGRST[0-9]{3})$/.test(error.code) ? ":" + error.code : "") + "]" : "")};
   }
 }
