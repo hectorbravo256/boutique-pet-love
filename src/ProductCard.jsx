@@ -192,7 +192,7 @@ export default function ProductCard({
         <span
 
           className="
-            mt-3
+            block text-center mt-3
             w-full
             bg-gradient-to-r
             from-pink-500
