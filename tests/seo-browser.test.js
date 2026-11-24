@@ -24,6 +24,12 @@ test("missing routes and route-specific robots directives",async()=>{
  await page.goto("http://127.0.0.1:4173/login");
  await page.waitForFunction(()=>document.querySelector('meta[name="robots"]')?.content==="noindex, nofollow");
  await page.goto("http://127.0.0.1:4173/");
+ await page.getByRole("heading",{level:1,name:"Ropa para perros y mascotas en Chile",exact:true}).waitFor();
+ assert.equal(await page.locator("h1").count(),1);
+ assert.equal(await page.title(),"Ropa para Perros y Mascotas en Chile | Boutique Pet Love");
+ assert.equal(await page.locator('link[rel="canonical"]').getAttribute("href"),"https://boutiquepetlove.cl/");
+ assert.equal(await page.locator('meta[name="description"]').count(),1);
+ assert.equal(await page.locator('meta[name="description"]').getAttribute("content"),"Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile.");
  await page.waitForFunction(()=>!document.querySelector('meta[name="robots"]')?.content.includes("noindex"));
  } finally {await browser.close();}
 });
