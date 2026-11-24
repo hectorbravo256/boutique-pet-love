@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+
 
 const site = "https://boutiquepetlove.cl";
 const esc = value => String(value ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"}[c]));
@@ -29,16 +29,22 @@ export async function handler(event) {
   if (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") return {statusCode:405,body:"Method not allowed"};
   let stage = "configuration";
   try {
-    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
+    const url = (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "").trim();
+    const key = (process.env.VITE_SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || "").trim();
     if (!url || !key) throw new Error("Missing catalog configuration");
     stage = "client";
-    const db = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+    const endpoint = new URL("/rest/v1/products", url);
+    if (endpoint.protocol !== "https:") throw new Error("Invalid catalog URL");
     stage = "query";
     const products = [];
     for (let offset=0;;offset+=100) {
-      const {data,error}=await db.from("products").select("id,name,description,meta_description,category,slug,active,discount_active,discount_percent,discount_start,discount_end,product_variants(id,size,price,stock),product_images(url,sort_order)").eq("active",true).order("id").range(offset,offset+99);
-      if (error) throw error;
+      endpoint.search = new URLSearchParams({select:"id,name,description,meta_description,category,slug,active,discount_active,discount_percent,discount_start,discount_end,product_variants(id,size,price,stock),product_images(url,sort_order)",active:"eq.true",order:"id.asc",offset:String(offset),limit:"100"}).toString();
+      const headers = {apikey:key};
+      if (key.startsWith("eyJ")) headers.Authorization = "Bearer " + key;
+      const response = await fetch(endpoint, {headers, signal:AbortSignal.timeout(15000)});
+      if (!response.ok) { stage = "query-http-" + response.status; throw new Error("Catalog request failed"); }
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error("Invalid catalog response");
       products.push(...data);
       if (data.length<100) break;
     }
