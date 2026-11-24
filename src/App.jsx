@@ -237,6 +237,14 @@ useEffect(() => {
 /* ================= UI ================= */
   return (
          <div className="bg-pink-50 min-h-screen">
+      <Helmet>
+        <title>Ropa para Perros y Mascotas en Chile | Boutique Pet Love</title>
+        <meta name="description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
+        <link rel="canonical" href="https://boutiquepetlove.cl/" />
+        <meta property="og:title" content="Ropa para Perros y Mascotas en Chile | Boutique Pet Love" />
+        <meta property="og:description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
+        <meta property="og:url" content="https://boutiquepetlove.cl/" />
+      </Helmet>
     
       
 
@@ -371,7 +379,7 @@ className="
         ⭐ Producto Destacado
       </span>
 
-      <h1
+      <h2
         className="
           mt-6
           text-[34px]
@@ -385,7 +393,7 @@ className="
         "
       >
         {heroProduct.name}
-      </h1>
+      </h2>
 
 	<p
   	  className="
@@ -546,7 +554,7 @@ className="
 
         <a
           href="https://instagram.com/boutique_petlove"
-          target="_blank"
+          target="_blank" rel="noopener noreferrer"
 
           className="
 			hidden
@@ -633,7 +641,7 @@ className="
       </h2>
 
       <p className="text-gray-700 mt-1">
-        Los favoritos de Boutique Pet Love
+        Ropa para mascotas: los favoritos de Boutique Pet Love
       </p>
 
     </div>
@@ -747,7 +755,7 @@ className="
         text-gray-500
         mt-2
       ">
-        Descubre los últimos productos premium
+        Descubre las novedades en ropa para mascotas
       </p>
 
     </div>
@@ -1041,7 +1049,8 @@ className="
 
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-3xl font-bold">Tienda online</h2>
+            <h1 className="text-3xl font-bold">Ropa para perros y mascotas en Chile</h1>
+            <p className="text-gray-700 mt-1">Explora nuestra tienda online de abrigos, vestidos, disfraces y ropa para ocasiones especiales. Encuentra la talla adecuada para tu mascota y recibe tu pedido en Chile.</p>
           </div>
         </div>
 
@@ -1108,7 +1117,7 @@ className="
               ? `${cat.featured_image || cat.image}?width=280&quality=55`
               : "/placeholder.png"
           }
-          alt={cat.name}
+          alt={`Colección ${cat.name} de Boutique Pet Love`}
           loading="lazy"
           className="
             transition-transform
