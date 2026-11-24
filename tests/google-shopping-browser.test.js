@@ -25,30 +25,7 @@ test('browser, cart storage and XML agree for active and expired promotions', as
  for(let i=0;i<2;i++){
  const v=product.product_variants[i];
  if(i) await page.getByRole('button',{name:v.size,exact:true}).click();
- const amount='
- await page.getByText(amount,{exact:true}).first().waitFor();
- assert.equal(new URL(page.url()).searchParams.get('variant'),String(v.id));
- const item=xml.split('<item>').find(s=>s.includes('<g:id>bpl-'+v.id+'</g:id>'));
- assert.ok(item);
- assert.ok(item.includes('<g:price>'+v.price+' CLP</g:price>'));
- if(prices[i]!==v.price) assert.ok(item.includes('<g:sale_price>'+prices[i]+' CLP</g:sale_price>'));
- else assert.ok(!item.includes('<g:sale_price>'));
- if(i===1) await page.getByRole('button',{name:'+',exact:true}).click();
- await page.getByRole('button',{name:/Agregar/}).first().click();
- const cart=await page.evaluate(()=>JSON.parse(localStorage.getItem('cart')));
- const line=cart.find(x=>x.id===v.id);
- assert.equal(line.price,prices[i]);assert.equal(line.qty,i+1);
- assert.equal(line.originalPrice,v.price);
- // Reload to close any cart drawer without changing its contents.
- if(i===0) {await page.reload();await page.getByRole('heading',{name:product.name,exact:true}).waitFor();}
- }
- const cart=await page.evaluate(()=>JSON.parse(localStorage.getItem('cart')));
- assert.equal(cart.reduce((sum,x)=>sum+x.price*x.qty,0),prices[0]+2*prices[1]);
- } finally {await context.close();}
- }
- } finally {await browser.close();}
-});
-+prices[i].toLocaleString('es-CL');
+ const amount='$'+prices[i].toLocaleString('es-CL');
  await page.waitForFunction(()=>Array.from(document.querySelectorAll('script[type="application/ld+json"]')).some(s=>JSON.parse(s.textContent)['@type']==='ProductGroup'));
  const group=await page.evaluate(()=>Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s=>JSON.parse(s.textContent)).find(s=>s['@type']==='ProductGroup'));
  assert.equal(group.hasVariant.length,2);
