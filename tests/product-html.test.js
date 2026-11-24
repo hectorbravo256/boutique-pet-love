@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {fetchPublicProduct,renderProductHtml} from "../netlify/edge-functions/product-html.js";
+import {fetchPublicProduct,renderProductHtml} from "../netlify/lib/product-html.js";
 const template=readFileSync(new URL("../index.html",import.meta.url),"utf8");
 const product={id:1,active:true,slug:"abrigo",name:"Abrigo <especial>",category:"Navidad",description:"Texto & detalle </script>",product_images:[{url:"https://example.com/a.webp",sort_order:0}],product_variants:[{id:1,size:"0",price:8490,stock:1},{id:2,size:"1",price:8990,stock:0}]};
 test("initial HTML has specific metadata, visible content and fresh offers",()=>{
