@@ -7,3 +7,14 @@
 
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/google-shopping.xml"
+  to = "/.netlify/functions/google-shopping"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
