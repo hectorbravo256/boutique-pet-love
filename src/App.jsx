@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, BrowserRouter, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Link, useLocation } from "react-router-dom";
 import './index.css';
 import { supabase } from "./supabaseClient";
 import Layout from "./Layout";
@@ -47,7 +47,6 @@ const InventoryReports = lazy(() => import("./admin/inventory/InventoryReports")
 /* ================= APP PRINCIPAL ================= */
 
 function AppContent() {
-  const navigate = useNavigate();
 
 
   const [products, setProducts] = useState([]);
@@ -521,12 +520,7 @@ className="
         "
       >
 
-        <button
-          onClick={() =>
-            navigate(
-              `/producto/${heroProduct.slug}`
-            )
-          }
+        <Link to={`/producto/${heroProduct.slug}`}
 
           className="
             bg-pink-600
@@ -547,7 +541,7 @@ className="
           "
         >
           Comprar ahora
-        </button>
+        </Link>
 
         <a
           href="https://instagram.com/boutique_petlove"
@@ -1092,9 +1086,7 @@ className="
 
   categories.map(cat => (
 
-      <div
-        key={cat.id}
-        onClick={() => navigate(`/categoria/${cat.slug}`)}
+      <Link key={cat.id} to={`/categoria/${cat.slug}`}
         className="
           group
           cursor-pointer
@@ -1142,7 +1134,7 @@ className="
           {cat.name}
         </div>
 
-      </div>
+      </Link>
 
     ))
 
