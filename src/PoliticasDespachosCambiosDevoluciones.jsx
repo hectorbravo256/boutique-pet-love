@@ -70,7 +70,7 @@ export default function PoliticasDespachosCambiosDevoluciones() {
           </Section>
 
           <Section id="horarios" number="02" title="Horarios y programación de despachos">
-            <p>Para la programación habitual de PAKET, nuestro <strong>horario de corte es a las 22:00 horas de Chile</strong>. Los pedidos se programan según el día y la hora de compra, considerando los días habilitados para despacho y las fechas de cierre operativo.</p>
+            <p>Para la programación habitual de PAKET, nuestro <strong>horario de corte es a las 20:00 horas de Chile</strong>. Los pedidos se programan según el día y la hora de compra, considerando los días habilitados para despacho y las fechas de cierre operativo.</p>
             <div className="rounded-2xl border border-pink-100 bg-pink-50/60 p-3 sm:p-4">
               <p className="mb-3 text-sm font-bold text-pink-900">Selecciona el día de compra y revisa cuándo se despacha tu pedido:</p>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -79,12 +79,12 @@ export default function PoliticasDespachosCambiosDevoluciones() {
                     <h3 className="mb-3 text-base font-black text-gray-900">Compra realizada el {day.toLowerCase()}</h3>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="min-w-0 rounded-lg bg-green-50 p-2.5">
-                        <p className="text-xs font-semibold leading-5 text-gray-600">Antes de las 22:00</p>
+                        <p className="text-xs font-semibold leading-5 text-gray-600">Antes de las 20:00</p>
                         <p className="mt-1 text-base font-black text-green-800">{before}</p>
                         <p className="mt-1 text-[11px] leading-4 text-gray-600">Despacho programado</p>
                       </div>
                       <div className="min-w-0 rounded-lg bg-pink-50 p-2.5">
-                        <p className="text-xs font-semibold leading-5 text-gray-600">Desde las 22:00</p>
+                        <p className="text-xs font-semibold leading-5 text-gray-600">Desde las 20:00</p>
                         <p className="mt-1 text-base font-black text-pink-800">{after}</p>
                         <p className="mt-1 text-[11px] leading-4 text-gray-600">Despacho programado</p>
                       </div>
@@ -121,7 +121,7 @@ export default function PoliticasDespachosCambiosDevoluciones() {
             <p>En las compras realizadas por internet, el consumidor puede ejercer el <strong>derecho a retracto dentro de los 10 días siguientes a la recepción del producto</strong>, conforme a la Ley N.º 19.496 y sus condiciones y excepciones legales aplicables.</p>
             <p>Para solicitarlo, el cliente deberá contactarnos indicando su número de pedido y los productos que desea devolver. Informaremos las instrucciones para efectuar la devolución por transporte, ya que no disponemos de atención presencial ni puntos de retiro.</p>
             <p>Para ejercer el retracto, el cliente deberá devolver la prenda en las condiciones exigidas por la normativa aplicable. El cliente asumirá el costo directo del transporte de devolución cuando corresponda legalmente, utilizando el medio previamente coordinado con Boutique Pet Love.</p>
-            <p>Una vez recibida la devolución, verificaremos su estado y gestionaremos la restitución del dinero conforme a los plazos y condiciones legales. Esta revisión no suspende ni restringe los derechos del consumidor. El derecho a retracto es independiente de nuestra política de cambios voluntarios de talla.</p>
+            <p>Una vez recibida la devolución, verificaremos su estado y gestionaremos el reembolso en un plazo máximo de 5 días corridos desde la recepción de la devolución, sin perjuicio de los plazos legales aplicables. La acreditación efectiva podrá depender del medio de pago y de la entidad financiera. No aplicamos comisiones administrativas ni cargos por reincorporación al inventario. Esta revisión no suspende ni restringe los derechos del consumidor. El derecho a retracto es independiente de nuestra política de cambios voluntarios de talla.</p>
             <h3 className="font-bold text-gray-900">Garantía legal</h3>
             <p>Si un producto nuevo presenta fallas o defectos cubiertos por la garantía legal, el consumidor dispone, por regla general, de <strong>seis meses desde su recepción</strong> para ejercer los derechos que establece la Ley del Consumidor, incluyendo las alternativas legales de reparación, cambio o devolución del dinero, según corresponda.</p>
             <p>La garantía legal cubre los defectos o fallas de origen que correspondan conforme a la ley; no cubre el desgaste normal ni los daños atribuibles al uso inadecuado, mordeduras, tirones o deterioro causado por la mascota, salvo que exista una falla legalmente cubierta.</p>
