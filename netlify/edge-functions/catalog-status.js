@@ -1,3 +1,4 @@
+import {fetchPublicProduct,renderProductHtml} from "./product-html.js";
 export async function catalogStatus(path, env, fetcher = fetch) {
  const match = /^\/(producto|categoria)\/([^/]+)\/?$/i.exec(path);
  if (!match) return 404;
@@ -45,7 +46,20 @@ export function createCatalogCache({ttl=60000,max=1000,clock=Date.now,lookup=cat
 const cachedCatalogStatus=createCatalogCache();
 export default async function handler(request,context){
  if(!["GET","HEAD"].includes(request.method))return;
- const status=await cachedCatalogStatus(new URL(request.url).pathname,k=>Netlify.env.get(k));
+ const url=new URL(request.url);
+ if(/^\/producto\//i.test(url.pathname)){
+ const result=await fetchPublicProduct(url.pathname,k=>Netlify.env.get(k));
+ if(result.status!==200)return errorResponse(result.status,request.method);
+ const response=await context.next();
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
+ const html=await response.text();
+ const rendered=renderProductHtml(html,result.product,url.searchParams.get("variant"));
+ const headers=new Headers(response.headers);
+ for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
+ headers.set("Cache-Control","no-store");
+ return new Response(rendered||html,{status:200,headers});
+ }
+ const status=await cachedCatalogStatus(url.pathname,k=>Netlify.env.get(k));
  if(status===200)return;
  return errorResponse(status,request.method);
 }
