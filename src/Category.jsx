@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import { Helmet } from "react-helmet-async";
 
 export default function Category() {
   const { slug } = useParams();
-  const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState(null);
@@ -292,9 +291,9 @@ const precioBase =
 
   return (
     
-<div
+<Link
   key={p.id}
-  onClick={() => navigate(`/producto/${p.slug}`)}
+  to={`/producto/${p.slug}`}
   className="
     group
     cursor-pointer
@@ -443,11 +442,7 @@ const precioBase =
   duration-500
 ">
 
-  <button
-    onClick={(e) => {
-  e.stopPropagation();
-  navigate(`/producto/${p.slug}`);
-}}
+  <span
     className="
       w-full
       bg-gradient-to-r
@@ -466,13 +461,13 @@ const precioBase =
     "
   >
     Ver producto
-  </button>
+  </span>
 
 </div>
 
   </div>
 
-</div>
+</Link>
   );
 })}
 
