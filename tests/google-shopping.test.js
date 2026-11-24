@@ -27,3 +27,8 @@ test('ProductGroup matches feed for each variant and promotion window',()=>{
  assert.equal(buildProductSchema({...product,product_images:[]}),null);
  assert.equal(categorySlug('Otoño - Invierno'),'otono-invierno');
 });
+
+test('variant offers reference the shared return policy',()=>{
+ const schema=buildProductSchema(product);
+ for(const v of schema.hasVariant) assert.equal(v.offers.hasMerchantReturnPolicy['@id'],'https://boutiquepetlove.cl/#return-policy');
+});
