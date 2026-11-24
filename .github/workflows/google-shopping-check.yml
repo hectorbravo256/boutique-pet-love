@@ -17,3 +17,13 @@ jobs:
       - run: npm ci
       - run: node --test tests/google-shopping.test.js
       - run: npm run build
+      - run: npm install --no-save --package-lock=false playwright@1.51.1
+      - run: npx playwright install --with-deps chromium
+      - name: Isolated browser checks
+        env:
+          VITE_SUPABASE_URL: https://example.invalid
+          VITE_SUPABASE_KEY: fake-test-key
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/bpl-vite.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ > /dev/null && break; sleep 1; done
+          node --test tests/google-shopping-browser.test.js
