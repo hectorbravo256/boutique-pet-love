@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import NotFound from "./NotFound";
 import { Helmet } from "react-helmet-async";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -12,6 +13,7 @@ export default function Product() {
 
   
   const [product, setProduct] = useState(null);
+  const [loadResult, setLoadResult] = useState(null);
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
@@ -201,8 +203,11 @@ const prevImage = () => {
 
   /* ================= CARGA DATOS ================= */
   useEffect(() => {
+    let cancelled = false;
+    setProduct(null);
+    setLoadResult(null);
     const cargar = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select(`
           *,
@@ -210,6 +215,7 @@ const prevImage = () => {
           product_images (*)
         `)
         .eq("slug", slug)
+        .eq("active", true)
         .order("sort_order", {
   foreignTable: "product_images",
   ascending: true
@@ -217,6 +223,8 @@ const prevImage = () => {
 .single();
       
 
+      if (cancelled) return;
+      setLoadResult({slug, error: Boolean(error && error.code !== "PGRST116"), missing: !data});
       setProduct(data);
 
       if (window.gtag && data) {
@@ -234,6 +242,7 @@ const prevImage = () => {
     };
 
     cargar();
+    return () => { cancelled = true; };
   }, [slug]);
 
   useEffect(() => {
@@ -277,7 +286,8 @@ const prevImage = () => {
     setQty(1);
   }, [product, requestedVariant]);
 
-  if (!product) {
+  if (loadResult?.slug === slug && loadResult.missing) return <NotFound unavailable={loadResult.error} />;
+  if (!product || product.slug !== slug) {
   return (
     <div className="
       min-h-screen
