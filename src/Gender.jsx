@@ -5,6 +5,7 @@ import {
   Link
 } from "react-router-dom";
 
+import NotFound from "./NotFound";
 import { supabase } from "./supabaseClient";
 
 export default function Gender() {
@@ -20,7 +21,7 @@ export default function Gender() {
 
   useEffect(() => {
 
-    cargar();
+    if (["macho","hembra","unisex"].includes(slug)) cargar();
 
   }, [slug]);
 
@@ -56,6 +57,7 @@ export default function Gender() {
 
   };
 
+  if (!["macho","hembra","unisex"].includes(slug)) return <NotFound />;
   if (loading) {
 
     return (
