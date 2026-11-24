@@ -142,7 +142,7 @@ export function calculatePaketPickup({
   }
 
   // Horario de corte.
-  const cutoff = settings.cutoff ?? "22:00";
+  const cutoff = settings.cutoff ?? "20:00";
 
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(cutoff)) {
     throw new Error("Horario de corte inválido.");
@@ -203,7 +203,7 @@ if (purchaseLocal) {
   const purchaseWeekday = weekdayISO(purchase.date);
 
   // El horario de corte es inclusivo:
-  // a las 22:00 ya se considera fuera de plazo.
+  // a las 20:00 ya se considera fuera de plazo.
   const afterCutoff = purchase.time >= cutoff;
 
   // Por defecto, retiro el próximo día habilitado.
@@ -220,7 +220,7 @@ if (purchaseLocal) {
     requiredDays = 2;
   }
 
-  // Domingo desde las 22:00:
+  // Domingo desde las 20:00:
   // el retiro se realiza el martes.
   if (purchaseWeekday === 7 && afterCutoff) {
     requiredDays = 2;
