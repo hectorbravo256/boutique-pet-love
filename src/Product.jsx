@@ -323,24 +323,10 @@ const prevImage = () => {
 }
 
   // 🔥 LÓGICA GLOBAL DESCUENTO
-const ahora = new Date();
-
-const inicio = product?.discount_start
-  ? new Date(product.discount_start)
-  : null;
-
-const fin = product?.discount_end
-  ? new Date(product.discount_end)
-  : null;
-
-const dentroDeFecha =
-  (!inicio || ahora >= inicio) &&
-  (!fin || ahora <= fin);
-
-const tieneDescuento =
-  product?.discount_active &&
-  product?.discount_percent > 0 &&
-  dentroDeFecha;
+const ahora = new Intl.DateTimeFormat("sv-SE", {timeZone:"America/Santiago", year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).format(new Date()).replace(" ","T");
+const inicio = product.discount_start?.replace(" ","T").slice(0,19);
+const fin = product.discount_end?.replace(" ","T").slice(0,19);
+const tieneDescuento = product.discount_active && Number(product.discount_percent) > 0 && Number(product.discount_percent) < 100 && (!inicio || ahora >= inicio) && (!fin || ahora <= fin);
 
   const seoTitle =
   product.meta_title ||
