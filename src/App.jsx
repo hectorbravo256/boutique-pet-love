@@ -1,6 +1,7 @@
+import { Helmet } from "react-helmet-async";
 
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
+import { Routes, Route, BrowserRouter, useNavigate, useLocation } from "react-router-dom";
 import './index.css';
 import { supabase } from "./supabaseClient";
 import Layout from "./Layout";
@@ -1197,7 +1198,8 @@ export default function App() {
   return (
   <BrowserRouter>
 	  <ScrollToTop />
-  <Routes>
+  <IndexingDirectives />
+<Routes>
 
 {/* 🟢 PÚBLICO (CON HEADER) */}
 <Route element={<Layout />}>
@@ -1417,4 +1419,11 @@ export default function App() {
   </Routes>
 </BrowserRouter>    
   );
+}
+
+function IndexingDirectives() {
+  const { pathname } = useLocation();
+  const path = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  const excluded = /^\/(admin|login|checkout|success)(\/|$)/.test(path);
+  return excluded ? <Helmet><meta name="robots" content="noindex, nofollow" /></Helmet> : null;
 }
