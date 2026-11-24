@@ -27,11 +27,14 @@ export function buildFeed(products, now = new Date()) {
 }
 export async function handler(event) {
   if (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") return {statusCode:405,body:"Method not allowed"};
+  let stage = "configuration";
   try {
     const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
     if (!url || !key) throw new Error("Missing catalog configuration");
+    stage = "client";
     const db = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+    stage = "query";
     const products = [];
     for (let offset=0;;offset+=100) {
       const {data,error}=await db.from("products").select("id,name,description,meta_description,category,slug,active,discount_active,discount_percent,discount_start,discount_end,product_variants(id,size,price,stock),product_images(url,sort_order)").eq("active",true).order("id").range(offset,offset+99);
@@ -39,11 +42,12 @@ export async function handler(event) {
       products.push(...data);
       if (data.length<100) break;
     }
+    stage = "render";
     const body=buildFeed(products);
-    if (!body.includes("<item>")) throw new Error("Empty catalog");
+    if (!body.includes("<item>")) { stage = "empty"; throw new Error("Empty catalog"); }
     return {statusCode:200,headers:{"Content-Type":"application/xml; charset=utf-8","Cache-Control":"public, max-age=300"},body:event.httpMethod==="HEAD"?"":body};
   } catch (error) {
     console.error("Google Shopping feed:",error.message);
-    return {statusCode:503,headers:{"Cache-Control":"no-store"},body:"Catalog temporarily unavailable"};
+    return {statusCode:503,headers:{"Cache-Control":"no-store"},body:"Catalog temporarily unavailable" + (process.env.CONTEXT === "deploy-preview" ? " [" + stage + (typeof error.code === "string" && /^(?:[0-9A-Z]{5}|PGRST[0-9]{3})$/.test(error.code) ? ":" + error.code : "") + "]" : "")};
   }
 }
