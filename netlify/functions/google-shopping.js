@@ -29,7 +29,7 @@ export async function handler(event) {
   if (event.httpMethod !== "GET" && event.httpMethod !== "HEAD") return {statusCode:405,body:"Method not allowed"};
   try {
     const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
     if (!url || !key) throw new Error("Missing catalog configuration");
     const db = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
     const products = [];
