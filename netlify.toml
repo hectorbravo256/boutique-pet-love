@@ -2,23 +2,16 @@
   NODE_VERSION = "20"
 
 [build]
-  command = "node ./node_modules/vite/bin/vite.js build"
+  command = "node scripts/test-build-guard.mjs && node ./node_modules/vite/bin/vite.js build"
   publish = "dist"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "netlify/test-disabled-functions"
 
-[[redirects]]
-  from = "/google-shopping.xml"
-  to = "/.netlify/functions/google-shopping"
-  status = 200
-  force = true
+[build.edge_functions]
+  directory = "netlify/test-disabled-edge"
 
-[[redirects]]
-  from = "/sitemap.xml"
-  to = "/.netlify/functions/sitemap"
-  status = 200
-  force = true
+
 
 [[headers]]
   for = "/admin"
@@ -129,3 +122,9 @@
   from = "/*"
   to = "/404.html"
   status = 404
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://gztsfbdtevhcskdztiiu.supabase.co; connect-src 'self' https://gztsfbdtevhcskdztiiu.supabase.co wss://gztsfbdtevhcskdztiiu.supabase.co; font-src 'self' data:; object-src 'none'; form-action 'self'; base-uri 'self'"
