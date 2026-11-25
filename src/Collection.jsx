@@ -78,11 +78,11 @@ export default function Collection() {
         <meta property="og:description" content={seo.description}/>
         <meta property="og:url" content={seo.url}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        <meta property="og:image" content="https://boutique-pet-love-test.netlify.app/logo-google.webp"/>
         <meta name="twitter:card" content="summary_large_image"/>
         <meta name="twitter:title" content={seo.title}/>
         <meta name="twitter:description" content={seo.description}/>
-        <meta name="twitter:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        <meta name="twitter:image" content="https://boutique-pet-love-test.netlify.app/logo-google.webp"/>
         {[seo.collection,seo.list,seo.breadcrumbs].map(s=><script key={s["@type"]} type="application/ld+json">{JSON.stringify(s)}</script>)}
       </Helmet>
       {/* HEADER */}
