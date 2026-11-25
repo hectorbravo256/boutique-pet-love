@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, BrowserRouter, Link, useLocation } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Link, useLocation, useOutletContext } from "react-router-dom";
 import './index.css';
 import { supabase } from "./supabaseClient";
 import Layout from "./Layout";
@@ -47,16 +47,8 @@ const InventoryReports = lazy(() => import("./admin/inventory/InventoryReports")
 
 /* ================= APP PRINCIPAL ================= */
 
-// Consume only the initial public home payload, never reuse it on later navigation.
-let initialHomeCategories = null;
-if (typeof document !== "undefined" && window.location.pathname === "/") {
-  const seed = document.getElementById("bpl-home-categories");
-  try { if (seed) { const value = JSON.parse(seed.textContent); if (Array.isArray(value)) initialHomeCategories = value; } } catch {}
-  seed?.remove();
-}
 function AppContent() {
-  const [seedCategories] = useState(() => initialHomeCategories);
-  useEffect(() => { initialHomeCategories = null; }, []);
+  const {categories,loadingCategories}=useOutletContext();
 
 
   const [products, setProducts] = useState([]);
@@ -147,8 +139,6 @@ const heroPrecioBase =
     p => p.exclusive
   );
 	
-  const [categories, setCategories] = useState(seedCategories ?? []);
-  const [loadingCategories, setLoadingCategories] = useState(seedCategories === null);
   const loadingProducts =
   products.length === 0;
 
@@ -215,32 +205,7 @@ cargar();
 
 }, []);
 
-useEffect(() => {
 
-  if (seedCategories !== null) return;
-  const cargarCategorias = async () => {
-
-    const { data, error } = await supabase
-      .from("categories")
-      .select("id,name,slug,active,featured_image,image,sort_order" )
-      .eq("active", true)
-      .order("sort_order", {
-        ascending: true
-      });
-
-
-    if (error) {
-      console.error(error);
-    }
-
-    setCategories(data || []);
-    setLoadingCategories(false);
-
-  };
-
-  cargarCategorias();
-
-}, []);
 
 
 	
