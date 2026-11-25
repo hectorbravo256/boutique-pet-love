@@ -9,7 +9,7 @@ export function activeDiscount(p, now = new Date()) {
 }
 export function buildProductSchema(p, now = new Date()) {
  const url=site+"/producto/"+encodeURIComponent(p.slug);
- const images=[...(p.product_images||[])].sort((a,b)=>(a.sort_order??0)-(b.sort_order??0)).map(i=>i.url).filter(u=>{try{return new URL(u).protocol==="https:";}catch{return false;}});
+ const images=[...(p.product_images||[])].sort((a,b)=>(a.sort_order??0)-(b.sort_order??0)).map(i=>typeof i.url==='string' && i.url.startsWith('/test-fixtures/') ? site+i.url : i.url).filter(u=>{try{return new URL(u).protocol==="https:";}catch{return false;}});
  const description=String(p.description||p.meta_description||p.name).replace(/<[^>]*>/g," ").trim();
  const groupId="bpl-product-"+p.id;
  const variants=[];
