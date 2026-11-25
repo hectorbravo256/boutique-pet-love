@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {catalogStatus,errorResponse,config,createCatalogCache} from "../netlify/edge-functions/catalog-status.js";
+import {catalogStatus,errorResponse,config,createCatalogCache,createPerformanceMetrics} from "../netlify/edge-functions/catalog-status.js";
 import {readFileSync} from "node:fs";
 const env=k=>({VITE_SUPABASE_URL:"https://example.invalid",VITE_SUPABASE_KEY:"fake"}[k]);
 test("active catalog and variant-independent lookup",async()=>{
@@ -50,4 +50,31 @@ test("comparative repeated lookup workload",async()=>{
  for(let i=0;i<20;i++)await cached("/producto/a",env);
  const warm=performance.now()-begin;assert.equal(calls,1);
  console.log(JSON.stringify({simulated:true,uncachedMs:uncached,cachedMs:warm,uncachedQueries:20,cachedQueries:1}));
+});
+
+test("request metrics preserve response and measure decoded UTF-8 bytes without leaking data",async()=>{
+ let now=0;const logs=[];
+ const body=JSON.stringify([{name:"Navidad ñ"}]);
+ const m=createPerformanceMetrics({clock:()=>now,logger:x=>logs.push(JSON.parse(x)),fetcher:async()=>{now+=20;return new Response(body);}});
+ const res=await m.fetch("https://example.invalid/private?token=secret",{headers:{apikey:"secret"}});
+ assert.deepEqual(await res.json(),JSON.parse(body));
+ await m.base(async()=>{now+=5;});
+ const html=m.render(()=>{now+=2;return "<h1>ñ</h1>";});
+ const out=m.finish(new Response(html,{headers:{"Cache-Control":"no-store"}}),"category",html);
+ assert.equal(await out.text(),html);
+ assert.equal(out.headers.get("Cache-Control"),"no-store");
+ assert.match(out.headers.get("Server-Timing"),/supabase;dur=20/);
+ assert.match(out.headers.get("Server-Timing"),/queries;desc="1"/);
+ assert.equal(logs[0].upstreamBytes,Buffer.byteLength(body));
+ assert.equal(logs[0].htmlBytes,Buffer.byteLength(html));
+ assert.equal(logs[0].totalMs,27);
+ assert.doesNotMatch(JSON.stringify(logs),/secret|Navidad|example.invalid/);
+});
+test("metrics preserve upstream failures and HTTP status headers",async()=>{
+ const logs=[];const m=createPerformanceMetrics({logger:x=>logs.push(JSON.parse(x)),fetcher:async()=>{throw Error("secret");}});
+ await assert.rejects(m.fetch("https://example.invalid"));
+ const out=m.finish(errorResponse(503,"HEAD"),"product");
+ assert.equal(out.status,503);assert.equal(out.headers.get("Retry-After"),"60");assert.equal(await out.text(),"");
+ assert.equal(logs[0].queries,1);assert.equal(logs[0].upstreamBytes,0);
+ assert.doesNotMatch(JSON.stringify(logs),/secret/);
 });
