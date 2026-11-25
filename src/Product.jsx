@@ -1,3 +1,4 @@
+import { readCart, remainingStock } from "./cartStock.mjs";
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
@@ -24,6 +25,11 @@ export default function Product() {
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
+  const [cartSnapshot,setCartSnapshot]=useState(readCart);
+  useEffect(()=>{const sync=()=>setCartSnapshot(readCart()); window.addEventListener("storage",sync); return ()=>window.removeEventListener("storage",sync);},[]);
+  const remaining=remainingStock(cartSnapshot,selectedVariant);
+  useEffect(()=>{setQty(q=>Math.max(1,Math.min(q,remaining)));},[remaining]);
+  const cannotAdd=!selectedVariant || remaining===0 || qty>remaining;
   const [showModal, setShowModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
@@ -45,7 +51,7 @@ export default function Product() {
 
     const stock = selectedVariant.stock || 0;
 
-    if (qty < stock) setQty(qty + 1);
+    if (qty < remaining) setQty(qty + 1);
   };
 
   const decreaseQty = () => {
@@ -101,13 +107,12 @@ const precioFinal = tieneDescuento
       return false;
     }
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cart = readCart();
 
 const existingIndex = cart.findIndex(
 
   i =>
-    i.product_id === product.id &&
-    i.size === size
+    String(i.id) === String(variant.id)
 
 );
 
@@ -778,7 +783,7 @@ const precioFinal = precioBase * cantidad;
 
     {isOutOfStock
       ? "❌ Sin stock"
-      : currentStock <= 3
+      : currentStock === 1 ? "⚠️ Última unidad disponible" : currentStock <= 3
         ? `⚠️ Últimas ${currentStock} unidades`
         : `✔ ${currentStock} disponibles`}
 
@@ -913,7 +918,7 @@ onMouseOut={(e) => {
             </span>
             
             <button 
-              onClick={increaseQty} 
+              onClick={increaseQty} disabled={qty>=remaining} 
               style={btnQty}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
@@ -940,7 +945,7 @@ onMouseOut={(e) => {
 onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
-            disabled={!selectedVariant || isOutOfStock}
+            disabled={cannotAdd}
             className={`
   flex-1
   py-4
@@ -953,13 +958,13 @@ onMouseOut={(e) => {
   hover:scale-[1.02]
   active:scale-[0.98]
   ${
-    (!selectedVariant || isOutOfStock)
+    cannotAdd
       ? "bg-gray-300 cursor-not-allowed"
       : "bg-gradient-to-r from-gray-800 to-black"
   }
 `}
           >
-            🛒 Agregar
+            {remaining===0 && currentStock>0 ? "Stock máximo en carrito" : "🛒 Agregar"}
           </button>
 
           <button
@@ -974,7 +979,7 @@ onMouseOut={(e) => {
 onMouseOut={(e) => {
   e.currentTarget.style.transform = "scale(1)";
 }}
-            disabled={!selectedVariant || isOutOfStock}
+            disabled={cannotAdd}
             className={`
   flex-1
   py-4
@@ -987,7 +992,7 @@ onMouseOut={(e) => {
   hover:scale-[1.02]
   active:scale-[0.98]
   ${
-    (!selectedVariant || isOutOfStock)
+    cannotAdd
       ? "bg-gray-300 cursor-not-allowed"
       : "bg-gradient-to-r from-emerald-500 to-green-500"
   }
