@@ -40,32 +40,15 @@ FOR r IN SELECT * FROM (VALUES
  -- Qualify only audited relation references, not CREATE TEMP TABLE names.
  body := regexp_replace(body,'(?i)(\m(?:FROM|INTO|JOIN)[ \t]+)(tmp_sale_items|tmp_repair_items|tmp_reentry_items|tmp_online_sale_items)\M','\1pg_temp.\2','g');
  ddl := replace(f.definition,f.prosrc,body);
- -- Preserve empty paths; pin other routines to trusted schemas, temp last.
+ -- The two dedicated purchase/payment candidates supersede generic output.
  IF r.signature NOT IN ('apply_physical_count(uuid)','create_physical_count(text,text,text,text)','registrar_abono_reserva(bigint,numeric,text,text,text)') THEN
   ddl := regexp_replace(ddl,'(?im)^ SET search_path TO [^\n]+\n','');
-  ddl := replace(ddl,'AS $function
- INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
-END LOOP;
-END $review$;
-SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate executed. Export securely outside repository.
--- Review exact diffs and test temp collision, repeated calls and search_path before granting.
-ROLLBACK;
-,E'SET search_path TO pg_catalog, public, pg_temp\nAS $function
- INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
-END LOOP;
-END $review$;
-SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate executed. Export securely outside repository.
--- Review exact diffs and test temp collision, repeated calls and search_path before granting.
-ROLLBACK;
-);
+  ddl := replace(ddl,'AS $function$',E'SET search_path TO pg_catalog, public, pg_temp\nAS $function$');
   IF strpos(ddl,'SET search_path TO pg_catalog, public, pg_temp')=0 THEN RAISE EXCEPTION 'Cannot pin search path: %',r.signature; END IF;
  END IF;
  INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
 END LOOP;
 END $review$;
 SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate executed. Export securely outside repository.
--- Review exact diffs and test temp collision, repeated calls and search_path before granting.
+-- No candidate executed. Review exact diffs before granting.
 ROLLBACK;
