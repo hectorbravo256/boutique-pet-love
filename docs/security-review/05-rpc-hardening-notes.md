@@ -1,0 +1,6 @@
+# RPC hardening review
+Read-only inspection of all 17 non-trigger bodies: declaration initializers are literals or scalar input expressions (coalesce, trim, round, lower, nullif); numeric conversion may fail before the guard, no business DML identified in initializers.
+Six functions use temporary relations. Candidate hardening must qualify references with pg_temp, verify CREATE TEMP behavior and ON COMMIT DROP, reject collisions, and test repeated calls. Set search_path to pg_catalog, public, pg_temp only after checking public CREATE grants and unqualified objects; retain empty paths for already qualified routines. Do not blindly replace names in comments or literals.
+The legacy email predicate in apply_physical_count is removed only after matching the audited body fingerprint and exactly one predicate; ownership and state checks remain.
+Restore authenticated EXECUTE only for the 16 exact signatures after candidate definitions are reviewed and installed in the isolated clone. Keep online confirmation service-only and trigger functions non-callable by API roles. No executable grant restoration yet.
+One initial metadata query failed due to missing split_part argument; corrected by fetching bodies and inspecting them locally. No database writes. Candidate generator not executed or validated.
