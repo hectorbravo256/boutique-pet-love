@@ -5,7 +5,7 @@ import NotFound from "./NotFound";
 import {buildProductSchema, categorySlug} from "./productSchema";
 import { Helmet } from "react-helmet-async";
 
-const WHATSAPP = "https://wa.me/56982700002";
+const WHATSAPP = "#";
 
 export default function Product() {
   const { slug } = useParams();
@@ -134,8 +134,8 @@ cart.push({
 });
     }
 
-    if (window.gtag) {
-  window.gtag("event", "add_to_cart", {
+    if (undefined /* TEST analytics disabled */) {
+  undefined /* TEST analytics disabled */("event", "add_to_cart", {
     currency: "CLP",
     value: precioFinal * qty,
     items: [
@@ -212,7 +212,7 @@ const prevImage = () => {
   useEffect(() => {
     document.getElementById("bpl-product-seed")?.remove();
     if(initialRoute.current===slug&&seed){
-      if(!trackedSeed.current&&window.gtag){window.gtag("event","view_item",{currency:"CLP",items:[{item_id:seed.id,item_name:seed.name,item_category:seed.category}]});trackedSeed.current=true;}
+      if(!trackedSeed.current&&undefined /* TEST analytics disabled */){undefined /* TEST analytics disabled */("event","view_item",{currency:"CLP",items:[{item_id:seed.id,item_name:seed.name,item_category:seed.category}]});trackedSeed.current=true;}
       return;
     }
     initialRoute.current=null;
@@ -241,8 +241,8 @@ const prevImage = () => {
       setLoadResult({slug, error: Boolean(error && error.code !== "PGRST116"), missing: !data});
       setProduct(data);
 
-      if (window.gtag && data) {
-  window.gtag("event", "view_item", {
+      if (undefined /* TEST analytics disabled */ && data) {
+  undefined /* TEST analytics disabled */("event", "view_item", {
     currency: "CLP",
     items: [
       {
