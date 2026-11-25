@@ -46,7 +46,7 @@ useEffect(() => {
         await Promise.all([
           supabase
             .from("paket_shipping_settings")
-            .select("*")
+            .select("id,enabled,timezone,cutoff,pickup_weekdays,preparation_days")
             .eq("id", 1)
             .single(),
           supabase
@@ -333,41 +333,8 @@ if (!telefonoRegex.test(formData.telefono || "")) {
 };
 
 const applyCoupon = async () => {
-  const code = coupon.trim().toUpperCase();
-
-  if (!code) {
-    setCouponError("Ingresa un código");
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("coupons")
-    .select("*")
-    .eq("code", code)
-    .eq("active", true)
-    .maybeSingle();
-
-  if (error || !data) {
-    setDiscount(0);
-    setCouponError("❌ Código inválido");
-    return;
-  }
-
-  // 🔥 VALIDAR EXPIRACIÓN
-  if (data.expires_at && new Date(data.expires_at) < new Date()) {
-    setDiscount(0);
-    setCouponError("⏳ Cupón expirado");
-    return;
-  }
-  if (data.max_uses && data.used_count >= data.max_uses) {
   setDiscount(0);
-  setCouponError("⚠️ Cupón agotado");
-  return;
-}
-
-  setDiscount(data.discount);
-  setCouponError("");
-  localStorage.setItem("couponUsed", data.code);
+  setCouponError("TEST: validación de cupones pendiente de implementación segura");
 };
 
 	useEffect(() => {
