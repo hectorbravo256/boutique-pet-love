@@ -8,57 +8,49 @@ import {
 import NotFound from "./NotFound";
 import { supabase } from "./supabaseClient";
 
+import { Helmet } from "react-helmet-async";
+import { genders, validGender, genderSeo } from "../netlify/lib/gender-html.js";
+let initialGender=null;
+if(typeof document!=="undefined"){
+ const el=document.getElementById("bpl-gender-seed");
+ try{if(el)initialGender=JSON.parse(el.textContent);}catch{}
+ el?.remove();
+}
 export default function Gender() {
 
   const { slug } = useParams();
 
 
-  const [products, setProducts] =
-    useState([]);
+  const [seed] = useState(()=>initialGender?.category?.slug===slug?initialGender:null);
+  const [products, setProducts] = useState(()=>seed?.products||[]);
+  const [loadedSlug,setLoadedSlug]=useState(()=>seed?slug:null);
+  const [failed,setFailed]=useState(false);
 
   const [loading, setLoading] =
-    useState(true);
+    useState(!seed);
 
-  useEffect(() => {
-
-    if (["macho","hembra","unisex"].includes(slug)) cargar();
-
-  }, [slug]);
-
-  const cargar = async () => {
-
-    setLoading(true);
-
-    const { data } =
-      await supabase
-        .from("products")
-        .select(`
-          *,
-          product_variants (*),
-          product_images (*)
-        `)
-        .eq("active", true)
-        .eq("gender", slug);
-
-    (data || []).forEach(product => {
-
-  product.product_images?.sort(
-    (a, b) =>
-      (a.sort_order || 0)
-      -
-      (b.sort_order || 0)
-  );
-
-});
-
-    setProducts(data || []);
-
-    setLoading(false);
-
-  };
-
-  if (!["macho","hembra","unisex"].includes(slug)) return <NotFound />;
-  if (loading) {
+  useEffect(()=>{
+    if(!validGender(slug))return;
+    if(seed?.category?.slug===slug&&initialGender===seed)return;
+    initialGender=null;
+    let cancelled=false;
+    setLoading(true);setFailed(false);
+    (async()=>{
+      try{
+        const {data,error}=await supabase.from("products").select("id,name,slug,active,gender,product_variants(price),product_images(url,sort_order)").eq("active",true).eq("gender",slug).order("id",{ascending:true});
+        if(cancelled)return;
+        if(error)throw error;
+        for(const p of data||[])p.product_images?.sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+        setProducts(data||[]);
+      }catch{if(!cancelled)setFailed(true);}
+      finally{if(!cancelled){setLoadedSlug(slug);setLoading(false);}}
+    })();
+    return()=>{cancelled=true;};
+  },[slug,seed]);
+  if(!validGender(slug))return <NotFound/>;
+  if(failed&&loadedSlug===slug)return <NotFound unavailable/>;
+  const seo=genderSeo(slug,products);
+  if (loading || loadedSlug!==slug) {
 
     return (
 
@@ -83,6 +75,21 @@ export default function Gender() {
   overflow-x-hidden
 ">
 
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description}/>
+        <link rel="canonical" href={seo.url}/>
+        <meta property="og:title" content={seo.title}/>
+        <meta property="og:description" content={seo.description}/>
+        <meta property="og:url" content={seo.url}/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content={seo.title}/>
+        <meta name="twitter:description" content={seo.description}/>
+        <meta name="twitter:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        {[seo.collection,seo.list,seo.breadcrumbs].map(s=><script key={s["@type"]} type="application/ld+json">{JSON.stringify(s)}</script>)}
+      </Helmet>
       {/* HEADER */}
       <div
         style={{
@@ -113,8 +120,9 @@ export default function Gender() {
             textTransform: "capitalize"
           }}
         >
-          {slug}
+          {genders[slug]}
         </h1>
+        <p className="text-gray-700 mt-2">{seo.description}</p>
 
       </div>
 
