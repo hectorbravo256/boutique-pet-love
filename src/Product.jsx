@@ -66,7 +66,7 @@ export default function Product() {
     detail: "Selecciona una talla"
   })
 );
-      return;
+      return false;
     }
 
     const variant = product.product_variants.find(
@@ -74,10 +74,7 @@ export default function Product() {
     );
 
     
-// 💰 PRECIO FINAL
-const precioFinal = tieneDescuento
-  ? Math.round(variant.price * (1 - product.discount_percent / 100))
-  : variant.price;
+
 
     if (!variant) {
       window.dispatchEvent(
@@ -85,9 +82,13 @@ const precioFinal = tieneDescuento
     detail: "Selecciona una talla"
   })
 );
-      return;
+      return false;
     }
 
+// 💰 PRECIO FINAL
+const precioFinal = tieneDescuento
+  ? Math.round(variant.price * (1 - product.discount_percent / 100))
+  : variant.price;
     const size = variant.size;
     const stock = variant.stock || 0;
 
@@ -97,7 +98,7 @@ const precioFinal = tieneDescuento
     detail: "⚠️ Sin stock disponible"
   })
 );
-      return;
+      return false;
     }
 
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -110,8 +111,21 @@ const existingIndex = cart.findIndex(
 
 );
 
+    const existingQty = existingIndex === -1 ? 0 : Number(cart[existingIndex].qty);
+    const requestedQty = Number(qty);
+    if (!Number.isSafeInteger(existingQty) || existingQty < 0 ||
+        !Number.isSafeInteger(requestedQty) || requestedQty < 1 ||
+        existingQty + requestedQty > stock) {
+      window.dispatchEvent(new CustomEvent("toast", {
+        detail: existingQty >= stock
+          ? "Stock máximo alcanzado. Revisa las cantidades de tu carrito."
+          : "Solo puedes agregar " + Math.max(0, stock - existingQty) + " unidades adicionales."
+      }));
+      return false;
+    }
     if (existingIndex !== -1) {
-      cart[existingIndex].qty += qty;
+      cart[existingIndex].qty = existingQty + requestedQty;
+      cart[existingIndex].stock = stock;
     } else {
 cart.push({
   id: variant.id,
@@ -154,6 +168,7 @@ cart.push({
     localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("storage"));
     window.dispatchEvent(new Event("openCart"));
+    return true;
   };
 
   const handleTouchStart = (e) => {
@@ -949,8 +964,7 @@ onMouseOut={(e) => {
 
           <button
             onClick={() => {
-              addToCart();
-              window.location.href = "/checkout";
+              if (addToCart()) window.location.href = "/checkout";
             }}
             onMouseOver={(e) => {
   if (!e.currentTarget.disabled) {
