@@ -222,7 +222,7 @@ useEffect(() => {
 
     const { data, error } = await supabase
       .from("categories")
-      .select("*")
+      .select("id,name,slug,active,featured_image,image,sort_order" )
       .eq("active", true)
       .order("sort_order", {
         ascending: true
