@@ -1,3 +1,4 @@
+import {fetchGender,renderGenderHtml} from "../lib/gender-html.js";
 import {fetchCategory,renderCategoryHtml} from "../lib/category-html.js";
 import {fetchHomeCategories,renderHomeHtml} from "../lib/home-html.js";
 import {fetchPublicProduct,renderProductHtml} from "../lib/product-html.js";
@@ -83,8 +84,19 @@ export default async function handler(request,context){
  headers.set("Cache-Control","no-store");
  return new Response(rendered||html,{status:200,headers});
  }
+ if(/^\/genero\//.test(url.pathname)){
+ const result=await fetchGender(url.pathname,k=>Netlify.env.get(k));
+ if(result.status!==200)return errorResponse(result.status,request.method);
+ const response=await context.next();
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
+ const html=await response.text(),rendered=renderGenderHtml(html,result.slug,result.products);
+ const headers=new Headers(response.headers);
+ for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
+ headers.set("Cache-Control","no-store");
+ return new Response(rendered||html,{status:200,headers});
+ }
  const status=await cachedCatalogStatus(url.pathname,k=>Netlify.env.get(k));
  if(status===200)return;
  return errorResponse(status,request.method);
 }
-export const config={path:["/","/producto/*","/categoria/*"]};
+export const config={path:["/","/producto/*","/categoria/*","/genero/*"]};
