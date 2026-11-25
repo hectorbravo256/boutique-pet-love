@@ -224,9 +224,9 @@ const prevImage = () => {
       const { data, error } = await supabase
         .from("products")
         .select(`
-          *,
-          product_variants (*),
-          product_images (*)
+          id,name,description,category,image,active,discount_active,discount_percent,discount_start,discount_end,featured,slug,meta_title,meta_description,seo_keywords,new_collection,best_seller,luxury,exclusive,gender,
+          product_variants (id,product_id,size,price,stock),
+          product_images (id,product_id,url,sort_order)
         `)
         .eq("slug", slug)
         .eq("active", true)
