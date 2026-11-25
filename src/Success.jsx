@@ -22,8 +22,8 @@ export default function Success() {
 
   setOrder(orderData);
 
-  if (window.gtag) {
-    window.gtag("event", "purchase", {
+  if (undefined /* TEST analytics disabled */) {
+    undefined /* TEST analytics disabled */("event", "purchase", {
       transaction_id:
         "ORD-" + new Date(orderData.date).getTime(),
 
