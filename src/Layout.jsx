@@ -1,3 +1,4 @@
+import { readCart, normalizeCart } from "./cartStock.mjs";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
@@ -92,14 +93,15 @@ const showToast = (message) => {
 
 	useEffect(() => {
   const updateCart = () => {
-    const savedCart = JSON.parse(localStorage.getItem("cart"));
-	  
-setCart(Array.isArray(savedCart) ? savedCart : []);
-
-    const total = (savedCart || []).reduce(
-      (acc, item) => acc + (item.qty || 1),
-      0
-    );
+    const savedCart = readCart();
+    const serialized=JSON.stringify(savedCart);
+    const raw=localStorage.getItem("cart");
+    if(raw!==null && raw!==serialized) {
+      localStorage.setItem("cart",serialized);
+      window.dispatchEvent(new CustomEvent("toast",{detail:"Ajustamos las cantidades del carrito según el stock disponible."}));
+    }
+    setCart(savedCart);
+    const total=savedCart.reduce((acc,item)=>acc+item.qty,0);
     setCartCount(total);
   };
 
@@ -109,6 +111,22 @@ setCart(Array.isArray(savedCart) ? savedCart : []);
 
   return () => window.removeEventListener("storage", updateCart);
 }, []);
+  useEffect(()=>{
+    let cancelled=false;
+    const raw=localStorage.getItem("cart");
+    const rows=readCart();
+    if(!rows.length)return;
+    const ids=rows.map(x=>x.id);
+    supabase.from("product_variants").select("id,stock").in("id",ids).then(({data,error})=>{
+      if(cancelled||error||!data||localStorage.getItem("cart")!==raw)return;
+      const next=normalizeCart(rows,new Map(data.map(x=>[String(x.id),x.stock])));
+      if(JSON.stringify(next)!==JSON.stringify(rows)){
+        saveCart(next);
+        window.dispatchEvent(new CustomEvent("toast",{detail:"Actualizamos tu carrito según las existencias actuales."}));
+      }
+    });
+    return ()=>{cancelled=true;};
+  },[location.pathname,cartOpen]);
 
 	useEffect(() => {
   const openCart = () => {
