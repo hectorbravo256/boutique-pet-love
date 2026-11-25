@@ -1,12 +1,10 @@
+import { readCart } from "./cartStock.mjs";
 import { useEffect, useState } from "react";
 import Checkout from "./Checkout";
 
 function CheckoutWrapper() {
 
-  const [cart, setCart] = useState(() => {
-  const stored = localStorage.getItem("cart");
-  return stored ? JSON.parse(stored) : [];
-});
+  const [cart, setCart] = useState(readCart);
 
   const [formData, setFormData] = useState({
   nombre: "",
@@ -104,7 +102,7 @@ const formatPrice = (p) =>
 
 	useEffect(() => {
   const updateCart = () => {
-    const stored = JSON.parse(localStorage.getItem("cart")) || [];
+    const stored = readCart();
     setCart(stored);
   };
 
