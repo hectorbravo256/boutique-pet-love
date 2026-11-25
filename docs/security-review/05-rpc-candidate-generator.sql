@@ -29,34 +29,16 @@ FOR r IN SELECT * FROM (VALUES
  body := regexp_replace(f.prosrc,'(?im)^(\s*begin)[ \t]*$',E'\\1\n IF NOT private.is_admin() THEN RAISE EXCEPTION ''Acceso administrativo no autorizado'' USING ERRCODE = ''42501''; END IF;');
  IF body=f.prosrc OR strpos(f.definition,f.prosrc)=0 THEN RAISE EXCEPTION 'Cannot generate: %',r.signature; END IF;
  IF r.signature='apply_physical_count(uuid)' THEN
-  IF regexp_count(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*
- INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
-END LOOP;
-END $review$;
-SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate is executed. Export securely outside repository (original may contain email).
--- Legacy email check removed only from fingerprint-matched count function.
--- Initializers reviewed: constants and scalar input expressions only; numeric overflow may precede guard.
--- search_path, temporary relations and exact grants still require validation.
-ROLLBACK;
-)<>1 THEN RAISE EXCEPTION 'Legacy check not uniquely identified'; END IF;
-  body := regexp_replace(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*
- INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
-END LOOP;
-END $review$;
-SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate is executed. Export securely outside repository (original may contain email).
--- apply_physical_count still needs removal of legacy email check.
--- Declaration initializers, search_path, temporary relations and exact grants need review.
-ROLLBACK;
-,'');
+  IF regexp_count(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*$')<>1 THEN RAISE EXCEPTION 'Legacy check not uniquely identified'; END IF;
+  body := regexp_replace(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*$','');
  END IF;
+ -- Qualify only audited relation references, not CREATE TEMP TABLE names.
+ body := regexp_replace(body,'(?i)(\m(?:FROM|INTO|JOIN)[ \t]+)(tmp_sale_items|tmp_repair_items|tmp_reentry_items)\M','\1pg_temp.\2','g');
  ddl := replace(f.definition,f.prosrc,body);
  INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
 END LOOP;
 END $review$;
 SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
--- No candidate is executed. Export securely outside repository (original may contain email).
--- apply_physical_count still needs removal of legacy email check.
--- Declaration initializers, search_path, temporary relations and exact grants need review.
+-- No candidate executed. Export securely outside repository.
+-- Review exact diffs and test temp collision, repeated calls and search_path before granting.
 ROLLBACK;
