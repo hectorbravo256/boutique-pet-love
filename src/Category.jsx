@@ -33,7 +33,7 @@ const seoDescription =
   `Descubre nuestra colección ${categoryName} para perros. Diseños premium, máxima comodidad y envíos a todo Chile.`;
 
 const seoUrl =
-  `https://boutiquepetlove.cl/categoria/${slug}`;
+  `https://boutique-pet-love-test.netlify.app/categoria/${slug}`;
 
   const collectionSchema = {
   "@context": "https://schema.org",
@@ -58,7 +58,7 @@ const seoUrl =
       position: index + 1,
 
       url:
-        `https://boutiquepetlove.cl/producto/${product.slug}`,
+        `https://boutique-pet-love-test.netlify.app/producto/${product.slug}`,
 
       name:
         product.name
@@ -214,7 +214,7 @@ return (
   property="og:image"
   content={
     category?.image ||
-    "https://boutiquepetlove.cl/logo-google.webp"
+    "https://boutique-pet-love-test.netlify.app/logo-google.webp"
   }
 />
 
@@ -237,7 +237,7 @@ return (
   name="twitter:image"
   content={
     category?.image ||
-    "https://boutiquepetlove.cl/logo-google.webp"
+    "https://boutique-pet-love-test.netlify.app/logo-google.webp"
   }
 />
 
