@@ -22,7 +22,7 @@ export async function fetchCategory(path,env,fetcher=fetch){
  const cats=await get(url);if(!cats.length)return {status:404};if(cats.length!==1)return {status:503};
  const c=cats[0];const purl=new URL("/rest/v1/products",base);
  const quote=s=>'"'+String(s).replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'"';
- const products=[];for(let offset=0;;){purl.search=new URLSearchParams({select:"id,name,slug,active,category,discount_active,discount_percent,product_images(url,sort_order),product_variants(price)",category:"in.("+[c.slug,c.name].map(quote).join(",")+")",active:"eq.true",order:"id.asc","product_images.order":"sort_order.asc",limit:"100",offset:String(offset)});const rows=await get(purl);if(!rows.length)break;products.push(...rows);offset+=rows.length;if(offset>50000)throw Error("limit");}
+ const products=[];for(let offset=0;;){purl.search=new URLSearchParams({select:"id,name,slug,active,category,discount_active,discount_percent,product_images(url,sort_order),product_variants(price)",category:"in.("+[c.slug,c.name].map(quote).join(",")+")",active:"eq.true",order:"id.asc","product_images.order":"sort_order.asc",limit:"100",offset:String(offset)});const rows=await get(purl);if(!rows.length)break;products.push(...rows);offset+=rows.length;if(offset>50000)throw Error("limit");if(rows.length<100)break;}
  return {status:200,category:{...c,image:c.image?image(c.image):null},products:products.filter(p=>p.active===true&&valid(p.slug)).map(p=>({...p,product_images:(p.product_images||[]).map(i=>({...i,url:image(i.url)}))}))};
  }catch{return {status:503};}
 }
