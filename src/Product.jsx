@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import NotFound from "./NotFound";
+import {buildProductSchema, categorySlug} from "./productSchema";
 import { Helmet } from "react-helmet-async";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -11,7 +13,14 @@ export default function Product() {
   const requestedVariant = searchParams.get("variant");
 
   
-  const [product, setProduct] = useState(null);
+  const [seed]=useState(()=>{
+    const el=document.getElementById("bpl-product-seed");
+    try{const p=JSON.parse(el?.textContent||"null");return p?.slug===slug&&p.active===true&&Array.isArray(p.product_variants)&&Array.isArray(p.product_images)?p:null;}catch{return null;}
+  });
+  const initialRoute=useRef(seed?slug:null);
+  const trackedSeed=useRef(false);
+  const [product, setProduct] = useState(seed);
+  const [loadResult, setLoadResult] = useState(null);
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [qty, setQty] = useState(1);
@@ -201,8 +210,18 @@ const prevImage = () => {
 
   /* ================= CARGA DATOS ================= */
   useEffect(() => {
+    document.getElementById("bpl-product-seed")?.remove();
+    if(initialRoute.current===slug&&seed){
+      if(!trackedSeed.current&&window.gtag){window.gtag("event","view_item",{currency:"CLP",items:[{item_id:seed.id,item_name:seed.name,item_category:seed.category}]});trackedSeed.current=true;}
+      return;
+    }
+    initialRoute.current=null;
+    let cancelled = false;
+    setCurrentIndex(0);
+    setProduct(null);
+    setLoadResult(null);
     const cargar = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select(`
           *,
@@ -210,6 +229,7 @@ const prevImage = () => {
           product_images (*)
         `)
         .eq("slug", slug)
+        .eq("active", true)
         .order("sort_order", {
   foreignTable: "product_images",
   ascending: true
@@ -217,6 +237,8 @@ const prevImage = () => {
 .single();
       
 
+      if (cancelled) return;
+      setLoadResult({slug, error: Boolean(error && error.code !== "PGRST116"), missing: !data});
       setProduct(data);
 
       if (window.gtag && data) {
@@ -234,6 +256,7 @@ const prevImage = () => {
     };
 
     cargar();
+    return () => { cancelled = true; };
   }, [slug]);
 
   useEffect(() => {
@@ -277,7 +300,8 @@ const prevImage = () => {
     setQty(1);
   }, [product, requestedVariant]);
 
-  if (!product) {
+  if (loadResult?.slug === slug && loadResult.missing) return <NotFound unavailable={loadResult.error} />;
+  if (!product || product.slug !== slug) {
   return (
     <div className="
       min-h-screen
@@ -344,35 +368,7 @@ const seoImage =
 const seoUrl =
   `https://boutiquepetlove.cl/producto/${product.slug}`;
 
-  const productSchema = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-
-  name: product.name,
-
-  image:
-    product.product_images?.map(
-      img => img.url
-    ) || [],
-
-  description: seoDescription,
-
-  sku: selectedVariant?.sku || String(selectedVariant?.id || product.slug),
-
-  brand: {
-    "@type": "Brand",
-    name: "Boutique Pet Love"
-  },
-
-  offers: {
-    "@type": "Offer",
-
-    price: selectedVariant ? (tieneDescuento ? Math.round(selectedVariant.price * (1 - product.discount_percent / 100)) : Number(selectedVariant.price)) : undefined,
-    priceCurrency: "CLP",
-    availability: Number(selectedVariant?.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-    url: selectedVariant ? seoUrl + "?variant=" + encodeURIComponent(selectedVariant.id) : seoUrl
-  }
-};
+  const productSchema = buildProductSchema(product);
 
   const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -393,11 +389,7 @@ const seoUrl =
       name: product.category,
 
       item:
-        `https://boutiquepetlove.cl/categoria/${product.category
-          ?.toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")}`
+        `https://boutiquepetlove.cl/categoria/${categorySlug(product.category)}`
     },
 
     {
@@ -474,9 +466,9 @@ return (
   content={seoImage}
 />
 
-<script type="application/ld+json">
-  {JSON.stringify(productSchema)}
-</script>
+{productSchema && <script type="application/ld+json">
+  {JSON.stringify(productSchema).replace(/</g, "\\u003c")}
+</script>}
 
     <script type="application/ld+json">
   {JSON.stringify(breadcrumbSchema)}
@@ -509,12 +501,7 @@ return (
   {" > "}
 
   <a
-href={`/categoria/${product.category
-  ?.toLowerCase()
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .replace(/\s*-\s*/g, "-")
-  .replace(/\s+/g, "-")
+href={`/categoria/${categorySlug(product.category)
 }`}
     className="hover:text-pink-500"
   >

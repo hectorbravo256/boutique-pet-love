@@ -27,11 +27,11 @@ gtag('config', 'G-H7M2KN7V40');
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- SEO -->
-  <title>BOUTIQUE PET LOVE | Moda premium para mascotas</title>
+  <title>Ropa para Perros y Mascotas en Chile | Boutique Pet Love</title>
 
   <meta
-    name="description"
-    content="Ropa y accesorios premium para perros y mascotas. Diseños exclusivos, máxima comodidad y envíos a todo Chile."
+    data-rh="true" name="description"
+    content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile."
   />
 
   <!-- FAVICON -->
@@ -43,30 +43,55 @@ gtag('config', 'G-H7M2KN7V40');
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
-
-  "name": "Boutique Pet Love",
-
-  "url": "https://boutiquepetlove.cl",
-
-  "logo": "https://boutiquepetlove.cl/logo-google.webp",
-
-  "sameAs": [
-
-    "https://www.instagram.com/boutiquepetlove.cl",
-
-    "https://www.facebook.com/boutiquepetlove.cl"
-
+  "@graph": [
+    {
+      "@type": [
+        "Organization",
+        "OnlineStore"
+      ],
+      "@id": "https://boutiquepetlove.cl/#store",
+      "name": "Boutique Pet Love",
+      "url": "https://boutiquepetlove.cl/",
+      "logo": "https://boutiquepetlove.cl/logo-google.webp",
+      "sameAs": [
+        "https://www.instagram.com/boutique_petlove/"
+      ],
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "@id": "https://boutiquepetlove.cl/#return-policy",
+        "applicableCountry": "CL",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 10,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnPolicyCountry": "CL",
+        "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility",
+        "customerRemorseReturnFees": "https://schema.org/ReturnFeesCustomerResponsibility",
+        "itemDefectReturnFees": "https://schema.org/FreeReturn",
+        "refundType": ["https://schema.org/FullRefund", "https://schema.org/ExchangeRefund"],
+        "restockingFee": 0,
+        "merchantReturnLink": "https://boutiquepetlove.cl/politicas-de-despachos-cambios-y-devoluciones"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://boutiquepetlove.cl/#website",
+      "url": "https://boutiquepetlove.cl/",
+      "name": "Boutique Pet Love",
+      "inLanguage": "es-CL",
+      "publisher": {
+        "@id": "https://boutiquepetlove.cl/#store"
+      }
+    }
   ]
 }
 </script>
 
   <!-- OPEN GRAPH -->
-  <meta property="og:title" content="BOUTIQUE PET LOVE" />
-  <meta property="og:description" content="Moda premium para mascotas" />
-  <meta property="og:image" content="https://boutiquepetlove.cl/logo-google.webp" />
-  <meta property="og:url" content="https://boutiquepetlove.cl" />
-  <meta property="og:type" content="website" />
+  <meta data-rh="true" property="og:title" content="Ropa para Perros y Mascotas en Chile | Boutique Pet Love" />
+  <meta data-rh="true" property="og:description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
+  <meta data-rh="true" property="og:image" content="https://boutiquepetlove.cl/logo-google.webp" />
+  <meta data-rh="true" property="og:url" content="https://boutiquepetlove.cl" />
+  <meta data-rh="true" property="og:type" content="website" />
 
   
 </head>

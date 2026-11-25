@@ -1,11 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function ProductCard({
   product
 }) {
 
-  const navigate =
-    useNavigate();
 
   const precios =
     product.product_variants
@@ -34,12 +32,8 @@ export default function ProductCard({
 
   return (
 
-    <div
-      onClick={() =>
-        navigate(
-          `/producto/${product.slug}`
-        )
-      }
+    <Link
+      to={`/producto/${product.slug}`}
 
       className="
         group
@@ -195,19 +189,10 @@ export default function ProductCard({
       
 
         {/* BOTÓN */}
-        <button
-          onClick={(e) => {
-
-            e.stopPropagation();
-
-            navigate(
-              `/producto/${product.slug}`
-            );
-
-          }}
+        <span
 
           className="
-            mt-3
+            block text-center mt-3
             w-full
             bg-gradient-to-r
             from-pink-500
@@ -226,11 +211,11 @@ export default function ProductCard({
           "
         >
           Ver producto
-        </button>
+        </span>
 
       </div>
 
-    </div>
+    </Link>
 
   );
 

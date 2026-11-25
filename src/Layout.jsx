@@ -1,6 +1,6 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "./supabaseClient";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -9,13 +9,20 @@ export default function Layout() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [toastTimeout, setToastTimeout] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [loadingCategories,setLoadingCategories]=useState(true);
+  const categoryRequest=useRef(null);
+  const initialPath=useRef(location.pathname);
+  const categoriesLoaded=useRef(false);
+  const [initialCategories]=useState(()=> {
+    const el=document.getElementById("bpl-home-categories");
+    try {const rows=JSON.parse(el?.textContent||"null");return location.pathname==="/"&&Array.isArray(rows)&&rows.every(c=>c.active===true&&typeof c.slug==="string"&&typeof c.name==="string")?rows:null;}catch{return null;}
+  });
 	
 const formatPrice = (price = 0) =>
   `$${Number(price).toLocaleString("es-CL")}`;
@@ -149,24 +156,28 @@ useEffect(() => {
 
 
 useEffect(() => {
-
+  document.getElementById("bpl-home-categories")?.remove();
+  if(initialPath.current===location.pathname&&initialCategories!==null){categoriesLoaded.current=true;setCategories(initialCategories);setLoadingCategories(false);return;}
+  initialPath.current=null;
+  if(categoriesLoaded.current&&location.pathname!=="/")return;
+  let cancelled=false;
   const fetchCategories = async () => {
 
-    const { data } = await supabase
+    const { data } = await (categoryRequest.current ||= Promise.resolve(supabase
       .from("categories")
-      .select("*")
+      .select("id,name,slug,active,featured_image,image,sort_order")
       .eq("active", true)
       .order("sort_order", {
         ascending: true
-      });
+      })).finally(()=>{categoryRequest.current=null;}));
 
-    setCategories(data || []);
+    if(!cancelled){categoriesLoaded.current=true;setCategories(data || []);setLoadingCategories(false);}
 
   };
 
   fetchCategories();
-
-}, []);
+  return()=>{cancelled=true;};
+}, [location.pathname]);
 
   return (
     <div className="bg-pink-50 min-h-screen">
@@ -256,11 +267,8 @@ useEffect(() => {
 ">
 
   {/* INICIO */}
-  <button
-    onClick={() => {
-      navigate("/");
-      setMenuOpen(false);
-    }}
+  <Link
+    to={"/"} onClick={() => setMenuOpen(false)}
 
     className="
   text-left
@@ -274,7 +282,7 @@ useEffect(() => {
 "
   >
     🏠 Inicio
-  </button>
+  </Link>
 
 {/* CATEGORÍAS */}
 	<div className="border-t border-pink-100 pt-6">
@@ -294,18 +302,10 @@ useEffect(() => {
 
 {categories.map(category => (
 
-  <button
+  <Link
     key={category.id}
 
-    onClick={() => {
-
-      navigate(
-        `/categoria/${category.slug}`
-      );
-
-      setMenuOpen(false);
-
-    }}
+    to={`/categoria/${category.slug}`} onClick={() => setMenuOpen(false)}
 
     className="
       text-left
@@ -317,7 +317,7 @@ useEffect(() => {
     "
   >
     ✨ {category.name}
-  </button>
+  </Link>
 
 ))}
 
@@ -342,33 +342,24 @@ useEffect(() => {
 
     <div className="flex flex-col gap-3">
 
-      <button
-        onClick={() => {
-          navigate("/genero/macho");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/genero/macho"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🐶 Macho
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/genero/hembra");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/genero/hembra"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🎀 Hembra
-      </button>
+      </Link>
 
-		<button
-  onClick={() => {
-    navigate("/genero/unisex");
-    setMenuOpen(false);
-  }}
+		<Link
+  to={"/genero/unisex"} onClick={() => setMenuOpen(false)}
 
   className="
     text-left
@@ -380,7 +371,7 @@ useEffect(() => {
   "
 >
   ✨ Unisex
-</button>
+</Link>
 
     </div>
 
@@ -403,49 +394,37 @@ useEffect(() => {
 
     <div className="flex flex-col gap-3">
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/new");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/new"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🆕 Nueva colección
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/best-seller");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/best-seller"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         🔥 Best Sellers
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/luxury");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/luxury"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         👑 Luxury
-      </button>
+      </Link>
 
-      <button
-        onClick={() => {
-          navigate("/coleccion/exclusive");
-          setMenuOpen(false);
-        }}
+      <Link
+        to={"/coleccion/exclusive"} onClick={() => setMenuOpen(false)}
 
         className="   text-left   text-pink-500   hover:text-pink-700   hover:translate-x-1   transition-all   duration-300 "
       >
         💎 Exclusivos
-      </button>
+      </Link>
 
     </div>
 
@@ -455,16 +434,7 @@ useEffect(() => {
   
 
   {/* CONTACTO */}
-  <button
-    onClick={() => {
-      navigate("/", {
-        state: {
-          scrollTo: "contacto"
-        }
-      });
-
-      setMenuOpen(false);
-    }}
+  <Link to="/" state={{scrollTo:"contacto"}} onClick={() => setMenuOpen(false)}
 
     className="
       mt-4
@@ -476,7 +446,7 @@ useEffect(() => {
     "
   >
     📞 Contacto
-  </button>
+  </Link>
 
 </div>
 
@@ -505,8 +475,7 @@ useEffect(() => {
 
     {/* 🟣 CENTRO → LOGO */}
  <div className="flex justify-center">
-  <div
-    onClick={() => navigate("/")}
+  <Link to="/"
     className="flex items-center gap-4 cursor-pointer"
   >
     
@@ -528,9 +497,9 @@ useEffect(() => {
   leading-tight
 ">
 
-      <h1 className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
+      <span className="text-pink-600 text-base sm:text-lg md:text-xl font-black tracking-[0.15em]">
         BOUTIQUE PET LOVE
-      </h1>
+      </span>
 
       <p className="text-purple-600 text-xs md:text-sm">
         Moda y accesorios para mascotas
@@ -538,7 +507,7 @@ useEffect(() => {
 
     </div>
 
-  </div>
+  </Link>
 </div>
 
 
@@ -668,7 +637,7 @@ useEffect(() => {
       {/* 🔽 CONTENIDO DINÁMICO */}
       <div>
         <main id="main-content">
- 	 		<Outlet />
+ 	 		<Outlet context={{categories,loadingCategories}} />
 		</main>
          
 

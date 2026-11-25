@@ -1,9 +1,11 @@
+import { Helmet } from "react-helmet-async";
 
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, BrowserRouter, useNavigate } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Link, useLocation, useOutletContext } from "react-router-dom";
 import './index.css';
 import { supabase } from "./supabaseClient";
 import Layout from "./Layout";
+import NotFound from "./NotFound";
 import ScrollToTop from "./ScrollToTop";
 import ProductCard from "./ProductCard";
 
@@ -46,7 +48,7 @@ const InventoryReports = lazy(() => import("./admin/inventory/InventoryReports")
 /* ================= APP PRINCIPAL ================= */
 
 function AppContent() {
-  const navigate = useNavigate();
+  const {categories,loadingCategories}=useOutletContext();
 
 
   const [products, setProducts] = useState([]);
@@ -137,8 +139,6 @@ const heroPrecioBase =
     p => p.exclusive
   );
 	
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
   const loadingProducts =
   products.length === 0;
 
@@ -205,37 +205,21 @@ cargar();
 
 }, []);
 
-useEffect(() => {
 
-  const cargarCategorias = async () => {
-
-    const { data, error } = await supabase
-      .from("categories")
-      .select("*")
-      .eq("active", true)
-      .order("sort_order", {
-        ascending: true
-      });
-
-
-    if (error) {
-      console.error(error);
-    }
-
-    setCategories(data || []);
-    setLoadingCategories(false);
-
-  };
-
-  cargarCategorias();
-
-}, []);
 
 
 	
 /* ================= UI ================= */
   return (
          <div className="bg-pink-50 min-h-screen">
+      <Helmet>
+        <title>Ropa para Perros y Mascotas en Chile | Boutique Pet Love</title>
+        <meta name="description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
+        <link rel="canonical" href="https://boutiquepetlove.cl/" />
+        <meta property="og:title" content="Ropa para Perros y Mascotas en Chile | Boutique Pet Love" />
+        <meta property="og:description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
+        <meta property="og:url" content="https://boutiquepetlove.cl/" />
+      </Helmet>
     
       
 
@@ -370,7 +354,7 @@ className="
         ⭐ Producto Destacado
       </span>
 
-      <h1
+      <h2
         className="
           mt-6
           text-[34px]
@@ -384,7 +368,7 @@ className="
         "
       >
         {heroProduct.name}
-      </h1>
+      </h2>
 
 	<p
   	  className="
@@ -520,12 +504,7 @@ className="
         "
       >
 
-        <button
-          onClick={() =>
-            navigate(
-              `/producto/${heroProduct.slug}`
-            )
-          }
+        <Link to={`/producto/${heroProduct.slug}`}
 
           className="
             bg-pink-600
@@ -546,11 +525,11 @@ className="
           "
         >
           Comprar ahora
-        </button>
+        </Link>
 
         <a
           href="https://instagram.com/boutique_petlove"
-          target="_blank"
+          target="_blank" rel="noopener noreferrer"
 
           className="
 			hidden
@@ -637,7 +616,7 @@ className="
       </h2>
 
       <p className="text-gray-700 mt-1">
-        Los favoritos de Boutique Pet Love
+        Ropa para mascotas: los favoritos de Boutique Pet Love
       </p>
 
     </div>
@@ -751,7 +730,7 @@ className="
         text-gray-500
         mt-2
       ">
-        Descubre los últimos productos premium
+        Descubre las novedades en ropa para mascotas
       </p>
 
     </div>
@@ -1045,7 +1024,8 @@ className="
 
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-3xl font-bold">Tienda online</h2>
+            <h1 className="text-3xl font-bold">Ropa para perros y mascotas en Chile</h1>
+            <p className="text-gray-700 mt-1">Explora nuestra tienda online de abrigos, vestidos, disfraces y ropa para ocasiones especiales. Encuentra la talla adecuada para tu mascota y recibe tu pedido en Chile.</p>
           </div>
         </div>
 
@@ -1091,9 +1071,7 @@ className="
 
   categories.map(cat => (
 
-      <div
-        key={cat.id}
-        onClick={() => navigate(`/categoria/${cat.slug}`)}
+      <Link key={cat.id} to={`/categoria/${cat.slug}`}
         className="
           group
           cursor-pointer
@@ -1114,7 +1092,7 @@ className="
               ? `${cat.featured_image || cat.image}?width=280&quality=55`
               : "/placeholder.png"
           }
-          alt={cat.name}
+          alt={`Colección ${cat.name} de Boutique Pet Love`}
           loading="lazy"
           className="
             transition-transform
@@ -1141,7 +1119,7 @@ className="
           {cat.name}
         </div>
 
-      </div>
+      </Link>
 
     ))
 
@@ -1197,7 +1175,8 @@ export default function App() {
   return (
   <BrowserRouter>
 	  <ScrollToTop />
-  <Routes>
+  <IndexingDirectives />
+<Routes>
 
 {/* 🟢 PÚBLICO (CON HEADER) */}
 <Route element={<Layout />}>
@@ -1414,7 +1393,15 @@ export default function App() {
   }
 />
 
+  <Route element={<Layout />}><Route path="*" element={<NotFound />} /></Route>
   </Routes>
 </BrowserRouter>    
   );
+}
+
+function IndexingDirectives() {
+  const { pathname } = useLocation();
+  const path = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  const excluded = /^\/(admin|login|checkout|success)(\/|$)/.test(path);
+  return excluded ? <Helmet><meta name="robots" content="noindex, nofollow" /></Helmet> : null;
 }

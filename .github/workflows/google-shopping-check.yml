@@ -26,4 +26,4 @@ jobs:
         run: |
           npm run dev -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/bpl-vite.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ > /dev/null && break; sleep 1; done
-          node --test tests/google-shopping-browser.test.js
+          node --test tests/google-shopping-browser.test.js tests/seo-browser.test.js

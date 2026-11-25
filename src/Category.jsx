@@ -1,14 +1,24 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useParams, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import NotFound from "./NotFound";
 import { Helmet } from "react-helmet-async";
 
+import { categorySeo } from "../netlify/lib/category-html.js";
+let initialCategory = null;
+if (typeof document !== "undefined") {
+ const seed=document.getElementById("bpl-category-seed");
+ try { if(seed) initialCategory=JSON.parse(seed.textContent); } catch {}
+ seed?.remove();
+}
 export default function Category() {
   const { slug } = useParams();
-  const navigate = useNavigate();
 
-  const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState(null);
+  const [seed] = useState(() => initialCategory?.category?.slug === slug ? initialCategory : null);
+  const initialRoute=useRef(seed?.category?.slug??null);
+  const [products, setProducts] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.products : []);
+  const [category, setCategory] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.category : null);
+  const [loadResult, setLoadResult] = useState(null);
 
   const categoryName = slug
   ?.replaceAll("-", " ")
@@ -115,16 +125,26 @@ const seoUrl =
 
 useEffect(() => {
 
+  let cancelled = false;
+  if (initialRoute.current === slug && seed) {
+    initialCategory=null;
+    setCategory(seed.category); setProducts(seed.products); setLoadResult(null); return;
+  }
+  initialRoute.current=null;
+  initialCategory=null;
+  setCategory(null); setProducts([]); setLoadResult(null);
   const cargar = async () => {
 
     // Buscar categoría por slug
-    const { data: categoryData } = await supabase
+    const { data: categoryData, error: categoryError } = await supabase
       .from("categories")
       .select("*")
       .eq("slug", slug)
+      .eq("active", true)
       .single();
 
-    if (!categoryData) return;
+    if (cancelled) return;
+    if (!categoryData) { setLoadResult({slug, error: Boolean(categoryError && categoryError.code !== "PGRST116")}); return; }
     
     setCategory(categoryData);
 
@@ -146,6 +166,7 @@ useEffect(() => {
         ascending: true
       });
 
+    if (cancelled) return;
     if (!error) {
       setProducts(data || []);
     }
@@ -153,9 +174,12 @@ useEffect(() => {
   };
 
   cargar();
+  return () => { cancelled = true; };
 
 }, [slug]);
 
+if (loadResult?.slug === slug) return <NotFound unavailable={loadResult.error} />;
+if (!category || category.slug !== slug) return <div className="p-10">Cargando...</div>;
 return (
 
   <>
@@ -238,6 +262,7 @@ return (
 >
   {JSON.stringify(itemListSchema)}
 </script>
+<script type="application/ld+json">{JSON.stringify(categorySeo(category,products).breadcrumbs)}</script>
 
     <script
   type="application/ld+json"
@@ -259,7 +284,7 @@ return (
   overflow-x-hidden
 ">
 
-  <h2 className="
+  <h1 className="
   text-2xl
   md:text-4xl
   font-black
@@ -268,7 +293,7 @@ return (
   tracking-wide
 ">
   {category?.name || categoryName}
-</h2>
+</h1>
 
 <div className="
   grid
@@ -292,9 +317,9 @@ const precioBase =
 
   return (
     
-<div
+<Link
   key={p.id}
-  onClick={() => navigate(`/producto/${p.slug}`)}
+  to={`/producto/${p.slug}`}
   className="
     group
     cursor-pointer
@@ -443,13 +468,9 @@ const precioBase =
   duration-500
 ">
 
-  <button
-    onClick={(e) => {
-  e.stopPropagation();
-  navigate(`/producto/${p.slug}`);
-}}
+  <span
     className="
-      w-full
+      block text-center w-full
       bg-gradient-to-r
       from-pink-500
       to-purple-500
@@ -466,13 +487,13 @@ const precioBase =
     "
   >
     Ver producto
-  </button>
+  </span>
 
 </div>
 
   </div>
 
-</div>
+</Link>
   );
 })}
 

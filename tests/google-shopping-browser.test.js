@@ -26,6 +26,11 @@ test('browser, cart storage and XML agree for active and expired promotions', as
  const v=product.product_variants[i];
  if(i) await page.getByRole('button',{name:v.size,exact:true}).click();
  const amount='$'+prices[i].toLocaleString('es-CL');
+ await page.waitForFunction(()=>Array.from(document.querySelectorAll('script[type="application/ld+json"]')).some(s=>JSON.parse(s.textContent)['@type']==='ProductGroup'));
+ const group=await page.evaluate(()=>Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s=>JSON.parse(s.textContent)).find(s=>s['@type']==='ProductGroup'));
+ assert.equal(group.hasVariant.length,2);
+ assert.equal(group.hasVariant.find(x=>x.sku==='bpl-'+v.id).offers.price,prices[i]);
+ assert.equal(group.hasVariant.find(x=>x.sku==='bpl-'+v.id).offers.url,'https://boutiquepetlove.cl/producto/prueba-aislada?variant='+v.id);
  await page.getByText(amount,{exact:true}).first().waitFor();
  assert.equal(new URL(page.url()).searchParams.get('variant'),String(v.id));
  const item=xml.split('<item>').find(s=>s.includes('<g:id>bpl-'+v.id+'</g:id>'));

@@ -1,114 +1,56 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
   useParams,
-  useNavigate
+  Link
 } from "react-router-dom";
 
+import NotFound from "./NotFound";
 import { supabase } from "./supabaseClient";
 
+import {Helmet} from "react-helmet-async";
+import {collections,validCollection,collectionSeo} from "../netlify/lib/collection-html.js";
+let initialCollection=null;
+if(typeof document!=="undefined"){
+ const el=document.getElementById("bpl-collection-seed");
+ try{if(el)initialCollection=JSON.parse(el.textContent);}catch{}
+ el?.remove();
+}
 export default function Collection() {
 
   const { slug } = useParams();
 
-  const navigate =
-    useNavigate();
 
-  const [products, setProducts] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  useEffect(() => {
-
-    cargar();
-
-  }, [slug]);
-
-  const cargar = async () => {
-
-    setLoading(true);
-
-    let query =
-      supabase
-        .from("products")
-        .select(`
-          *,
-          product_variants (*),
-          product_images (*)
-        `)
-        .eq("active", true);
-
-    if (slug === "new") {
-      query =
-        query.eq(
-          "new_collection",
-          true
-        );
-    }
-
-    if (slug === "best-seller") {
-      query =
-        query.eq(
-          "best_seller",
-          true
-        );
-    }
-
-    if (slug === "luxury") {
-      query =
-        query.eq(
-          "luxury",
-          true
-        );
-    }
-
-    if (slug === "exclusive") {
-      query =
-        query.eq(
-          "exclusive",
-          true
-        );
-    }
-
-    const { data } =
-      await query;
-
-    (data || []).forEach(product => {
-
-  product.product_images?.sort(
-    (a, b) =>
-      (a.sort_order || 0)
-      -
-      (b.sort_order || 0)
-  );
-
-});
-
-    setProducts(data || []);
-
-    setLoading(false);
-
-  };
-
-  const titles = {
-
-    "new":
-      "🆕 Nueva colección",
-
-    "best-seller":
-      "🔥 Best Sellers",
-
-    "luxury":
-      "👑 Luxury Collection",
-
-    "exclusive":
-      "💎 Exclusivos"
-
-  };
-
-  if (loading) {
+  const [seed]=useState(()=>initialCollection?.category?.slug===slug?initialCollection:null);
+  const initialRoute=useRef(seed?.category?.slug??null);
+  const [products,setProducts]=useState(()=>seed?.products||[]);
+  const [loading,setLoading]=useState(!seed);
+  const [loadedSlug,setLoadedSlug]=useState(()=>seed?slug:null);
+  const [failed,setFailed]=useState(false);
+  useEffect(()=>{
+    if(!validCollection(slug))return;
+    if(initialRoute.current===slug&&seed){initialCollection=null;return;}
+    initialRoute.current=null;
+    initialCollection=null;
+    let cancelled=false;
+    setLoading(true);setFailed(false);
+    (async()=>{
+      try{
+        const field=collections[slug].field;
+        const {data,error}=await supabase.from("products").select("id,name,slug,active,"+field+",product_variants(price),product_images(url,sort_order)").eq("active",true).eq(field,true).order("id",{ascending:true});
+        if(cancelled)return;
+        if(error)throw error;
+        for(const p of data||[])p.product_images?.sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+        setProducts(data||[]);
+      }catch{if(!cancelled)setFailed(true);}
+      finally{if(!cancelled){setLoadedSlug(slug);setLoading(false);}}
+    })();
+    return()=>{cancelled=true;};
+  },[slug,seed]);
+  if(!validCollection(slug))return <NotFound/>;
+  if(failed&&loadedSlug===slug)return <NotFound unavailable/>;
+  const seo=collectionSeo(slug,products);
+  if (loading || loadedSlug!==slug) {
 
     return (
       <div style={{ padding: 40 }}>
@@ -127,6 +69,22 @@ export default function Collection() {
   overflow-x-hidden
 ">
 
+      <Helmet>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description}/>
+        <link rel="canonical" href={seo.url}/>
+        {!products.length&&<meta name="robots" content="noindex, follow"/>}
+        <meta property="og:title" content={seo.title}/>
+        <meta property="og:description" content={seo.description}/>
+        <meta property="og:url" content={seo.url}/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content={seo.title}/>
+        <meta name="twitter:description" content={seo.description}/>
+        <meta name="twitter:image" content="https://boutiquepetlove.cl/logo-google.webp"/>
+        {[seo.collection,seo.list,seo.breadcrumbs].map(s=><script key={s["@type"]} type="application/ld+json">{JSON.stringify(s)}</script>)}
+      </Helmet>
       {/* HEADER */}
       <div className="mb-10">
 
@@ -146,8 +104,10 @@ export default function Collection() {
           text-gray-900
           mt-3
         ">
-          {titles[slug]}
+          {collections[slug].name}
         </h1>
+        <p className="text-gray-700 mt-2">{seo.description}</p>
+        {!products.length&&<Link to="/" className="inline-block mt-4 text-pink-600 font-bold">Explorar catálogo</Link>}
 
       </div>
 
@@ -179,14 +139,10 @@ export default function Collection() {
 
           return (
 
-            <div
+            <Link
               key={product.id}
 
-              onClick={() =>
-                navigate(
-                  `/producto/${product.slug}`
-                )
-              }
+              to={`/producto/${product.slug}`}
 
               className="
                 bg-white
@@ -209,6 +165,7 @@ export default function Collection() {
               ">
 
                 <img
+                  alt={product.name}
                   src={
                     product.product_images?.[0]?.url
                     || "/placeholder.png"
@@ -250,7 +207,7 @@ export default function Collection() {
 
               </div>
 
-            </div>
+            </Link>
 
           );
 
