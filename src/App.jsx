@@ -215,10 +215,10 @@ cargar();
       <Helmet>
         <title>Ropa para Perros y Mascotas en Chile | Boutique Pet Love</title>
         <meta name="description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
-        <link rel="canonical" href="https://boutiquepetlove.cl/" />
+        <link rel="canonical" href="https://boutique-pet-love-test.netlify.app/" />
         <meta property="og:title" content="Ropa para Perros y Mascotas en Chile | Boutique Pet Love" />
         <meta property="og:description" content="Descubre ropa para perros y mascotas: abrigos, vestidos, disfraces y prendas para ocasiones especiales. Compra online en Boutique Pet Love con envíos a todo Chile." />
-        <meta property="og:url" content="https://boutiquepetlove.cl/" />
+        <meta property="og:url" content="https://boutique-pet-love-test.netlify.app/" />
       </Helmet>
     
       
@@ -528,7 +528,7 @@ className="
         </Link>
 
         <a
-          href="https://instagram.com/boutique_petlove"
+          href="#"
           target="_blank" rel="noopener noreferrer"
 
           className="
