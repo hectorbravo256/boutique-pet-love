@@ -47,7 +47,16 @@ const InventoryReports = lazy(() => import("./admin/inventory/InventoryReports")
 
 /* ================= APP PRINCIPAL ================= */
 
+// Consume only the initial public home payload, never reuse it on later navigation.
+let initialHomeCategories = null;
+if (typeof document !== "undefined" && window.location.pathname === "/") {
+  const seed = document.getElementById("bpl-home-categories");
+  try { if (seed) { const value = JSON.parse(seed.textContent); if (Array.isArray(value)) initialHomeCategories = value; } } catch {}
+  seed?.remove();
+}
 function AppContent() {
+  const [seedCategories] = useState(() => initialHomeCategories);
+  useEffect(() => { initialHomeCategories = null; }, []);
 
 
   const [products, setProducts] = useState([]);
@@ -138,8 +147,8 @@ const heroPrecioBase =
     p => p.exclusive
   );
 	
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categories, setCategories] = useState(seedCategories ?? []);
+  const [loadingCategories, setLoadingCategories] = useState(seedCategories === null);
   const loadingProducts =
   products.length === 0;
 
@@ -208,6 +217,7 @@ cargar();
 
 useEffect(() => {
 
+  if (seedCategories !== null) return;
   const cargarCategorias = async () => {
 
     const { data, error } = await supabase
