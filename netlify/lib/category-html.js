@@ -26,12 +26,12 @@ export async function fetchCategory(path,env,fetcher=fetch){
  return {status:200,category:{...c,image:c.image?image(c.image):null},products:products.filter(p=>p.active===true&&valid(p.slug)).map(p=>({...p,product_images:(p.product_images||[]).map(i=>({...i,url:image(i.url)}))}))};
  }catch{return {status:503};}
 }
-export function renderCategoryHtml(html,c,products){
+export function renderCategoryHtml(html,c,products,{seo=categorySeo(c,products),seedId="bpl-category-seed"}={}){
  if(!html.includes('<div id="root"></div>'))return null;
- const s=categorySeo(c,products),img=c.image||site+"/logo-google.webp";
+ const s=seo,img=c.image||site+"/logo-google.webp";
  const meta=(key,value,prop=false)=>'<meta data-rh="true" '+(prop?"property":"name")+'="'+key+'" content="'+esc(value)+'">';
  const head='<title>'+esc(s.title)+'</title>'+meta("description",s.description)+'<link data-rh="true" rel="canonical" href="'+esc(s.url)+'">'+meta("og:title",s.title,true)+meta("og:description",s.description,true)+meta("og:image",img,true)+meta("og:url",s.url,true)+meta("og:type","website",true)+meta("twitter:card","summary_large_image")+meta("twitter:title",s.title)+meta("twitter:description",s.description)+meta("twitter:image",img)+[s.collection,s.list,s.breadcrumbs].map(v=>'<script data-rh="true" type="application/ld+json">'+json(v)+'</script>').join("");
  const cards=products.map(p=>'<a class="block bg-white rounded-2xl overflow-hidden p-4" href="/producto/'+esc(encodeURIComponent(p.slug))+'"><img loading="lazy" width="450" height="450" class="w-full aspect-square object-cover" src="'+esc(image(p.product_images?.[0]?.url))+'" alt="'+esc(p.name)+'"><h2 class="font-black text-gray-800">'+esc(p.name)+'</h2><span>Ver producto</span></a>').join("");
- const body='<div id="root"><main class="px-4 md:px-8 py-8 bg-pink-50 min-h-screen"><h1 class="text-2xl md:text-4xl font-black text-pink-600 mb-8 tracking-wide">'+esc(c.name)+'</h1><div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">'+cards+'</div>'+(c.seo_text?'<p class="mt-16 whitespace-pre-line">'+esc(c.seo_text)+'</p>':'')+'</main></div><script id="bpl-category-seed" type="application/json">'+json({category:c,products})+'</script>';
+ const body='<div id="root"><main class="px-4 md:px-8 py-8 bg-pink-50 min-h-screen"><h1 class="text-2xl md:text-4xl font-black text-pink-600 mb-8 tracking-wide">'+esc(c.name)+'</h1><div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">'+cards+'</div>'+(c.seo_text?'<p class="mt-16 whitespace-pre-line">'+esc(c.seo_text)+'</p>':'')+'</main></div><script id="'+esc(seedId)+'" type="application/json">'+json({category:c,products})+'</script>';
  return html.replace(/<title>[\s\S]*?<\/title>/i,"").replace(/<meta\b[^>]*data-rh="true"[^>]*>/gi,"").replace("</head>",()=>head+"</head>").replace('<div id="root"></div>',()=>body);
 }
