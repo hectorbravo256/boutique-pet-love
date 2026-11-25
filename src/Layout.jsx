@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "./supabaseClient";
 
 const WHATSAPP = "https://wa.me/56982700002";
@@ -16,6 +16,8 @@ export default function Layout() {
   const [toastTimeout, setToastTimeout] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingCategories,setLoadingCategories]=useState(true);
+  const categoryRequest=useRef(null);
+  const initialPath=useRef(location.pathname);
   const [initialCategories]=useState(()=> {
     const el=document.getElementById("bpl-home-categories");
     try {const rows=JSON.parse(el?.textContent||"null");return location.pathname==="/"&&Array.isArray(rows)&&rows.every(c=>c.active===true&&typeof c.slug==="string"&&typeof c.name==="string")?rows:null;}catch{return null;}
@@ -154,17 +156,18 @@ useEffect(() => {
 
 useEffect(() => {
   document.getElementById("bpl-home-categories")?.remove();
-  if(initialCategories!==null){setCategories(initialCategories);setLoadingCategories(false);return;}
+  if(initialPath.current===location.pathname&&initialCategories!==null){setCategories(initialCategories);setLoadingCategories(false);return;}
+  initialPath.current=null;
   let cancelled=false;
   const fetchCategories = async () => {
 
-    const { data } = await supabase
+    const { data } = await (categoryRequest.current ||= Promise.resolve(supabase
       .from("categories")
       .select("id,name,slug,active,featured_image,image,sort_order")
       .eq("active", true)
       .order("sort_order", {
         ascending: true
-      });
+      })).finally(()=>{categoryRequest.current=null;}));
 
     if(!cancelled){setCategories(data || []);setLoadingCategories(false);}
 
@@ -172,7 +175,7 @@ useEffect(() => {
 
   fetchCategories();
   return()=>{cancelled=true;};
-}, []);
+}, [location.pathname]);
 
   return (
     <div className="bg-pink-50 min-h-screen">
