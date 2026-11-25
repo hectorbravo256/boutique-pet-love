@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
   useParams,
@@ -22,13 +22,15 @@ export default function Collection() {
 
 
   const [seed]=useState(()=>initialCollection?.category?.slug===slug?initialCollection:null);
+  const initialRoute=useRef(seed?.category?.slug??null);
   const [products,setProducts]=useState(()=>seed?.products||[]);
   const [loading,setLoading]=useState(!seed);
   const [loadedSlug,setLoadedSlug]=useState(()=>seed?slug:null);
   const [failed,setFailed]=useState(false);
   useEffect(()=>{
     if(!validCollection(slug))return;
-    if(seed?.category?.slug===slug&&initialCollection===seed)return;
+    if(initialRoute.current===slug&&seed){initialCollection=null;return;}
+    initialRoute.current=null;
     initialCollection=null;
     let cancelled=false;
     setLoading(true);setFailed(false);
