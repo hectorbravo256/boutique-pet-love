@@ -15,7 +15,7 @@ test("category initial HTML and public seed",()=>{
 });
 test("category lookup filters active rows and handles pagination",async()=>{
  let calls=0;const result=await fetchCategory("/categoria/navidad",env,async u=>{calls++;assert.equal(u.searchParams.get("active"),"eq.true");if(u.pathname.endsWith("/categories"))return Response.json([category]);assert.equal(u.searchParams.get("category"),'in.("navidad","Navidad")');return Response.json(u.searchParams.get("offset")==="0"?[product,{...product,id:2,active:false}]:[]);});
- assert.equal(result.status,200);assert.equal(result.products.length,1);assert.equal(calls,3);
+ assert.equal(result.status,200);assert.equal(result.products.length,1);assert.equal(calls,2);
 });
 test("category missing and upstream errors",async()=>{
  assert.equal((await fetchCategory("/categoria/ausente",env,async()=>Response.json([]))).status,404);
@@ -24,3 +24,17 @@ test("category missing and upstream errors",async()=>{
  assert.equal((await fetchCategory("/categoria/navidad",env,async u=>u.pathname.endsWith("/categories")?Response.json([category]):new Response("",{status:500}))).status,503);
 });
 test("category rendering benchmark",()=>{const products=Array.from({length:51},(_,i)=>({...product,id:i,slug:"abrigo-"+i}));const start=performance.now();for(let i=0;i<100;i++)assert.ok(renderCategoryHtml(template,category,products));console.log(JSON.stringify({categoryRenderMeanMs:(performance.now()-start)/100,iterations:100,products:51}));});
+
+test("category pagination preserves full pages and exact multiples",async()=>{
+ for(const count of [0,12,100,101,200,201]){
+ const rows=Array.from({length:count},(_,i)=>({...product,id:i+1,slug:"p-"+(i+1)}));
+ let calls=0;
+ const result=await fetchCategory("/categoria/navidad",env,async u=>{
+ calls++;if(u.pathname.endsWith("/categories"))return Response.json([category]);
+ const offset=Number(u.searchParams.get("offset"));
+ return Response.json(rows.slice(offset,offset+100));
+ });
+ assert.equal(result.status,200);assert.deepEqual(result.products.map(p=>p.id),rows.map(p=>p.id));
+ assert.equal(calls,2+Math.floor(count/100));
+ }
+});
