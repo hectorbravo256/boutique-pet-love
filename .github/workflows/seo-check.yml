@@ -13,5 +13,5 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: node --test tests/sitemap.test.js tests/google-shopping.test.js tests/catalog-status.test.js tests/product-html.test.js
+      - run: node --test tests/sitemap.test.js tests/google-shopping.test.js tests/catalog-status.test.js tests/product-html.test.js tests/home-html.test.js
       - run: npm run build
