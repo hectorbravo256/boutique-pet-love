@@ -32,3 +32,10 @@ test("rendering benchmark with 13 variants",()=>{
  const start=performance.now();for(let i=0;i<100;i++)assert.ok(renderProductHtml(template,p,"2"));
  console.log(JSON.stringify({renderOnlyMeanMs:(performance.now()-start)/100,iterations:100,variants:13}));
 });
+
+test("product seed preserves public variant data and escapes script terminators",()=>{
+ const html=renderProductHtml(template,product,"2");
+ const seed=html.match(/<script id="bpl-product-seed" type="application\/json">([\s\S]*?)<\/script>/)[1];
+ assert.deepEqual(JSON.parse(seed),product);
+ assert.ok(!seed.includes("<"));
+});
