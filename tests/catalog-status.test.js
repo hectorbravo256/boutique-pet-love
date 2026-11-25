@@ -22,7 +22,7 @@ test("missing, inactive, malformed and upstream failures",async()=>{
  assert.equal(await errorResponse(404,"HEAD").text(),"");
 });
 test("edge scope and shopping rewrite preserved",()=>{
- assert.deepEqual(config.path,["/producto/*","/categoria/*"]);
+ assert.deepEqual(config.path,["/","/producto/*","/categoria/*"]);
  const toml=readFileSync(new URL("../netlify.toml",import.meta.url),"utf8");
  assert.match(toml,/from = "\/google-shopping.xml"\s+to = "\/\.netlify\/functions\/google-shopping"/);
  assert.match(toml,/from = "\/\*"\s+to = "\/404.html"\s+status = 404/);
