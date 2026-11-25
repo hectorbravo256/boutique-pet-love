@@ -1,3 +1,4 @@
+import {fetchCategory,renderCategoryHtml} from "../lib/category-html.js";
 import {fetchHomeCategories,renderHomeHtml} from "../lib/home-html.js";
 import {fetchPublicProduct,renderProductHtml} from "../lib/product-html.js";
 export async function catalogStatus(path, env, fetcher = fetch) {
@@ -66,6 +67,17 @@ export default async function handler(request,context){
  if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
  const html=await response.text();
  const rendered=renderProductHtml(html,result.product,url.searchParams.get("variant"));
+ const headers=new Headers(response.headers);
+ for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
+ headers.set("Cache-Control","no-store");
+ return new Response(rendered||html,{status:200,headers});
+ }
+ if(/^\/categoria\//i.test(url.pathname)){
+ const result=await fetchCategory(url.pathname,k=>Netlify.env.get(k));
+ if(result.status!==200)return errorResponse(result.status,request.method);
+ const response=await context.next();
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
+ const html=await response.text(),rendered=renderCategoryHtml(html,result.category,result.products);
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
