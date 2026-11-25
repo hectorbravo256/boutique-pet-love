@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import NotFound from "./NotFound";
@@ -15,6 +15,7 @@ export default function Category() {
   const { slug } = useParams();
 
   const [seed] = useState(() => initialCategory?.category?.slug === slug ? initialCategory : null);
+  const initialRoute=useRef(seed?.category?.slug??null);
   const [products, setProducts] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.products : []);
   const [category, setCategory] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.category : null);
   const [loadResult, setLoadResult] = useState(null);
@@ -125,9 +126,11 @@ const seoUrl =
 useEffect(() => {
 
   let cancelled = false;
-  if (seed?.category?.slug === slug && initialCategory === seed) {
+  if (initialRoute.current === slug && seed) {
+    initialCategory=null;
     setCategory(seed.category); setProducts(seed.products); setLoadResult(null); return;
   }
+  initialRoute.current=null;
   initialCategory=null;
   setCategory(null); setProducts([]); setLoadResult(null);
   const cargar = async () => {
