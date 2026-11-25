@@ -3,7 +3,7 @@ import { ShoppingBag, MessageCircle, ShoppingCart, Instagram } from "lucide-reac
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "./supabaseClient";
 
-const WHATSAPP = "https://wa.me/56982700002";
+const WHATSAPP = "#";
 
 export default function Layout() {
 
@@ -522,7 +522,7 @@ useEffect(() => {
 
   {/* INSTAGRAM */}
   <a
-  href="https://instagram.com/boutique_petlove"
+  href="#"
   target="_blank"
   rel="noreferrer"
   aria-label="Instagram Boutique Pet Love"
