@@ -14,6 +14,7 @@ if (typeof document !== "undefined") {
 export default function Category() {
   const { slug } = useParams();
 
+  const [seed] = useState(() => initialCategory?.category?.slug === slug ? initialCategory : null);
   const [products, setProducts] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.products : []);
   const [category, setCategory] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.category : null);
   const [loadResult, setLoadResult] = useState(null);
@@ -124,9 +125,10 @@ const seoUrl =
 useEffect(() => {
 
   let cancelled = false;
-  if (initialCategory?.category?.slug === slug) {
-    setCategory(initialCategory.category); setProducts(initialCategory.products); setLoadResult(null); initialCategory=null; return;
+  if (seed?.category?.slug === slug && initialCategory === seed) {
+    setCategory(seed.category); setProducts(seed.products); setLoadResult(null); return;
   }
+  initialCategory=null;
   setCategory(null); setProducts([]); setLoadResult(null);
   const cargar = async () => {
 
