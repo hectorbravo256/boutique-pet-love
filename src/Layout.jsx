@@ -15,6 +15,11 @@ export default function Layout() {
   const [toast, setToast] = useState(null);
   const [toastTimeout, setToastTimeout] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [loadingCategories,setLoadingCategories]=useState(true);
+  const [initialCategories]=useState(()=> {
+    const el=document.getElementById("bpl-home-categories");
+    try {const rows=JSON.parse(el?.textContent||"null");return location.pathname==="/"&&Array.isArray(rows)&&rows.every(c=>c.active===true&&typeof c.slug==="string"&&typeof c.name==="string")?rows:null;}catch{return null;}
+  });
 	
 const formatPrice = (price = 0) =>
   `$${Number(price).toLocaleString("es-CL")}`;
@@ -148,23 +153,25 @@ useEffect(() => {
 
 
 useEffect(() => {
-
+  document.getElementById("bpl-home-categories")?.remove();
+  if(initialCategories!==null){setCategories(initialCategories);setLoadingCategories(false);return;}
+  let cancelled=false;
   const fetchCategories = async () => {
 
     const { data } = await supabase
       .from("categories")
-      .select("id,name,slug,sort_order" )
+      .select("id,name,slug,active,featured_image,image,sort_order")
       .eq("active", true)
       .order("sort_order", {
         ascending: true
       });
 
-    setCategories(data || []);
+    if(!cancelled){setCategories(data || []);setLoadingCategories(false);}
 
   };
 
   fetchCategories();
-
+  return()=>{cancelled=true;};
 }, []);
 
   return (
@@ -625,7 +632,7 @@ useEffect(() => {
       {/* 🔽 CONTENIDO DINÁMICO */}
       <div>
         <main id="main-content">
- 	 		<Outlet />
+ 	 		<Outlet context={{categories,loadingCategories}} />
 		</main>
          
 
