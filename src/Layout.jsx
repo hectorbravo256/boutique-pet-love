@@ -18,6 +18,7 @@ export default function Layout() {
   const [loadingCategories,setLoadingCategories]=useState(true);
   const categoryRequest=useRef(null);
   const initialPath=useRef(location.pathname);
+  const categoriesLoaded=useRef(false);
   const [initialCategories]=useState(()=> {
     const el=document.getElementById("bpl-home-categories");
     try {const rows=JSON.parse(el?.textContent||"null");return location.pathname==="/"&&Array.isArray(rows)&&rows.every(c=>c.active===true&&typeof c.slug==="string"&&typeof c.name==="string")?rows:null;}catch{return null;}
@@ -156,8 +157,9 @@ useEffect(() => {
 
 useEffect(() => {
   document.getElementById("bpl-home-categories")?.remove();
-  if(initialPath.current===location.pathname&&initialCategories!==null){setCategories(initialCategories);setLoadingCategories(false);return;}
+  if(initialPath.current===location.pathname&&initialCategories!==null){categoriesLoaded.current=true;setCategories(initialCategories);setLoadingCategories(false);return;}
   initialPath.current=null;
+  if(categoriesLoaded.current&&location.pathname!=="/")return;
   let cancelled=false;
   const fetchCategories = async () => {
 
@@ -169,7 +171,7 @@ useEffect(() => {
         ascending: true
       })).finally(()=>{categoryRequest.current=null;}));
 
-    if(!cancelled){setCategories(data || []);setLoadingCategories(false);}
+    if(!cancelled){categoriesLoaded.current=true;setCategories(data || []);setLoadingCategories(false);}
 
   };
 
