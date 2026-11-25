@@ -138,7 +138,7 @@ useEffect(() => {
     // Buscar categoría por slug
     const { data: categoryData, error: categoryError } = await supabase
       .from("categories")
-      .select("*")
+      .select("id,name,slug,image,active,sort_order,featured_image,seo_title,seo_description,seo_text")
       .eq("slug", slug)
       .eq("active", true)
       .single();
@@ -152,9 +152,9 @@ useEffect(() => {
     const { data, error } = await supabase
       .from("products")
       .select(`
-        *,
-        product_images (*),
-        product_variants (*)
+        id,name,description,category,image,active,discount_active,discount_percent,discount_start,discount_end,featured,slug,meta_title,meta_description,seo_keywords,new_collection,best_seller,luxury,exclusive,gender,
+        product_images (id,product_id,url,sort_order),
+        product_variants (id,product_id,size,price,stock)
       `)
       .in("category", [
   categoryData.slug,
