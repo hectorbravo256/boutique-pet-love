@@ -2,7 +2,7 @@
   NODE_VERSION = "20"
 
 [build]
-  command = "node scripts/test-build-guard.mjs && node ./node_modules/vite/bin/vite.js build"
+  command = "node scripts/test-build-guard.mjs && node scripts/generate-test-fixtures.mjs && node ./node_modules/vite/bin/vite.js build"
   publish = "dist"
   edge_functions = "netlify/test-disabled-edge"
 
