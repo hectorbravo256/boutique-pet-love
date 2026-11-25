@@ -4,11 +4,18 @@ import { supabase } from "./supabaseClient";
 import NotFound from "./NotFound";
 import { Helmet } from "react-helmet-async";
 
+import { categorySeo } from "../netlify/lib/category-html.js";
+let initialCategory = null;
+if (typeof document !== "undefined") {
+ const seed=document.getElementById("bpl-category-seed");
+ try { if(seed) initialCategory=JSON.parse(seed.textContent); } catch {}
+ seed?.remove();
+}
 export default function Category() {
   const { slug } = useParams();
 
-  const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState(null);
+  const [products, setProducts] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.products : []);
+  const [category, setCategory] = useState(() => initialCategory?.category?.slug === slug ? initialCategory.category : null);
   const [loadResult, setLoadResult] = useState(null);
 
   const categoryName = slug
@@ -117,6 +124,9 @@ const seoUrl =
 useEffect(() => {
 
   let cancelled = false;
+  if (initialCategory?.category?.slug === slug) {
+    setCategory(initialCategory.category); setProducts(initialCategory.products); setLoadResult(null); initialCategory=null; return;
+  }
   setCategory(null); setProducts([]); setLoadResult(null);
   const cargar = async () => {
 
@@ -247,6 +257,7 @@ return (
 >
   {JSON.stringify(itemListSchema)}
 </script>
+<script type="application/ld+json">{JSON.stringify(categorySeo(category,products).breadcrumbs)}</script>
 
     <script
   type="application/ld+json"
@@ -268,7 +279,7 @@ return (
   overflow-x-hidden
 ">
 
-  <h2 className="
+  <h1 className="
   text-2xl
   md:text-4xl
   font-black
@@ -277,7 +288,7 @@ return (
   tracking-wide
 ">
   {category?.name || categoryName}
-</h2>
+</h1>
 
 <div className="
   grid
