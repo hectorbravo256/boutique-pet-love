@@ -16,7 +16,7 @@ export async function fetchHomeCategories(env,fetcher=fetch){
 }
 export function renderHomeHtml(html,categories){
  if(!html.includes('<div id="root"></div>'))return null;
- const rows=(categories||[]).filter(c=>c.active===true&&validSlug(c.slug)&&c.name);
+ const rows=(categories||[]).filter(c=>c.active===true&&validSlug(c.slug)&&c.name).map(c=>({id:c.id,active:true,name:c.name,slug:c.slug,featured_image:imageUrl(c.featured_image||c.image),image:null,sort_order:c.sort_order}));
  const cards=rows.map(c=>'<a class="group rounded-3xl overflow-hidden bg-white shadow-sm" href="/categoria/'+esc(encodeURIComponent(c.slug))+'"><img loading="lazy" width="280" height="350" style="width:100%;aspect-ratio:4/5;object-fit:cover" src="'+esc(imageUrl(c.featured_image||c.image))+'" alt="'+esc("Colección "+c.name+" de Boutique Pet Love")+'"><div class="p-4 text-center font-black text-gray-800 text-lg bg-white">'+esc(c.name)+'</div></a>').join("");
  const body='<div id="root"><div class="bg-pink-50 min-h-screen"><section id="catalogo" class="p-6"><div class="mb-6"><h1 class="text-3xl font-bold">Ropa para perros y mascotas en Chile</h1><p class="text-gray-700 mt-1">Explora nuestra tienda online de abrigos, vestidos, disfraces y ropa para ocasiones especiales. Encuentra la talla adecuada para tu mascota y recibe tu pedido en Chile.</p></div><div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">'+cards+'</div></section></div></div>';
  const seed=categories===null?"":'<script id="bpl-home-categories" type="application/json">'+JSON.stringify(rows).replace(/</g,"\\u003c")+'</script>';
