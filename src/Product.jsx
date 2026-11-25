@@ -363,10 +363,10 @@ const seoDescription =
 
 const seoImage =
   product.product_images?.[0]?.url ||
-  "https://boutiquepetlove.cl/logo-google.webp";
+  "https://boutique-pet-love-test.netlify.app/logo-google.webp";
 
 const seoUrl =
-  `https://boutiquepetlove.cl/producto/${product.slug}`;
+  `https://boutique-pet-love-test.netlify.app/producto/${product.slug}`;
 
   const productSchema = buildProductSchema(product);
 
@@ -380,7 +380,7 @@ const seoUrl =
       "@type": "ListItem",
       position: 1,
       name: "Inicio",
-      item: "https://boutiquepetlove.cl"
+      item: "https://boutique-pet-love-test.netlify.app"
     },
 
     {
@@ -389,7 +389,7 @@ const seoUrl =
       name: product.category,
 
       item:
-        `https://boutiquepetlove.cl/categoria/${categorySlug(product.category)}`
+        `https://boutique-pet-love-test.netlify.app/categoria/${categorySlug(product.category)}`
     },
 
     {
