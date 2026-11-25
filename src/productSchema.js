@@ -1,4 +1,4 @@
-const site = "https://boutiquepetlove.cl";
+const site = "https://boutique-pet-love-test.netlify.app";
 export function categorySlug(value) {
  return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().replace(/\s*-\s*/g,"-").replace(/\s+/g,"-");
 }
