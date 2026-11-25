@@ -141,7 +141,7 @@ const showToast = (message) => {
 useEffect(() => {
 
   document.body.style.overflow =
-    menuOpen || cartOpen ? "hidden" : "auto";
+    menuOpen ? "hidden" : "auto";
 
   return () => {
     document.body.style.overflow = "auto";
