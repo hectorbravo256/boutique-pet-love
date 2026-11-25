@@ -6,6 +6,7 @@ DO $review$
 DECLARE r record; f record; body text; ddl text;
 BEGIN
 FOR r IN SELECT * FROM (VALUES
+('confirmar_venta_online(text,jsonb)','0285e8486e2c75561ed925b53a3d1171'),
 ('apply_physical_count(uuid)','bae83b007aceec5da42c9652936467ce'),
 ('convertir_reserva_a_venta(bigint)','126f9891d4a515c4cd206a21ff367552'),
 ('crear_reserva(text,text,text,text,text,text,text,text,boolean,jsonb,numeric,text,text,text)','92c32b531e3f0b88f787fe47f60e65d0'),
@@ -26,15 +27,41 @@ FOR r IN SELECT * FROM (VALUES
  SELECT p.oid,p.prosrc,pg_get_functiondef(p.oid) AS definition INTO STRICT f FROM pg_proc p WHERE p.oid=to_regprocedure('public.'||r.signature);
  IF md5(f.prosrc) <> r.fingerprint THEN RAISE EXCEPTION 'Definition changed: %',r.signature; END IF;
  IF regexp_count(f.prosrc,'(?im)^\s*begin\s*$') <> 1 THEN RAISE EXCEPTION 'Unexpected block: %',r.signature; END IF;
+ IF r.signature='confirmar_venta_online(text,jsonb)' THEN
+  body := f.prosrc;
+ ELSE
  body := regexp_replace(f.prosrc,'(?im)^(\s*begin)[ \t]*$',E'\\1\n IF NOT private.is_admin() THEN RAISE EXCEPTION ''Acceso administrativo no autorizado'' USING ERRCODE = ''42501''; END IF;');
- IF body=f.prosrc OR strpos(f.definition,f.prosrc)=0 THEN RAISE EXCEPTION 'Cannot generate: %',r.signature; END IF;
+ END IF;
+ IF (body=f.prosrc AND r.signature<>'confirmar_venta_online(text,jsonb)') OR strpos(f.definition,f.prosrc)=0 THEN RAISE EXCEPTION 'Cannot generate: %',r.signature; END IF;
  IF r.signature='apply_physical_count(uuid)' THEN
   IF regexp_count(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*$')<>1 THEN RAISE EXCEPTION 'Legacy check not uniquely identified'; END IF;
   body := regexp_replace(body,'(?im)^[ \t]*if \(auth\.jwt\(\)->>''email''\) is distinct from [^\n]+end if;[ \t]*$','');
  END IF;
  -- Qualify only audited relation references, not CREATE TEMP TABLE names.
- body := regexp_replace(body,'(?i)(\m(?:FROM|INTO|JOIN)[ \t]+)(tmp_sale_items|tmp_repair_items|tmp_reentry_items)\M','\1pg_temp.\2','g');
+ body := regexp_replace(body,'(?i)(\m(?:FROM|INTO|JOIN)[ \t]+)(tmp_sale_items|tmp_repair_items|tmp_reentry_items|tmp_online_sale_items)\M','\1pg_temp.\2','g');
  ddl := replace(f.definition,f.prosrc,body);
+ -- Preserve empty paths; pin other routines to trusted schemas, temp last.
+ IF r.signature NOT IN ('apply_physical_count(uuid)','create_physical_count(text,text,text,text)','registrar_abono_reserva(bigint,numeric,text,text,text)') THEN
+  ddl := regexp_replace(ddl,'(?im)^ SET search_path TO [^\n]+\n','');
+  ddl := replace(ddl,'AS $function
+ INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
+END LOOP;
+END $review$;
+SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
+-- No candidate executed. Export securely outside repository.
+-- Review exact diffs and test temp collision, repeated calls and search_path before granting.
+ROLLBACK;
+,E'SET search_path TO pg_catalog, public, pg_temp\nAS $function
+ INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
+END LOOP;
+END $review$;
+SELECT signature,original_ddl,candidate_ddl FROM rpc_review_candidates ORDER BY signature;
+-- No candidate executed. Export securely outside repository.
+-- Review exact diffs and test temp collision, repeated calls and search_path before granting.
+ROLLBACK;
+);
+  IF strpos(ddl,'SET search_path TO pg_catalog, public, pg_temp')=0 THEN RAISE EXCEPTION 'Cannot pin search path: %',r.signature; END IF;
+ END IF;
  INSERT INTO rpc_review_candidates VALUES(r.signature,f.definition,ddl);
 END LOOP;
 END $review$;
