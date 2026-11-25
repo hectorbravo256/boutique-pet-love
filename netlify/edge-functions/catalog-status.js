@@ -48,67 +48,96 @@ export function createCatalogCache({ttl=60000,max=1000,clock=Date.now,lookup=cat
  };
 }
 const cachedCatalogStatus=createCatalogCache();
+// Request-local metrics; never record URLs, headers, bodies or customer data.
+export function createPerformanceMetrics({clock=()=>performance.now(),fetcher=fetch,logger=console.log}={}){
+ const start=clock(),m={queries:0,upstreamMs:0,upstreamBytes:0,baseMs:0,renderMs:0,htmlBytes:0};
+ const bytes=s=>new TextEncoder().encode(s).byteLength;
+ const measuredFetch=async(...args)=>{
+  const t=clock();m.queries++;
+  try{
+   const response=await fetcher(...args);
+   if(!response.ok)return response;
+   // Measure decoded body bytes, not compressed network transfer.
+   const body=await response.text();m.upstreamBytes+=bytes(body);
+   return new Response(body,{status:response.status,statusText:response.statusText,headers:response.headers});
+  }finally{m.upstreamMs+=clock()-t;}
+ };
+ const base=async fn=>{const t=clock();try{return await fn();}finally{m.baseMs+=clock()-t;}};
+ const render=fn=>{const t=clock();try{const result=fn();return result;}finally{m.renderMs+=clock()-t;}};
+ const finish=(response,route,html)=>{
+  if(html!==undefined)m.htmlBytes=bytes(html);
+  const round=n=>Math.round(n*100)/100;
+  const total=round(clock()-start);
+  const headers=new Headers(response.headers);
+  headers.append("Server-Timing",["supabase;dur="+round(m.upstreamMs),"htmlbase;dur="+round(m.baseMs),"render;dur="+round(m.renderMs),"edge;dur="+total,"queries;desc=\""+m.queries+"\"","upstream_bytes;desc=\""+m.upstreamBytes+"\"","html_bytes;desc=\""+m.htmlBytes+"\""].join(", "));
+  logger(JSON.stringify({event:"catalog_performance",route,status:response.status,queries:m.queries,upstreamMs:round(m.upstreamMs),upstreamBytes:m.upstreamBytes,baseMs:round(m.baseMs),renderMs:round(m.renderMs),htmlBytes:m.htmlBytes,totalMs:total}));
+  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+ };
+ return {fetch:measuredFetch,base,render,finish};
+}
 export default async function handler(request,context){
  if(!["GET","HEAD"].includes(request.method))return;
  const url=new URL(request.url);
+ const metrics=createPerformanceMetrics();
+ const route=url.pathname==="/"?"home":({producto:"product",categoria:"category",genero:"gender",coleccion:"collection"}[url.pathname.split("/")[1].toLowerCase()]||"other");
  if(url.pathname==="/"){
- const response=await context.next();
- if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
- const categories=await fetchHomeCategories(k=>Netlify.env.get(k));
- const html=await response.text();
- const rendered=renderHomeHtml(html,categories);
+ const response=await metrics.base(()=>context.next());
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return metrics.finish(response,route);
+ const categories=await fetchHomeCategories(k=>Netlify.env.get(k),metrics.fetch);
+ const html=await metrics.base(()=>response.text());
+ const rendered=metrics.render(()=>renderHomeHtml(html,categories));
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
- return new Response(rendered||html,{status:200,headers});
+ return metrics.finish(new Response(rendered||html,{status:200,headers}),route,rendered||html);
  }
  if(/^\/producto\//i.test(url.pathname)){
- const result=await fetchPublicProduct(url.pathname,k=>Netlify.env.get(k));
- if(result.status!==200)return errorResponse(result.status,request.method);
- const response=await context.next();
- if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
- const html=await response.text();
- const rendered=renderProductHtml(html,result.product,url.searchParams.get("variant"));
+ const result=await fetchPublicProduct(url.pathname,k=>Netlify.env.get(k),metrics.fetch);
+ if(result.status!==200)return metrics.finish(errorResponse(result.status,request.method),route);
+ const response=await metrics.base(()=>context.next());
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return metrics.finish(response,route);
+ const html=await metrics.base(()=>response.text());
+ const rendered=metrics.render(()=>renderProductHtml(html,result.product,url.searchParams.get("variant")));
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
- return new Response(rendered||html,{status:200,headers});
+ return metrics.finish(new Response(rendered||html,{status:200,headers}),route,rendered||html);
  }
  if(/^\/categoria\//i.test(url.pathname)){
- const result=await fetchCategory(url.pathname,k=>Netlify.env.get(k));
- if(result.status!==200)return errorResponse(result.status,request.method);
- const response=await context.next();
- if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
- const html=await response.text(),rendered=renderCategoryHtml(html,result.category,result.products);
+ const result=await fetchCategory(url.pathname,k=>Netlify.env.get(k),metrics.fetch);
+ if(result.status!==200)return metrics.finish(errorResponse(result.status,request.method),route);
+ const response=await metrics.base(()=>context.next());
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return metrics.finish(response,route);
+ const html=await metrics.base(()=>response.text()),rendered=metrics.render(()=>renderCategoryHtml(html,result.category,result.products));
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
- return new Response(rendered||html,{status:200,headers});
+ return metrics.finish(new Response(rendered||html,{status:200,headers}),route,rendered||html);
  }
  if(/^\/genero\//.test(url.pathname)){
- const result=await fetchGender(url.pathname,k=>Netlify.env.get(k));
- if(result.status!==200)return errorResponse(result.status,request.method);
- const response=await context.next();
- if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
- const html=await response.text(),rendered=renderGenderHtml(html,result.slug,result.products);
+ const result=await fetchGender(url.pathname,k=>Netlify.env.get(k),metrics.fetch);
+ if(result.status!==200)return metrics.finish(errorResponse(result.status,request.method),route);
+ const response=await metrics.base(()=>context.next());
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return metrics.finish(response,route);
+ const html=await metrics.base(()=>response.text()),rendered=metrics.render(()=>renderGenderHtml(html,result.slug,result.products));
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
- return new Response(rendered||html,{status:200,headers});
+ return metrics.finish(new Response(rendered||html,{status:200,headers}),route,rendered||html);
  }
  if(/^\/coleccion\//.test(url.pathname)){
- const result=await fetchCollection(url.pathname,k=>Netlify.env.get(k));
- if(result.status!==200)return errorResponse(result.status,request.method);
- const response=await context.next();
- if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
- const html=await response.text(),rendered=renderCollectionHtml(html,result.slug,result.products);
+ const result=await fetchCollection(url.pathname,k=>Netlify.env.get(k),metrics.fetch);
+ if(result.status!==200)return metrics.finish(errorResponse(result.status,request.method),route);
+ const response=await metrics.base(()=>context.next());
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return metrics.finish(response,route);
+ const html=await metrics.base(()=>response.text()),rendered=metrics.render(()=>renderCollectionHtml(html,result.slug,result.products));
  const headers=new Headers(response.headers);
  for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
  headers.set("Cache-Control","no-store");
- return new Response(rendered||html,{status:200,headers});
+ return metrics.finish(new Response(rendered||html,{status:200,headers}),route,rendered||html);
  }
- const status=await cachedCatalogStatus(url.pathname,k=>Netlify.env.get(k));
+ const status=await cachedCatalogStatus(url.pathname,k=>Netlify.env.get(k),metrics.fetch);
  if(status===200)return;
- return errorResponse(status,request.method);
+ return metrics.finish(errorResponse(status,request.method),route);
 }
 export const config={path:["/","/producto/*","/categoria/*","/genero/*","/coleccion/*"]};
