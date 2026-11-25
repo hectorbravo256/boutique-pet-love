@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
   useParams,
@@ -22,6 +22,7 @@ export default function Gender() {
 
 
   const [seed] = useState(()=>initialGender?.category?.slug===slug?initialGender:null);
+  const initialRoute=useRef(seed?.category?.slug??null);
   const [products, setProducts] = useState(()=>seed?.products||[]);
   const [loadedSlug,setLoadedSlug]=useState(()=>seed?slug:null);
   const [failed,setFailed]=useState(false);
@@ -31,7 +32,8 @@ export default function Gender() {
 
   useEffect(()=>{
     if(!validGender(slug))return;
-    if(seed?.category?.slug===slug&&initialGender===seed)return;
+    if(initialRoute.current===slug&&seed){initialGender=null;return;}
+    initialRoute.current=null;
     initialGender=null;
     let cancelled=false;
     setLoading(true);setFailed(false);
