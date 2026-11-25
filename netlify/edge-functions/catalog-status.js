@@ -1,3 +1,4 @@
+import {fetchHomeCategories,renderHomeHtml} from "../lib/home-html.js";
 import {fetchPublicProduct,renderProductHtml} from "../lib/product-html.js";
 export async function catalogStatus(path, env, fetcher = fetch) {
  const match = /^\/(producto|categoria)\/([^/]+)\/?$/i.exec(path);
@@ -47,6 +48,17 @@ const cachedCatalogStatus=createCatalogCache();
 export default async function handler(request,context){
  if(!["GET","HEAD"].includes(request.method))return;
  const url=new URL(request.url);
+ if(url.pathname==="/"){
+ const response=await context.next();
+ if(request.method==="HEAD"||response.status!==200||!response.headers.get("content-type")?.includes("text/html"))return response;
+ const categories=await fetchHomeCategories(k=>Netlify.env.get(k));
+ const html=await response.text();
+ const rendered=renderHomeHtml(html,categories);
+ const headers=new Headers(response.headers);
+ for(const key of ["content-length","content-encoding","etag","last-modified"])headers.delete(key);
+ headers.set("Cache-Control","no-store");
+ return new Response(rendered||html,{status:200,headers});
+ }
  if(/^\/producto\//i.test(url.pathname)){
  const result=await fetchPublicProduct(url.pathname,k=>Netlify.env.get(k));
  if(result.status!==200)return errorResponse(result.status,request.method);
@@ -63,4 +75,4 @@ export default async function handler(request,context){
  if(status===200)return;
  return errorResponse(status,request.method);
 }
-export const config={path:["/producto/*","/categoria/*"]};
+export const config={path:["/","/producto/*","/categoria/*"]};
