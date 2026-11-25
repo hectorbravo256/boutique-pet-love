@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import NotFound from "./NotFound";
@@ -13,7 +13,13 @@ export default function Product() {
   const requestedVariant = searchParams.get("variant");
 
   
-  const [product, setProduct] = useState(null);
+  const [seed]=useState(()=>{
+    const el=document.getElementById("bpl-product-seed");
+    try{const p=JSON.parse(el?.textContent||"null");return p?.slug===slug&&p.active===true&&Array.isArray(p.product_variants)&&Array.isArray(p.product_images)?p:null;}catch{return null;}
+  });
+  const initialRoute=useRef(seed?slug:null);
+  const trackedSeed=useRef(false);
+  const [product, setProduct] = useState(seed);
   const [loadResult, setLoadResult] = useState(null);
   const [selected, setSelected] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -204,7 +210,14 @@ const prevImage = () => {
 
   /* ================= CARGA DATOS ================= */
   useEffect(() => {
+    document.getElementById("bpl-product-seed")?.remove();
+    if(initialRoute.current===slug&&seed){
+      if(!trackedSeed.current&&window.gtag){window.gtag("event","view_item",{currency:"CLP",items:[{item_id:seed.id,item_name:seed.name,item_category:seed.category}]});trackedSeed.current=true;}
+      return;
+    }
+    initialRoute.current=null;
     let cancelled = false;
+    setCurrentIndex(0);
     setProduct(null);
     setLoadResult(null);
     const cargar = async () => {
